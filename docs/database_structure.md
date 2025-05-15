@@ -33,7 +33,7 @@
 |---------|---------|------|------|--------|
 | subject_code | TEXT | NO | シラバス管理番号 | シラバス検索画面 |
 | name | TEXT | NO | 科目名 | シラバス検索画面 |
-| class_name | TEXT | YES | 科目区分 | シラバス検索画面 |
+| class_name | TEXT | NO | 科目区分 | シラバス検索画面 |
 | subclass_name | TEXT | YES | 科目小区分 | シラバス検索画面 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
@@ -68,8 +68,8 @@
 | grade_d1 | BOOLEAN | NO | 博士1年履修可能 | Web Syllabus |
 | grade_d2 | BOOLEAN | NO | 博士2年履修可能 | Web Syllabus |
 | grade_d3 | BOOLEAN | NO | 博士3年履修可能 | Web Syllabus |
-| campus | TEXT | NO | 開講キャンパス | Web Syllabus |
-| credits | INTEGER | NO | 単位数 | Web Syllabus |
+| campus | VARCHAR(6) | NO | 開講キャンパス | Web Syllabus |
+| credits | TINYINT | NO | 単位数 | Web Syllabus |
 | lecture_code | TEXT | NO | 開講コード | Web Syllabus |
 | summary | TEXT | YES | 授業概要 | Web Syllabus |
 | goals | TEXT | YES | 到達目標 | Web Syllabus |
@@ -134,7 +134,7 @@
 |---------|---------|------|------|--------|
 | instructor_code | TEXT | NO | 教職員番号 | Web Syllabus |
 | name | TEXT | NO | 氏名 | Web Syllabus |
-| name_kana | TEXT | NO | 氏名（カナ） | Web Syllabus |
+| name_kana | TEXT | YES | 氏名（カナ） | Web Syllabus |
 | name_en | TEXT | YES | 氏名（英語） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
@@ -187,7 +187,6 @@
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
 | session_number | INTEGER | NO | 回数 | Web Syllabus |
-| instructor_code | TEXT | YES | 担当教職員番号 | Web Syllabus |
 | description | TEXT | NO | 内容 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
@@ -301,10 +300,19 @@
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| criteria_type | TEXT | NO | 評価種別 | Web Syllabus |
-| ratio | INTEGER | NO | 評価比率（%） | Web Syllabus |
+| criteria_type | VARCHAR(4) | NO | 評価種別（'平常'：平常点、'小テ'：小テスト、'定期'：定期試験、'レポ'：レポート、'他'：その他、'自由'：自由記載） | Web Syllabus |
+| ratio | TINYINT | YES | 評価比率（%） ※自由記載の場合はNULL | Web Syllabus |
 | note | TEXT | YES | 備考 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### 制約
+- criteria_typeは以下のいずれかの値のみ許可：
+  - '平常'：平常点
+  - '小テ'：小テスト
+  - '定期'：定期試験
+  - 'レポ'：レポート
+  - '他'：その他
+  - '自由'：自由記載（この場合、ratioはNULLとなり、noteのみ使用）
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
@@ -330,7 +338,7 @@
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| faculty | TEXT | NO | 開講学部/課程 | Web Syllabus |
+| faculty | VARCHAR(60) | NO | 開講学部/課程 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
