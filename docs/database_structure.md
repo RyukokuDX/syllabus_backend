@@ -36,7 +36,7 @@ CREATE TABLE syllabus (
     methods TEXT,                        -- 授業方法
     outside_study TEXT,                  -- 授業外学習
     prerequisites TEXT,                  -- 履修条件
-    notes TEXT                          -- 備考
+    notes TEXT                           -- 備考
 );
 ```
 
