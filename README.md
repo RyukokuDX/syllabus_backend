@@ -8,8 +8,7 @@
   - `database_policy.md`: データベース設計ポリシー
   - `database_er.md`: データベースER図
   - `server.md`: サーバー構成の説明
-  - `docker_structure.md`: 本番環境のDocker構成
-  - `docker_structure_develop.md`: 開発環境のDocker構成
+  - `docker_structure.md`: Docker構成
 
 - `src/`: ソースコード
   - `syllabus/`: シラバス
@@ -22,10 +21,7 @@
 - `docker/`: Docker関連ファイル
   - `api/`: APIサーバー用
     - `Dockerfile`: 本番用Dockerfile
-    - `Dockerfile.dev`: 開発用Dockerfile
     - `requirements.txt`: Pythonパッケージ依存関係
-  - `db/`: データベース用
-    - `init.sql`: 初期化SQL
 
 - `db/`: データベースファイル
 
@@ -36,24 +32,22 @@
 
 ## サーバー構成
 - [API仕様](docs/server.md)
-- [Docker共通仕様](docs/docker.md)
-- [本番環境Docker構成](docs/docker_structure.md)
-- [開発環境Docker構成](docs/docker_structure_develop.md)
+- [Docker構成](docs/docker_structure.md)
 
-## 開発環境セットアップ
+## デプロイ方法
 ```bash
-# 開発環境の起動
-docker-compose -f docker-compose.dev.yml up -d
+# 環境変数の設定
+export DATABASE_URL="postgresql://user:password@your-db-host:5432/syllabus"
 
-# 開発環境の停止
-docker-compose -f docker-compose.dev.yml down
-```
+# コンテナのビルドと起動
+docker-compose up -d --build
 
-## 本番環境デプロイ
-```bash
-# 本番環境の起動
-docker-compose up -d
-
-# 本番環境の停止
+# コンテナの停止
 docker-compose down
 ```
+
+## 注意事項
+- データベースは外部のマネージドサービスまたは専用サーバーを使用
+- 環境変数は適切に管理
+- セキュリティ設定を確認
+- 定期的なバックアップを実施
