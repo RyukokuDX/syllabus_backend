@@ -6,6 +6,7 @@
 - `docs/`: プロジェクトのドキュメント
   - `database_structure.md`: データベース構造の定義
   - `database_policy.md`: データベース設計ポリシー
+  - `database_er.md`: データベースER図
   - `Server.md`: サーバー構成の説明
 
 - `src/`: ソースコード
@@ -21,6 +22,7 @@
 ## DB 構成
 - [DB構成ポリシー](docs/database_policy.md)
 - [DB構成仕様](docs/database_structure.md)
+- [DB ER図](docs/database_er.md)
 
 ## サーバー構成
 [Server.md](Server.md)
