@@ -5,25 +5,25 @@
 シラバス情報を提供するRESTful APIサーバー。FastAPIを使用して実装されています。
 
 ## 基本情報
-- ベースURL: `http://localhost:8000`
 - APIバージョン: v1
 - エンドポイントプレフィックス: `/api`
 
-## 認証
-- 現時点では認証なし（将来的に必要に応じて実装）
-
-## エンドポイント一覧
+## エンドポイント
 
 ### SQLクエリ実行
 
 #### エンドポイント 
 ```
-GET /api/
+POST /api/query
 ```
 
-#### クエリパラメータ
-- `query` (required): 実行するSQLクエリ文
-  - 例: `SELECT * FROM syllabus WHERE year = '2025'`
+#### リクエストボディ
+```json
+{
+  "query": "SELECT * FROM syllabus WHERE year = ? AND semester = ?",
+  "params": ["2025", "前期"]
+}
+```
 
 #### レスポンス
 ```json
@@ -31,15 +31,16 @@ GET /api/
   "status": "success",
   "data": [
     {
-      // SQLクエリの結果に応じた動的なJSONオブジェクト
-      // 例：
       "id": 1,
       "year": "2025",
-      "title": "プログラミング基礎"
+      "title": "プログラミング基礎",
+      "semester": "前期"
     }
   ],
-  "row_count": 1,
-  "execution_time": "0.123s"
+  "metadata": {
+    "row_count": 1,
+    "execution_time": "0.123s"
+  }
 }
 ```
 
@@ -56,174 +57,173 @@ GET /api/
 ```
 
 ### 制限事項
-- 使用許可命令
-  - .tables
-  - pragma
-  - select
-- 全テーブル使用許可
+- Content-Type: application/json
+- 最大リクエストサイズ: 1MB
+- 1リクエストにつき1つのSQLクエリのみ実行可能
+- セミコロン（;）による複数命令は禁止
 - 1回のクエリで返却される最大行数：1000行
 - クエリ実行の最大時間：30秒
-- 複数命令可（但し構文解析を行う)
 
-### 主なエラーコード
+### 使用可能な操作
+1. SELECT文
+```sql
+-- 基本的な検索
+SELECT * FROM syllabus WHERE year = ?
+
+-- 列の指定
+SELECT title, teacher, year FROM syllabus WHERE year = ?
+
+-- 集計関数
+SELECT COUNT(*) FROM syllabus WHERE year = ?
+```
+
+2. 検索条件
+```sql
+-- 完全一致
+WHERE column = ?
+
+-- あいまい検索
+WHERE title LIKE ? ESCAPE '\'
+-- パラメータ例: ["プログラミング%"]  -- 前方一致
+-- パラメータ例: ["%プログラミング%"]  -- 中間一致
+
+-- 範囲検索
+WHERE credit BETWEEN ? AND ?
+-- パラメータ例: [1, 4]
+```
+
+3. 使用可能な関数
+- 集計関数：COUNT, SUM, AVG, MAX, MIN
+- 文字列関数：UPPER, LOWER, TRIM
+- 日付関数：DATE, STRFTIME
+
+### 禁止されている操作
+- セミコロンを含むクエリ
+- サブクエリ
+- テーブル結合（JOIN）
+- データ更新操作（INSERT, UPDATE, DELETE等）
+- スキーマ操作（CREATE, ALTER, DROP等）
+- トランザクション操作（BEGIN, COMMIT, ROLLBACK）
+
+### エラーコード
 - 400: リクエストパラメータが不正
-- 403: 許可されていないSQLクエリ（SELECT以外）
+- 403: 許可されていないSQLクエリ
 - 404: リソースが見つからない
 - 408: クエリ実行がタイムアウト
 - 500: サーバー内部エラー
 
-## レート制限
-- 現時点では制限なし（将来的に必要に応じて実装）
+### セキュリティ対策
+1. パラメータ化されたクエリの使用
+- すべてのユーザー入力は必ずパラメータとして渡す
+- クエリ文字列への直接的な値の埋め込みは禁止
 
-## 注意事項
-- すべてのレスポンスはJSONフォーマットで返却
-- 日時フォーマットはISO 8601形式を使用
-- 文字エンコーディングはUTF-8
+2. クエリの検証
+- 構文解析による有効性確認
+- 禁止操作のチェック
+- 実行計画の検証
 
-## SQLインジェクションポリシー
-
-### 基本方針
-- すべてのSQLクエリは構文解析を経て実行される
-- パラメータ化されたクエリのみ受け付ける
-- 許可された命令のみ実行可能
-
-### パラメータ化
-1. クエリ形式
-```sql
--- 基本形式
-SELECT * FROM table WHERE column = ?
-
--- 複数パラメータ
-SELECT * FROM table WHERE column1 = ? AND column2 = ?
-
--- IN句の場合
-SELECT * FROM table WHERE column IN (?, ?, ?)
-```
-
-2. パラメータの受け渡し
+3. カラム指定の制限
+- 動的なカラム指定時はホワイトリストで検証
 ```json
 {
-  "query": "SELECT * FROM syllabus WHERE year = ? AND semester = ?",
-  "params": ["2025", "前期"]
+  "allowed_columns": {
+    "syllabus": ["id", "year", "title", "teacher", "semester", "credit"],
+    "departments": ["id", "name", "faculty"],
+    "teachers": ["id", "name", "title"]
+  }
 }
 ```
+- `SELECT *` の使用は監査ログに記録
 
-### 論理演算子の使用
-1. 基本形式
-```sql
--- ANDの使用
-SELECT * FROM table WHERE column1 = ? AND column2 = ?
-
--- ORの使用
-SELECT * FROM table WHERE column1 = ? OR column2 = ?
-
--- AND/ORの組み合わせ
-SELECT * FROM table WHERE (column1 = ? OR column2 = ?) AND column3 = ?
-```
-
-2. パラメータ化された論理演算の例
+4. LIKE句の保護
+- ワイルドカード使用パターンの監視
 ```json
 {
-  "query": "SELECT * FROM syllabus WHERE (year = ? OR year = ?) AND semester = ?",
-  "params": ["2024", "2025", "前期"]
-}
-```
-
-3. 複雑な条件の例
-```json
-{
-  "query": "SELECT * FROM syllabus WHERE (faculty = ? OR faculty = ?) AND (year = ? OR semester = ?) AND teacher = ?",
-  "params": ["文学部", "経済学部", "2025", "前期", "山田太郎"]
-}
-```
-
-4. 注意事項
-- 括弧`()`による優先順位の明示を推奨
-- 条件の複雑さに応じた適切なインデックスの使用
-- 過度に複雑な条件は実行計画の検証で制限される可能性あり
-
-### 構文解析プロセス
-1. クエリの分割
-   - セミコロンで区切られた複数のクエリを個別に解析
-   - 各クエリの構文を検証
-
-2. 命令の検証
-   - 許可された命令のみ実行可能
-     - `.tables`: テーブル一覧の取得
-     - `pragma`: テーブル情報の取得
-     - `select`: データの取得
-   - その他の命令は即時エラー
-
-3. セキュリティチェック
-   - テーブル名の検証
-   - カラム名の検証
-   - 条件句の検証
-
-### 複数命令実行
-```json
-{
-  "queries": [
-    {
-      "query": ".tables",
-      "params": []
-    },
-    {
-      "query": "SELECT * FROM syllabus WHERE year = ?",
-      "params": ["2025"]
-    },
-    {
-      "query": "PRAGMA table_info(syllabus)",
-      "params": []
-    }
+  "suspicious_patterns": [
+    "%--",
+    "%';",
+    "%;",
+    "%/*",
+    "%*/",
+    "%@@"
   ]
 }
 ```
+- 異常パターン検出時は警告ログを出力
+- 同一IPからの連続した異常パターンでブロック
 
-### エラー処理
-1. 構文エラー
+5. レスポンスフィールドの制限
+- デフォルトビューの定義
 ```json
 {
-  "status": "error",
-  "error": {
-    "code": "SYNTAX_ERROR",
-    "message": "SQLクエリの構文が不正です",
-    "details": "構文解析エラーの詳細",
-    "query_index": 0  // 複数クエリの場合、エラーが発生したクエリのインデックス
+  "default_views": {
+    "syllabus_public": ["title", "teacher", "semester", "credit"],
+    "syllabus_admin": ["*"],
+    "teachers_public": ["name", "title"]
+  }
+}
+```
+- アクセス権限に応じたフィールド制限
+- 機密情報を含むフィールドの除外
+
+6. 監査ログ
+```json
+{
+  "timestamp": "2024-03-20T10:30:00Z",
+  "level": "INFO",
+  "event": "QUERY_EXECUTION",
+  "details": {
+    "query": "SELECT * FROM syllabus WHERE year = ?",
+    "params": ["2025"],
+    "execution_time": "0.123s",
+    "query_analysis": {
+      "used_wildcards": false,
+      "used_functions": ["STRFTIME"],
+      "selected_columns": ["*"],
+      "table_access": ["syllabus"]
+    },
+    "client_info": {
+      "ip": "192.168.1.100",
+      "user_id": "user123",
+      "access_level": "public"
+    }
   }
 }
 ```
 
-2. 不正な命令
+7. 異常検知ルール
+- 関数使用頻度の監視
 ```json
 {
-  "status": "error",
-  "error": {
-    "code": "INVALID_COMMAND",
-    "message": "許可されていない命令が含まれています",
-    "details": "INSERT/UPDATE/DELETE等の命令は許可されていません",
-    "query_index": 1
+  "function_limits": {
+    "interval": "1hour",
+    "thresholds": {
+      "STRFTIME": 100,
+      "UPPER": 50,
+      "LOWER": 50,
+      "COUNT": 200
+    }
   }
 }
 ```
+- パターンベースの検知
+  - 同一IPからの特定関数の連続使用
+  - 通常とは異なる時間帯での関数使用
+  - 特定のテーブル・カラムへの集中的なアクセス
 
-3. パラメータエラー
-```json
-{
-  "status": "error",
-  "error": {
-    "code": "PARAM_ERROR",
-    "message": "パラメータの数が一致しません",
-    "details": "クエリのパラメータ数: 2, 提供されたパラメータ数: 1",
-    "query_index": 0
-  }
-}
-```
+8. ブロックポリシー
+- 段階的な制限
+  1. 警告ログの出力
+  2. レート制限の強化
+  3. 一時的なIPブロック
+  4. アカウントの停止
+- 管理者への通知
+  - Slack通知
+  - メール通知
+  - ダッシュボードでのアラート表示
 
-### セキュリティ上の注意
-- すべてのパラメータは型チェックを実施
-- エスケープ処理は自動的に実施
-- テーブル名やカラム名のホワイトリスト検証
-- クエリの実行前に必ずEXPLAINを実行
-- 実行計画の検証によるパフォーマンス保護
+### レート制限
+- 1分あたりの最大リクエスト数: 60
+- 超過した場合は429エラー（Too Many Requests）を返却
 
 [トップへ](#)

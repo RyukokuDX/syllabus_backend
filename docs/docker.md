@@ -2,11 +2,110 @@
 [readmeへ](../README.md)
 
 ## 概要
-本プロジェクトではDockerを使用して、開発環境と本番環境の一貫性を保ちます。
+FastAPIアプリケーションをコンテナ化して提供するための構成です。
+データベースは外部のマネージドサービスまたは専用サーバーを使用します。
 
-## 開発環境
-- APIサーバー: Dockerコンテナ
-- データベース: ローカルホスト（推奨）またはDockerコンテナ
+## ディレクトリ構造
+```
+.
+├── docker-compose.yml
+└── docker/
+    └── api/
+        ├── Dockerfile
+        └── requirements.txt
+```
+
+## 必要なパッケージ
+
+### Pythonパッケージ（本番環境用）
+- Web Framework
+  - fastapi==0.109.0
+    - 高速なAPIフレームワーク
+    - OpenAPI（Swagger）ドキュメント自動生成
+    - 型ヒントによる自動バリデーション
+    - JSONリクエスト/レスポンスの自動処理
+  - uvicorn==0.27.0
+    - ASGIサーバー
+    - 高パフォーマンスなサーバー実装
+  - pydantic==2.5.3
+    - データバリデーション
+    - 設定管理
+    - JSONシリアライズ/デシリアライズ
+    - SQLクエリのパラメータバリデーション
+  - pydantic-settings==2.1.0
+    - 環境変数からの設定読み込み
+    - 設定値の型チェック
+
+- データベース
+  - sqlalchemy==2.0.25
+    - ORMマッパー
+    - SQLクエリビルダー
+    - データベース抽象化レイヤー
+  - psycopg2-binary==2.9.9
+    - PostgreSQLドライバ
+    - バイナリ配布版（ビルド不要）
+  - alembic==1.13.1
+    - データベースマイグレーション
+    - スキーマバージョン管理
+
+- ユーティリティ
+  - python-dotenv==1.0.0
+    - .env ファイルの読み込み
+    - 環境変数管理
+  - requests==2.31.0
+    - HTTP通信
+    - 外部APIとの連携
+  - httpx==0.26.0
+    - 非同期HTTP通信
+  - typing-extensions==4.9.0
+    - 高度な型ヒント機能
+    - Python3.7以降の型機能の下位互換性
+
+- ロギング・モニタリング
+  - loguru==0.7.2
+    - 構造化ログ出力
+    - ログローテーション
+    - エラートレース出力
+  - prometheus-client==0.19.0
+    - メトリクス収集
+    - パフォーマンスモニタリング
+  - uvicorn-prometheus==0.5.0
+    - Uvicornのメトリクス収集
+    - リクエスト統計
+  - python-json-logger==2.0.7
+    - JSON形式でのログ出力
+    - ログの構造化
+
+- ヘルスチェック
+  - fastapi-health==0.4.0
+    - エンドポイントのヘルスチェック
+    - 依存サービスの状態確認
+    - カスタムヘルスチェックの実装
+  - APScheduler==3.10.4
+    - 定期的なヘルスチェック実行
+    - バックグラウンドタスク管理
+    - クロン形式のスケジュール設定
+
+### PostgreSQL
+- バージョン: 15
+  - 最新の安定版
+  - 高度な機能サポート
+  - セキュリティアップデート対応
+
+- 拡張機能:
+  - pg_trgm
+    - あいまい検索
+    - 文字列類似度検索
+    - インデックス最適化
+  - btree_gin
+    - 複数列インデックス
+    - 範囲検索の最適化
+  - pg_stat_statements
+    - SQLクエリの統計情報
+    - パフォーマンス分析
+    - クエリチューニング
+
+注：開発用ツール（black, flake8, pytest等）は開発環境で別途管理し、本番環境のrequirements.txtには含めません。
 
 ## コンテナ構成
 
@@ -14,102 +113,86 @@
 - イメージ: `python:3.11-slim`
 - ポート: 8000
 - 環境変数:
-  - `DATABASE_URL`: 環境に応じたDB接続情報
-  - `DEBUG_MODE`
-  - `LOG_LEVEL`
+  - `DATABASE_URL`: 外部DB接続情報
+  - `DEBUG_MODE`: false
+  - `LOG_LEVEL`: info
 
-## データベース運用方針
-- prostagesql
-- DB接続情報は環境変数で管理
-- SSL/TLS暗号化の強制
 
-## 監視と運用
-- コンテナのヘルスチェック
-- DBコネクションプールの適切な設定
-- クエリパフォーマンスの監視
-- リソース使用率の監視
-- ログ集中管理
+## ヘルスチェック設定
 
-## バックアップ方針
-- 本番DBの定期バックアップ
-- バックアップの自動化
-- リストア手順の文書化
+### エンドポイント
+```python
+# health_check.py
+from fastapi_health import health
 
-## ディレクトリ構造
-```
-.
-├── docker-compose.yml
-└── docker/
-    ├── api/
-    │   ├── Dockerfile
-    │   └── requirements.txt
-    └── db/
-        └── init.sql
+async def db_health_check():
+    # データベース接続確認
+    return True
+
+async def api_health_check():
+    # API全体の状態確認
+    return True
+
+app.add_api_route("/health", health([db_health_check, api_health_check]))
 ```
 
-## Docker共通仕様
+### 定期チェック
+```python
+# scheduler.py
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
-### 初期化SQL（init.sql）の用途
+scheduler = AsyncIOScheduler()
 
-#### 概要
-`init.sql`は、PostgreSQLコンテナが初めて起動する際に自動的に実行されるSQLスクリプトです。
-データベースの初期セットアップを自動化する目的で使用されます。
+# 5分ごとのヘルスチェック
+@scheduler.scheduled_job(CronTrigger(minute='*/5'))
+async def periodic_health_check():
+    # ヘルスチェック実行
+    pass
 
-#### 主な用途
-1. テーブルの作成
-```sql
-CREATE TABLE IF NOT EXISTS syllabus (
-    id SERIAL PRIMARY KEY,
-    year VARCHAR(4) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    -- その他のカラム
-);
+# メモリ使用量監視
+@scheduler.scheduled_job(CronTrigger(minute='*/15'))
+async def monitor_memory():
+    # メモリ使用量確認
+    pass
+
+scheduler.start()
 ```
 
-2. 初期データの投入
-```sql
-INSERT INTO faculty (name, code) VALUES
-    ('文学部', 'LIT'),
-    ('経済学部', 'ECO');
+## ログ設定
+
+### JSON形式ログ
+```python
+# logging_config.py
+from pythonjsonlogger import jsonlogger
+import logging
+
+def setup_logging():
+    json_handler = logging.StreamHandler()
+    json_handler.setFormatter(
+        jsonlogger.JsonFormatter(
+            '%(timestamp)s %(level)s %(name)s %(message)s'
+        )
+    )
+    logging.getLogger().addHandler(json_handler)
 ```
 
-3. インデックスの作成
-```sql
-CREATE INDEX idx_syllabus_year ON syllabus(year);
-CREATE INDEX idx_syllabus_title ON syllabus(title);
+### Prometheusメトリクス
+```python
+# metrics.py
+from prometheus_client import Counter, Histogram
+
+http_requests_total = Counter(
+    'http_requests_total',
+    'Total HTTP requests',
+    ['method', 'endpoint', 'status']
+)
+
+http_request_duration_seconds = Histogram(
+    'http_request_duration_seconds',
+    'HTTP request duration',
+    ['method', 'endpoint']
+)
 ```
-
-4. 権限の設定
-```sql
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO api_user;
-```
-
-#### 実行タイミング
-- PostgreSQLコンテナの初回起動時のみ実行
-- データベースが既に初期化されている場合は実行されない
-- コンテナの再起動時は実行されない
-
-#### 配置場所
-```
-docker/
-└── db/
-    └── init.sql  # PostgreSQLコンテナの/docker-entrypoint-initdb.d/にマウント
-```
-
-#### 注意事項
-- 開発環境でのみ使用することを推奨
-- 本番環境ではマイグレーションツールの使用を推奨
-- 大量のデータ投入は別のプロセスで実行
-- エラーハンドリングを適切に実装
-
-#### 開発環境での利用例
-- テストデータの自動投入
-- 開発用アカウントの作成
-- テスト用のビューやファンクションの作成
-
-#### 本番環境での代替案
-- データベースマイグレーションツール（Alembic等）の使用
-- 手動でのデータベース初期化
-- バックアップからのリストア
 
 [トップへ](#)

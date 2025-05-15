@@ -8,7 +8,7 @@
   - `database_policy.md`: データベース設計ポリシー
   - `database_er.md`: データベースER図
   - `server.md`: サーバー構成の説明
-  - `docker_structure.md`: Docker構成
+  - `docker.md`: Docker構成
 
 - `src/`: ソースコード
   - `syllabus/`: シラバス
@@ -32,7 +32,7 @@
 
 ## サーバー構成
 - [API仕様](docs/server.md)
-- [Docker構成](docs/docker_structure.md)
+- [Docker構成](docs/docker.md)
 
 ## デプロイ方法
 ```bash
