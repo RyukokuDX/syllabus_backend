@@ -33,7 +33,7 @@
 |---------|---------|------|------|--------|
 | subject_code | TEXT | NO | シラバス管理番号 | シラバス検索画面 |
 | name | TEXT | NO | 科目名 | シラバス検索画面 |
-| class_name | TEXT | YES | 科目区分 | シラバス検索画面 |
+| class_name | TEXT | NO | 科目区分 | シラバス検索画面 |
 | subclass_name | TEXT | YES | 科目小区分 | シラバス検索画面 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
@@ -134,7 +134,7 @@
 |---------|---------|------|------|--------|
 | instructor_code | TEXT | NO | 教職員番号 | Web Syllabus |
 | name | TEXT | NO | 氏名 | Web Syllabus |
-| name_kana | TEXT | NO | 氏名（カナ） | Web Syllabus |
+| name_kana | TEXT | YES | 氏名（カナ） | Web Syllabus |
 | name_en | TEXT | YES | 氏名（英語） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
@@ -187,7 +187,6 @@
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
 | session_number | INTEGER | NO | 回数 | Web Syllabus |
-| instructor_code | TEXT | YES | 担当教職員番号 | Web Syllabus |
 | description | TEXT | NO | 内容 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
