@@ -15,6 +15,7 @@
 8. [syllabus_textbook（シラバス-教科書関連）](#syllabus_textbookシラバス-教科書関連)
 9. [syllabus_reference（シラバス-参考文献関連）](#syllabus_referenceシラバス-参考文献関連)
 10. [grading_criterion（成績評価基準）](#grading_criterion成績評価基準)
+11. [syllabus_faculty（シラバス-学部/課程関連）](#syllabus_facultyシラバス-学部課程関連)
 
 ### [データソースと更新ポリシー](#データソースと更新ポリシー)
 
@@ -55,7 +56,6 @@
 | subject_code | TEXT | NO | 科目コード | Web Syllabus |
 | year | INTEGER | NO | 開講年度 | Web Syllabus |
 | subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
-| faculty | TEXT | NO | 開講学部/課程 | Web Syllabus |
 | term | TEXT | NO | 開講学期 | Web Syllabus |
 | grade_years | TEXT | NO | 対象学年 | Web Syllabus |
 | campus | TEXT | NO | 開講キャンパス | Web Syllabus |
@@ -76,7 +76,6 @@
 |---------------|--------|------|
 | PRIMARY KEY | subject_code | 主キー |
 | idx_syllabus_year | year | 開講年度での検索用 |
-| idx_syllabus_faculty | faculty | 開講学部での検索用 |
 | idx_syllabus_term | term | 開講学期での検索用 |
 | idx_syllabus_grade_years | grade_years | 対象学年での検索用 |
 | idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
@@ -304,6 +303,33 @@
 | PRIMARY KEY | id | 主キー |
 | idx_grading_criterion_type | criteria_type | 評価種別での検索用 |
 | idx_grading_criterion_subject_type | (subject_code, criteria_type) | 科目コード・評価種別での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| subject_code | subject(subject_code) | CASCADE |
+
+[目次へ戻る](#目次)
+
+### syllabus_faculty（シラバス-学部/課程関連）
+
+#### テーブル概要
+シラバスと開講学部/課程の関連を管理する中間テーブル。1つの科目が複数の学部/課程で開講される場合に対応。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
+| id | INTEGER | NO | ID | システム生成 |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
+| faculty | TEXT | NO | 開講学部/課程 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_syllabus_faculty_subject | subject_code | 科目コードでの検索用 |
+| idx_syllabus_faculty_faculty | faculty | 学部/課程での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
