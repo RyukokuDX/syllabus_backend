@@ -338,7 +338,7 @@
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| faculty | TEXT | NO | 開講学部/課程 | Web Syllabus |
+| faculty | VARCHAR(60) | NO | 開講学部/課程 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
