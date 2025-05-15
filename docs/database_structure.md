@@ -2,6 +2,22 @@
 
 [readmeへ](../README.md)
 
+## 目次
+
+### テーブル構成
+1. [subject（科目基本情報）](#subject科目基本情報)
+2. [syllabus（シラバス情報）](#syllabusシラバス情報)
+3. [syllabus_time（講義時間）](#syllabus_time講義時間)
+4. [instructor（教員）](#instructor教員)
+5. [syllabus_instructor（シラバス-教員関連）](#syllabus_instructorシラバス-教員関連)
+6. [lecture_session（講義計画）](#lecture_session講義計画)
+7. [book（書籍）](#book書籍)
+8. [syllabus_textbook（シラバス-教科書関連）](#syllabus_textbookシラバス-教科書関連)
+9. [syllabus_reference（シラバス-参考文献関連）](#syllabus_referenceシラバス-参考文献関連)
+10. [grading_criterion（成績評価基準）](#grading_criterion成績評価基準)
+
+### [データソースと更新ポリシー](#データソースと更新ポリシー)
+
 ## テーブル構成
 
 ### subject（科目基本情報）
@@ -25,6 +41,8 @@
 | PRIMARY KEY | subject_code | 主キー |
 | idx_subject_name | name | 科目名での検索用 |
 | idx_subject_class | class_name | クラス名での検索用 |
+
+[目次へ戻る](#目次)
 
 ### syllabus（シラバス情報）
 
@@ -68,6 +86,8 @@
 |--------|--------|-------------|
 | subject_code | subject(subject_code) | CASCADE |
 
+[目次へ戻る](#目次)
+
 ### syllabus_time（講義時間）
 
 #### テーブル概要
@@ -77,7 +97,7 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_id | TEXT | NO | シラバスID | Web Syllabus |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
 | day_of_week | TEXT | NO | 曜日 | Web Syllabus |
 | period | TEXT | NO | 時限 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
@@ -87,12 +107,14 @@
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
 | idx_syllabus_time_day_period | (day_of_week, period) | 曜日・時限での検索用 |
-| idx_syllabus_time_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_syllabus_time_subject | subject_code | 科目コードでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_id | syllabus(subject_code) | CASCADE |
+| subject_code | subject(subject_code) | CASCADE |
+
+[目次へ戻る](#目次)
 
 ### instructor（教員）
 
@@ -102,7 +124,7 @@
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
-| id | INTEGER | NO | 教員ID | システム生成 |
+| instructor_code | TEXT | NO | 教員コード | Web Syllabus |
 | name | TEXT | NO | 氏名 | Web Syllabus |
 | name_kana | TEXT | NO | 氏名（カナ） | Web Syllabus |
 | name_en | TEXT | YES | 氏名（英語） | Web Syllabus |
@@ -112,9 +134,11 @@
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
+| PRIMARY KEY | instructor_code | 主キー |
 | idx_instructor_name | name | 氏名での検索用 |
 | idx_instructor_name_kana | name_kana | カナ氏名での検索用 |
+
+[目次へ戻る](#目次)
 
 ### syllabus_instructor（シラバス-教員関連）
 
@@ -125,22 +149,24 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_id | TEXT | NO | シラバスID | Web Syllabus |
-| instructor_id | INTEGER | NO | 教員ID | Web Syllabus |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
+| instructor_code | TEXT | NO | 教員コード | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_syllabus_instructor_syllabus | syllabus_id | シラバスIDでの検索用 |
-| idx_syllabus_instructor_instructor | instructor_id | 教員IDでの検索用 |
+| idx_syllabus_instructor_subject | subject_code | 科目コードでの検索用 |
+| idx_syllabus_instructor_instructor | instructor_code | 教員コードでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_id | syllabus(subject_code) | CASCADE |
-| instructor_id | instructor(id) | CASCADE |
+| subject_code | subject(subject_code) | CASCADE |
+| instructor_code | instructor(instructor_code) | CASCADE |
+
+[目次へ戻る](#目次)
 
 ### lecture_session（講義計画）
 
@@ -151,9 +177,9 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_id | TEXT | NO | シラバスID | Web Syllabus |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
 | session_number | INTEGER | NO | 回数 | Web Syllabus |
-| instructor_id | INTEGER | YES | 担当教員ID | Web Syllabus |
+| instructor_code | TEXT | YES | 担当教員コード | Web Syllabus |
 | description | TEXT | NO | 内容 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
@@ -161,14 +187,16 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_lecture_session_syllabus_num | (syllabus_id, session_number) | シラバスID・回数での検索用 |
-| idx_lecture_session_instructor | instructor_id | 担当教員での検索用 |
+| idx_lecture_session_subject_num | (subject_code, session_number) | 科目コード・回数での検索用 |
+| idx_lecture_session_instructor | instructor_code | 担当教員での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_id | syllabus(subject_code) | CASCADE |
-| instructor_id | instructor(id) | SET NULL |
+| subject_code | subject(subject_code) | CASCADE |
+| instructor_code | instructor(instructor_code) | SET NULL |
+
+[目次へ戻る](#目次)
 
 ### book（書籍）
 
@@ -195,6 +223,8 @@
 | idx_book_title | title | 書籍タイトルでの検索用 |
 | idx_book_author | author | 著者名での検索用 |
 
+[目次へ戻る](#目次)
+
 ### syllabus_textbook（シラバス-教科書関連）
 
 #### テーブル概要
@@ -204,7 +234,7 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_id | TEXT | NO | シラバスID | Web Syllabus |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
 | book_id | INTEGER | NO | 書籍ID | Web Syllabus |
 | note | TEXT | YES | 備考 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
@@ -213,14 +243,16 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_syllabus_textbook_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_syllabus_textbook_subject | subject_code | 科目コードでの検索用 |
 | idx_syllabus_textbook_book | book_id | 書籍IDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_id | syllabus(subject_code) | CASCADE |
+| subject_code | subject(subject_code) | CASCADE |
 | book_id | book(id) | CASCADE |
+
+[目次へ戻る](#目次)
 
 ### syllabus_reference（シラバス-参考文献関連）
 
@@ -231,7 +263,7 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_id | TEXT | NO | シラバスID | Web Syllabus |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
 | book_id | INTEGER | NO | 書籍ID | Web Syllabus |
 | note | TEXT | YES | 備考 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
@@ -240,14 +272,16 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_syllabus_reference_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_syllabus_reference_subject | subject_code | 科目コードでの検索用 |
 | idx_syllabus_reference_book | book_id | 書籍IDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_id | syllabus(subject_code) | CASCADE |
+| subject_code | subject(subject_code) | CASCADE |
 | book_id | book(id) | CASCADE |
+
+[目次へ戻る](#目次)
 
 ### grading_criterion（成績評価基準）
 
@@ -258,7 +292,7 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_id | TEXT | NO | シラバスID | Web Syllabus |
+| subject_code | TEXT | NO | 科目コード | Web Syllabus |
 | criteria_type | TEXT | NO | 評価種別 | Web Syllabus |
 | ratio | INTEGER | NO | 評価比率（%） | Web Syllabus |
 | note | TEXT | YES | 備考 | Web Syllabus |
@@ -269,12 +303,14 @@
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
 | idx_grading_criterion_type | criteria_type | 評価種別での検索用 |
-| idx_grading_criterion_syllabus_type | (syllabus_id, criteria_type) | シラバスID・評価種別での検索用 |
+| idx_grading_criterion_subject_type | (subject_code, criteria_type) | 科目コード・評価種別での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_id | syllabus(subject_code) | CASCADE |
+| subject_code | subject(subject_code) | CASCADE |
+
+[目次へ戻る](#目次)
 
 ## データソースと更新ポリシー
 
@@ -289,4 +325,4 @@
 #### 3. メディアセンターcsv
 -　メディアセンターからコモンズが取得しているcsv
 
-[ページトップへ](#シラバス情報データベース設計)
+[目次へ戻る](#目次)
