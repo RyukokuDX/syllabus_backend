@@ -111,7 +111,7 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
 
 ### APIサーバー（FastAPI）
 - イメージ: `python:3.11-slim`
-- ポート: 8000
+- ポート: 5000
 - 環境変数:
   - `DATABASE_URL`: 外部DB接続情報
   - `DEBUG_MODE`: false
