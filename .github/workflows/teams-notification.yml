@@ -1,0 +1,23 @@
+name: Teams Notification
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Microsoft Teams Notification
+        uses: skitionek/notify-microsoft-teams@master
+        if: always()
+        with:
+          webhook_url: ${{ secrets.TEAMS_WEBHOOK }}
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
+          overwrite: "{title: `GitHub ${github.event_name} 通知`, text: `リポジトリ: ${github.repository}\nブランチ: ${github.ref}\nイベント: ${github.event_name}\n実行者: ${github.actor}`}" 
