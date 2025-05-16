@@ -1,9 +1,10 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, List, Dict, Any
 from .models import Base
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class Database:
         finally:
             session.close()
 
-    def add_records(self, models: list[T]) -> bool:
+    def add_records(self, models: List[T]) -> bool:
         """
         複数レコードの一括追加
         Args:
@@ -123,5 +124,104 @@ class Database:
             session.rollback()
             logger.error(f"レコード削除中にエラーが発生しました: {e}")
             return False
+        finally:
+            session.close()
+
+    def query_records(self, model_class: Type[T], filters: Dict[str, Any] = None, 
+                     order_by: List[str] = None, limit: int = None) -> List[T]:
+        """
+        条件に基づいてレコードを検索
+        Args:
+            model_class: モデルクラス
+            filters: フィルター条件の辞書
+            order_by: ソート条件のリスト
+            limit: 取得件数の制限
+        Returns:
+            検索結果のリスト
+        """
+        session = self.get_session()
+        try:
+            query = session.query(model_class)
+            
+            if filters:
+                filter_conditions = []
+                for key, value in filters.items():
+                    if isinstance(value, (list, tuple)):
+                        filter_conditions.append(getattr(model_class, key).in_(value))
+                    else:
+                        filter_conditions.append(getattr(model_class, key) == value)
+                query = query.filter(and_(*filter_conditions))
+
+            if order_by:
+                for field in order_by:
+                    desc = field.startswith('-')
+                    field_name = field[1:] if desc else field
+                    field_attr = getattr(model_class, field_name)
+                    query = query.order_by(field_attr.desc() if desc else field_attr)
+
+            if limit:
+                query = query.limit(limit)
+
+            return query.all()
+        except SQLAlchemyError as e:
+            logger.error(f"レコード検索中にエラーが発生しました: {e}")
+            return []
+        finally:
+            session.close()
+
+    def search_syllabus(self, year: int = None, term: str = None, 
+                       class_name: str = None, faculty: str = None,
+                       instructor_name: str = None) -> List[Dict[str, Any]]:
+        """
+        シラバス情報の検索
+        Args:
+            year: 開講年度
+            term: 開講学期
+            class_name: 科目区分
+            faculty: 開講学部
+            instructor_name: 教員名
+        Returns:
+            検索結果のリスト
+        """
+        from .models import Subject, Syllabus, SyllabusFaculty, Instructor, SyllabusInstructor
+
+        session = self.get_session()
+        try:
+            query = session.query(
+                Subject.subject_code,
+                Subject.name.label('subject_name'),
+                Subject.class_name,
+                Syllabus.year,
+                Syllabus.term,
+                Syllabus.credits,
+                Syllabus.campus,
+                Instructor.name.label('instructor_name'),
+                SyllabusFaculty.faculty
+            ).join(
+                Syllabus, Subject.subject_code == Syllabus.subject_code
+            ).join(
+                SyllabusFaculty, Subject.subject_code == SyllabusFaculty.subject_code
+            ).join(
+                SyllabusInstructor, Subject.subject_code == SyllabusInstructor.subject_code
+            ).join(
+                Instructor, SyllabusInstructor.instructor_code == Instructor.instructor_code
+            )
+
+            if year:
+                query = query.filter(Syllabus.year == year)
+            if term:
+                query = query.filter(Syllabus.term == term)
+            if class_name:
+                query = query.filter(Subject.class_name == class_name)
+            if faculty:
+                query = query.filter(SyllabusFaculty.faculty == faculty)
+            if instructor_name:
+                query = query.filter(Instructor.name.like(f"%{instructor_name}%"))
+
+            results = query.all()
+            return [dict(zip(result.keys(), result)) for result in results]
+        except SQLAlchemyError as e:
+            logger.error(f"シラバス検索中にエラーが発生しました: {e}")
+            return []
         finally:
             session.close() 

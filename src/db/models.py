@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -14,6 +14,11 @@ class Subject(Base):
     subclass_name = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_subject_name', name),
+        Index('idx_subject_class', class_name),
+    )
 
 class Syllabus(Base):
     __tablename__ = 'syllabus'
@@ -43,6 +48,14 @@ class Syllabus(Base):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
+    __table_args__ = (
+        Index('idx_syllabus_year', year),
+        Index('idx_syllabus_term', term),
+        Index('idx_syllabus_grades', grade_b1, grade_b2, grade_b3, grade_b4, 
+              grade_m1, grade_m2, grade_d1, grade_d2, grade_d3),
+        Index('idx_syllabus_campus', campus),
+    )
+
 class SyllabusTime(Base):
     __tablename__ = 'syllabus_time'
 
@@ -51,6 +64,11 @@ class SyllabusTime(Base):
     day_of_week = Column(Text, nullable=False)
     period = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_syllabus_time_day_period', day_of_week, period),
+        Index('idx_syllabus_time_subject', subject_code),
+    )
 
 class Instructor(Base):
     __tablename__ = 'instructor'
@@ -61,6 +79,11 @@ class Instructor(Base):
     name_en = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_instructor_name', name),
+        Index('idx_instructor_name_kana', name_kana),
+    )
 
 class SyllabusInstructor(Base):
     __tablename__ = 'syllabus_instructor'
