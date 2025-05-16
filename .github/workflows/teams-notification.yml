@@ -10,6 +10,16 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
+            # キャッシュをクリアするためのステップ
+      - name: Clear GitHub Actions Cache
+        run: |
+          echo "::remove-matcher owner=go::"
+          echo "::remove-matcher owner=java::"
+          echo "::remove-matcher owner=python::"
+          echo "::remove-matcher owner=eslint-compact::"
+          echo "::remove-matcher owner=eslint-stylish::"
+          git clean -ffdx
+
       - uses: actions/checkout@v2
 
       - name: Microsoft Teams Notification
