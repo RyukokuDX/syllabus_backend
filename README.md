@@ -14,7 +14,7 @@
     - `2025/`: 年
         - `serarch_page/`: シラバスの解析済み検索画面を入れる
         - `syllabus_html/`: シラバスの生ページ
-  = `course_guide/`: 要項
+  - `course_guide/`: 要項
     - `2025/`: 年
 
 - `db/` : dbいれ
