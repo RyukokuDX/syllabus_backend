@@ -13,19 +13,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Microsoft Teams Notification
-        uses: toko-bifrost/ms-teams-deploy-card@master
+        uses: skitionek/notify-microsoft-teams@master
         if: always()
         with:
-          webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
-          github-token: ${{ github.token }}
-          card-layout-start: cozy
-          card-layout-exit: complete
-          show-on-start: true
-          show-on-exit: true
-          custom-facts: |
-            - name: Repository
-              value: ${{ github.repository }}
-            - name: Workflow
-              value: ${{ github.workflow }}
-            - name: Event
-              value: ${{ github.event_name }} 
+          webhook_url: ${{ secrets.TEAMS_WEBHOOK }}
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
+          overwrite: '{"title":"🔔 ${{ github.repository }} - ${{ github.event_name }}通知","text":"## ブランチ情報\n- 対象ブランチ: `${{ github.ref_name }}`\n\n## 変更情報\n- リポジトリ: ${{ github.repository }}\n- イベント: ${{ github.event_name }}\n- 実行者: ${{ github.actor }}\n\n[変更を確認](${{ github.event.head_commit.url }}"}'
+          
