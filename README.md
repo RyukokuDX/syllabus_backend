@@ -12,10 +12,16 @@
   - `docker.md`: Docker構成
 
 - `src/`: ソースコード
+  - `__init__.py`: パッケージ定義
+  - `db/`: データベース関連
+    - `__init__.py`: データベースパッケージ定義
+    - `models.py`: データベースモデル定義
+    - `database.py`: データベース操作クラス
+    - `py.typed`: 型チェック用マーカー
   - `syllabus/`: シラバス
     - `2025/`: 年
-        - `serarch_page/`: シラバスの解析済み検索画面を入れる
-        - `syllabus_html/`: シラバスの生ページ
+      - `serarch_page/`: シラバスの解析済み検索画面を入れる
+      - `syllabus_html/`: シラバスの生ページ
   - `course_guide/`: 要項
     - `2025/`: 年
 
