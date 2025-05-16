@@ -1,6 +1,6 @@
 # シラバス情報データベース設計
 
-[readmeへ](../README.md) | [ER図へ](database_er.md)
+[readmeへ](../README.md) | [ER図へ](database_er.md) | [ライブラリ仕様へ](database_python.md)
 
 ## 目次
 

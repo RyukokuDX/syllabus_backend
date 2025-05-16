@@ -7,14 +7,21 @@
   - `database_structure.md`: データベース構造の定義
   - `database_policy.md`: データベース設計ポリシー
   - `database_er.md`: データベースER図
+  - `database_python.md`: データベースライブラリ仕様
   - `server.md`: サーバー構成の説明
   - `docker.md`: Docker構成
 
 - `src/`: ソースコード
+  - `__init__.py`: パッケージ定義
+  - `db/`: データベース関連
+    - `__init__.py`: データベースパッケージ定義
+    - `models.py`: データベースモデル定義
+    - `database.py`: データベース操作クラス
+    - `py.typed`: 型チェック用マーカー
   - `syllabus/`: シラバス
     - `2025/`: 年
-        - `serarch_page/`: シラバスの解析済み検索画面を入れる
-        - `syllabus_html/`: シラバスの生ページ
+      - `serarch_page/`: シラバスの解析済み検索画面を入れる
+      - `syllabus_html/`: シラバスの生ページ
   - `course_guide/`: 要項
     - `2025/`: 年
 
@@ -29,6 +36,7 @@
 - [DB構成ポリシー](docs/database_policy.md)
 - [DB構成仕様](docs/database_structure.md)
 - [DB ER図](docs/database_er.md)
+- [DBライブラリ仕様](docs/database_python.md)
 
 ## サーバー構成
 - [API仕様](docs/server.md)
