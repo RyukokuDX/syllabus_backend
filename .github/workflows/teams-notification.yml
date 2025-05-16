@@ -13,11 +13,13 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Microsoft Teams Notification
-        uses: jdcargile/ms-teams-notification@v1.3
+        uses: dhollerbach/github-action-send-message-to-ms-teams@v1
         with:
-          github-token: ${{ github.token }}
-          ms-teams-webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
-          notification-summary: "🔔 ${{ github.repository }} の更新通知"
-          notification-color: 28a745
-          timezone: "Asia/Tokyo"
+          webhook: ${{ secrets.TEAMS_WEBHOOK }}
+          message: |
+            ## 🔔 ${{ github.repository }} の更新通知
+            
+            **ブランチ**: ${{ github.ref_name }}
+            **イベント**: ${{ github.event_name }}
+            **実行者**: ${{ github.actor }}
           
