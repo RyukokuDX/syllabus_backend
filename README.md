@@ -7,6 +7,7 @@
   - `database_structure.md`: データベース構造の定義
   - `database_policy.md`: データベース設計ポリシー
   - `database_er.md`: データベースER図
+  - `database_python.md`: データベースライブラリ仕様
   - `server.md`: サーバー構成の説明
   - `docker.md`: Docker構成
 
@@ -29,6 +30,7 @@
 - [DB構成ポリシー](docs/database_policy.md)
 - [DB構成仕様](docs/database_structure.md)
 - [DB ER図](docs/database_er.md)
+- [DBライブラリ仕様](docs/database_python.md)
 
 ## サーバー構成
 - [API仕様](docs/server.md)
