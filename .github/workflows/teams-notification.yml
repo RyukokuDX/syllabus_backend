@@ -1,0 +1,31 @@
+name: Teams Notification
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Microsoft Teams Notification
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        if: always()
+        with:
+          webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
+          github-token: ${{ github.token }}
+          card-layout-start: cozy
+          card-layout-exit: complete
+          show-on-start: true
+          show-on-exit: true
+          custom-facts: |
+            - name: Repository
+              value: ${{ github.repository }}
+            - name: Workflow
+              value: ${{ github.workflow }}
+            - name: Event
+              value: ${{ github.event_name }} 
