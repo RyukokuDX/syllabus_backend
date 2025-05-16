@@ -20,4 +20,4 @@ jobs:
           needs: ${{ toJson(needs) }}
           job: ${{ toJson(job) }}
           steps: ${{ toJson(steps) }}
-          overwrite: "{title: `GitHub ${github.event_name} 通知`, text: `リポジトリ: ${github.repository}\nブランチ: ${github.ref}\nイベント: ${github.event_name}\n実行者: ${github.actor}`}" 
+          overwrite: '{"title":"🔔 ${{ github.repository }} - ${{ github.event_name }}通知","text":"## ブランチ情報\n- 対象ブランチ: `${{ github.ref_name }}`\n\n## 変更情報\n- リポジトリ: ${{ github.repository }}\n- イベント: ${{ github.event_name }}\n- 実行者: ${{ github.actor }}\n\n[変更を確認](${{ github.event.head_commit.url }}"}' 
