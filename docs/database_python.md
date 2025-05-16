@@ -39,7 +39,22 @@ src/db/
 ```python
 def __init__(self, db_url: str)
 ```
-- `db_url`: データベース接続URL（例: "postgresql://user:password@localhost:5432/syllabus_db"）
+- `db_url`: データベース接続URL
+  - SQLite3の場合: `"sqlite:///db/syllabus.db"`（プロジェクトルートからの相対パス）
+  - PostgreSQLの場合: `"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"`
+    - 環境変数から読み込む（推奨）：
+      ```python
+      import os
+      from urllib.parse import quote_plus
+
+      db_url = "postgresql://{user}:{password}@{host}:{port}/{dbname}".format(
+          user=quote_plus(os.getenv('DB_USER', 'postgres')),
+          password=quote_plus(os.getenv('DB_PASSWORD', '')),
+          host=os.getenv('DB_HOST', 'localhost'),
+          port=os.getenv('DB_PORT', '5432'),
+          dbname=os.getenv('DB_NAME', 'syllabus_db')
+      )
+      ```
 
 #### メソッド一覧
 
@@ -95,15 +110,40 @@ def delete_record(self, model: T) -> bool
 
 ### データベース接続
 ```python
+import os
+from urllib.parse import quote_plus
 from src.db.database import Database
 from src.db.models import Subject, Syllabus
 
-# データベースインスタンスの作成
-db = Database("postgresql://user:password@localhost:5432/syllabus_db")
+# SQLite3を使用する場合（開発環境向け）
+db = Database("sqlite:///db/syllabus.db")
+
+# PostgreSQLを使用する場合（本番環境向け）
+# 環境変数から安全に接続情報を取得
+db_url = "postgresql://{user}:{password}@{host}:{port}/{dbname}".format(
+    user=quote_plus(os.getenv('DB_USER', 'postgres')),
+    password=quote_plus(os.getenv('DB_PASSWORD', '')),
+    host=os.getenv('DB_HOST', 'localhost'),
+    port=os.getenv('DB_PORT', '5432'),
+    dbname=os.getenv('DB_NAME', 'syllabus_db')
+)
+db = Database(db_url)
 
 # データベースの初期化
 db.init_db()
 ```
+
+### 環境変数の設定例
+```bash
+# .env ファイル
+DB_USER=syllabus_user
+DB_PASSWORD=your_secure_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=syllabus_db
+```
+
+**注意**: 環境変数やパスワードは必ずバージョン管理から除外し（.gitignore）、安全に管理してください。
 
 ### レコードの追加
 ```python
