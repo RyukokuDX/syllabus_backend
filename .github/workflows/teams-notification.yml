@@ -10,17 +10,18 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-            # キャッシュをクリアするためのステップ
-      - name: Clear GitHub Actions Cache
-        run: |
-          echo "::remove-matcher owner=go::"
-          echo "::remove-matcher owner=java::"
-          echo "::remove-matcher owner=python::"
-          echo "::remove-matcher owner=eslint-compact::"
-          echo "::remove-matcher owner=eslint-stylish::"
-          git clean -ffdx
-
       - uses: actions/checkout@v2
+
+      # キャッシュを無効化
+      - name: Clear Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache
+            !~/.cache/exclude
+          key: ${{ runner.os }}-cache-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-cache-
 
       - name: Microsoft Teams Notification
         uses: dhollerbach/github-action-send-message-to-ms-teams@v1
