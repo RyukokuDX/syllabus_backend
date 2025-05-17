@@ -23,6 +23,10 @@ Curosrへ指示する事で処理します
   - `postgresql.md`: PostgreSQL仕様書
   - `server.md`: サーバー構成の説明
   - `docker.md`: Docker構成
+  - `python`: pythonスクリプトの仕様書
+    - `database.md`
+    - `models.md`
+    - `update_db.md`
 
 - `src/`: ソースコード
   - `__init__.py`: パッケージ定義
@@ -47,11 +51,15 @@ Curosrへ指示する事で処理します
   - 設定ファイル（現在検討中）
 
 ## DB 構成
-- [PostgreSQL仕様書](docs/postgresql.md)
 - [DB構成ポリシー](docs/database_policy.md)
 - [DB構成仕様](docs/database_structure.md)
 - [DB ER図](docs/database_er.md)
 - [DBライブラリ仕様](docs/database_python.md)
+
+## Pythonスクリプト
+- [database](docs/python/database.md)
+- [models.md](docs/python/models.md)
+- [db更新スクリプト](docs/python/update_db.md)
 
 ## サーバー構成
 - [API仕様](docs/server.md)

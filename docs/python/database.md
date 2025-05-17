@@ -1,51 +1,8 @@
-# シラバスデータベース Pythonライブラリ仕様
+# データベース操作 (`database.py`)
 
-[readmeへ](../README.md) | [DB構造へ](database_structure.md) | [PostgreSQL設定へ](postgresql.md) | [DB運用マニュアルへ](db_operation_manual.md)
+## クラス: `Database`
 
-## 目次
-1. [概要](#概要)
-2. [インストール方法](#インストール方法)
-3. [基本的な使い方](#基本的な使い方)
-4. [モデルクラス](#モデルクラス)
-5. [データベース操作](#データベース操作)
-6. [バッチ処理](#バッチ処理)
-7. [エラーハンドリング](#エラーハンドリング)
-8. [ユーティリティ関数](#ユーティリティ関数)
-
-## 概要
-シラバス情報データベースを操作するためのPythonライブラリです。SQLAlchemyを使用してORMを提供し、データベースの初期化やレコードの操作を行うことができます。
-
-## ディレクトリ構成
-```
-src/db/
-├── models.py      # データベースモデルの定義
-└── database.py    # データベース操作用ユーティリティ
-```
-
-## モデル定義 (`models.py`)
-
-### テーブル一覧
-1. `Subject`: 科目基本情報
-2. `Syllabus`: シラバス情報
-3. `SyllabusTime`: 講義時間
-4. `Instructor`: 教員
-5. `SyllabusInstructor`: シラバス-教員関連
-6. `LectureSession`: 講義計画
-7. `Book`: 書籍
-8. `SyllabusTextbook`: シラバス-教科書関連
-9. `SyllabusReference`: シラバス-参考文献関連
-10. `GradingCriterion`: 成績評価基準
-11. `SyllabusFaculty`: シラバス-学部/課程関連
-12. `SubjectRequirement`: 科目要件・属性
-13. `SubjectProgram`: 科目-学習プログラム関連
-
-各テーブルの詳細な定義は[DB構成仕様](database_structure.md)を参照してください。
-
-## データベース操作 (`database.py`)
-
-### クラス: `Database`
-
-#### コンストラクタ
+### コンストラクタ
 ```python
 def __init__(self, db_url: str)
 ```
@@ -68,7 +25,7 @@ def __init__(self, db_url: str)
 
 #### メソッド一覧
 
-##### データベース初期化
+#### データベース初期化
 ```python
 def init_db(self)
 ```
@@ -81,35 +38,35 @@ def get_session(self)
 ```
 - 新しいデータベースセッションを返します
 
-##### レコード追加
+#### レコード追加
 ```python
 def add_record(self, model: T) -> Optional[T]
 ```
 - 単一のレコードを追加します
 - 成功時は追加されたモデルインスタンス、失敗時は`None`を返します
 
-##### 複数レコード一括追加
+#### 複数レコード一括追加
 ```python
 def add_records(self, models: list[T]) -> bool
 ```
 - 複数のレコードを一括で追加します
 - 成功時は`True`、失敗時は`False`を返します
 
-##### ID指定でのレコード取得
+#### ID指定でのレコード取得
 ```python
 def get_by_id(self, model_class: Type[T], id_value: any) -> Optional[T]
 ```
 - 指定されたIDのレコードを取得します
 - 存在しない場合は`None`を返します
 
-##### レコード更新
+#### レコード更新
 ```python
 def update_record(self, model: T) -> bool
 ```
 - レコードを更新します
 - 成功時は`True`、失敗時は`False`を返します
 
-##### レコード削除
+#### レコード削除
 ```python
 def delete_record(self, model: T) -> bool
 ```
@@ -142,18 +99,6 @@ db = Database(db_url)
 # データベースの初期化
 db.init_db()
 ```
-
-### 環境変数の設定例
-```bash
-# .env ファイル
-DB_USER=syllabus_user
-DB_PASSWORD=your_secure_password
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=syllabus_db
-```
-
-**注意**: 環境変数やパスワードは必ずバージョン管理から除外し（.gitignore）、安全に管理してください。
 
 ### レコードの追加
 ```python
@@ -214,4 +159,4 @@ if subject:
 |------|------------|--------|------|
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
 
-[🔝 ページトップへ](#シラバスデータベース-pythonライブラリ仕様) 
+[🔝 ページトップへ](#)
