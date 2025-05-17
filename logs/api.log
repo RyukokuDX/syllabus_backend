@@ -1,0 +1,1 @@
+2025-05-17 14:29:58.482 | ERROR    | src.main:execute_query:188 - Database error: Incorrect number of bindings supplied. The current statement uses 0, and there are 1 supplied.
