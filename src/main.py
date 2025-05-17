@@ -165,7 +165,7 @@ def convert_sqlite_command(query: str) -> str:
     
     # .tables コマンドの変換
     if re.match(r"^\.tables\s*;?\s*$", query):
-        return "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;"
+        return "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
         
     return query
 
@@ -178,17 +178,14 @@ async def execute_query(request: QueryRequest):
         converted_query = convert_sqlite_command(request.query)
         
         # クエリの検証
-        validate_query(converted_query, request.params)
+        validate_query(converted_query, None)  # パラメータをNoneに設定
         
         # データベース接続とクエリ実行
         with get_db_connection() as conn:
             cursor = conn.cursor()
             
             try:
-                if request.params:
-                    cursor.execute(converted_query, request.params)
-                else:
-                    cursor.execute(converted_query)
+                cursor.execute(converted_query)  # パラメータなしで実行
                 
                 # 結果の取得（最大1000行まで）
                 rows = cursor.fetchmany(1000)
