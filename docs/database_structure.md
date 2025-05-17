@@ -1,6 +1,6 @@
 # シラバス情報データベース設計
 
-[readmeへ](../README.md) | [ER図へ](database_er.md) | [ライブラリ仕様へ](database_python.md)
+[readmeへ](../README.md) | [ER図へ](database_er.md) | [ライブラリ仕様へ](database_python.md) | [PostgreSQL設定へ](postgresql.md) | [DB運用マニュアルへ](db_operation_manual.md)
 
 ## 目次
 
@@ -20,6 +20,12 @@
 13. [subject_program（科目-学習プログラム関連）](#subject_program科目-学習プログラム関連)
 
 ### [データソースと更新ポリシー](#データソースと更新ポリシー)
+
+## 更新履歴
+
+| 日付 | バージョン | 更新者 | 内容 |
+|------|------------|--------|------|
+| 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
 
 ## テーブル構成
 
