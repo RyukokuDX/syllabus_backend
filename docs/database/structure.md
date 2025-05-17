@@ -1,6 +1,6 @@
-# シラバス情報データベース設計
+# データベース構造定義
 
-[readmeへ](../README.md) | [ER図へ](database_er.md)
+[readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
 ## 目次
 
@@ -436,3 +436,10 @@
 -　メディアセンターからコモンズが取得しているcsv
 
 [目次へ戻る](#目次)
+
+## 関連ドキュメント
+- [データベース設計ポリシー](policy.md)
+- [データベースER図](er.md)
+- [データベースライブラリ仕様](python.md)
+- [データベース操作クラス](../python/database.md)
+- [データモデル定義](../python/models.md)

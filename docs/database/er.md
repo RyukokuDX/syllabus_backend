@@ -1,6 +1,6 @@
 # シラバスデータベース ER図仕様
 
-[readmeへ](../README.md) | [DB構造へ](database_structure.md) | [PostgreSQL設定へ](postgresql.md) | [ライブラリ仕様へ](database_python.md)
+[readmeへ](../../README.md) | [構造定義へ](structure.md) | [設計ポリシーへ](policy.md)
 
 ## 目次
 1. [概要](#概要)
@@ -167,4 +167,10 @@ erDiagram
 |------|------------|--------|------|
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
 
-[🔝 ページトップへ](#シラバスデータベース-er図仕様) 
+## 関連ドキュメント
+- [データベース構造定義](structure.md)
+- [データベース設計ポリシー](policy.md)
+- [データベースライブラリ仕様](python.md)
+- [データモデル定義](../python/models.md)
+
+[🔝 ページトップへ](#データベース-er図) 
