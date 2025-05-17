@@ -14,7 +14,7 @@
 
 ## 概要
 FastAPIアプリケーションをコンテナ化して提供するための構成です。
-データベースは外部のマネージドサービスまたは専用サーバーを使用します。
+データベースはSQLiteを使用し、データファイルはボリュームマウントで永続化します。
 
 ## ディレクトリ構造
 ```
@@ -52,9 +52,6 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
     - ORMマッパー
     - SQLクエリビルダー
     - データベース抽象化レイヤー
-  - psycopg2-binary==2.9.9
-    - PostgreSQLドライバ
-    - バイナリ配布版（ビルド不要）
   - alembic==1.13.1
     - データベースマイグレーション
     - スキーマバージョン管理
@@ -102,11 +99,35 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
 ### APIサーバー（FastAPI）
 - イメージ: `python:3.11-slim`
 - ポート: 8000
+- ボリューム:
+  - `./db:/app/db`: SQLiteデータベースファイル
+  - `./logs:/app/logs`: ログファイル
 - 環境変数:
-  - `DATABASE_URL`: 外部DB接続情報
+  - `SQLITE_DB_PATH`: /app/db/syllabus.db
   - `DEBUG_MODE`: false
   - `LOG_LEVEL`: info
 
+## Docker Compose設定例
+
+```yaml
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./docker/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./db:/app/db
+      - ./logs:/app/logs
+    environment:
+      - SQLITE_DB_PATH=/app/db/syllabus.db
+      - DEBUG_MODE=false
+      - LOG_LEVEL=info
+    restart: unless-stopped
+```
 
 ## ヘルスチェック設定
 
@@ -116,7 +137,7 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
 from fastapi_health import health
 
 async def db_health_check():
-    # データベース接続確認
+    # SQLite接続確認
     return True
 
 async def api_health_check():
@@ -190,5 +211,6 @@ http_request_duration_seconds = Histogram(
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
+| 2024-03-20 | 1.1.0 | 藤原 | PostgreSQLからSQLiteに変更 |
 
 [🔝 ページトップへ](#docker環境構築仕様書)
