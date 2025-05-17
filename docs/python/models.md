@@ -1,6 +1,6 @@
 # データモデル定義 (`models.py`)
 
-[readmeへ](../../README.md) | [DB構成仕様へ](../database_structure.md)
+[readmeへ](../../README.md) | [DB構成仕様へ](../database/structure.md)
 
 ## 概要
 SQLAlchemyを使用したデータベースモデルの定義を提供します。
@@ -110,7 +110,7 @@ except TypeError as e:
 ```
 
 ## 関連ドキュメント
-- [データベース構造定義](../database_structure.md)
+- [データベース構造定義](../database/structure.md)
 - [データベース操作クラス](database.md)
 - [DB更新スクリプト](update_db.md)
 

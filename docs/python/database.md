@@ -1,6 +1,6 @@
 # データベース操作クラス (`database.py`)
 
-[readmeへ](../../README.md) | [DB構成仕様へ](../database_structure.md) | [モデル定義へ](models.md)
+[readmeへ](../../README.md) | [DB構成仕様へ](../database/structure.md) | [モデル定義へ](models.md)
 
 ## クラス: `Database`
 
@@ -162,7 +162,7 @@ if subject:
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
 
 ## 関連ドキュメント
-- [データベース構造定義](../database_structure.md)
+- [データベース構造定義](../database/structure.md)
 - [モデル定義](models.md)
 - [DB更新スクリプト](update_db.md)
 

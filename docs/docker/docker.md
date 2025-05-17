@@ -1,6 +1,6 @@
 # Docker環境構築仕様書
 
-[readmeへ](../README.md) | [サーバー構成へ](server.md) | [DB構造へ](database_structure.md) | [PostgreSQL設定へ](postgresql.md)
+[readmeへ](../README.md) | [サーバー構成へ](server.md) 
 
 ## 目次
 1. [概要](#概要)
@@ -96,27 +96,6 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
     - 定期的なヘルスチェック実行
     - バックグラウンドタスク管理
     - クロン形式のスケジュール設定
-
-### PostgreSQL
-- バージョン: 15
-  - 最新の安定版
-  - 高度な機能サポート
-  - セキュリティアップデート対応
-
-- 拡張機能:
-  - pg_trgm
-    - あいまい検索
-    - 文字列類似度検索
-    - インデックス最適化
-  - btree_gin
-    - 複数列インデックス
-    - 範囲検索の最適化
-  - pg_stat_statements
-    - SQLクエリの統計情報
-    - パフォーマンス分析
-    - クエリチューニング
-
-注：開発用ツール（black, flake8, pytest等）は開発環境で別途管理し、本番環境のrequirements.txtには含めません。
 
 ## コンテナ構成
 

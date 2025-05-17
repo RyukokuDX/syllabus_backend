@@ -11,4 +11,4 @@ Curosrは
 
 ## 処理内容
 ### DBを更新してください
-`src/db/update_db.py`を実行
+`docs/database/updateflow.md`に従って解析

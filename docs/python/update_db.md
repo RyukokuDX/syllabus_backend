@@ -1,6 +1,6 @@
 # データベース更新スクリプト (`update_db.py`)
 
-[readmeへ](../../README.md) | [データベース構造へ](../database_structure.md) | [ライブラリ仕様へ](../database_python.md)
+[readmeへ](../../README.md) | [データベース構造へ](../database/structure.md) | [ライブラリ仕様へ](../database/python.md)
 
 ## 概要
 `src/db/update_db.py`は、JSONファイルからデータベースを更新するためのスクリプトです。
@@ -112,7 +112,7 @@ python src/db/update_db.py
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 | 
 
 ## 関連ドキュメント
-- [データベース構造定義](../database_structure.md)
+- [データベース構造定義](../database/structure.md)
 - [データベース操作クラス](database.md)
 - [モデル定義](models.md)
 - [シラバスページパーサー](raw_page_parser.md)
