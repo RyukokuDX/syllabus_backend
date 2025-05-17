@@ -13,10 +13,10 @@ services:
       - ./src:/app/src
     environment:
       - SQLITE_DB_PATH=/app/db/syllabus.db
-      - DEBUG_MODE=false
-      - LOG_LEVEL=info
+      - DEBUG_MODE=true
+      - LOG_LEVEL=debug
       - MAX_WORKERS=4
-      - RELOAD_MODE=false
+      - RELOAD_MODE=true
       - API_PREFIX=/api/v1
       - CORS_ORIGINS=["http://localhost:3000"]
       - CORS_ALLOW_CREDENTIALS=true

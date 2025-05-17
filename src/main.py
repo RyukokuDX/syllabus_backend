@@ -60,7 +60,7 @@ ALLOWED_COLUMNS = {
 
 # 禁止されたSQLパターン
 FORBIDDEN_PATTERNS = [
-    r";",              # セミコロン
+    r";(?!\s*$)",     # セミコロン（末尾のセミコロンは許可）
     r"(?i)INSERT",     # INSERT文
     r"(?i)UPDATE",     # UPDATE文
     r"(?i)DELETE",     # DELETE文
@@ -70,7 +70,13 @@ FORBIDDEN_PATTERNS = [
     r"(?i)TRUNCATE",   # TRUNCATE文
     r"(?i)ATTACH",     # ATTACH文
     r"(?i)DETACH",     # DETACH文
-    r"(?i)PRAGMA",     # PRAGMA文
+]
+
+# 常に許可されるパターン（メタデータクエリ）
+METADATA_PATTERNS = [
+    r"^PRAGMA\s+table_info\([^)]+\)\s*;?\s*$",  # PRAGMA table_info
+    r"^PRAGMA\s+foreign_key_list\([^)]+\)\s*;?\s*$",  # PRAGMA foreign_key_list
+    r"^SELECT\s+name\s+FROM\s+sqlite_master\s+WHERE\s+type\s*=\s*'table'.*$"  # テーブル一覧のSQLite標準クエリ
 ]
 
 # 疑わしいLIKEパターン
@@ -97,6 +103,19 @@ def get_db_connection():
         conn.close()
 
 def validate_query(query: str, params: Optional[List[Any]] = None) -> None:
+    # メタデータクエリの確認（常に許可）
+    query_stripped = query.strip()
+    for pattern in METADATA_PATTERNS:
+        if re.match(pattern, query_stripped, re.IGNORECASE):
+            return
+
+    # SELECTで始まることを確認（メタデータクエリでない場合）
+    if not re.match(r"^\s*SELECT", query, re.IGNORECASE):
+        raise HTTPException(
+            status_code=403,
+            detail="Only SELECT queries and metadata queries are allowed"
+        )
+    
     # 禁止パターンのチェック
     for pattern in FORBIDDEN_PATTERNS:
         if re.search(pattern, query):
@@ -104,13 +123,6 @@ def validate_query(query: str, params: Optional[List[Any]] = None) -> None:
                 status_code=403,
                 detail=f"Forbidden SQL pattern detected"
             )
-    
-    # SELECTで始まることを確認
-    if not re.match(r"^\s*SELECT", query, re.IGNORECASE):
-        raise HTTPException(
-            status_code=403,
-            detail="Only SELECT queries are allowed"
-        )
     
     # LIKEパターンの検証
     if params:
@@ -147,14 +159,26 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal server error"}
     )
 
-# クエリエンドポイント
-@router.post("/query")
+def convert_sqlite_command(query: str) -> str:
+    """SQLiteの特殊コマンドを標準SQLクエリに変換"""
+    query = query.strip()
+    
+    # .tables コマンドの変換
+    if re.match(r"^\.tables\s*;?\s*$", query):
+        return "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;"
+        
+    return query
+
+@app.post(f"{API_PREFIX}/query")
 async def execute_query(request: QueryRequest):
     start_time = time.time()
     
     try:
+        # SQLiteコマンドの変換
+        converted_query = convert_sqlite_command(request.query)
+        
         # クエリの検証
-        validate_query(request.query, request.params)
+        validate_query(converted_query, request.params)
         
         # データベース接続とクエリ実行
         with get_db_connection() as conn:
@@ -162,9 +186,9 @@ async def execute_query(request: QueryRequest):
             
             try:
                 if request.params:
-                    cursor.execute(request.query, request.params)
+                    cursor.execute(converted_query, request.params)
                 else:
-                    cursor.execute(request.query)
+                    cursor.execute(converted_query)
                 
                 # 結果の取得（最大1000行まで）
                 rows = cursor.fetchmany(1000)

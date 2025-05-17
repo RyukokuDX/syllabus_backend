@@ -1,1 +1,4 @@
 2025-05-17 14:29:58.482 | ERROR    | src.main:execute_query:188 - Database error: Incorrect number of bindings supplied. The current statement uses 0, and there are 1 supplied.
+2025-05-17 14:40:25.249 | ERROR    | src.main:execute_query:201 - Database error: near ".": syntax error
+2025-05-17 14:40:48.986 | ERROR    | src.main:execute_query:201 - Database error: near ".": syntax error
+2025-05-17 14:41:08.870 | ERROR    | src.main:execute_query:201 - Database error: near ".": syntax error
