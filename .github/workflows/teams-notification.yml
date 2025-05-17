@@ -5,27 +5,27 @@ on:
     branches: [ main, develop, fujiwara/feature/teamsnotice ]
   pull_request:
     branches: [ main, develop ]
-
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Microsoft Teams Notification
-        uses: toko-bifrost/ms-teams-deploy-card@master
-        if: always()
-        with:
-          github-token: ${{ github.token }}
-          webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
-          card-layout-start: complete
-          custom-facts: |
-            - name: リポジトリ
-              value: ${{ github.repository }}
-            - name: ブランチ
-              value: ${{ github.ref_name }}
-            - name: イベント
-              value: ${{ github.event_name }}
-            - name: 実行者
-              value: ${{ github.actor }}
-          
+      - name: Notify to Microsoft Teams via webhook
+        run: |
+          curl -H "Content-Type: application/json" -d '{
+            "@type": "MessageCard",
+            "@context": "https://schema.org/extensions",
+            "summary": "GitHub Actions 通知",
+            "themeColor": "0076D7",
+            "title": "🚀 GitHub Actions 通知",
+            "sections": [{
+              "facts": [
+                {"name": "リポジトリ", "value": "${{ github.repository }}"},
+                {"name": "ブランチ", "value": "${{ github.ref_name }}"},
+                {"name": "イベント", "value": "${{ github.event_name }}"},
+                {"name": "実行者", "value": "${{ github.actor }}"},
+                {"name": "ステータス", "value": "${{ job.status }}"},
+                {"name": "コミットメッセージ", "value": "${{ github.event.head_commit.message }}"}
+              ],
+              "markdown": true
+            }]
+          }' "${{ secrets.TEAMS_WEBHOOK }}"
