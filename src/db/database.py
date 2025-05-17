@@ -5,15 +5,56 @@ from typing import Optional, Type, TypeVar, List, Dict, Any
 from .models import Base
 import logging
 from datetime import datetime
+import sqlite3
+from pathlib import Path
+from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar('T')
 
 class Database:
-    def __init__(self, db_url: str):
-        self.engine = create_engine(db_url)
-        self.SessionLocal = sessionmaker(bind=self.engine)
+    """データベース接続を管理するクラス"""
+    _instance: Optional['Database'] = None
+    
+    def __init__(self):
+        """
+        シングルトンパターンを使用してデータベース接続を管理
+        """
+        self.db_path = Path("db/syllabus.db")
+        self._connection = None
+
+    @classmethod
+    def get_instance(cls) -> 'Database':
+        """シングルトンインスタンスを取得"""
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    @contextmanager
+    def get_connection(self):
+        """データベース接続を取得するコンテキストマネージャ"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            yield conn
+        finally:
+            if conn:
+                conn.close()
+
+    @contextmanager
+    def get_cursor(self):
+        """データベースカーソルを取得するコンテキストマネージャ"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                yield cursor
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+            finally:
+                cursor.close()
 
     def init_db(self):
         """データベースの初期化"""
