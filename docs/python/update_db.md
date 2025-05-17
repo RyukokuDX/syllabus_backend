@@ -1,4 +1,4 @@
-# update_db.md
+# データベース更新スクリプト (`update_db.py`)
 
 [readmeへ](../../README.md) | [データベース構造へ](../database_structure.md) | [ライブラリ仕様へ](../database_python.md)
 
@@ -111,4 +111,11 @@ python src/db/update_db.py
 |------|------------|--------|------|
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 | 
 
-[🔝 ページトップへ](#update_dbmd)
+## 関連ドキュメント
+- [データベース構造定義](../database_structure.md)
+- [データベース操作クラス](database.md)
+- [モデル定義](models.md)
+- [シラバスページパーサー](raw_page_parser.md)
+- [DB更新手順](../database_update_workflow.md)
+
+[🔝 ページトップへ](#データベース更新スクリプト-update_dbpy)

@@ -23,11 +23,11 @@ Curosrへ指示する事で処理します
   - `postgresql.md`: PostgreSQL仕様書
   - `server.md`: サーバー構成の説明
   - `docker.md`: Docker構成
-  - `python`: pythonスクリプトの仕様書
-    - `database.md`
-    - `models.md`
-    - `update_db.md`
-    - `raw_page_parser.md`: シラバス検索ページパーサー
+  - `python/`: Pythonライブラリの仕様書
+    - `database.md`: データベース操作クラスの仕様
+    - `models.md`: データモデルの定義と使用方法
+    - `update_db.md`: DB更新処理の仕様
+    - `raw_page_parser.md`: シラバス検索ページパーサーの仕様
 
 - `src/`: ソースコード
   - `__init__.py`: パッケージ定義
@@ -58,11 +58,35 @@ Curosrへ指示する事で処理します
 - [DB ER図](docs/database_er.md)
 - [DBライブラリ仕様](docs/database_python.md)
 
-## Pythonスクリプト
-- [database](docs/python/database.md)
-- [models.md](docs/python/models.md)
-- [db更新スクリプト](docs/python/update_db.md)
-- [シラバス検索ページパーサー](docs/python/raw_page_parser.md)
+## Pythonライブラリ
+### データベース操作 [`database.py`](docs/python/database.md)
+シングルトンパターンを使用したSQLiteデータベース操作クラス
+- 接続管理
+- トランザクション制御
+- エラーハンドリング
+
+### データモデル [`models.py`](docs/python/models.md)
+SQLAlchemyを使用したデータモデル定義
+- 科目情報（Subject）
+- シラバス情報（Syllabus）
+- 講義時間（SyllabusTime）
+- 教員情報（Instructor）
+- 書籍情報（Book）
+- 成績評価基準（GradingCriterion）
+- その他関連テーブル
+
+### データ更新 [`update_db.py`](docs/python/update_db.md)
+JSONファイルからデータベースを更新する処理
+- データの整合性チェック
+- バリデーション
+- エラーハンドリング
+- 処理済みファイルの自動アーカイブ
+
+### パーサー [`raw_page_parser.py`](docs/python/raw_page_parser.md)
+シラバス検索ページのパース処理
+- HTMLパース
+- データ抽出
+- 正規化処理
 
 ## サーバー構成
 - [API仕様](docs/server.md)
