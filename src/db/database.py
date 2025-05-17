@@ -1,19 +1,61 @@
 from sqlalchemy import create_engine, and_, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Optional, Type, TypeVar, List, Dict, Any
-from .models import Base
+from typing import Optional, Type, TypeVar, List, Dict, Any, Generator
+from src.db.models import Base
 import logging
 from datetime import datetime
+import sqlite3
+from pathlib import Path
+from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar('T')
 
 class Database:
-    def __init__(self, db_url: str):
-        self.engine = create_engine(db_url)
-        self.SessionLocal = sessionmaker(bind=self.engine)
+    """データベース接続を管理するクラス"""
+    _instance: Optional['Database'] = None
+    
+    def __init__(self):
+        """
+        シングルトンパターンを使用してデータベース接続を管理
+        """
+        if Database._instance is not None:
+            raise RuntimeError("Database is a singleton class. Use get_instance() instead.")
+        
+        self.db_path = Path("db/syllabus.db")
+        self.conn = None
+
+    @classmethod
+    def get_instance(cls) -> 'Database':
+        """シングルトンインスタンスを取得"""
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def connect(self):
+        if self.conn is None:
+            self.conn = sqlite3.connect(self.db_path)
+    
+    def close(self):
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None
+
+    @contextmanager
+    def get_cursor(self) -> Generator[sqlite3.Cursor, None, None]:
+        """データベースカーソルを取得するコンテキストマネージャ"""
+        self.connect()
+        cursor = self.conn.cursor()
+        try:
+            yield cursor
+            self.conn.commit()
+        except Exception as e:
+            self.conn.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     def init_db(self):
         """データベースの初期化"""

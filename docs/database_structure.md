@@ -1,6 +1,6 @@
 # シラバス情報データベース設計
 
-[readmeへ](../README.md) | [ER図へ](database_er.md) | [ライブラリ仕様へ](database_python.md)
+[readmeへ](../README.md) | [ER図へ](database_er.md)
 
 ## 目次
 
@@ -21,6 +21,12 @@
 
 ### [データソースと更新ポリシー](#データソースと更新ポリシー)
 
+## 更新履歴
+
+| 日付 | バージョン | 更新者 | 内容 |
+|------|------------|--------|------|
+| 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
+
 ## テーブル構成
 
 ### subject（科目基本情報）
@@ -35,6 +41,7 @@
 | name | TEXT | NO | 科目名 | シラバス検索画面 |
 | class_name | TEXT | NO | 科目区分 | シラバス検索画面 |
 | subclass_name | TEXT | YES | 科目小区分 | シラバス検索画面 |
+| class_note | TEXT | YES | 科目区分の備考 | シラバス検索画面 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
