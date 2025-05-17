@@ -33,6 +33,7 @@ erDiagram
         TEXT name
         TEXT class_name
         TEXT subclass_name
+        TEXT class_note
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }

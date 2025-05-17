@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine, and_, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Optional, Type, TypeVar, List, Dict, Any
-from .models import Base
+from typing import Optional, Type, TypeVar, List, Dict, Any, Generator
+from src.db.models import Base
 import logging
 from datetime import datetime
 import sqlite3
@@ -21,8 +21,11 @@ class Database:
         """
         シングルトンパターンを使用してデータベース接続を管理
         """
+        if Database._instance is not None:
+            raise RuntimeError("Database is a singleton class. Use get_instance() instead.")
+        
         self.db_path = Path("db/syllabus.db")
-        self._connection = None
+        self.conn = None
 
     @classmethod
     def get_instance(cls) -> 'Database':
@@ -31,30 +34,28 @@ class Database:
             cls._instance = cls()
         return cls._instance
 
-    @contextmanager
-    def get_connection(self):
-        """データベース接続を取得するコンテキストマネージャ"""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            yield conn
-        finally:
-            if conn:
-                conn.close()
+    def connect(self):
+        if self.conn is None:
+            self.conn = sqlite3.connect(self.db_path)
+    
+    def close(self):
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None
 
     @contextmanager
-    def get_cursor(self):
+    def get_cursor(self) -> Generator[sqlite3.Cursor, None, None]:
         """データベースカーソルを取得するコンテキストマネージャ"""
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            try:
-                yield cursor
-                conn.commit()
-            except Exception:
-                conn.rollback()
-                raise
-            finally:
-                cursor.close()
+        self.connect()
+        cursor = self.conn.cursor()
+        try:
+            yield cursor
+            self.conn.commit()
+        except Exception as e:
+            self.conn.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     def init_db(self):
         """データベースの初期化"""

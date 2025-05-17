@@ -1,6 +1,6 @@
 # シラバス情報データベース設計
 
-[readmeへ](../README.md) | [ER図へ](database_er.md) | [ライブラリ仕様へ](database_python.md) | [PostgreSQL設定へ](postgresql.md) | [DB運用マニュアルへ](db_operation_manual.md)
+[readmeへ](../README.md) | [ER図へ](database_er.md)
 
 ## 目次
 
@@ -41,6 +41,7 @@
 | name | TEXT | NO | 科目名 | シラバス検索画面 |
 | class_name | TEXT | NO | 科目区分 | シラバス検索画面 |
 | subclass_name | TEXT | YES | 科目小区分 | シラバス検索画面 |
+| class_note | TEXT | YES | 科目区分の備考 | シラバス検索画面 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 

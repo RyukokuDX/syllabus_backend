@@ -27,6 +27,7 @@ Curosrへ指示する事で処理します
     - `database.md`
     - `models.md`
     - `update_db.md`
+    - `raw_page_parser.md`: シラバス検索ページパーサー
 
 - `src/`: ソースコード
   - `__init__.py`: パッケージ定義
@@ -34,6 +35,7 @@ Curosrへ指示する事で処理します
     - `__init__.py`: データベースパッケージ定義
     - `models.py`: データベースモデル定義
     - `database.py`: データベース操作クラス
+    - `raw_page_parser.py`: シラバス検索ページパーサー
     - `py.typed`: 型チェック用マーカー
   - `syllabus/`: シラバス
     - `2025/`: 年
@@ -60,6 +62,7 @@ Curosrへ指示する事で処理します
 - [database](docs/python/database.md)
 - [models.md](docs/python/models.md)
 - [db更新スクリプト](docs/python/update_db.md)
+- [シラバス検索ページパーサー](docs/python/raw_page_parser.md)
 
 ## サーバー構成
 - [API仕様](docs/server.md)

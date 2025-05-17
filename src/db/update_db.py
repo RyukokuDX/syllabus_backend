@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Type, TypeVar
 from datetime import datetime
 import shutil
-from database import Database
+from src.db.database import Database
 from dataclasses import asdict
-from models import (
+from src.db.models import (
     Subject, Syllabus, SyllabusTime, Instructor, Book, GradingCriterion,
     SyllabusInstructor, LectureSession, SyllabusTextbook, SyllabusReference,
     SyllabusFaculty, SubjectRequirement, SubjectProgram
