@@ -12,20 +12,53 @@ jobs:
       - name: Notify to Microsoft Teams via webhook
         run: |
           curl -H "Content-Type: application/json" -d '{
-            "@type": "MessageCard",
-            "@context": "https://schema.org/extensions",
-            "summary": "GitHub Actions 通知",
-            "themeColor": "0076D7",
-            "title": "🚀 GitHub Actions 通知",
-            "sections": [{
-              "facts": [
-                {"name": "リポジトリ", "value": "${{ github.repository }}"},
-                {"name": "ブランチ", "value": "${{ github.ref_name }}"},
-                {"name": "イベント", "value": "${{ github.event_name }}"},
-                {"name": "実行者", "value": "${{ github.actor }}"},
-                {"name": "ステータス", "value": "${{ job.status }}"},
-                {"name": "コミットメッセージ", "value": "${{ github.event.head_commit.message }}"}
-              ],
-              "markdown": true
-            }]
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": null,
+                "content": {
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "type": "AdaptiveCard",
+                  "version": "1.2",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "size": "Large",
+                      "weight": "Bolder",
+                      "text": "🚀 GitHub Actions 通知"
+                    },
+                    {
+                      "type": "FactSet",
+                      "facts": [
+                        {
+                          "title": "リポジトリ",
+                          "value": "${{ github.repository }}"
+                        },
+                        {
+                          "title": "ブランチ",
+                          "value": "${{ github.ref_name }}"
+                        },
+                        {
+                          "title": "イベント",
+                          "value": "${{ github.event_name }}"
+                        },
+                        {
+                          "title": "実行者",
+                          "value": "${{ github.actor }}"
+                        },
+                        {
+                          "title": "ステータス",
+                          "value": "${{ job.status }}"
+                        },
+                        {
+                          "title": "コミットメッセージ",
+                          "value": "${{ github.event.head_commit.message }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
           }' "${{ secrets.TEAMS_WEBHOOK }}"
