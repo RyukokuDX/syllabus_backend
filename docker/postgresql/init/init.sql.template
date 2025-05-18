@@ -53,20 +53,20 @@ CREATE INDEX idx_subject_class ON subject(class_name);
 
 -- syllabus（シラバス情報）
 CREATE TABLE syllabus (
-    subject_code TEXT PRIMARY KEY,
+    subject_code TEXT NOT NULL,
     year INTEGER NOT NULL,
     subtitle TEXT,
     term TEXT NOT NULL,
-    grade_b0 BOOLEAN NOT NULL,
     grade_b1 BOOLEAN NOT NULL,
     grade_b2 BOOLEAN NOT NULL,
     grade_b3 BOOLEAN NOT NULL,
-    grade_m0 BOOLEAN NOT NULL,
+    grade_b4 BOOLEAN NOT NULL,
     grade_m1 BOOLEAN NOT NULL,
-    grade_d0 BOOLEAN NOT NULL,
+    grade_m2 BOOLEAN NOT NULL,
     grade_d1 BOOLEAN NOT NULL,
     grade_d2 BOOLEAN NOT NULL,
-    campus VARCHAR(5) NOT NULL,
+    grade_d3 BOOLEAN NOT NULL,
+    campus VARCHAR(6) NOT NULL,
     credits SMALLINT NOT NULL,
     lecture_code TEXT NOT NULL,
     summary TEXT,
@@ -77,12 +77,13 @@ CREATE TABLE syllabus (
     remarks TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
+    PRIMARY KEY (subject_code, year, term),
     FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_syllabus_year ON syllabus(year);
 CREATE INDEX idx_syllabus_term ON syllabus(term);
-CREATE INDEX idx_syllabus_grades ON syllabus(grade_b0, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3);
+CREATE INDEX idx_syllabus_grades ON syllabus(grade_b1, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3);
 CREATE INDEX idx_syllabus_campus ON syllabus(campus);
 
 -- syllabus_time（講義時間）
@@ -277,3 +278,10 @@ CREATE INDEX idx_subject_class ON subject(class_name);
 
 -- 以下、master_dbと同じテーブル定義を繰り返し...
 -- （以下、上記のテーブル定義と同じ内容を繰り返すため省略）
+
+-- ========== マイグレーションファイルの実行 ==========
+
+-- マイグレーションファイルを実行
+\i /docker-entrypoint-initdb.d/02-migrations/V20250518211454__insert_subjects.sql
+\i /docker-entrypoint-initdb.d/02-migrations/V20250519022619__insert_syllabuss.sql
+\i /docker-entrypoint-initdb.d/02-migrations/V20250519023115__insert_syllabus_times.sql

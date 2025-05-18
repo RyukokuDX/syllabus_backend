@@ -13,9 +13,6 @@ ENV LC_ALL=ja_JP.UTF-8
 # タイムゾーンを設定
 ENV TZ=Asia/Tokyo
 
-# 初期化スクリプトをコピー
-COPY ./init/ /docker-entrypoint-initdb.d/
-
 # PostgreSQLの設定をカスタマイズ
 COPY postgresql.conf /etc/postgresql/postgresql.conf
 
