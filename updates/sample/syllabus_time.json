@@ -1,0 +1,24 @@
+{
+  "syllabus_times": [
+    {
+      "subject_code": "CSCI0001",
+      "day_of_week": 1,
+      "period": 2
+    },
+    {
+      "subject_code": "CSCI0001",
+      "day_of_week": 1,
+      "period": 3
+    },
+    {
+      "subject_code": "MATH0001",
+      "day_of_week": 2,
+      "period": 1
+    },
+    {
+      "subject_code": "ENGL0001",
+      "day_of_week": 3,
+      "period": 4
+    }
+  ]
+} 

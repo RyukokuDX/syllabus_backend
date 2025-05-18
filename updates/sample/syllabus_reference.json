@@ -1,0 +1,14 @@
+{
+  "syllabus_references": [
+    {
+      "subject_code": "CSCI0001",
+      "book_id": 2,
+      "note": "アルゴリズムの理解に役立つ"
+    },
+    {
+      "subject_code": "ENGL0001",
+      "book_id": 3,
+      "note": "自習用教材として推奨"
+    }
+  ]
+} 

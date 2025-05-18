@@ -1,0 +1,20 @@
+{
+  "subject_programs": [
+    {
+      "subject_code": "CSCI0001",
+      "program_code": "CS-BASIC"
+    },
+    {
+      "subject_code": "CSCI0001",
+      "program_code": "IT-CORE"
+    },
+    {
+      "subject_code": "MATH0001",
+      "program_code": "MATH-BASIC"
+    },
+    {
+      "subject_code": "ENGL0001",
+      "program_code": "GLOBAL-COM"
+    }
+  ]
+} 

@@ -1,0 +1,24 @@
+{
+  "lecture_sessions": [
+    {
+      "subject_code": "CSCI0001",
+      "session_number": 1,
+      "description": "Pythonの開発環境セットアップと基本文法"
+    },
+    {
+      "subject_code": "CSCI0001",
+      "session_number": 2,
+      "description": "変数、データ型、基本的な演算"
+    },
+    {
+      "subject_code": "MATH0001",
+      "session_number": 1,
+      "description": "ベクトルの基本概念と演算"
+    },
+    {
+      "subject_code": "MATH0001",
+      "session_number": 2,
+      "description": "行列の定義と基本演算"
+    }
+  ]
+} 

@@ -19,11 +19,22 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
 ## ディレクトリ構造
 ```
 .
-├── docker-compose.yml
-└── docker/
-    └── api/
-        ├── Dockerfile
-        └── requirements.txt
+├── .github/            # GitHub Actions設定
+├── db/                # データベース関連ファイル
+├── docker/            # Docker設定ファイル
+│   ├── .env          # 環境設定ファイル
+│   ├── fastapi/      # FastAPI用Docker設定
+│   │   ├── app/      # アプリケーション設定
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml
+│   │   └── pyproject.toml
+│   └── postgre/      # PostgreSQL用Docker設定
+├── docs/             # ドキュメント
+├── postgre/          # PostgreSQL関連ファイル
+├── src/              # アプリケーションソース
+├── .dockerignore
+├── .gitignore
+└── README.md
 ```
 
 ## 必要なパッケージ
@@ -101,12 +112,45 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
 
 ### APIサーバー（FastAPI）
 - イメージ: `python:3.11-slim`
-- ポート: 8000
+- ポート: 5000
 - 環境変数:
   - `DATABASE_URL`: 外部DB接続情報
   - `DEBUG_MODE`: false
   - `LOG_LEVEL`: info
 
+- Database (PostgreSQL)
+  - ポート: 5433
+  - 詳細: [PostgreSQL環境の説明](postgresql.md)
+
+## ネットワーク構成
+
+- `api-network`: APIサーバーとデータベース間の通信用ネットワーク
+
+## 環境変数
+
+主な環境変数は`.env`ファイルで管理されています：
+
+```env
+DATABASE_URL=postgresql://app:password@db:5433/syllabus
+PYTHONPATH=/app
+```
+
+## 開発環境の起動方法
+
+1. 環境のビルド
+```bash
+docker-compose up --build
+```
+
+2. 環境の起動（バックグラウンド）
+```bash
+docker-compose up -d
+```
+
+3. 環境の停止
+```bash
+docker-compose down
+```
 
 ## ヘルスチェック設定
 
@@ -183,6 +227,27 @@ http_request_duration_seconds = Histogram(
     'HTTP request duration',
     ['method', 'endpoint']
 )
+```
+
+## トラブルシューティング
+
+### コンテナログの確認
+```bash
+# 全てのコンテナのログを表示
+docker-compose logs
+
+# 特定のサービスのログを表示
+docker-compose logs api
+docker-compose logs db
+```
+
+### コンテナ内でのコマンド実行
+```bash
+# APIサーバーのコンテナでコマンドを実行
+docker-compose exec api bash
+
+# データベースのコンテナでコマンドを実行
+docker-compose exec db bash
 ```
 
 ## 更新履歴

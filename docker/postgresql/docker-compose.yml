@@ -1,0 +1,27 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=ja_JP.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      # 自動生成された init.sql を初期化時に実行
+      - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shared-network
+
+volumes:
+  postgres_data:
+
+networks:
+  shared-network:
+    external: true

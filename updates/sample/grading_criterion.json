@@ -1,0 +1,34 @@
+{
+  "grading_criteria": [
+    {
+      "subject_code": "CSCI0001",
+      "criteria_type": "平常",
+      "ratio": 30,
+      "note": "授業への参加度と課題提出"
+    },
+    {
+      "subject_code": "CSCI0001",
+      "criteria_type": "レポ",
+      "ratio": 40,
+      "note": "最終課題プログラム"
+    },
+    {
+      "subject_code": "CSCI0001",
+      "criteria_type": "定期",
+      "ratio": 30,
+      "note": "筆記試験"
+    },
+    {
+      "subject_code": "MATH0001",
+      "criteria_type": "小テ",
+      "ratio": 20,
+      "note": "毎回の小テスト"
+    },
+    {
+      "subject_code": "MATH0001",
+      "criteria_type": "定期",
+      "ratio": 80,
+      "note": "筆記試験"
+    }
+  ]
+} 
