@@ -12,6 +12,8 @@ services:
       - DATABASE_URL=postgresql://postgres:password@postgres-db:5432/mydatabase
     networks:
       - shared-network
+    env_file:
+      - ../.env
 
 networks:
   shared-network:

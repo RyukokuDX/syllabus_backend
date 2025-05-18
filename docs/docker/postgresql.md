@@ -217,4 +217,99 @@ go run cmd/dbtools/main.go migrate up
 - 環境変数による設定値の管理
 - アクセス権限の適切な設定
 
+## PostgreSQL Docker環境
+
+## 概要
+
+PostgreSQLデータベースの環境構成について説明します。
+
+## 基本情報
+
+- イメージ: `postgres:15-alpine`
+- ポート: 5433
+- データベース名: syllabus
+- ユーザー名: app
+- パスワード: password
+
+## 環境変数
+
+| 変数名 | 説明 | デフォルト値 |
+|--------|------|--------------|
+| POSTGRES_DB | データベース名 | syllabus |
+| POSTGRES_USER | データベースユーザー | app |
+| POSTGRES_PASSWORD | データベースパスワード | password |
+| POSTGRES_PORT | データベースポート | 5433 |
+
+## データの永続化
+
+データは`db/data`ディレクトリに永続化されます：
+
+```yaml
+volumes:
+  - ./db/data:/var/lib/postgresql/data
+```
+
+## データベース管理
+
+### データベースへの接続
+
+```bash
+# コンテナ内のpsqlを使用
+docker-compose exec db psql -U app -d syllabus
+
+# ホストマシンのpsqlを使用
+psql -h localhost -p 5433 -U app -d syllabus
+```
+
+### バックアップとリストア
+
+```bash
+# バックアップの作成
+docker-compose exec db pg_dump -U app syllabus > backup.sql
+
+# リストア
+cat backup.sql | docker-compose exec -T db psql -U app -d syllabus
+```
+
+### マイグレーション
+
+マイグレーションはAlembicを使用して管理されています：
+
+```bash
+# マイグレーションの作成
+docker-compose exec api poetry run alembic revision --autogenerate -m "description"
+
+# マイグレーションの適用
+docker-compose exec api poetry run alembic upgrade head
+
+# マイグレーションの履歴確認
+docker-compose exec api poetry run alembic history
+```
+
+## トラブルシューティング
+
+### データベースのリセット
+
+1. コンテナとボリュームの削除
+```bash
+docker-compose down -v
+```
+
+2. データディレクトリの削除
+```bash
+rm -rf db/data
+```
+
+3. 環境の再作成
+```bash
+docker-compose up -d
+```
+
+### ログの確認
+
+```bash
+# データベースのログを表示
+docker-compose logs db
+```
+
 [🔝 ページトップへ](#fastapi--postgresql-環境構築データ管理設計書) 

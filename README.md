@@ -98,6 +98,7 @@ JSONファイルからデータベースを更新する処理
 - データ抽出
 - 正規化処理
 
-## サーバー構成
-- [API仕様](docs/docker/server.md)
+## Docker構成
 - [Docker構成](docs/docker/docker.md)
+- [FastAPI構成](docs/docker/fastapi.md)
+- [PostgreSQL構成](docs/docker/postgresql.md)
