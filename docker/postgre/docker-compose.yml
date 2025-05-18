@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=syllabus
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - APP_USER=app
+      - APP_PASSWORD=password
+      - TZ=Asia/Tokyo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - api-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  api-network:
+    name: api-network
+    driver: bridge 

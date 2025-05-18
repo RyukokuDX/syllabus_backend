@@ -1,0 +1,18 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-api
+    ports:
+      - "5000:5000"  # ホスト:コンテナ ポート対応
+    volumes:
+      - ./app:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres-db:5432/mydatabase
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true
