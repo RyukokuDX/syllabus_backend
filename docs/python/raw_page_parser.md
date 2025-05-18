@@ -18,6 +18,7 @@
 |---------|----------|
 | subject | 科目一覧テーブルから科目情報を抽出 |
 | syllabus | シラバス詳細ページから情報を抽出 |
+| syllabus_time | 授業時間割情報を抽出 |
 
 ## コマンドラインオプション
 ```bash
@@ -28,7 +29,19 @@ python src/db/raw_page_parser.py -y [年度] -t [データ型]
 | オプション | 説明 | 必須 |
 |-----------|------|------|
 | -y, --year | 処理対象の年度（例：2025） | はい |
-| -t, --type | 処理対象のデータ型（subject または syllabus） | はい |
+| -t, --type | 処理対象のデータ型 | はい |
+
+#### データ型一覧
+- `subject`: 科目基本情報
+- `syllabus`: シラバス詳細情報
+- `syllabus_time`: 授業時間割情報
+- `syllabus_textbook`: 教科書情報
+- `syllabus_reference`: 参考文献情報
+- `syllabus_faculty`: 担当教員情報
+- `subject_requirement`: 履修要件情報
+- `subject_program`: プログラム情報
+- `instructor`: 教員情報
+- `book`: 書籍情報
 
 ## 出力形式
 
@@ -64,7 +77,7 @@ python src/db/raw_page_parser.py -y [年度] -t [データ型]
 ```json
 {
     "content": {
-        "syllabus_id": "G250110001",
+        "syllabus_id": "1",
         "subject_code": "G250110001",
         "year": 2025,
         "subtitle": "サブタイトル",
@@ -84,6 +97,18 @@ python src/db/raw_page_parser.py -y [年度] -t [データ型]
         "summary": "講義概要",
         "goals": "到達目標",
         "methods": "講義方法"
+    }
+}
+```
+
+### 授業時間割情報（syllabus_time）
+```json
+{
+    "content": {
+        "subject_code": "G250110001",
+        "day_of_week": 2,
+        "periods": [3, 4],
+        "created_at": "2024-05-18T12:34:56.789Z"
     }
 }
 ```

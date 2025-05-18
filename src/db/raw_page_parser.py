@@ -425,7 +425,15 @@ def save_json(entry, year, table_name):
 def main():
     parser = argparse.ArgumentParser(description='Parse syllabus HTML and output JSON files.')
     parser.add_argument('-y', '--year', required=True, help='Target year')
-    parser.add_argument('-t', '--table', required=True, choices=['subject', 'syllabus', 'syllabus_time'], help='Target table name')
+    parser.add_argument(
+        '-t', '--table',
+        required=True,
+        choices=['subject', 'syllabus', 'syllabus_time'],
+        help='''Target table name:
+            subject: Extract subject information (code, name, etc.)
+            syllabus: Extract syllabus details (summary, goals, etc.)
+            syllabus_time: Extract class schedule information (day of week, period)'''
+    )
     args = parser.parse_args()
 
     if args.table == 'subject':
