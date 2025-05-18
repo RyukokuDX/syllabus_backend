@@ -4,6 +4,7 @@
 ## 環境要件
 - SQLite
   - DB構成は[DB構成](docs/database/structure.md)
+  - Git操作時の注意点は[Git操作ガイド](docs/githelp.md)
 
 ## Cursorへの指示
 - [Cursorへの指示書](docs/cursor.md)
