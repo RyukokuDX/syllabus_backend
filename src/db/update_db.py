@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Type, TypeVar
 from datetime import datetime
 import shutil
+import logging
 from src.db.database import Database
 from dataclasses import asdict
 from src.db.models import (
@@ -11,10 +12,22 @@ from src.db.models import (
     SyllabusFaculty, SubjectRequirement, SubjectProgram
 )
 
+# ロガーの設定
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('db/updates/update.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
 T = TypeVar('T')
 
 def load_and_validate_json(file_path: Path, model_class: Type[T]) -> List[T]:
     """JSONファイルを読み込み、データクラスのインスタンスとして検証"""
+    logger.info(f"JSONファイルを読み込み中: {file_path}")
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
@@ -31,16 +44,21 @@ def load_and_validate_json(file_path: Path, model_class: Type[T]) -> List[T]:
         try:
             instance = model_class(**item)
             instances.append(instance)
+            logger.debug(f"レコード {i + 1} を正常に検証: {item}")
         except TypeError as e:
+            logger.error(f"レコード {i + 1} の型エラー: {str(e)}")
             raise ValueError(f"{file_path} の項目 {i + 1}: {str(e)}")
         except ValueError as e:
+            logger.error(f"レコード {i + 1} の値エラー: {str(e)}")
             raise ValueError(f"{file_path} の項目 {i + 1}: {str(e)}")
     
+    logger.info(f"{len(instances)}件のレコードを検証完了")
     return instances
 
-def insert_records(cur, instances: List[T], table_name: str):
-    """データベースにレコードを挿入"""
+def insert_records(cur, instances: List[T], table_name: str, operation: str):
+    """データベースにレコードを挿入または更新"""
     if not instances:
+        logger.warning("処理対象のレコードがありません")
         return
     
     # インスタンスを辞書に変換
@@ -52,15 +70,39 @@ def insert_records(cur, instances: List[T], table_name: str):
     columns_str = ','.join(columns)
     
     # SQLクエリの構築
-    query = f"""
-    INSERT OR REPLACE INTO {table_name} ({columns_str})
-    VALUES ({placeholders})
-    """
+    if operation == 'add':
+        query = f"""
+        INSERT OR REPLACE INTO {table_name} ({columns_str})
+        VALUES ({placeholders})
+        """
+        logger.info(f"INSERTクエリを実行: {table_name}")
+    else:  # modify
+        # 主キーを特定（subject_codeまたはsyllabus_id）
+        primary_key = 'subject_code' if 'subject_code' in columns else 'syllabus_id'
+        set_clause = ', '.join([f"{col} = ?" for col in columns if col != primary_key])
+        query = f"""
+        UPDATE {table_name}
+        SET {set_clause}
+        WHERE {primary_key} = ?
+        """
+        logger.info(f"UPDATEクエリを実行: {table_name}")
     
-    # レコードの挿入
-    for record in records:
-        values = [record[column] for column in columns]
-        cur.execute(query, values)
+    # レコードの挿入または更新
+    for i, record in enumerate(records):
+        try:
+            if operation == 'add':
+                values = [record[column] for column in columns]
+            else:  # modify
+                # 主キー以外のカラムの値を取得
+                values = [record[column] for column in columns if column != primary_key]
+                # 主キーの値を最後に追加
+                values.append(record[primary_key])
+            
+            cur.execute(query, values)
+            logger.debug(f"レコード {i + 1} を処理: {record}")
+        except Exception as e:
+            logger.error(f"レコード {i + 1} の処理中にエラー: {str(e)}")
+            raise
 
 def move_to_registered(json_file: Path):
     """処理済みのJSONファイルをregisteredディレクトリに移動"""
@@ -82,10 +124,12 @@ def move_to_registered(json_file: Path):
 
     # ファイルを移動
     shutil.move(str(json_file), str(target_path))
-    print(f"✓ ファイルを移動しました: {target_path}")
+    logger.info(f"ファイルを移動: {json_file} -> {target_path}")
 
 def main():
     """メイン処理"""
+    logger.info("データベース更新処理を開始")
+    
     # モデルクラスとテーブル名のマッピング
     model_mapping = {
         'subject': (Subject, 'subject'),
@@ -110,24 +154,27 @@ def main():
         # 1. JSONファイルの検索（addとmodifyディレクトリのみ）
         json_files = []
         for operation in ['add', 'modify']:
-            json_files.extend(list(updates_dir.glob(f"*/{operation}/*.json")))
+            files = list(updates_dir.glob(f"*/{operation}/*.json"))
+            json_files.extend(files)
+            logger.info(f"{operation}ディレクトリから{len(files)}件のファイルを検出")
         
         if not json_files:
-            print("更新対象のJSONファイルが見つかりませんでした。")
+            logger.warning("更新対象のJSONファイルが見つかりませんでした。")
             return
         
         # 2. 各JSONファイルの処理
         for json_file in json_files:
-            print(f"\n{json_file}を処理中...")
+            logger.info(f"\n{json_file}を処理中...")
             
             # ファイル名からデータ型を判断
             data_type = json_file.parent.parent.name
             if data_type not in model_mapping:
-                print(f"エラー: 未知のデータ型です: {data_type}")
+                logger.error(f"未知のデータ型です: {data_type}")
                 print("処理を中止します。")
                 exit(1)
             
             model_class, table_name = model_mapping[data_type]
+            operation = json_file.parent.name  # 'add' または 'modify'
             
             try:
                 # データの整合性チェック
@@ -135,29 +182,26 @@ def main():
                 
                 # データベースの更新
                 with db.get_cursor() as cur:
-                    insert_records(cur, instances, table_name)
+                    insert_records(cur, instances, table_name, operation)
                 
-                print(f"✓ {len(instances)}件のレコードを正常に処理しました。")
+                logger.info(f"✓ {len(instances)}件のレコードを正常に処理しました。")
                 
                 # 処理済みファイルの移動
                 move_to_registered(json_file)
                 
             except ValueError as e:
-                print(f"エラー: データの整合性チェックに失敗しました:")
-                print(f"  {str(e)}")
+                logger.error(f"データの整合性チェックに失敗しました: {str(e)}")
                 print("処理を中止します。")
                 exit(1)
             except Exception as e:
-                print(f"エラー: データベースの更新中にエラーが発生しました:")
-                print(f"  {str(e)}")
+                logger.error(f"データベースの更新中にエラーが発生しました: {str(e)}")
                 print("処理を中止します。")
                 exit(1)
         
-        print("\nすべてのファイルが正常に処理されました。")
+        logger.info("\nすべてのファイルが正常に処理されました。")
         
     except Exception as e:
-        print(f"\n予期せぬエラーが発生しました:")
-        print(f"  {str(e)}")
+        logger.error(f"予期せぬエラーが発生しました: {str(e)}")
         print("処理を中止します。")
         exit(1)
 

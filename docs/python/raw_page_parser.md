@@ -1,123 +1,162 @@
-# シラバス検索ページパーサー (`raw_page_parser.py`)
+# シラバスページパーサー (`raw_page_parser.py`)
 
-[readmeへ](../../README.md) | [DB更新手順へ](../database_update_workflow.md)
+[readmeへ](../../README.md) | [データベース構造へ](../database/structure.md) | [ライブラリ仕様へ](../database/python.md)
 
 ## 概要
-シラバス検索ページのHTMLファイルから科目情報を抽出し、データベース更新用のJSONファイルを生成します。
-BeautifulSoupを使用してHTMLを解析し、必要な情報を構造化されたデータとして取得します。
+`src/db/raw_page_parser.py`は、HTMLファイルからシラバス情報を抽出し、JSONファイルとして保存するスクリプトです。
+科目情報とシラバス詳細情報の両方を処理できます。
 
-## 機能
-- HTMLファイルの解析
-- 科目情報の抽出
-- JSONファイルの生成
-- デバッグ用の整形HTMLの出力
+## 処理フロー
+1. 指定されたディレクトリ内のHTMLファイルを検索
+2. 各HTMLファイルに対して:
+   - BeautifulSoupを使用してHTMLを解析
+   - データ型に応じて適切なパーサーを実行
+   - 抽出したデータをJSONファイルとして保存
 
-## 使用方法
+## 対応データ型
+| データ型 | 処理内容 |
+|---------|----------|
+| subject | 科目一覧テーブルから科目情報を抽出 |
+| syllabus | シラバス詳細ページから情報を抽出 |
 
-### コマンドライン
+## コマンドラインオプション
 ```bash
-# 基本的な使用方法
-python src/db/raw_page_parser.py -y 2024
-
-# デバッグモードで実行（詳細なログ出力）
-python src/db/raw_page_parser.py -y 2024 --debug
+python src/db/raw_page_parser.py -y [年度] -t [データ型]
 ```
 
 ### オプション
-| オプション | 説明 | デフォルト値 |
-|------------|------|--------------|
-| `-y`, `--year` | 対象年度（必須） | - |
-| `--debug` | デバッグモードの有効化 | False |
-| `--output-dir` | 出力ディレクトリの指定 | `db/updates/subject/add` |
+| オプション | 説明 | 必須 |
+|-----------|------|------|
+| -y, --year | 処理対象の年度（例：2025） | はい |
+| -t, --type | 処理対象のデータ型（subject または syllabus） | はい |
 
-## 入力ファイル
-### ディレクトリ構造
-```
-src/syllabus/{年}/search_page/
-  ├── page1.html
-  ├── page2.html
-  └── ...
-```
+## 出力形式
 
-### HTMLファイル形式
-```html
-<table class="dataT">
-  <tr>
-    <td class="attribute">専門科目：情報系・必修</td>
-    <td class="subject">
-      <a href="syllabus.php?code=SUBJ001">プログラミング基礎</a>
-    </td>
-  </tr>
-  <!-- 他の科目情報 -->
-</table>
-```
-
-## 出力ファイル
-### ディレクトリ構造
-```
-db/updates/subject/add/
-  ├── SUBJ001.json
-  ├── SUBJ002.json
-  └── ...
-```
-
-### JSONファイル形式
+### 科目情報（subject）
 ```json
 {
-  "content": {
-    "subject_code": "SUBJ001",
-    "name": "プログラミング基礎",
-    "class_name": "専門科目",
-    "subclass_name": "情報系",
-    "class_note": "必修"
-  }
+    "content": {
+        "subject_code": "G250110001",
+        "name": "科目名",
+        "class_name": "教養科目",
+        "subclass_name": "社会系化学",
+        "class_note": "2015年度以降",
+        "created_at": "2024-05-18T12:34:56.789Z",
+        "updated_at": null
+    }
 }
 ```
 
-## 処理フロー
-1. コマンドライン引数の解析
-   - 年度の取得
-   - オプションの設定
+- 科目区分の分解は、
+`{class_note}：{class_name}・{subclass_name}`
+としている.
+   - 例１: `必修外国語・英語`なら
+      - "class_name": "必修外国語",
+      - "subclass_name": "英語",
+      - "class_note": "",
+   - 例2: `2015年度以降入学：教養科目・社会系科学`なら
+      - "class_name": "教養科目",
+      - "subclass_name": "社会系化学",
+      - "class_note": "2015年度以降",
 
-2. HTMLファイルの読み込み
-   - 指定された年度のディレクトリからHTMLファイルを検索
-   - BeautifulSoupによるパース
-   - デバッグモード時は整形HTMLを出力
 
-3. データの抽出
-   - テーブルの特定（class="dataT"）
-   - 各行からの情報抽出
-     - 属性カラム：「：」と「・」で分解
-     - 科目名カラム：科目名とリンクから科目コードを取得
+### シラバス情報（syllabus）
+```json
+{
+    "content": {
+        "syllabus_id": "G250110001",
+        "subject_code": "G250110001",
+        "year": 2025,
+        "subtitle": "サブタイトル",
+        "term": "前期",
+        "lecture_code": "G111",
+        "grade_b1": true,
+        "grade_b2": false,
+        "grade_b3": false,
+        "grade_b4": false,
+        "grade_m1": false,
+        "grade_m2": false,
+        "grade_d1": false,
+        "grade_d2": false,
+        "grade_d3": false,
+        "campus": "キャンパス名",
+        "credits": 2,
+        "summary": "講義概要",
+        "goals": "到達目標",
+        "methods": "講義方法"
+    }
+}
+```
 
-4. JSONファイルの生成
-   - 科目ごとにJSONファイルを作成
-   - 出力ディレクトリに保存
+## 処理の詳細
+
+### 科目情報の抽出（parse_subject_table）
+1. 科目一覧テーブルの特定
+   - 属性と科目名を含むテーブルを検索
+2. 各行の処理
+   - 科目コードの抽出（リンクのhref属性から）
+   - 科目名の抽出（@記号以前の部分）
+   - 属性の分解（クラス名、サブクラス名、備考）
+
+### シラバス情報の抽出（parse_syllabus_detail）
+1. 基本情報の抽出
+   - シラバス管理番号
+   - 科目コード
+   - 開講年度
+   - サブタイトル
+2. 開講情報の抽出
+   - 開講期（前期/後期/通年）
+   - 講義コード
+   - 配当年次
+   - キャンパス
+   - 単位数
+3. 講義内容の抽出
+   - 講義概要
+   - 到達目標
+   - 講義方法
+
+## 出力ディレクトリ
+- 科目情報: `db/updates/subject/add/`
+- シラバス情報: `db/updates/syllabus/add/`
 
 ## エラーハンドリング
-- HTMLファイルが存在しない場合
-- HTMLの構造が不正な場合
-- 必須情報が取得できない場合
-- ファイル書き込み権限がない場合
+1. ファイル処理エラー
+   - ファイルが存在しない
+   - ファイルの読み込みエラー
+   - HTMLの解析エラー
 
-## デバッグ機能
-- 詳細なログ出力
-  - ファイル処理状況
-  - 抽出データの内容
-  - エラー情報
-- 整形されたHTMLの出力
-  - ファイル名: `{元のファイル名}.pretty.html`
-  - 1回目の実行時のみ生成
+2. データ抽出エラー
+   - 必要な要素が見つからない
+   - データ形式が不正
+   - 値の変換エラー
 
-## 関連ドキュメント
-- [DB更新手順](../database_update_workflow.md)
-- [DB更新スクリプト](update_db.md)
+## 注意事項
+1. HTMLファイルの形式
+   - 整形されたHTMLファイル（.pretty.html）を自動生成
+   - 既存の整形ファイルは上書きしない
+
+2. データの整合性
+   - 科目コードとシラバス管理番号の対応
+   - 年度情報の整合性
+   - 必須フィールドの存在確認
 
 ## 更新履歴
 
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
 | 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
-| 2024-03-21 | 1.1.0 | 藤原 | 処理フローとデバッグ機能の説明を追加 |
+| 2024-05-18 | 1.1.0 | 藤原 | サブタイトル抽出の修正 |
 
-[🔝 ページトップへ](#シラバス検索ページパーサー-raw_page_parserpy) 
+### バージョン1.1.0の主な変更点
+1. サブタイトル抽出の改善
+   - `th`要素の検索方法を修正
+   - より正確なサブタイトル抽出を実現
+
+## 関連ドキュメント
+- [データベース構造定義](../database/structure.md)
+- [データベース操作クラス](database.md)
+- [モデル定義](models.md)
+- [DB更新スクリプト](update_db.md)
+- [DB更新手順](../database_update_workflow.md)
+
+[🔝 ページトップへ](#シラバスページパーサー-raw_page_parserpy) 

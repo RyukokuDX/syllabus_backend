@@ -1,4 +1,4 @@
-# シラバスデータベース ER図仕様
+# データベースER図
 
 [readmeへ](../../README.md) | [構造定義へ](structure.md) | [設計ポリシーへ](policy.md)
 
@@ -95,8 +95,8 @@ erDiagram
     syllabus_time {
         INTEGER id PK
         TEXT subject_code FK
-        TEXT day_of_week
-        TEXT period
+        TINYINT day_of_week
+        TINYINT period
         TIMESTAMP created_at
     }
 

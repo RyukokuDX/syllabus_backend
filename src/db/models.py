@@ -2,7 +2,7 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, T
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List
 
 Base = declarative_base()
@@ -52,8 +52,8 @@ class SyllabusTime(Base):
 
     id = Column(Integer, primary_key=True)
     subject_code = Column(Text, ForeignKey('subject.subject_code', ondelete='CASCADE'), nullable=False)
-    day_of_week = Column(String(10), nullable=False)
-    period = Column(String(10), nullable=False)
+    day_of_week = Column(Integer, nullable=False)
+    period = Column(Integer, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
 class Instructor(Base):
@@ -196,11 +196,11 @@ class Syllabus:
 @dataclass
 class SyllabusTime:
     """講義時間モデル"""
-    id: int
     subject_code: str
-    day_of_week: str
-    period: str
-    created_at: datetime
+    day_of_week: int
+    period: int
+    id: Optional[int] = None
+    created_at: datetime = field(default_factory=datetime.now)
 
 @dataclass
 class Instructor:

@@ -113,9 +113,11 @@
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| day_of_week | TEXT | NO | 曜日 | Web Syllabus |
-| period | TEXT | NO | 時限 | Web Syllabus |
+| day_of_week | TINYINT | NO | 曜日 | Web Syllabus |
+| period | TINYINT | NO | 時限 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+- 曜日は[月-土]を[1-6]に
 
 #### インデックス
 | インデックス名 | カラム | 説明 |

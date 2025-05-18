@@ -1,0 +1,28 @@
+{
+  "content": {
+    "subject_code": "Y003005010",
+    "year": 2,
+    "subtitle": "高等学校の「数学」「物理」の再確認し、大学への数学および物理学の基礎を学ぶ",
+    "term": "前期",
+    "grade_b1": true,
+    "grade_b2": true,
+    "grade_b3": false,
+    "grade_b4": false,
+    "grade_m1": false,
+    "grade_m2": false,
+    "grade_d1": false,
+    "grade_d2": false,
+    "grade_d3": false,
+    "campus": "瀬田",
+    "credits": 2,
+    "lecture_code": "",
+    "summary": "",
+    "goals": "",
+    "methods": "",
+    "outside_study": "",
+    "notes": "Y3000\n□",
+    "remarks": "",
+    "created_at": "2025-05-18T02:41:35.434586",
+    "updated_at": null
+  }
+}

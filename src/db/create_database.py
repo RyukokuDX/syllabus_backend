@@ -63,8 +63,8 @@ def init_database():
     CREATE TABLE IF NOT EXISTS syllabus_time (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         subject_code TEXT NOT NULL,
-        day_of_week TEXT NOT NULL,
-        period TEXT NOT NULL,
+        day_of_week TINYINT NOT NULL,
+        period TINYINT NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
     )
