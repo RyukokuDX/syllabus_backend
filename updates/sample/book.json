@@ -1,0 +1,28 @@
+{
+  "books": [
+    {
+      "id": 1,
+      "author": "山田 太郎",
+      "title": "Python入門 第2版",
+      "publisher": "技術出版社",
+      "price": 3000,
+      "isbn": "978-4-12345-678-9"
+    },
+    {
+      "id": 2,
+      "author": "鈴木 花子",
+      "title": "わかりやすい線形代数",
+      "publisher": "数学出版",
+      "price": 2500,
+      "isbn": "978-4-98765-432-1"
+    },
+    {
+      "id": 3,
+      "author": "John Smith",
+      "title": "Academic English Skills",
+      "publisher": "Global Education Press",
+      "price": 3500,
+      "isbn": "978-0-11111-111-1"
+    }
+  ]
+} 

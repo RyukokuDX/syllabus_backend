@@ -1,0 +1,20 @@
+{
+  "syllabus_faculties": [
+    {
+      "subject_code": "CSCI0001",
+      "faculty": "理工学部"
+    },
+    {
+      "subject_code": "CSCI0001",
+      "faculty": "情報学部"
+    },
+    {
+      "subject_code": "MATH0001",
+      "faculty": "理工学部"
+    },
+    {
+      "subject_code": "ENGL0001",
+      "faculty": "全学部"
+    }
+  ]
+} 

@@ -1,0 +1,16 @@
+{
+  "syllabus_instructors": [
+    {
+      "subject_code": "CSCI0001",
+      "instructor_code": "PROF0001"
+    },
+    {
+      "subject_code": "MATH0001",
+      "instructor_code": "PROF0002"
+    },
+    {
+      "subject_code": "ENGL0001",
+      "instructor_code": "PROF0003"
+    }
+  ]
+} 

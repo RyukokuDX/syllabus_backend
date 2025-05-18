@@ -1,0 +1,22 @@
+{
+  "instructors": [
+    {
+      "instructor_code": "PROF0001",
+      "name": "山田 太郎",
+      "name_kana": "ヤマダ タロウ",
+      "name_en": "YAMADA Taro"
+    },
+    {
+      "instructor_code": "PROF0002",
+      "name": "鈴木 花子",
+      "name_kana": "スズキ ハナコ",
+      "name_en": "SUZUKI Hanako"
+    },
+    {
+      "instructor_code": "PROF0003",
+      "name": "佐藤 一郎",
+      "name_kana": "サトウ イチロウ",
+      "name_en": "SATO Ichiro"
+    }
+  ]
+} 
