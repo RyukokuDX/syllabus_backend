@@ -7,7 +7,7 @@ from datetime import datetime
 import re
 
 def parse_html_file(filepath, table_name):
-    print(f"Processing: {filepath}")
+    # print(f"Processing: {filepath}")
     with open(filepath, 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f, 'html.parser')
 
@@ -43,7 +43,7 @@ def parse_subject_table(soup):
 
     data = []
     rows = table.find_all('tr')[1:]  # Skip header row
-    print(f"  Found {len(rows)} data rows.")
+    # print(f"  Found {len(rows)} data rows.")
     for i, row in enumerate(rows):
         cols = row.find_all('td')
         if len(cols) < 4:
@@ -169,7 +169,7 @@ def parse_syllabus_detail(soup):
             grade_td = grade_elem.find_next('td')
             if grade_td:
                 grade_text = grade_td.get_text(strip=True)
-                print(f"  Found grade text: {grade_text}")
+                # print(f"  Found grade text: {grade_text}")
                 
                 # 範囲指定の処理（例：1～2年次）
                 if '～' in grade_text:
@@ -304,7 +304,7 @@ def parse_syllabus_detail(soup):
             "created_at": current_time,
             "updated_at": None
         }
-        print(f"    Parsed syllabus detail: {entry}")
+        # print(f"    Parsed syllabus detail: {entry}")
         return [entry]
     except Exception as e:
         print(f"  Error in parse_syllabus_detail: {str(e)}")
@@ -409,7 +409,7 @@ def save_json(entry, year, table_name):
     else:  # syllabus
         subject_code = entry["subject_code"]  # シラバス管理番号を使用
 
-    out_dir = f"db/updates/{table_name}/add"
+    out_dir = f"updates/{table_name}/add"
     os.makedirs(out_dir, exist_ok=True)
     filepath = os.path.join(out_dir, f"{subject_code}.json")
     
@@ -449,7 +449,7 @@ def main():
     processed_count = 0
     for file in html_files:
         processed_count += 1
-        print(f"\nProcessing file {processed_count}/{total_files}: {file}")
+        # print(f"\nProcessing file {processed_count}/{total_files}: {file}")
         try:
             entries = parse_html_file(file, args.table)
             for entry in entries:
