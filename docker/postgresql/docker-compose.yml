@@ -10,11 +10,13 @@ services:
       - ../.env
     environment:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=ja_JP.UTF-8"
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     ports:
       - "5432:5432"
     volumes:
-      # 自動生成された init.sql を初期化時に実行
-      - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./init/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./init/migrations:/docker-entrypoint-initdb.d/02-migrations:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
       - shared-network

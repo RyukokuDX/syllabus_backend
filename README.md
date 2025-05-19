@@ -1,5 +1,48 @@
-# syllabus_backend
-龍大のシラバス情報を集約して提供するバックエンド
+# シラバス管理システム バックエンド
+
+## プロジェクト構成
+```
+.
+├── docker/
+│   ├── fastapi/      # FastAPIアプリケーションコンテナ
+│   └── postgresql/   # PostgreSQLコンテナ
+└── src/
+    └── db/          # データベース関連スクリプト
+```
+
+## 環境構築
+
+### 1. ホスト環境のセットアップ
+データベースマイグレーション用の環境をセットアップします：
+
+```bash
+# 必要なパッケージのインストール
+cd src/db
+pip install -r requirements.txt
+```
+
+### 2. Dockerコンテナの起動
+```bash
+docker-compose up -d
+```
+
+## データベースマイグレーション
+
+### マイグレーションの実行
+```bash
+# デフォルトデータベース（master_db）に対してマイグレーションを実行
+python src/db/migrations/manual_migrate.py
+
+# 特定のデータベースに対してマイグレーションを実行
+python src/db/migrations/manual_migrate.py [database_name]
+```
+
+### 環境変数
+マイグレーションスクリプトは以下の環境変数を使用します：
+- `POSTGRES_HOST`: データベースホスト（デフォルト: localhost）
+- `POSTGRES_PORT`: データベースポート（デフォルト: 5432）
+- `POSTGRES_USER`: データベースユーザー（デフォルト: postgres）
+- `POSTGRES_PASSWORD`: データベースパスワード（デフォルト: postgres）
 
 ## Cursorへの指示
 - [Cursorへの指示書](docs/cursor.md)
@@ -80,6 +123,12 @@ SQLAlchemyを使用したデータモデル定義
 - 書籍情報（Book）
 - 成績評価基準（GradingCriterion）
 - その他関連テーブル
+
+### マイグレーション実行 [`manual_migrate.py`](docs/python/manual_migrate.md)
+SQLマイグレーションファイルを実行する処理
+- マイグレーションファイルの自動検出
+- トランザクション管理
+- 複数データベース対応
 
 ### マイグレーション [`generate_migration.py`](docs/python/generate_migration.py.md)
 JSONファイルからSQLマイグレーションファイルを生成する処理

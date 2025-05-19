@@ -9,15 +9,19 @@ import time
 import re
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
-import sqlite3
+import psycopg2
+from psycopg2.extras import DictCursor
 from contextlib import contextmanager
+from urllib.parse import urlparse
 
 # 環境変数から設定を読み込み
 DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
 API_PREFIX = os.getenv("API_PREFIX", "/api/v1")
 CORS_ORIGINS = json.loads(os.getenv("CORS_ORIGINS", '["http://localhost:3000"]'))
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
-SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "db/syllabus.db")
+
+# PostgreSQL接続設定
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres-db:5432/master_db")
 
 # FastAPIアプリケーションの初期化
 app = FastAPI(
@@ -74,9 +78,9 @@ FORBIDDEN_PATTERNS = [
 
 # 常に許可されるパターン（メタデータクエリ）
 METADATA_PATTERNS = [
-    r"^PRAGMA\s+table_info\([^)]+\)\s*;?\s*$",  # PRAGMA table_info
-    r"^PRAGMA\s+foreign_key_list\([^)]+\)\s*;?\s*$",  # PRAGMA foreign_key_list
-    r"^SELECT\s+name\s+FROM\s+sqlite_master\s+WHERE\s+type\s*=\s*'table'.*$"  # テーブル一覧のSQLite標準クエリ
+    r"^SELECT\s+column_name,\s*data_type\s+FROM\s+information_schema\.columns\s+WHERE\s+table_name\s*=\s*'[^']+'",  # テーブル情報
+    r"^SELECT\s+table_name\s+FROM\s+information_schema\.tables\s+WHERE\s+table_schema\s*=\s*'public'",  # テーブル一覧
+    r"^SELECT\s+constraint_name,\s*column_name\s+FROM\s+information_schema\.key_column_usage\s+WHERE\s+table_name\s*=\s*'[^']+'",  # 外部キー情報
 ]
 
 # 疑わしいLIKEパターン
@@ -95,8 +99,7 @@ class QueryRequest(BaseModel):
 
 @contextmanager
 def get_db_connection():
-    conn = sqlite3.connect(SQLITE_DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=DictCursor)
     try:
         yield conn
     finally:
@@ -159,66 +162,38 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal server error"}
     )
 
-def convert_sqlite_command(query: str) -> str:
-    """SQLiteの特殊コマンドを標準SQLクエリに変換"""
-    query = query.strip()
-    
-    # .tables コマンドの変換
-    if re.match(r"^\.tables\s*;?\s*$", query):
-        return "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-        
-    return query
-
 @app.post(f"{API_PREFIX}/query")
 async def execute_query(request: QueryRequest):
     start_time = time.time()
     
     try:
-        # SQLiteコマンドの変換
-        converted_query = convert_sqlite_command(request.query)
-        
         # クエリの検証
-        validate_query(converted_query, None)  # パラメータをNoneに設定
+        validate_query(request.query, request.params)
         
-        # データベース接続とクエリ実行
         with get_db_connection() as conn:
             cursor = conn.cursor()
+            cursor.execute(request.query, request.params)
+            results = cursor.fetchall()
             
-            try:
-                cursor.execute(converted_query)  # パラメータなしで実行
-                
-                # 結果の取得（最大1000行まで）
-                rows = cursor.fetchmany(1000)
-                
-                # 実行時間の計算
-                execution_time = f"{time.time() - start_time:.3f}s"
-                
-                # 結果を辞書のリストに変換
-                results = [dict(row) for row in rows]
-                
-                return {
-                    "status": "success",
-                    "data": results,
-                    "metadata": {
-                        "row_count": len(results),
-                        "execution_time": execution_time
-                    }
-                }
-                
-            except sqlite3.Error as e:
-                logger.error(f"Database error: {e}")
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Database error: {str(e)}"
-                )
-                
-    except HTTPException as e:
-        raise e
+            # 実行時間の計算
+            execution_time = time.time() - start_time
+            
+            return {
+                "results": results,
+                "execution_time": execution_time,
+                "row_count": len(results)
+            }
+    except psycopg2.Error as e:
+        logger.error(f"Database error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error: {str(e)}"
+        )
     except Exception as e:
         logger.error(f"Query execution error: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Internal server error during query execution"
+            detail=f"Query execution error: {str(e)}"
         )
 
 # APIバージョン情報

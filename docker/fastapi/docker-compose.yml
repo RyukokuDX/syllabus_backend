@@ -9,7 +9,7 @@ services:
     volumes:
       - ./app:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:password@postgres-db:5432/mydatabase
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-db:5432/master_db
     networks:
       - shared-network
     env_file:

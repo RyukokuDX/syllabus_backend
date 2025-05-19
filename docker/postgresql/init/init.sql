@@ -53,20 +53,20 @@ CREATE INDEX idx_subject_class ON subject(class_name);
 
 -- syllabus（シラバス情報）
 CREATE TABLE syllabus (
-    subject_code TEXT PRIMARY KEY,
+    subject_code TEXT NOT NULL,
     year INTEGER NOT NULL,
     subtitle TEXT,
     term TEXT NOT NULL,
-    grade_b0 BOOLEAN NOT NULL,
     grade_b1 BOOLEAN NOT NULL,
     grade_b2 BOOLEAN NOT NULL,
     grade_b3 BOOLEAN NOT NULL,
-    grade_m0 BOOLEAN NOT NULL,
+    grade_b4 BOOLEAN NOT NULL,
     grade_m1 BOOLEAN NOT NULL,
-    grade_d0 BOOLEAN NOT NULL,
+    grade_m2 BOOLEAN NOT NULL,
     grade_d1 BOOLEAN NOT NULL,
     grade_d2 BOOLEAN NOT NULL,
-    campus VARCHAR(5) NOT NULL,
+    grade_d3 BOOLEAN NOT NULL,
+    campus VARCHAR(6) NOT NULL,
     credits SMALLINT NOT NULL,
     lecture_code TEXT NOT NULL,
     summary TEXT,
@@ -77,12 +77,13 @@ CREATE TABLE syllabus (
     remarks TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
+    PRIMARY KEY (subject_code, year, term),
     FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_syllabus_year ON syllabus(year);
 CREATE INDEX idx_syllabus_term ON syllabus(term);
-CREATE INDEX idx_syllabus_grades ON syllabus(grade_b0, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3);
+CREATE INDEX idx_syllabus_grades ON syllabus(grade_b1, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3);
 CREATE INDEX idx_syllabus_campus ON syllabus(campus);
 
 -- syllabus_time（講義時間）
@@ -183,22 +184,21 @@ CREATE INDEX idx_syllabus_reference_book ON syllabus_reference(book_id);
 CREATE TABLE grading_criterion (
     id SERIAL PRIMARY KEY,
     subject_code TEXT NOT NULL,
-    criteria_type VARCHAR(3) NOT NULL,
-    ratio SMALLINT,
-    note TEXT,
+    criteria_type TEXT NOT NULL,
+    description TEXT NOT NULL,
+    percentage INTEGER,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE,
-    CHECK (criteria_type IN ('平常', '小テ', '定期', 'レポ', '他', '自由'))
+    FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_grading_criterion_type ON grading_criterion(criteria_type);
 CREATE INDEX idx_grading_criterion_subject_type ON grading_criterion(subject_code, criteria_type);
 
--- syllabus_faculty（シラバス-学部/課程関連）
+-- syllabus_faculty（シラバス-学部関連）
 CREATE TABLE syllabus_faculty (
     id SERIAL PRIMARY KEY,
     subject_code TEXT NOT NULL,
-    faculty VARCHAR(59) NOT NULL,
+    faculty TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
 );
@@ -206,25 +206,22 @@ CREATE TABLE syllabus_faculty (
 CREATE INDEX idx_syllabus_faculty_subject ON syllabus_faculty(subject_code);
 CREATE INDEX idx_syllabus_faculty_faculty ON syllabus_faculty(faculty);
 
--- subject_requirement（科目要件・属性）
+-- subject_requirement（科目要件）
 CREATE TABLE subject_requirement (
-    subject_code TEXT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    subject_code TEXT NOT NULL,
     requirement_type TEXT NOT NULL,
-    applied_science_available BOOLEAN NOT NULL,
-    graduation_credit_limit BOOLEAN NOT NULL,
-    year_restriction BOOLEAN NOT NULL,
-    first_year_only BOOLEAN NOT NULL,
-    up_to_second_year BOOLEAN NOT NULL,
-    guidance_required BOOLEAN NOT NULL,
+    applied_science_available BOOLEAN NOT NULL DEFAULT false,
+    graduation_credit_limit INTEGER,
+    year_restriction TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
     FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_requirement_type ON subject_requirement(requirement_type);
 CREATE INDEX idx_requirement_restrictions ON subject_requirement(applied_science_available, graduation_credit_limit, year_restriction);
 
--- subject_program（科目-学習プログラム関連）
+-- subject_program（科目-プログラム関連）
 CREATE TABLE subject_program (
     id SERIAL PRIMARY KEY,
     subject_code TEXT NOT NULL,
