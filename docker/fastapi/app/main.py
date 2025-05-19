@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 import psycopg2
 from psycopg2.extras import DictCursor
 from contextlib import contextmanager
+from urllib.parse import urlparse
 
 # 環境変数から設定を読み込み
 DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
@@ -20,11 +21,7 @@ CORS_ORIGINS = json.loads(os.getenv("CORS_ORIGINS", '["http://localhost:3000"]')
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
 # PostgreSQL接続設定
-DB_USER = os.getenv("POSTGRES_USER", "postgres")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
-DB_HOST = os.getenv("DB_HOST", "postgres-db")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "master_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres-db:5432/master_db")
 
 # FastAPIアプリケーションの初期化
 app = FastAPI(
@@ -102,14 +99,7 @@ class QueryRequest(BaseModel):
 
 @contextmanager
 def get_db_connection():
-    conn = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT,
-        cursor_factory=DictCursor
-    )
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=DictCursor)
     try:
         yield conn
     finally:
