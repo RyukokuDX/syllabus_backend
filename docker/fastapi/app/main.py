@@ -9,7 +9,8 @@ import time
 import re
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
-import sqlite3
+import psycopg2
+from psycopg2.extras import DictCursor
 from contextlib import contextmanager
 
 # 環境変数から設定を読み込み
@@ -17,7 +18,13 @@ DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
 API_PREFIX = os.getenv("API_PREFIX", "/api/v1")
 CORS_ORIGINS = json.loads(os.getenv("CORS_ORIGINS", '["http://localhost:3000"]'))
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
-SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "db/syllabus.db")
+
+# PostgreSQL接続設定
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
+DB_HOST = os.getenv("DB_HOST", "postgres-db")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "master_db")
 
 # FastAPIアプリケーションの初期化
 app = FastAPI(
@@ -95,8 +102,14 @@ class QueryRequest(BaseModel):
 
 @contextmanager
 def get_db_connection():
-    conn = sqlite3.connect(SQLITE_DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT,
+        cursor_factory=DictCursor
+    )
     try:
         yield conn
     finally:
@@ -178,14 +191,17 @@ async def execute_query(request: QueryRequest):
         converted_query = convert_sqlite_command(request.query)
         
         # クエリの検証
-        validate_query(converted_query, None)  # パラメータをNoneに設定
+        validate_query(converted_query, request.params)
         
         # データベース接続とクエリ実行
         with get_db_connection() as conn:
             cursor = conn.cursor()
             
             try:
-                cursor.execute(converted_query)  # パラメータなしで実行
+                if request.params:
+                    cursor.execute(converted_query, request.params)
+                else:
+                    cursor.execute(converted_query)
                 
                 # 結果の取得（最大1000行まで）
                 rows = cursor.fetchmany(1000)
@@ -205,7 +221,7 @@ async def execute_query(request: QueryRequest):
                     }
                 }
                 
-            except sqlite3.Error as e:
+            except psycopg2.Error as e:
                 logger.error(f"Database error: {e}")
                 raise HTTPException(
                     status_code=500,

@@ -1,0 +1,4 @@
+2025-05-19 10:53:31.336 | ERROR    | main:execute_query:234 - Query execution error: connection to server at "postgres-db" (172.24.0.2), port 5432 failed: FATAL:  ユーザー"postgres"のパスワード認証に失敗しました
+
+2025-05-19 10:53:44.182 | ERROR    | main:execute_query:234 - Query execution error: connection to server at "postgres-db" (172.24.0.2), port 5432 failed: FATAL:  ユーザー"postgres"のパスワード認証に失敗しました
+
