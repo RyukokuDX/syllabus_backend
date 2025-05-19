@@ -60,7 +60,7 @@ erDiagram
         TEXT subtitle
         TEXT term
         TINYINT[] available_grades
-        VARCHAR(6) campus
+        TEXT campus
         TINYINT credits
         TEXT lecture_code
         TINYINT day_of_week
@@ -80,9 +80,10 @@ erDiagram
 
     instructor {
         TEXT instructor_code PK
-        TEXT name
-        TEXT name_kana
-        TEXT name_en
+        TEXT last_name
+        TEXT first_name
+        TEXT last_name_kana
+        TEXT first_name_kana
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
