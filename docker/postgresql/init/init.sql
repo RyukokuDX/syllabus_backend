@@ -278,10 +278,3 @@ CREATE INDEX idx_subject_class ON subject(class_name);
 
 -- 以下、master_dbと同じテーブル定義を繰り返し...
 -- （以下、上記のテーブル定義と同じ内容を繰り返すため省略）
-
--- ========== マイグレーションファイルの実行 ==========
-
--- マイグレーションファイルを実行
-\i /docker-entrypoint-initdb.d/migrations/V20250518211454__insert_subjects.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250519022619__insert_syllabuss.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250519023115__insert_syllabus_times.sql

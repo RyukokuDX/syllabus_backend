@@ -15,9 +15,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # 自動生成された init.sql を初期化時に実行
       - ./init/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
-      # マイグレーションファイルをマウント
       - ./init/migrations:/docker-entrypoint-initdb.d/02-migrations:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
