@@ -72,7 +72,10 @@
 | subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
 | term | TEXT | NO | 開講学期 | Web Syllabus |
 | available_grades | TINYINT[] | NO | 履修可能学年（1:学部1年, 2:学部2年, 3:学部3年, 4:学部4年, 5:修士1年, 6:修士2年, 7:博士1年, 8:博士2年, 9:博士3年） | Web Syllabus |
-| campus | VARCHAR(6) | NO | 開講キャンパス | Web Syllabus |
+| grade_d1 | BOOLEAN | NO | 博士1年 | Web Syllabus |
+| grade_d2 | BOOLEAN | NO | 博士2年 | Web Syllabus |
+| grade_d3 | BOOLEAN | NO | 博士3年 | Web Syllabus |
+| campus | TEXT | NO | 開講キャンパス | Web Syllabus |
 | credits | TINYINT | NO | 単位数 | Web Syllabus |
 | lecture_code | TEXT | NO | 開講コード | Web Syllabus |
 | day_of_week | TINYINT | NO | 曜日 | Web Syllabus |
@@ -117,10 +120,11 @@
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
-| instructor_code | TEXT | NO | 教職員番号 | Web Syllabus |
-| name | TEXT | NO | 氏名 | Web Syllabus |
-| name_kana | TEXT | YES | 氏名（カナ） | Web Syllabus |
-| name_en | TEXT | YES | 氏名（英語） | Web Syllabus |
+| instructor_code | TEXT | NO | 独自教職員番号 | システム生成 |
+| last_name | TEXT | NO | 苗字 | Web Syllabus |
+| first_name | TEXT | NO | 名前 | Web Syllabus |
+| last_name_kana | TEXT | YES | 苗字（カナ） | Web Syllabus |
+| first_name_kana | TEXT | YES | 名前（カナ） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -128,8 +132,10 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | instructor_code | 主キー |
-| idx_instructor_name | name | 氏名での検索用 |
-| idx_instructor_name_kana | name_kana | カナ氏名での検索用 |
+| idx_instructor_last_name | last_name | 苗字での検索用 |
+| idx_instructor_first_name | first_name | 名前での検索用 |
+| idx_instructor_last_name_kana | last_name_kana | 苗字（カナ）での検索用 |
+| idx_instructor_first_name_kana | first_name_kana | 名前（カナ）での検索用 |
 
 [目次へ戻る](#目次)
 
@@ -143,7 +149,7 @@
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
 | subject_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| instructor_code | TEXT | NO | 教職員番号 | Web Syllabus |
+| instructor_code | TEXT[] | NO | 独自教職員番号 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス

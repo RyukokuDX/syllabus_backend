@@ -66,7 +66,7 @@ CREATE TABLE syllabus (
     grade_d1 BOOLEAN NOT NULL,
     grade_d2 BOOLEAN NOT NULL,
     grade_d3 BOOLEAN NOT NULL,
-    campus VARCHAR(6) NOT NULL,
+    campus TEXT NOT NULL,
     credits SMALLINT NOT NULL,
     lecture_code TEXT NOT NULL,
     summary TEXT,
@@ -102,28 +102,30 @@ CREATE INDEX idx_syllabus_time_subject ON syllabus_time(subject_code);
 -- instructor（教員）
 CREATE TABLE instructor (
     instructor_code TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    name_kana TEXT,
-    name_en TEXT,
+    last_name TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name_kana TEXT,
+    first_name_kana TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX idx_instructor_name ON instructor(name);
-CREATE INDEX idx_instructor_name_kana ON instructor(name_kana);
+CREATE INDEX idx_instructor_last_name ON instructor(last_name);
+CREATE INDEX idx_instructor_first_name ON instructor(first_name);
+CREATE INDEX idx_instructor_last_name_kana ON instructor(last_name_kana);
+CREATE INDEX idx_instructor_first_name_kana ON instructor(first_name_kana);
 
 -- syllabus_instructor（シラバス-教員関連）
 CREATE TABLE syllabus_instructor (
     id SERIAL PRIMARY KEY,
     subject_code TEXT NOT NULL,
-    instructor_code TEXT NOT NULL,
+    instructor_code TEXT[] NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE,
-    FOREIGN KEY (instructor_code) REFERENCES instructor(instructor_code) ON DELETE CASCADE
+    FOREIGN KEY (subject_code) REFERENCES subject(subject_code) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_syllabus_instructor_subject ON syllabus_instructor(subject_code);
-CREATE INDEX idx_syllabus_instructor_instructor ON syllabus_instructor(instructor_code);
+CREATE INDEX idx_syllabus_instructor_instructor ON syllabus_instructor USING GIN (instructor_code);
 
 -- lecture_session（講義計画）
 CREATE TABLE lecture_session (
