@@ -1,34 +1,44 @@
 {
   "grading_criteria": [
     {
-      "subject_code": "CSCI0001",
+      "id": 1,
+      "syllabus_code": "K250622250",
       "criteria_type": "平常",
       "ratio": 30,
-      "note": "授業への参加度と課題提出"
+      "note": "出席と授業参加度",
+      "created_at": "2025-03-20T00:00:00"
     },
     {
-      "subject_code": "CSCI0001",
+      "id": 2,
+      "syllabus_code": "K250622250",
       "criteria_type": "レポ",
-      "ratio": 40,
-      "note": "最終課題プログラム"
-    },
-    {
-      "subject_code": "CSCI0001",
-      "criteria_type": "定期",
       "ratio": 30,
-      "note": "筆記試験"
+      "note": "プログラミング課題",
+      "created_at": "2025-03-20T00:00:00"
     },
     {
-      "subject_code": "MATH0001",
-      "criteria_type": "小テ",
+      "id": 3,
+      "syllabus_code": "K250622250",
+      "criteria_type": "定期",
+      "ratio": 40,
+      "note": "期末試験",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 4,
+      "syllabus_code": "EU25731000",
+      "criteria_type": "平常",
       "ratio": 20,
-      "note": "毎回の小テスト"
+      "note": "演習問題の提出",
+      "created_at": "2025-03-20T00:00:00"
     },
     {
-      "subject_code": "MATH0001",
+      "id": 5,
+      "syllabus_code": "EU25731000",
       "criteria_type": "定期",
       "ratio": 80,
-      "note": "筆記試験"
+      "note": "期末試験",
+      "created_at": "2025-03-20T00:00:00"
     }
   ]
 } 

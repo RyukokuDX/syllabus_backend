@@ -4,23 +4,19 @@
 
 ## 目次
 
-### 現行テーブル
+### テーブル構成
 1. [subject（科目基本情報）](#subject科目基本情報)
 2. [syllabus（シラバス情報）](#syllabusシラバス情報)
-3. [instructor（教員）](#instructor教員)
-4. [syllabus_instructor（シラバス-教員関連）](#syllabus_instructorシラバス-教員関連)
-5. [lecture_session（講義計画）](#lecture_session講義計画)
+3. [lecture_session（講義時間）](#lecture_session講義時間)
+4. [instructor（教員）](#instructor教員)
+5. [syllabus_instructor（シラバス-教員関連）](#syllabus_instructorシラバス-教員関連)
 6. [book（書籍）](#book書籍)
-7. [grading_criterion（成績評価基準）](#grading_criterion成績評価基準)
-8. [subject_guide（科目履修ガイド）](#subject_guide科目履修ガイド)
-
-### 廃止テーブル
-1. [syllabus_time（講義時間）](#syllabus_time講義時間)
-2. [syllabus_textbook（シラバス-教科書関連）](#syllabus_textbookシラバス-教科書関連)
-3. [syllabus_reference（シラバス-参考文献関連）](#syllabus_referenceシラバス-参考文献関連)
-4. [syllabus_faculty（シラバス-学部/課程関連）](#syllabus_facultyシラバス-学部課程関連)
-5. [subject_requirement（科目要件・属性）](#subject_requirement科目要件属性)
-6. [subject_program（科目-学習プログラム関連）](#subject_program科目-学習プログラム関連)
+7. [syllabus_book（シラバス-教科書関連）](#syllabus_bookシラバス-教科書関連)
+8. [grading_criterion（成績評価基準）](#grading_criterion成績評価基準)
+9. [syllabus_faculty（シラバス-学部/課程関連）](#syllabus_facultyシラバス-学部課程関連)
+10. [requirement（科目要件・属性）](#requirement科目要件属性)
+11. [subject_requirement（科目-要綱関連）](#subject_requirement科目-要綱関連)
+12. [subject_program（科目-学習プログラム関連）](#subject_program科目-学習プログラム関連)
 
 ## 更新履歴
 

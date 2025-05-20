@@ -1,16 +1,16 @@
 {
   "syllabus_instructors": [
     {
-      "subject_code": "CSCI0001",
-      "instructor_code": "PROF0001"
+      "id": 1,
+      "syllabus_code": "K250622250",
+      "instructor_code": "INS001",
+      "created_at": "2025-03-20T00:00:00"
     },
     {
-      "subject_code": "MATH0001",
-      "instructor_code": "PROF0002"
-    },
-    {
-      "subject_code": "ENGL0001",
-      "instructor_code": "PROF0003"
+      "id": 2,
+      "syllabus_code": "EU25731000",
+      "instructor_code": "INS002",
+      "created_at": "2025-03-20T00:00:00"
     }
   ]
 } 

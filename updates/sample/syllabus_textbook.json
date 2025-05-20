@@ -1,14 +1,20 @@
 {
-  "syllabus_textbooks": [
+  "syllabus_books": [
     {
-      "subject_code": "CSCI0001",
+      "id": 1,
+      "syllabus_code": "K250622250",
       "book_id": 1,
-      "note": "必携テキスト"
+      "role": 1,
+      "note": "教科書",
+      "created_at": "2025-03-20T00:00:00"
     },
     {
-      "subject_code": "MATH0001",
+      "id": 2,
+      "syllabus_code": "EU25731000",
       "book_id": 2,
-      "note": "授業で使用する主教材"
+      "role": 1,
+      "note": "教科書",
+      "created_at": "2025-03-20T00:00:00"
     }
   ]
 } 

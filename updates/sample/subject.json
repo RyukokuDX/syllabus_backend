@@ -1,25 +1,31 @@
 {
   "subjects": [
     {
-      "subject_code": "CSCI0001",
+      "syllabus_code": "K250622250",
       "name": "プログラミング基礎",
       "class_name": "専門科目",
       "subclass_name": "情報系科目",
-      "class_note": "初学者向け"
+      "class_note": "初学者向け",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     },
     {
-      "subject_code": "MATH0001",
+      "syllabus_code": "EU25731000",
       "name": "線形代数学",
       "class_name": "専門基礎科目",
       "subclass_name": "数学系科目",
-      "class_note": null
+      "class_note": null,
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     },
     {
-      "subject_code": "ENGL0001",
+      "syllabus_code": "K250613470",
       "name": "アカデミック英語",
       "class_name": "共通科目",
       "subclass_name": "外国語科目",
-      "class_note": "TOEIC 500点以上推奨"
+      "class_note": "TOEIC 500点以上推奨",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     }
   ]
 } 

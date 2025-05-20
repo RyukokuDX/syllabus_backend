@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
-from typing import Dict, Any, List, Optional
-from dataclasses import dataclass
+from typing import Dict, Any, List
 from datetime import datetime
 import os
 import json
@@ -15,111 +14,83 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from src.db.models import Subject
-from src.db.database import Database
-
-@dataclass
-class Subject:
-    syllabus_code: str
-    subject_name: str
-    subject_name_en: str
-    subject_type: str
-    subject_type_en: str
-    credits: int
-    grade: str
-    grade_en: str
-    semester: str
-    semester_en: str
-    department: str
-    department_en: str
-    created_at: datetime
-    updated_at: datetime
-
-class SubjectParser:
-    @staticmethod
-    def parse(raw_data: Dict[str, Any]) -> Optional[Subject]:
-        try:
-            return Subject(
-                syllabus_code=raw_data.get('syllabus_code', ''),
-                subject_name=raw_data.get('subject_name', ''),
-                subject_name_en=raw_data.get('subject_name_en', ''),
-                subject_type=raw_data.get('subject_type', ''),
-                subject_type_en=raw_data.get('subject_type_en', ''),
-                credits=raw_data.get('credits', 0),
-                grade=raw_data.get('grade', ''),
-                grade_en=raw_data.get('grade_en', ''),
-                semester=raw_data.get('semester', ''),
-                semester_en=raw_data.get('semester_en', ''),
-                department=raw_data.get('department', ''),
-                department_en=raw_data.get('department_en', ''),
-                created_at=datetime.now(),
-                updated_at=datetime.now()
-            )
-        except Exception as e:
-            print(f"Error parsing subject data: {e}")
-            return None
 
 def parse_subject_table(soup: BeautifulSoup) -> List[Dict[str, Any]]:
-    # 明示的にテーブルを検索する（複数候補の中から属性と科目名を含むものを特定）
-    tables = soup.find_all('table', class_='dataT')
-    table = None
-    for t in tables:
-        headers = t.find_all('th')
-        if any('属性' in th.get_text(strip=True) for th in headers) and any('科目名' in th.get_text(strip=True) for th in headers):
-            table = t
-            break
-
+    """
+    検索結果ページのテーブルから科目情報を抽出する
+    
+    Args:
+        soup (BeautifulSoup): 解析対象のHTML
+        
+    Returns:
+        List[Dict[str, Any]]: 抽出された科目情報のリスト
+    """
+    # 検索結果テーブルを探す
+    table = soup.find("table", class_="dataT")
     if not table:
-        print("  No matching table found.")
+        print("  Error: table.dataT not found.")
+        return []
+
+    # データ行を取得（ヘッダー行をスキップ）
+    rows = table.find_all("tr")[1:]
+    print(f"  Found {len(rows)} rows in dataT table")
+
+    # シラバス管理番号リストを取得
+    syllabus_codes = []
+    input_tag = soup.find("input", {"name": "param_syllabusKanriNo"})
+    if input_tag and input_tag.get("value"):
+        syllabus_codes = input_tag["value"].split(",")
+    else:
+        print("  Error: param_syllabusKanriNo not found")
         return []
 
     data = []
-    rows = table.find_all('tr')[1:]  # Skip header row
     for i, row in enumerate(rows):
-        cols = row.find_all('td')
-        if len(cols) < 4:
-            print(f"    Row {i} skipped (not enough columns).")
-            continue
+        try:
+            cols = row.find_all("td")
+            if len(cols) < 7 or i >= len(syllabus_codes):
+                print(f"    Row {i+1} skipped: insufficient columns or no syllabus code")
+                continue
 
-        # 属性の処理
-        attr_text = cols[2].get_text(strip=True)
-        note = ''
-        class_name = attr_text
-        subclass_name = ''
+            syllabus_code = syllabus_codes[i].strip()
+            year = cols[1].get_text(strip=True)
+            attribute = cols[2].get_text(strip=True)
+            subject_name = cols[3].get_text(strip=True)
+            timeslot = cols[4].get_text(strip=True)
+            assigned_year = cols[5].get_text(strip=True)
+            instructor = cols[6].get_text(strip=True)
 
-        if '：' in attr_text:
-            note, rest = attr_text.split('：', 1)
-            class_name = rest
-
-        if '・' in class_name:
-            class_name, subclass_name = class_name.split('・', 1)
-
-        # 科目名の処理
-        name_part = cols[3].get_text(strip=True).split('\n')[0].strip()
-        name_part = name_part.split('@')[0].strip()
-        links = cols[3].find_all('a', href=True)
-        syllabus_code = ''
-        for link in links:
-            href = link['href']
-            if 'do?i=' in href:
-                syllabus_code = href.split('do?i=')[1].split('&')[0]
-                break
-
-        if syllabus_code:
             current_time = datetime.now().isoformat()
             entry = {
                 "syllabus_code": syllabus_code,
-                "name": name_part,
-                "class_name": class_name,
-                "subclass_name": subclass_name,
-                "class_note": note,
+                "name": subject_name,
+                "class_name": attribute,
+                "subclass_name": "",
+                "class_note": "",
+                "year": year,
+                "timeslot": timeslot,
+                "assigned_year": assigned_year,
+                "instructor": instructor,
                 "created_at": current_time,
                 "updated_at": None
             }
             data.append(entry)
+            print(f"    Row {i+1}: {subject_name} ({syllabus_code})")
+
+        except Exception as e:
+            print(f"    Error processing row {i+1}: {str(e)}")
+            continue
 
     return data
 
 def save_json(entry: Dict[str, Any], year: str) -> None:
+    """
+    科目情報をJSONファイルとして保存する
+    
+    Args:
+        entry (Dict[str, Any]): 保存する科目情報
+        year (str): 対象年度
+    """
     syllabus_code = entry["syllabus_code"]
     out_dir = f"updates/subject/add"
     os.makedirs(out_dir, exist_ok=True)
@@ -129,21 +100,42 @@ def save_json(entry: Dict[str, Any], year: str) -> None:
         "content": entry
     }
     
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(json_data, f, ensure_ascii=False, indent=2)
-    print(f"  Saved: {filepath}")
+    try:
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(json_data, f, ensure_ascii=False, indent=2)
+        print(f"  Saved: {filepath}")
+    except Exception as e:
+        print(f"  Error saving {filepath}: {str(e)}")
 
 def parse_html_file(filepath: str) -> List[Dict[str, Any]]:
-    with open(filepath, 'r', encoding='utf-8') as f:
-        soup = BeautifulSoup(f, 'html.parser')
+    """
+    HTMLファイルを解析して科目情報を抽出する
+    
+    Args:
+        filepath (str): 解析対象のHTMLファイルパス
+        
+    Returns:
+        List[Dict[str, Any]]: 抽出された科目情報のリスト
+    """
+    print(f"Processing file: {filepath}")
+    
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            soup = BeautifulSoup(f, "html.parser")
 
-    # 整形されたHTMLを初回のみ保存（多重保存を防ぐ）
-    pretty_path = filepath.replace('.pretty.html', '') + '.pretty.html'
-    if not os.path.exists(pretty_path):
-        with open(pretty_path, 'w', encoding='utf-8') as f:
-            f.write(soup.prettify())
+        # 整形されたHTMLを初回のみ保存
+        pretty_path = filepath.replace(".pretty.html", "") + ".pretty.html"
+        if not os.path.exists(pretty_path):
+            with open(pretty_path, "w", encoding="utf-8") as f:
+                f.write(soup.prettify())
 
-    return parse_subject_table(soup)
+        entries = parse_subject_table(soup)
+        print(f"  Found {len(entries)} entries in {filepath}")
+        return entries
+        
+    except Exception as e:
+        print(f"  Error processing {filepath}: {str(e)}")
+        return []
 
 def process_subject_data(year: str) -> None:
     """
@@ -152,26 +144,37 @@ def process_subject_data(year: str) -> None:
     Args:
         year (str): 処理対象の年
     """
-    html_files = glob(f"src/syllabus/{year}/search_page/*.html")
+    html_files = glob(f"src/syllabus/{year}/raw_page/*.html")
     total_files = len(html_files)
     print(f"Found {total_files} HTML files.")
 
     processed_count = 0
+    total_entries = 0
+    error_count = 0
+
     for file in html_files:
         processed_count += 1
         try:
             entries = parse_html_file(file)
-            for entry in entries:
-                save_json(entry, year)
+            if entries:
+                total_entries += len(entries)
+                for entry in entries:
+                    save_json(entry, year)
+            else:
+                error_count += 1
         except Exception as e:
             print(f"Error processing {file}: {str(e)}")
+            error_count += 1
             continue
 
-    print(f"\nCompleted processing {processed_count} files.")
+    print(f"\nProcessing Summary:")
+    print(f"Total files processed: {processed_count}")
+    print(f"Total entries found: {total_entries}")
+    print(f"Files with errors: {error_count}")
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Parse syllabus HTML and output JSON files.')
-    parser.add_argument('-y', '--year', required=True, help='Target year')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Parse syllabus HTML and output JSON files.")
+    parser.add_argument("-y", "--year", default="2025", help="Target year (default: 2025)")
     args = parser.parse_args()
     
     process_subject_data(args.year) 

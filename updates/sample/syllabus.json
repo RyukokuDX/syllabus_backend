@@ -1,8 +1,8 @@
 {
   "syllabuses": [
     {
-      "subject_code": "CSCI0001",
-      "year": 2024,
+      "syllabus_code": "K250622250",
+      "year": 2025,
       "subtitle": "Pythonによるプログラミング入門",
       "term": "前期",
       "grade_b1": true,
@@ -14,19 +14,21 @@
       "grade_d1": false,
       "grade_d2": false,
       "grade_d3": false,
-      "campus": "深草",
+      "campus": "瀬田",
       "credits": 2,
-      "lecture_code": "2024-CSCI0001-01",
+      "lecture_code": "2025-K250622250-01",
       "summary": "プログラミングの基礎概念とPython言語の基本を学びます。",
       "goals": "1. プログラミングの基本概念を理解する\n2. Python言語の基本文法を習得する\n3. 簡単なプログラムを作成できるようになる",
       "methods": "講義と実習を組み合わせて行います。",
       "outside_study": "毎週の課題プログラミングに取り組んでください。",
       "notes": "ノートPCを持参してください。",
-      "remarks": "初回授業でPython開発環境のセットアップを行います。"
+      "remarks": "初回授業でPython開発環境のセットアップを行います。",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     },
     {
-      "subject_code": "MATH0001",
-      "year": 2024,
+      "syllabus_code": "EU25731000",
+      "year": 2025,
       "subtitle": null,
       "term": "前期",
       "grade_b1": true,
@@ -38,15 +40,17 @@
       "grade_d1": false,
       "grade_d2": false,
       "grade_d3": false,
-      "campus": "深草",
+      "campus": "瀬田",
       "credits": 2,
-      "lecture_code": "2024-MATH0001-01",
+      "lecture_code": "2025-EU25731000-01",
       "summary": "線形代数学の基礎概念を学びます。",
       "goals": "1. ベクトルと行列の基本演算を理解する\n2. 連立方程式の解法を習得する\n3. 固有値と固有ベクトルの概念を理解する",
       "methods": "講義形式で行い、演習問題を解きながら理解を深めます。",
       "outside_study": "毎回の授業で出される演習問題に取り組んでください。",
       "notes": "高校数学IIBの内容を復習しておくことを推奨します。",
-      "remarks": null
+      "remarks": null,
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     }
   ]
 } 

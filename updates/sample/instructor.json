@@ -1,22 +1,22 @@
 {
   "instructors": [
     {
-      "instructor_code": "PROF0001",
-      "name": "山田 太郎",
-      "name_kana": "ヤマダ タロウ",
-      "name_en": "YAMADA Taro"
+      "instructor_code": "INS001",
+      "last_name": "山田",
+      "first_name": "太郎",
+      "last_name_kana": "ヤマダ",
+      "first_name_kana": "タロウ",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     },
     {
-      "instructor_code": "PROF0002",
-      "name": "鈴木 花子",
-      "name_kana": "スズキ ハナコ",
-      "name_en": "SUZUKI Hanako"
-    },
-    {
-      "instructor_code": "PROF0003",
-      "name": "佐藤 一郎",
-      "name_kana": "サトウ イチロウ",
-      "name_en": "SATO Ichiro"
+      "instructor_code": "INS002",
+      "last_name": "鈴木",
+      "first_name": "次郎",
+      "last_name_kana": "スズキ",
+      "first_name_kana": "ジロウ",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
     }
   ]
 } 

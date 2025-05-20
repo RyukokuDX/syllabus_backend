@@ -1,7 +1,14 @@
 # Environment variables
 .env
+
+# JSON files
 *.json
 !updates/sample/*.json
+!updates/*/add/*.json
+!updates/*/modify/*.json
+!updates/*/json/*.json
+*pretty.html
+updates/*/registered/json/*.json
 
 # Python
 __pycache__/
