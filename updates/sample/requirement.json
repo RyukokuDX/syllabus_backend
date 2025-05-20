@@ -1,0 +1,30 @@
+{
+  "requirements": [
+    {
+      "requirement_code": "REQ001",
+      "subject_name": "プログラミング基礎",
+      "requirement_type": "必修",
+      "applied_science_available": true,
+      "graduation_credit_limit": false,
+      "year_restriction": false,
+      "first_year_only": false,
+      "up_to_second_year": false,
+      "guidance_required": false,
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
+    },
+    {
+      "requirement_code": "REQ002",
+      "subject_name": "線形代数学",
+      "requirement_type": "選択必修",
+      "applied_science_available": true,
+      "graduation_credit_limit": true,
+      "year_restriction": false,
+      "first_year_only": false,
+      "up_to_second_year": true,
+      "guidance_required": false,
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
+    }
+  ]
+} 

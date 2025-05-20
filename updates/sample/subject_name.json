@@ -1,0 +1,7 @@
+{
+  "subject_names": [
+    { "subject_name_id": 1, "name": "プログラミング基礎" },
+    { "subject_name_id": 2, "name": "線形代数学" },
+    { "subject_name_id": 3, "name": "アカデミック英語" }
+  ]
+} 
