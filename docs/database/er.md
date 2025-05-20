@@ -1,6 +1,6 @@
 # データベースER図
 
-[readmeへ](../../README.md) | [構造定義へ](structure.md) | [設計ポリシーへ](policy.md)
+[readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
 
 ## 目次
 
@@ -26,26 +26,30 @@
 
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
-| 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
+| 2025-05-19 | 1.0.0 | 藤原 | 初版作成 |
+| 2025-05-20 | 1.1.0 | 藤原 | テーブル名・カラム名の統一（subject_code → syllabus_code） |
+| 2025-05-20 | 1.1.1 | 藤原 | requirementテーブルの主キーをrequirement_codeに修正 |
+| 2025-05-20 | 1.1.2 | 藤原 | インデックス名の統一、外部キー制約の整理 |
 
 ## ER図
 
 ```mermaid
 erDiagram
     subject ||--o{ syllabus : "has"
-    subject ||--|| subject_guide : "has"
-    subject ||--o{ syllabus_instructor : "has"
     subject ||--o{ lecture_session : "has"
+    subject ||--o{ syllabus_instructor : "has"
+    subject ||--o{ syllabus_book : "has"
     subject ||--o{ grading_criterion : "has"
-    
+    subject ||--o{ syllabus_faculty : "has"
+    subject ||--o{ subject_requirement : "has"
+    subject ||--o{ subject_program : "has"
+
     instructor ||--o{ syllabus_instructor : "teaches"
-    instructor ||--o{ lecture_session : "conducts"
-    
-    book ||--o{ syllabus : "used_as_textbook"
-    book ||--o{ syllabus : "used_as_reference"
+    book ||--o{ syllabus_book : "used_in"
+    requirement ||--o{ subject_requirement : "applies_to"
 
     subject {
-        TEXT subject_code PK
+        TEXT syllabus_code PK
         TEXT name
         TEXT class_name
         TEXT subclass_name
@@ -55,19 +59,22 @@ erDiagram
     }
 
     syllabus {
-        TEXT subject_code PK, FK
+        TEXT syllabus_code PK,FK
         INTEGER year
         TEXT subtitle
         TEXT term
-        TINYINT[] available_grades
+        BOOLEAN grade_b1
+        BOOLEAN grade_b2
+        BOOLEAN grade_b3
+        BOOLEAN grade_b4
+        BOOLEAN grade_m1
+        BOOLEAN grade_m2
+        BOOLEAN grade_d1
+        BOOLEAN grade_d2
+        BOOLEAN grade_d3
         TEXT campus
-        TINYINT credits
+        INTEGER credits
         TEXT lecture_code
-        TINYINT day_of_week
-        INTEGER[] periods
-        INTEGER[] textbooks
-        INTEGER[] references
-        VARCHAR(60)[] faculties
         TEXT summary
         TEXT goals
         TEXT methods
@@ -78,6 +85,14 @@ erDiagram
         TIMESTAMP updated_at
     }
 
+    lecture_session {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        TINYINT day_of_week
+        TINYINT period
+        TIMESTAMP created_at
+    }
+
     instructor {
         TEXT instructor_code PK
         TEXT last_name
@@ -86,6 +101,13 @@ erDiagram
         TEXT first_name_kana
         TIMESTAMP created_at
         TIMESTAMP updated_at
+    }
+
+    syllabus_instructor {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        TEXT instructor_code FK
+        TIMESTAMP created_at
     }
 
     book {
@@ -99,32 +121,34 @@ erDiagram
         TIMESTAMP updated_at
     }
 
-    syllabus_instructor {
+    syllabus_book {
         INTEGER id PK
-        TEXT subject_code FK
-        TEXT instructor_code FK
-        TIMESTAMP created_at
-    }
-
-    lecture_session {
-        INTEGER id PK
-        TEXT subject_code FK
-        INTEGER session_number
-        TEXT description
+        TEXT syllabus_code FK
+        INTEGER book_id FK
+        TINYINT role
+        TEXT note
         TIMESTAMP created_at
     }
 
     grading_criterion {
         INTEGER id PK
-        TEXT subject_code FK
-        VARCHAR(4) criteria_type
-        TINYINT ratio
+        TEXT syllabus_code FK
+        TEXT criteria_type
+        INTEGER ratio
         TEXT note
         TIMESTAMP created_at
     }
 
-    subject_guide {
-        TEXT subject_code PK, FK
+    syllabus_faculty {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        VARCHAR faculty
+        TIMESTAMP created_at
+    }
+
+    requirement {
+        TEXT requirement_code PK
+        TEXT subject_name
         TEXT requirement_type
         BOOLEAN applied_science_available
         BOOLEAN graduation_credit_limit
@@ -132,68 +156,72 @@ erDiagram
         BOOLEAN first_year_only
         BOOLEAN up_to_second_year
         BOOLEAN guidance_required
-        TINYINT[] program_codes
         TIMESTAMP created_at
         TIMESTAMP updated_at
+    }
+
+    subject_requirement {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        TEXT requirement_code FK
+        TIMESTAMP created_at
+    }
+
+    subject_program {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        TEXT program_code
+        TIMESTAMP created_at
     }
 ```
 
 ## テーブル間の関連
 
-### 現行テーブル
+### 1対多の関連
+- subject → syllabus
+- subject → lecture_session
+- subject → syllabus_instructor
+- subject → syllabus_book
+- subject → grading_criterion
+- subject → syllabus_faculty
+- subject → subject_requirement
+- subject → subject_program
+- instructor → syllabus_instructor
+- book → syllabus_book
+- requirement → subject_requirement
 
-#### subject（科目基本情報）
-- 1対多の関係で`syllabus`テーブルと関連
-- 1対1の関係で`subject_guide`テーブルと関連
+### 多対多の関連
+- subject ⟷ instructor (syllabus_instructor)
+- subject ⟷ book (syllabus_book)
+- subject ⟷ requirement (subject_requirement)
 
-#### syllabus（シラバス情報）
-- 多対1の関係で`subject`テーブルと関連
-- 多対多の関係で`instructor`テーブルと関連（`syllabus_instructor`テーブルを介して）
-- 1対多の関係で`lecture_session`テーブルと関連
-- 多対多の関係で`book`テーブルと関連（配列カラム`textbooks`で管理）
-- 多対多の関係で`book`テーブルと関連（配列カラム`references`で管理）
-- 1対多の関係で`grading_criterion`テーブルと関連
+## 主キーと外部キー
 
-#### instructor（教員）
-- 多対多の関係で`syllabus`テーブルと関連（`syllabus_instructor`テーブルを介して）
-- 1対多の関係で`lecture_session`テーブルと関連
+### 主キー
+- subject: syllabus_code
+- syllabus: syllabus_code
+- lecture_session: id
+- instructor: instructor_code
+- syllabus_instructor: id
+- book: id
+- syllabus_book: id
+- grading_criterion: id
+- syllabus_faculty: id
+- requirement: requirement_code
+- subject_requirement: id
+- subject_program: id
 
-#### syllabus_instructor（シラバス-教員関連）
-- 多対1の関係で`syllabus`テーブルと関連
-- 多対1の関係で`instructor`テーブルと関連
-
-#### lecture_session（講義計画）
-- 多対1の関係で`syllabus`テーブルと関連
-- 多対1の関係で`instructor`テーブルと関連
-
-#### book（書籍）
-- 多対多の関係で`syllabus`テーブルと関連（配列カラム`textbooks`で管理）
-- 多対多の関係で`syllabus`テーブルと関連（配列カラム`references`で管理）
-
-#### grading_criterion（成績評価基準）
-- 多対1の関係で`syllabus`テーブルと関連
-
-#### subject_guide（科目履修ガイド）
-- 1対1の関係で`subject`テーブルと関連
-
-### 廃止テーブル
-
-#### syllabus_time（講義時間）
-※ このテーブルは削除され、syllabusテーブルのperiodsカラムに統合されました。
-
-#### syllabus_textbook（シラバス-教科書関連）
-※ このテーブルは削除され、syllabusテーブルのtextbooksカラムに統合されました。
-
-#### syllabus_reference（シラバス-参考文献関連）
-※ このテーブルは削除され、syllabusテーブルのreferencesカラムに統合されました。
-
-#### syllabus_faculty（シラバス-学部/課程関連）
-※ このテーブルは削除され、syllabusテーブルのfacultiesカラムに統合されました。
-
-#### subject_requirement（科目要件・属性）
-※ このテーブルは削除され、subject_guideテーブルに統合されました。
-
-#### subject_program（科目-学習プログラム関連）
-※ このテーブルは削除され、subject_guideテーブルのprogram_codesカラムに統合されました。
+### 外部キー
+- syllabus.syllabus_code → subject.syllabus_code
+- lecture_session.syllabus_code → syllabus.syllabus_code
+- syllabus_instructor.syllabus_code → subject.syllabus_code
+- syllabus_instructor.instructor_code → instructor.instructor_code
+- syllabus_book.syllabus_code → subject.syllabus_code
+- syllabus_book.book_id → book.id
+- grading_criterion.syllabus_code → syllabus.syllabus_code
+- syllabus_faculty.syllabus_code → subject.syllabus_code
+- subject_requirement.syllabus_code → subject.syllabus_code
+- subject_requirement.requirement_code → requirement.requirement_code
+- subject_program.syllabus_code → subject.syllabus_code
 
 [目次へ戻る](#目次) 

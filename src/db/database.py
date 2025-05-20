@@ -1,275 +1,311 @@
-from sqlalchemy import create_engine, and_, or_
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Optional, Type, TypeVar, List, Dict, Any, Generator
-from src.db.models import Base
-import logging
+from typing import List, Optional, Dict, Any
 from datetime import datetime
-import sqlite3
-from pathlib import Path
-from contextlib import contextmanager
+import os
+from .models import (
+    Subject, Syllabus, LectureSession, Instructor, Book, SyllabusBook,
+    GradingCriterion, SyllabusInstructor, SyllabusFaculty, Requirement,
+    SubjectRequirement, SubjectProgram
+)
 
-logger = logging.getLogger(__name__)
+# データベース接続設定
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/syllabus')
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-T = TypeVar('T')
+def get_db():
+    """データベースセッションを取得"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-class Database:
-    """データベース接続を管理するクラス"""
-    _instance: Optional['Database'] = None
-    
-    def __init__(self):
-        """
-        シングルトンパターンを使用してデータベース接続を管理
-        """
-        if Database._instance is not None:
-            raise RuntimeError("Database is a singleton class. Use get_instance() instead.")
-        
-        self.db_path = Path("db/syllabus.db")
-        self.conn = None
+def save_subject(db, subject_data: Dict[str, Any]) -> Subject:
+    """科目基本情報を保存"""
+    subject = Subject(
+        syllabus_code=subject_data['syllabus_code'],
+        name=subject_data['name'],
+        class_name=subject_data['class_name'],
+        subclass_name=subject_data.get('subclass_name'),
+        class_note=subject_data.get('class_note'),
+        created_at=datetime.now()
+    )
+    db.add(subject)
+    db.commit()
+    db.refresh(subject)
+    return subject
 
-    @classmethod
-    def get_instance(cls) -> 'Database':
-        """シングルトンインスタンスを取得"""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
+def save_syllabus(db, syllabus_data: Dict[str, Any]) -> Syllabus:
+    """シラバス情報を保存"""
+    syllabus = Syllabus(
+        syllabus_code=syllabus_data['syllabus_code'],
+        year=syllabus_data['year'],
+        subtitle=syllabus_data.get('subtitle'),
+        term=syllabus_data['term'],
+        grade_b1=syllabus_data['grade_b1'],
+        grade_b2=syllabus_data['grade_b2'],
+        grade_b3=syllabus_data['grade_b3'],
+        grade_b4=syllabus_data['grade_b4'],
+        grade_m1=syllabus_data['grade_m1'],
+        grade_m2=syllabus_data['grade_m2'],
+        grade_d1=syllabus_data['grade_d1'],
+        grade_d2=syllabus_data['grade_d2'],
+        grade_d3=syllabus_data['grade_d3'],
+        campus=syllabus_data['campus'],
+        credits=syllabus_data['credits'],
+        lecture_code=syllabus_data['lecture_code'],
+        summary=syllabus_data.get('summary'),
+        goals=syllabus_data.get('goals'),
+        methods=syllabus_data.get('methods'),
+        outside_study=syllabus_data.get('outside_study'),
+        notes=syllabus_data.get('notes'),
+        remarks=syllabus_data.get('remarks'),
+        created_at=datetime.now()
+    )
+    db.add(syllabus)
+    db.commit()
+    db.refresh(syllabus)
+    return syllabus
 
-    def connect(self):
-        if self.conn is None:
-            self.conn = sqlite3.connect(self.db_path)
-    
-    def close(self):
-        if self.conn is not None:
-            self.conn.close()
-            self.conn = None
+def save_lecture_session(db, session_data: Dict[str, Any]) -> LectureSession:
+    """講義時間を保存"""
+    session = LectureSession(
+        syllabus_code=session_data['syllabus_code'],
+        day_of_week=session_data['day_of_week'],
+        period=session_data['period'],
+        created_at=datetime.now()
+    )
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session
 
-    @contextmanager
-    def get_cursor(self) -> Generator[sqlite3.Cursor, None, None]:
-        """データベースカーソルを取得するコンテキストマネージャ"""
-        self.connect()
-        cursor = self.conn.cursor()
-        try:
-            yield cursor
-            self.conn.commit()
-        except Exception as e:
-            self.conn.rollback()
-            raise e
-        finally:
-            cursor.close()
+def save_instructor(db, instructor_data: Dict[str, Any]) -> Instructor:
+    """教員情報を保存"""
+    instructor = Instructor(
+        instructor_code=instructor_data['instructor_code'],
+        last_name=instructor_data['last_name'],
+        first_name=instructor_data['first_name'],
+        last_name_kana=instructor_data.get('last_name_kana'),
+        first_name_kana=instructor_data.get('first_name_kana'),
+        created_at=datetime.now()
+    )
+    db.add(instructor)
+    db.commit()
+    db.refresh(instructor)
+    return instructor
 
-    def init_db(self):
-        """データベースの初期化"""
-        try:
-            Base.metadata.create_all(self.engine)
-            logger.info("データベースの初期化が完了しました")
-        except SQLAlchemyError as e:
-            logger.error(f"データベースの初期化中にエラーが発生しました: {e}")
-            raise
+def save_book(db, book_data: Dict[str, Any]) -> Book:
+    """書籍情報を保存"""
+    book = Book(
+        author=book_data.get('author'),
+        title=book_data['title'],
+        publisher=book_data.get('publisher'),
+        price=book_data.get('price'),
+        isbn=book_data.get('isbn'),
+        created_at=datetime.now()
+    )
+    db.add(book)
+    db.commit()
+    db.refresh(book)
+    return book
 
-    def get_session(self):
-        """セッションの取得"""
-        return self.SessionLocal()
+def save_syllabus_book(db, syllabus_book_data: Dict[str, Any]) -> SyllabusBook:
+    """シラバス-書籍関連を保存"""
+    syllabus_book = SyllabusBook(
+        syllabus_code=syllabus_book_data['syllabus_code'],
+        book_id=syllabus_book_data['book_id'],
+        role=syllabus_book_data['role'],
+        note=syllabus_book_data.get('note'),
+        created_at=datetime.now()
+    )
+    db.add(syllabus_book)
+    db.commit()
+    db.refresh(syllabus_book)
+    return syllabus_book
 
-    def add_record(self, model: T) -> Optional[T]:
-        """
-        レコードの追加
-        Args:
-            model: 追加するモデルインスタンス
-        Returns:
-            追加されたモデルインスタンス、エラー時はNone
-        """
-        session = self.get_session()
-        try:
-            session.add(model)
-            session.commit()
-            session.refresh(model)
-            return model
-        except SQLAlchemyError as e:
-            session.rollback()
-            logger.error(f"レコード追加中にエラーが発生しました: {e}")
-            return None
-        finally:
-            session.close()
+def save_grading_criterion(db, criterion_data: Dict[str, Any]) -> GradingCriterion:
+    """成績評価基準を保存"""
+    criterion = GradingCriterion(
+        syllabus_code=criterion_data['syllabus_code'],
+        criteria_type=criterion_data['criteria_type'],
+        ratio=criterion_data.get('ratio'),
+        note=criterion_data.get('note'),
+        created_at=datetime.now()
+    )
+    db.add(criterion)
+    db.commit()
+    db.refresh(criterion)
+    return criterion
 
-    def add_records(self, models: List[T]) -> bool:
-        """
-        複数レコードの一括追加
-        Args:
-            models: 追加するモデルインスタンスのリスト
-        Returns:
-            成功時True、失敗時False
-        """
-        session = self.get_session()
-        try:
-            session.add_all(models)
-            session.commit()
-            return True
-        except SQLAlchemyError as e:
-            session.rollback()
-            logger.error(f"レコード一括追加中にエラーが発生しました: {e}")
-            return False
-        finally:
-            session.close()
+def save_syllabus_instructor(db, instructor_data: Dict[str, Any]) -> SyllabusInstructor:
+    """シラバス-教員関連を保存"""
+    syllabus_instructor = SyllabusInstructor(
+        syllabus_code=instructor_data['syllabus_code'],
+        instructor_code=instructor_data['instructor_code'],
+        created_at=datetime.now()
+    )
+    db.add(syllabus_instructor)
+    db.commit()
+    db.refresh(syllabus_instructor)
+    return syllabus_instructor
 
-    def get_by_id(self, model_class: Type[T], id_value: any) -> Optional[T]:
-        """
-        IDによるレコードの取得
-        Args:
-            model_class: モデルクラス
-            id_value: 主キーの値
-        Returns:
-            モデルインスタンス、存在しない場合はNone
-        """
-        session = self.get_session()
-        try:
-            return session.query(model_class).get(id_value)
-        except SQLAlchemyError as e:
-            logger.error(f"レコード取得中にエラーが発生しました: {e}")
-            return None
-        finally:
-            session.close()
+def save_syllabus_faculty(db, faculty_data: Dict[str, Any]) -> SyllabusFaculty:
+    """シラバス-学部/課程関連を保存"""
+    syllabus_faculty = SyllabusFaculty(
+        syllabus_code=faculty_data['syllabus_code'],
+        faculty=faculty_data['faculty'],
+        created_at=datetime.now()
+    )
+    db.add(syllabus_faculty)
+    db.commit()
+    db.refresh(syllabus_faculty)
+    return syllabus_faculty
 
-    def update_record(self, model: T) -> bool:
-        """
-        レコードの更新
-        Args:
-            model: 更新するモデルインスタンス
-        Returns:
-            成功時True、失敗時False
-        """
-        session = self.get_session()
-        try:
-            session.merge(model)
-            session.commit()
-            return True
-        except SQLAlchemyError as e:
-            session.rollback()
-            logger.error(f"レコード更新中にエラーが発生しました: {e}")
-            return False
-        finally:
-            session.close()
+def save_requirement(db, requirement_data: Dict[str, Any]) -> Requirement:
+    """科目要件・属性を保存"""
+    requirement = Requirement(
+        requirement_code=requirement_data['requirement_code'],
+        subject_name=requirement_data['subject_name'],
+        requirement_type=requirement_data['requirement_type'],
+        applied_science_available=requirement_data['applied_science_available'],
+        graduation_credit_limit=requirement_data['graduation_credit_limit'],
+        year_restriction=requirement_data['year_restriction'],
+        first_year_only=requirement_data['first_year_only'],
+        up_to_second_year=requirement_data['up_to_second_year'],
+        guidance_required=requirement_data['guidance_required'],
+        created_at=datetime.now()
+    )
+    db.add(requirement)
+    db.commit()
+    db.refresh(requirement)
+    return requirement
 
-    def delete_record(self, model: T) -> bool:
-        """
-        レコードの削除
-        Args:
-            model: 削除するモデルインスタンス
-        Returns:
-            成功時True、失敗時False
-        """
-        session = self.get_session()
-        try:
-            session.delete(model)
-            session.commit()
-            return True
-        except SQLAlchemyError as e:
-            session.rollback()
-            logger.error(f"レコード削除中にエラーが発生しました: {e}")
-            return False
-        finally:
-            session.close()
+def save_subject_requirement(db, subject_requirement_data: Dict[str, Any]) -> SubjectRequirement:
+    """科目-要綱関連を保存"""
+    subject_requirement = SubjectRequirement(
+        syllabus_code=subject_requirement_data['syllabus_code'],
+        requirement_code=subject_requirement_data['requirement_code'],
+        created_at=datetime.now()
+    )
+    db.add(subject_requirement)
+    db.commit()
+    db.refresh(subject_requirement)
+    return subject_requirement
 
-    def query_records(self, model_class: Type[T], filters: Dict[str, Any] = None, 
-                     order_by: List[str] = None, limit: int = None) -> List[T]:
-        """
-        条件に基づいてレコードを検索
-        Args:
-            model_class: モデルクラス
-            filters: フィルター条件の辞書
-            order_by: ソート条件のリスト
-            limit: 取得件数の制限
-        Returns:
-            検索結果のリスト
-        """
-        session = self.get_session()
-        try:
-            query = session.query(model_class)
-            
-            if filters:
-                filter_conditions = []
-                for key, value in filters.items():
-                    if isinstance(value, (list, tuple)):
-                        filter_conditions.append(getattr(model_class, key).in_(value))
-                    else:
-                        filter_conditions.append(getattr(model_class, key) == value)
-                query = query.filter(and_(*filter_conditions))
+def save_subject_program(db, program_data: Dict[str, Any]) -> SubjectProgram:
+    """科目-学習プログラム関連を保存"""
+    subject_program = SubjectProgram(
+        syllabus_code=program_data['syllabus_code'],
+        program_code=program_data['program_code'],
+        created_at=datetime.now()
+    )
+    db.add(subject_program)
+    db.commit()
+    db.refresh(subject_program)
+    return subject_program
 
-            if order_by:
-                for field in order_by:
-                    desc = field.startswith('-')
-                    field_name = field[1:] if desc else field
-                    field_attr = getattr(model_class, field_name)
-                    query = query.order_by(field_attr.desc() if desc else field_attr)
+def get_subject_by_code(db, syllabus_code: str) -> Optional[Subject]:
+    """科目コードから科目情報を取得"""
+    return db.query(Subject).filter(Subject.syllabus_code == syllabus_code).first()
 
-            if limit:
-                query = query.limit(limit)
+def get_syllabus_by_code_and_year(db, syllabus_code: str, year: int) -> Optional[Syllabus]:
+    """科目コードと年度からシラバス情報を取得"""
+    return db.query(Syllabus).filter(
+        Syllabus.syllabus_code == syllabus_code,
+        Syllabus.year == year
+    ).first()
 
-            return query.all()
-        except SQLAlchemyError as e:
-            logger.error(f"レコード検索中にエラーが発生しました: {e}")
-            return []
-        finally:
-            session.close()
+def get_lecture_sessions_by_syllabus(db, syllabus_code: str) -> List[LectureSession]:
+    """科目コードから講義時間一覧を取得"""
+    return db.query(LectureSession).filter(
+        LectureSession.syllabus_code == syllabus_code
+    ).all()
 
-    def search_syllabus(self, year: int = None, term: str = None, 
-                       class_name: str = None, faculty: str = None,
-                       instructor_name: str = None) -> List[Dict[str, Any]]:
-        """
-        シラバス情報の検索
-        Args:
-            year: 開講年度
-            term: 開講学期
-            class_name: 科目区分
-            faculty: 開講学部
-            instructor_name: 教員名
-        Returns:
-            検索結果のリスト
-        """
-        from .models import Subject, Syllabus, SyllabusFaculty, Instructor, SyllabusInstructor
+def get_instructors_by_syllabus(db, syllabus_code: str) -> List[Instructor]:
+    """科目コードから教員一覧を取得"""
+    return db.query(Instructor).join(
+        SyllabusInstructor,
+        Instructor.instructor_code == SyllabusInstructor.instructor_code
+    ).filter(
+        SyllabusInstructor.syllabus_code == syllabus_code
+    ).all()
 
-        session = self.get_session()
-        try:
-            query = session.query(
-                Subject.subject_code,
-                Subject.name.label('subject_name'),
-                Subject.class_name,
-                Syllabus.year,
-                Syllabus.term,
-                Syllabus.credits,
-                Syllabus.campus,
-                Instructor.last_name.label('instructor_last_name'),
-                Instructor.first_name.label('instructor_first_name'),
-                SyllabusFaculty.faculty
-            ).join(
-                Syllabus, Subject.subject_code == Syllabus.subject_code
-            ).join(
-                SyllabusFaculty, Subject.subject_code == SyllabusFaculty.subject_code
-            ).join(
-                SyllabusInstructor, Subject.subject_code == SyllabusInstructor.subject_code
-            ).join(
-                Instructor, Instructor.instructor_code == any_(SyllabusInstructor.instructor_code)
-            )
+def get_books_by_syllabus(db, syllabus_code: str) -> List[Book]:
+    """科目コードから書籍一覧を取得"""
+    return db.query(Book).join(
+        SyllabusBook,
+        Book.id == SyllabusBook.book_id
+    ).filter(
+        SyllabusBook.syllabus_code == syllabus_code
+    ).all()
 
-            if year:
-                query = query.filter(Syllabus.year == year)
-            if term:
-                query = query.filter(Syllabus.term == term)
-            if class_name:
-                query = query.filter(Subject.class_name == class_name)
-            if faculty:
-                query = query.filter(SyllabusFaculty.faculty == faculty)
-            if instructor_name:
-                query = query.filter(or_(
-                    Instructor.last_name.like(f"%{instructor_name}%"),
-                    Instructor.first_name.like(f"%{instructor_name}%"),
-                    Instructor.last_name_kana.like(f"%{instructor_name}%"),
-                    Instructor.first_name_kana.like(f"%{instructor_name}%")
-                ))
+def get_grading_criteria_by_syllabus(db, syllabus_code: str) -> List[GradingCriterion]:
+    """科目コードから成績評価基準一覧を取得"""
+    return db.query(GradingCriterion).filter(
+        GradingCriterion.syllabus_code == syllabus_code
+    ).all()
 
-            results = query.all()
-            return [dict(zip(result.keys(), result)) for result in results]
-        except SQLAlchemyError as e:
-            logger.error(f"シラバス検索中にエラーが発生しました: {e}")
-            return []
-        finally:
-            session.close() 
+def get_faculties_by_syllabus(db, syllabus_code: str) -> List[SyllabusFaculty]:
+    """科目コードから学部/課程一覧を取得"""
+    return db.query(SyllabusFaculty).filter(
+        SyllabusFaculty.syllabus_code == syllabus_code
+    ).all()
+
+def get_requirements_by_syllabus(db, syllabus_code: str) -> List[Requirement]:
+    """科目コードから要件一覧を取得"""
+    return db.query(Requirement).join(
+        SubjectRequirement,
+        Requirement.requirement_code == SubjectRequirement.requirement_code
+    ).filter(
+        SubjectRequirement.syllabus_code == syllabus_code
+    ).all()
+
+def get_programs_by_syllabus(db, syllabus_code: str) -> List[SubjectProgram]:
+    """科目コードから学習プログラム一覧を取得"""
+    return db.query(SubjectProgram).filter(
+        SubjectProgram.syllabus_code == syllabus_code
+    ).all()
+
+def update_subject(db, syllabus_code: str, subject_data: Dict[str, Any]) -> Optional[Subject]:
+    """科目情報を更新"""
+    subject = get_subject_by_code(db, syllabus_code)
+    if subject:
+        for key, value in subject_data.items():
+            setattr(subject, key, value)
+        subject.updated_at = datetime.now()
+        db.commit()
+        db.refresh(subject)
+    return subject
+
+def update_syllabus(db, syllabus_code: str, year: int, syllabus_data: Dict[str, Any]) -> Optional[Syllabus]:
+    """シラバス情報を更新"""
+    syllabus = get_syllabus_by_code_and_year(db, syllabus_code, year)
+    if syllabus:
+        for key, value in syllabus_data.items():
+            setattr(syllabus, key, value)
+        syllabus.updated_at = datetime.now()
+        db.commit()
+        db.refresh(syllabus)
+    return syllabus
+
+def delete_subject(db, syllabus_code: str) -> bool:
+    """科目情報を削除"""
+    subject = get_subject_by_code(db, syllabus_code)
+    if subject:
+        db.delete(subject)
+        db.commit()
+        return True
+    return False
+
+def delete_syllabus(db, syllabus_code: str, year: int) -> bool:
+    """シラバス情報を削除"""
+    syllabus = get_syllabus_by_code_and_year(db, syllabus_code, year)
+    if syllabus:
+        db.delete(syllabus)
+        db.commit()
+        return True
+    return False 
