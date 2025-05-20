@@ -31,10 +31,17 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                     subclass_name = None
                     class_note = None
                     
-                    # 属性に括弧が含まれる場合、括弧内をclass_noteとして抽出
-                    if '(' in attribute and ')' in attribute:
-                        class_name = attribute.split('(')[0].strip()
-                        class_note = attribute[attribute.find('(')+1:attribute.find(')')].strip()
+                    # 「•」があれば、右側をsubclass_nameに、左側を保持
+                    if '•' in attribute:
+                        parts = attribute.split('•')
+                        class_name = parts[0].strip()
+                        subclass_name = parts[1].strip()
+                    
+                    # 「：」があれば、左側をclass_noteに
+                    if '：' in class_name:
+                        parts = class_name.split('：')
+                        class_note = parts[0].strip()
+                        class_name = parts[1].strip() if len(parts) > 1 else class_note
                     
                     entry = {
                         'syllabus_code': row.get('シラバス管理番号', ''),
