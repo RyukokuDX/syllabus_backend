@@ -154,17 +154,27 @@ class GradingCriterion(Base):
         ),
     )
 
+class Faculty(Base):
+    __tablename__ = 'faculty'
+
+    faculty_id = Column(Integer, primary_key=True)
+    faculty_name = Column(Text, nullable=False)
+
+    __table_args__ = (
+        Index('idx_faculty_name', 'faculty_name'),
+    )
+
 class SyllabusFaculty(Base):
     __tablename__ = 'syllabus_faculty'
 
     id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('subject.syllabus_code', ondelete='CASCADE'), nullable=False)
-    faculty = Column(String(60), nullable=False)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
     __table_args__ = (
         Index('idx_syllabus_faculty_syllabus', 'syllabus_code'),
-        Index('idx_syllabus_faculty_faculty', 'faculty'),
+        Index('idx_syllabus_faculty_faculty', 'faculty_id'),
     )
 
 class Requirement(Base):
