@@ -23,7 +23,11 @@ def read_json_files(directory):
     for file in Path(directory).glob('*.json'):
         with open(file, 'r', encoding='utf-8') as f:
             json_data = json.load(f)
-            data.append(json_data['content'])
+            # subjects配列の中の各エントリーを追加
+            if 'subjects' in json_data:
+                data.extend(json_data['subjects'])
+            else:
+                print(f"Warning: {file} does not contain 'subjects' array")
     return data
 
 def generate_sql_insert(table_name, records):
@@ -53,37 +57,37 @@ def generate_sql_insert(table_name, records):
 
     # テーブルごとのON CONFLICT句を設定
     conflict_columns = {
-        'subject': ['subject_code'],
-        'syllabus': ['subject_code', 'year', 'term'],
-        'syllabus_time': ['subject_code', 'day_of_week', 'period'],
+        'subject': ['syllabus_code'],
+        'syllabus': ['syllabus_code', 'year', 'term'],
+        'syllabus_time': ['syllabus_code', 'day_of_week', 'period'],
         'instructor': ['instructor_code'],
-        'syllabus_instructor': ['subject_code', 'instructor_code'],
-        'lecture_session': ['subject_code', 'session_number'],
+        'syllabus_instructor': ['syllabus_code', 'instructor_code'],
+        'lecture_session': ['syllabus_code', 'session_number'],
         'book': ['isbn'],
-        'syllabus_textbook': ['subject_code', 'book_id'],
-        'syllabus_reference': ['subject_code', 'book_id'],
-        'grading_criterion': ['subject_code', 'criteria_type'],
-        'syllabus_faculty': ['subject_code', 'faculty']
+        'syllabus_textbook': ['syllabus_code', 'book_id'],
+        'syllabus_reference': ['syllabus_code', 'book_id'],
+        'grading_criterion': ['syllabus_code', 'criteria_type'],
+        'syllabus_faculty': ['syllabus_code', 'faculty']
     }
     
     # 更新対象のカラムを設定
     update_columns = {
-        'subject': [col for col in columns if col not in ['subject_code', 'created_at']],
-        'syllabus': [col for col in columns if col not in ['subject_code', 'year', 'term', 'created_at']],
-        'syllabus_time': [col for col in columns if col not in ['subject_code', 'day_of_week', 'period', 'created_at']],
+        'subject': [col for col in columns if col not in ['syllabus_code', 'created_at']],
+        'syllabus': [col for col in columns if col not in ['syllabus_code', 'year', 'term', 'created_at']],
+        'syllabus_time': [col for col in columns if col not in ['syllabus_code', 'day_of_week', 'period', 'created_at']],
         'instructor': [col for col in columns if col not in ['instructor_code', 'created_at']],
-        'syllabus_instructor': [col for col in columns if col not in ['subject_code', 'instructor_code', 'created_at']],
-        'lecture_session': [col for col in columns if col not in ['subject_code', 'session_number', 'created_at']],
+        'syllabus_instructor': [col for col in columns if col not in ['syllabus_code', 'instructor_code', 'created_at']],
+        'lecture_session': [col for col in columns if col not in ['syllabus_code', 'session_number', 'created_at']],
         'book': [col for col in columns if col not in ['isbn', 'created_at']],
-        'syllabus_textbook': [col for col in columns if col not in ['subject_code', 'book_id', 'created_at']],
-        'syllabus_reference': [col for col in columns if col not in ['subject_code', 'book_id', 'created_at']],
-        'grading_criterion': [col for col in columns if col not in ['subject_code', 'criteria_type', 'created_at']],
-        'syllabus_faculty': [col for col in columns if col not in ['subject_code', 'faculty', 'created_at']]
+        'syllabus_textbook': [col for col in columns if col not in ['syllabus_code', 'book_id', 'created_at']],
+        'syllabus_reference': [col for col in columns if col not in ['syllabus_code', 'book_id', 'created_at']],
+        'grading_criterion': [col for col in columns if col not in ['syllabus_code', 'criteria_type', 'created_at']],
+        'syllabus_faculty': [col for col in columns if col not in ['syllabus_code', 'faculty', 'created_at']]
     }
 
     # ON CONFLICT句を生成
-    conflict_cols = conflict_columns.get(table_name, ['subject_code'])
-    update_cols = update_columns.get(table_name, [col for col in columns if col not in ['subject_code', 'created_at']])
+    conflict_cols = conflict_columns.get(table_name, ['syllabus_code'])
+    update_cols = update_columns.get(table_name, [col for col in columns if col not in ['syllabus_code', 'created_at']])
     
     conflict_str = ', '.join(conflict_cols)
     update_str = ',\n    '.join([f"{col} = EXCLUDED.{col}" for col in update_cols])
@@ -102,21 +106,102 @@ ON CONFLICT ({conflict_str}) DO UPDATE SET
 def generate_migration():
     """マイグレーションファイルを生成"""
     try:
-        # マイグレーションファイルのパスを設定
-        migration_dir = os.path.dirname(__file__)
+        # プロジェクトルートからの相対パス
+        project_root = Path(__file__).parent.parent.parent.parent
         
-        # 現在の日時を取得してファイル名を生成
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        migration_file = os.path.join(migration_dir, f'migration_{timestamp}.sql')
+        # 処理対象のディレクトリとテーブル名のマッピング
+        targets = [
+            {
+                'json_dir': project_root / 'updates' / 'subject' / 'add',
+                'table_name': 'subject',
+                'source': 'syllabus_search'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus' / 'add',
+                'table_name': 'syllabus',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_time' / 'add',
+                'table_name': 'syllabus_time',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'instructor' / 'add',
+                'table_name': 'instructor',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_instructor' / 'add',
+                'table_name': 'syllabus_instructor',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'lecture_session' / 'add',
+                'table_name': 'lecture_session',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'book' / 'add',
+                'table_name': 'book',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_textbook' / 'add',
+                'table_name': 'syllabus_textbook',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_reference' / 'add',
+                'table_name': 'syllabus_reference',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'grading_criterion' / 'add',
+                'table_name': 'grading_criterion',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_faculty' / 'add',
+                'table_name': 'syllabus_faculty',
+                'source': 'web_syllabus'
+            }
+        ]
         
-        # マイグレーションSQLを生成
-        migration_sql = generate_migration_sql()
+        # 出力先ディレクトリ
+        output_dir = project_root / 'docker' / 'postgresql' / 'init' / 'migrations'
+        output_dir.mkdir(parents=True, exist_ok=True)
         
-        # ファイルに書き込み
-        with open(migration_file, 'w', encoding='utf-8') as f:
-            f.write(migration_sql)
+        for target in targets:
+            if not target['json_dir'].exists():
+                print(f"Skipping {target['json_dir']} as it doesn't exist")
+                continue
+                
+            # JSONデータを読み込む
+            records = read_json_files(target['json_dir'])
+            if not records:
+                print(f"No JSON files found in {target['json_dir']}")
+                continue
+            
+            # SQL生成
+            sql = generate_sql_insert(target['table_name'], records)
+            
+            # ファイルに書き出し
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            output_file = output_dir / f'V{timestamp}__insert_{target["table_name"]}s.sql'
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(sql)
+            
+            # 使用したJSONファイルを移動
+            registered_dir = project_root / 'updates' / target['table_name'] / 'registered' / output_file.stem
+            registered_dir.mkdir(parents=True, exist_ok=True)
+            
+            for json_file in target['json_dir'].glob('*.json'):
+                json_file.rename(registered_dir / json_file.name)
+            
+            print(f'Generated migration file: {output_file}')
+            print(f'Moved JSON files to: {registered_dir}')
         
-        print(f'Migration file generated: {migration_file}')
         return True
     except Exception as e:
         print(f'Error generating migration: {str(e)}')
@@ -324,103 +409,6 @@ CREATE INDEX IF NOT EXISTS idx_subject_program_program ON subject_program(progra
 """)
 
     return '\n'.join(sql)
-
-def main():
-    # プロジェクトルートからの相対パス
-    project_root = Path(__file__).parent.parent.parent.parent
-    
-    # 処理対象のディレクトリとテーブル名のマッピング
-    targets = [
-        {
-            'json_dir': project_root / 'updates' / 'subject' / 'add',
-            'table_name': 'subject',
-            'source': 'syllabus_search'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'syllabus' / 'add',
-            'table_name': 'syllabus',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'syllabus_time' / 'add',
-            'table_name': 'syllabus_time',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'instructor' / 'add',
-            'table_name': 'instructor',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'syllabus_instructor' / 'add',
-            'table_name': 'syllabus_instructor',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'lecture_session' / 'add',
-            'table_name': 'lecture_session',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'book' / 'add',
-            'table_name': 'book',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'syllabus_textbook' / 'add',
-            'table_name': 'syllabus_textbook',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'syllabus_reference' / 'add',
-            'table_name': 'syllabus_reference',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'grading_criterion' / 'add',
-            'table_name': 'grading_criterion',
-            'source': 'web_syllabus'
-        },
-        {
-            'json_dir': project_root / 'updates' / 'syllabus_faculty' / 'add',
-            'table_name': 'syllabus_faculty',
-            'source': 'web_syllabus'
-        }
-    ]
-    
-    # 出力先ディレクトリ
-    output_dir = project_root / 'docker' / 'postgresql' / 'init' / 'migrations'
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    for target in targets:
-        if not target['json_dir'].exists():
-            print(f"Skipping {target['json_dir']} as it doesn't exist")
-            continue
-            
-        # JSONデータを読み込む
-        records = read_json_files(target['json_dir'])
-        if not records:
-            print(f"No JSON files found in {target['json_dir']}")
-            continue
-        
-        # SQL生成
-        sql = generate_sql_insert(target['table_name'], records)
-        
-        # ファイルに書き出し
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        output_file = output_dir / f'V{timestamp}__insert_{target["table_name"]}s.sql'
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(sql)
-        
-        # 使用したJSONファイルを移動
-        registered_dir = project_root / 'updates' / target['table_name'] / 'registered' / output_file.stem
-        registered_dir.mkdir(parents=True, exist_ok=True)
-        
-        for json_file in target['json_dir'].glob('*.json'):
-            json_file.rename(registered_dir / json_file.name)
-        
-        print(f'Generated migration file: {output_file}')
-        print(f'Moved JSON files to: {registered_dir}')
 
 if __name__ == '__main__':
     generate_migration() 
