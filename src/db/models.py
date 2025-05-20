@@ -35,7 +35,7 @@ class Syllabus(Base):
     grade_d1 = Column(Boolean, nullable=False)
     grade_d2 = Column(Boolean, nullable=False)
     grade_d3 = Column(Boolean, nullable=False)
-    campus = Column(String(20), nullable=False)
+    campus = Column(Text, nullable=False)
     credits = Column(Integer, nullable=False)
     lecture_code = Column(Text, nullable=False)
     summary = Column(Text)
@@ -60,11 +60,19 @@ class Instructor(Base):
     __tablename__ = 'instructor'
 
     instructor_code = Column(Text, primary_key=True)
-    name = Column(Text, nullable=False)
-    name_kana = Column(Text)
-    name_en = Column(Text)
+    last_name = Column(Text, nullable=False)
+    first_name = Column(Text, nullable=False)
+    last_name_kana = Column(Text)
+    first_name_kana = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_instructor_last_name', 'last_name'),
+        Index('idx_instructor_first_name', 'first_name'),
+        Index('idx_instructor_last_name_kana', 'last_name_kana'),
+        Index('idx_instructor_first_name_kana', 'first_name_kana'),
+    )
 
 class Book(Base):
     __tablename__ = 'book'
@@ -95,6 +103,11 @@ class SyllabusInstructor(Base):
     subject_code = Column(Text, ForeignKey('subject.subject_code', ondelete='CASCADE'), nullable=False)
     instructor_code = Column(Text, ForeignKey('instructor.instructor_code', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_syllabus_instructor_subject', 'subject_code'),
+        Index('idx_syllabus_instructor_instructor', 'instructor_code'),
+    )
 
 class LectureSession(Base):
     __tablename__ = 'lecture_session'
@@ -206,9 +219,10 @@ class SyllabusTime:
 class Instructor:
     """教員モデル"""
     instructor_code: str
-    name: str
-    name_kana: Optional[str]
-    name_en: Optional[str]
+    last_name: str
+    first_name: str
+    last_name_kana: Optional[str]
+    first_name_kana: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime]
 
@@ -232,4 +246,12 @@ class GradingCriterion:
     criteria_type: str
     ratio: Optional[int]
     note: Optional[str]
+    created_at: datetime
+
+@dataclass
+class SyllabusInstructor:
+    """シラバス-教員関連モデル"""
+    id: int
+    subject_code: str
+    instructor_code: str
     created_at: datetime 

@@ -1,0 +1,14 @@
+-- アプリケーションユーザーの作成
+CREATE USER ${APP_USER} WITH PASSWORD '${APP_PASSWORD}';
+
+-- データベースの作成
+CREATE DATABASE ${POSTGRES_DB}
+    WITH 
+    OWNER = ${POSTGRES_USER}
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'C'
+    LC_CTYPE = 'C'
+    TEMPLATE = template0;
+
+-- アプリケーションユーザーに権限を付与
+GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${APP_USER}; 

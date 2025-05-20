@@ -1,0 +1,34 @@
+{
+  "subject_requirements": [
+    {
+      "subject_code": "CSCI0001",
+      "requirement_type": "必修",
+      "applied_science_available": true,
+      "graduation_credit_limit": false,
+      "year_restriction": true,
+      "first_year_only": true,
+      "up_to_second_year": false,
+      "guidance_required": false
+    },
+    {
+      "subject_code": "MATH0001",
+      "requirement_type": "必修",
+      "applied_science_available": true,
+      "graduation_credit_limit": false,
+      "year_restriction": true,
+      "first_year_only": true,
+      "up_to_second_year": false,
+      "guidance_required": false
+    },
+    {
+      "subject_code": "ENGL0001",
+      "requirement_type": "選択",
+      "applied_science_available": true,
+      "graduation_credit_limit": true,
+      "year_restriction": false,
+      "first_year_only": false,
+      "up_to_second_year": false,
+      "guidance_required": false
+    }
+  ]
+} 

@@ -237,7 +237,8 @@ class Database:
                 Syllabus.term,
                 Syllabus.credits,
                 Syllabus.campus,
-                Instructor.name.label('instructor_name'),
+                Instructor.last_name.label('instructor_last_name'),
+                Instructor.first_name.label('instructor_first_name'),
                 SyllabusFaculty.faculty
             ).join(
                 Syllabus, Subject.subject_code == Syllabus.subject_code
@@ -246,7 +247,7 @@ class Database:
             ).join(
                 SyllabusInstructor, Subject.subject_code == SyllabusInstructor.subject_code
             ).join(
-                Instructor, SyllabusInstructor.instructor_code == Instructor.instructor_code
+                Instructor, Instructor.instructor_code == any_(SyllabusInstructor.instructor_code)
             )
 
             if year:
@@ -258,7 +259,12 @@ class Database:
             if faculty:
                 query = query.filter(SyllabusFaculty.faculty == faculty)
             if instructor_name:
-                query = query.filter(Instructor.name.like(f"%{instructor_name}%"))
+                query = query.filter(or_(
+                    Instructor.last_name.like(f"%{instructor_name}%"),
+                    Instructor.first_name.like(f"%{instructor_name}%"),
+                    Instructor.last_name_kana.like(f"%{instructor_name}%"),
+                    Instructor.first_name_kana.like(f"%{instructor_name}%")
+                ))
 
             results = query.all()
             return [dict(zip(result.keys(), result)) for result in results]

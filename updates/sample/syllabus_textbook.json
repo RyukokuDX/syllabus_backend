@@ -1,0 +1,14 @@
+{
+  "syllabus_textbooks": [
+    {
+      "subject_code": "CSCI0001",
+      "book_id": 1,
+      "note": "必携テキスト"
+    },
+    {
+      "subject_code": "MATH0001",
+      "book_id": 2,
+      "note": "授業で使用する主教材"
+    }
+  ]
+} 

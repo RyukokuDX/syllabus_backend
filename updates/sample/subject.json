@@ -1,0 +1,25 @@
+{
+  "subjects": [
+    {
+      "subject_code": "CSCI0001",
+      "name": "プログラミング基礎",
+      "class_name": "専門科目",
+      "subclass_name": "情報系科目",
+      "class_note": "初学者向け"
+    },
+    {
+      "subject_code": "MATH0001",
+      "name": "線形代数学",
+      "class_name": "専門基礎科目",
+      "subclass_name": "数学系科目",
+      "class_note": null
+    },
+    {
+      "subject_code": "ENGL0001",
+      "name": "アカデミック英語",
+      "class_name": "共通科目",
+      "subclass_name": "外国語科目",
+      "class_note": "TOEIC 500点以上推奨"
+    }
+  ]
+} 
