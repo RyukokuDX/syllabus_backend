@@ -35,6 +35,10 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                         parts = attribute.split('：')
                         class_note = parts[0].strip()
                     
+                    # 法学部専攻科目の例外処理
+                    if attribute == "法学部専攻科目：０８年以降入学":
+                        class_note = "０８年以降入学"
+                    
                     # 重複チェック
                     if class_note and class_note not in seen_notes:
                         seen_notes.add(class_note)
@@ -65,7 +69,7 @@ def save_json(entries: List[Dict[str, Any]], year: str) -> None:
         print("  No entries to save")
         return
         
-    filepath = f"update/class_note/add/class_note_{year}.json"
+    filepath = f"updates/class_note/add/class_note_{year}.json"
     
     try:
         os.makedirs(os.path.dirname(filepath), exist_ok=True)

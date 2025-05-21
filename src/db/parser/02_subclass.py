@@ -64,7 +64,7 @@ def save_json(entries: List[Dict[str, Any]], year: str) -> None:
         print("  No entries to save")
         return
         
-    filepath = f"update/subclass/add/subclass_{year}.json"
+    filepath = f"updates/subclass/add/subclass_{year}.json"
     
     try:
         os.makedirs(os.path.dirname(filepath), exist_ok=True)

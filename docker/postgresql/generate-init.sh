@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")"
 
 TEMPLATE_FILE="init/init.sql.template"
-OUTPUT_FILE="init/01-init.sql"
+OUTPUT_FILE="init/02-init.sql"
 ENV_FILE=".env"
 
 if [ ! -f "$ENV_FILE" ]; then

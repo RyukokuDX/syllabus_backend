@@ -1,45 +1,45 @@
 ﻿-- ========== データベースの作成 ==========
 
-CREATE DATABASE master_db;
+CREATE DATABASE syllabus_db;
 
 -- ========== ユーザーの作成 ==========
 
 -- master_user: 全操作
 CREATE USER ${MASTER_USER} WITH PASSWORD '${MASTER_PASSWORD}';
 
--- dev_user: dev_db 全操作 + master_db 読み取り専用
+-- dev_user: dev_db 全操作 + syllabus_db 読み取り専用
 CREATE USER ${DEV_USER} WITH PASSWORD '${DEV_PASSWORD}';
 
--- app_user: master_db 読み取り専用
+-- app_user: syllabus_db 読み取り専用
 CREATE USER ${APP_USER} WITH PASSWORD '${APP_PASSWORD}';
 
 -- ========== 権限付与 ==========
 
 -- master_user に全DBへのフルアクセス（明示）
-GRANT ALL PRIVILEGES ON DATABASE master_db TO ${MASTER_USER};
-GRANT ALL PRIVILEGES ON DATABASE master_db TO ${DEV_USER};
+GRANT ALL PRIVILEGES ON DATABASE syllabus_db TO ${MASTER_USER};
+GRANT ALL PRIVILEGES ON DATABASE syllabus_db TO ${DEV_USER};
 
--- dev_user に dev_db の全権限
-GRANT ALL PRIVILEGES ON DATABASE master_db TO ${DEV_USER};
+-- dev_user に syllabus_db の全権限
+GRANT ALL PRIVILEGES ON DATABASE syllabus_db TO ${DEV_USER};
 
--- app_user/dev_user に master_db への読み取り権限のみ
+-- app_user/dev_user に syllabus_db への読み取り権限のみ
 -- ※ PostgreSQL では DATABASE への GRANT だけではなく、スキーマやテーブルに対する明示的な付与が必要
 
--- === master_db に対して dev_user/app_user を読み取り専用で設定 ===
+-- === syllabus_db に対して dev_user/app_user を読み取り専用で設定 ===
 
--- 接続切替（master_db）
-\connect master_db
+-- 接続切替（syllabus_db）
+\connect syllabus_db
 
 -- 共有スキーマ public に接続・参照許可
-GRANT CONNECT ON DATABASE master_db TO ${DEV_USER}, ${APP_USER};
+GRANT CONNECT ON DATABASE syllabus_db TO ${DEV_USER}, ${APP_USER};
 GRANT USAGE ON SCHEMA public TO ${DEV_USER}, ${APP_USER};
 
--- ========== テーブル作成（master_db） ==========
+-- ========== テーブル作成（syllabus_db） ==========
 
 -- class（科目区分）
 CREATE TABLE IF NOT EXISTS class (
     class_id SERIAL PRIMARY KEY,
-    class_name TEXT NOT NULL,
+    class_name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS class (
 -- subclass（科目小区分）
 CREATE TABLE IF NOT EXISTS subclass (
     subclass_id SERIAL PRIMARY KEY,
-    subclass_name TEXT NOT NULL,
+    subclass_name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS subclass (
 -- class_note（科目区分の備考）
 CREATE TABLE IF NOT EXISTS class_note (
     class_note_id SERIAL PRIMARY KEY,
-    class_note TEXT NOT NULL,
+    class_note TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS class_note (
 -- subject_name（科目名マスタ）
 CREATE TABLE IF NOT EXISTS subject_name (
     subject_name_id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -86,12 +86,16 @@ CREATE TABLE IF NOT EXISTS subject (
     FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id) ON DELETE RESTRICT
 );
 
+CREATE INDEX idx_subject_name ON subject(subject_name_id);
+CREATE INDEX idx_subject_class ON subject(class_id);
+CREATE INDEX idx_subject_subclass ON subject(subclass_id);
+
 -- syllabus（シラバス情報）
 CREATE TABLE IF NOT EXISTS syllabus (
     syllabus_code TEXT,
     year INTEGER,
     subtitle TEXT,
-    term VARCHAR(10) NOT NULL,
+    term TEXT NOT NULL,
     grade_b1 BOOLEAN NOT NULL,
     grade_b2 BOOLEAN NOT NULL,
     grade_b3 BOOLEAN NOT NULL,
@@ -124,14 +128,15 @@ CREATE INDEX idx_syllabus_campus ON syllabus(campus);
 CREATE TABLE IF NOT EXISTS lecture_session (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
+    year INTEGER NOT NULL,
     day_of_week TEXT NOT NULL,
     period INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE
+    FOREIGN KEY (syllabus_code, year) REFERENCES syllabus(syllabus_code, year) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_lecture_session_day_period ON lecture_session(day_of_week, period);
-CREATE INDEX idx_lecture_session_syllabus ON lecture_session(syllabus_code);
+CREATE INDEX idx_lecture_session_syllabus ON lecture_session(syllabus_code, year);
 
 -- instructor（教員）
 CREATE TABLE IF NOT EXISTS instructor (
@@ -167,7 +172,7 @@ CREATE TABLE IF NOT EXISTS book (
     title TEXT NOT NULL,
     publisher TEXT,
     price INTEGER,
-    isbn VARCHAR(20),
+    isbn TEXT UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -193,7 +198,7 @@ CREATE INDEX idx_syllabus_book_book ON syllabus_book(book_id);
 -- criteria（評価種別マスタ）
 CREATE TABLE IF NOT EXISTS criteria (
     criteria_id SERIAL PRIMARY KEY,
-    criteria_type TEXT NOT NULL,
+    criteria_type TEXT NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
@@ -205,21 +210,22 @@ CREATE UNIQUE INDEX idx_criteria_type ON criteria(criteria_type);
 CREATE TABLE IF NOT EXISTS grading_criterion (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
+    year INTEGER NOT NULL,
     criteria_id INTEGER NOT NULL,
     ratio INTEGER,
     note TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
+    FOREIGN KEY (syllabus_code, year) REFERENCES syllabus(syllabus_code, year) ON DELETE CASCADE,
     FOREIGN KEY (criteria_id) REFERENCES criteria(criteria_id) ON DELETE RESTRICT
 );
 
 CREATE INDEX idx_grading_criterion_criteria ON grading_criterion(criteria_id);
-CREATE INDEX idx_grading_criterion_syllabus_criteria ON grading_criterion(syllabus_code, criteria_id);
+CREATE INDEX idx_grading_criterion_syllabus_criteria ON grading_criterion(syllabus_code, year, criteria_id);
 
 -- faculty（開講学部・課程）
 CREATE TABLE IF NOT EXISTS faculty (
     faculty_id SERIAL PRIMARY KEY,
-    faculty_name TEXT NOT NULL,
+    faculty_name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -297,7 +303,7 @@ GRANT SELECT ON pg_catalog.pg_tables TO ${DEV_USER}, ${APP_USER};
 GRANT SELECT ON information_schema.tables TO ${DEV_USER}, ${APP_USER};
 
 -- 接続切替（dev_db）
-\connect master_db
+\connect syllabus_db
 
 -- dev_user に dev_db の public スキーマ操作権限（必要なら）
 GRANT ALL PRIVILEGES ON SCHEMA public TO ${DEV_USER};
@@ -325,7 +331,7 @@ CREATE INDEX idx_subject_name ON subject(subject_name_id);
 CREATE INDEX idx_subject_class ON subject(class_id);
 CREATE INDEX idx_subject_subclass ON subject(subclass_id);
 
--- 以下、master_dbと同じテーブル定義を繰り返し...
+-- 以下、syllabus_dbと同じテーブル定義を繰り返し...
 -- （以下、上記のテーブル定義と同じ内容を繰り返すため省略）
 
 -- ========== マイグレーションファイルの実行 ==========
@@ -333,3 +339,23 @@ CREATE INDEX idx_subject_subclass ON subject(subclass_id);
 -- マイグレーションファイルを実行
 \i /docker-entrypoint-initdb.d/migrations/V20250521111859__insert_subject_names.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250521111859__insert_class_notes.sql
+
+-- 各テーブルに明示的に権限を付与
+GRANT SELECT ON class TO ${DEV_USER};
+GRANT SELECT ON subclass TO ${DEV_USER};
+GRANT SELECT ON class_note TO ${DEV_USER};
+GRANT SELECT ON subject_name TO ${DEV_USER};
+GRANT SELECT ON subject TO ${DEV_USER};
+GRANT SELECT ON syllabus TO ${DEV_USER};
+GRANT SELECT ON lecture_session TO ${DEV_USER};
+GRANT SELECT ON instructor TO ${DEV_USER};
+GRANT SELECT ON syllabus_instructor TO ${DEV_USER};
+GRANT SELECT ON book TO ${DEV_USER};
+GRANT SELECT ON syllabus_book TO ${DEV_USER};
+GRANT SELECT ON criteria TO ${DEV_USER};
+GRANT SELECT ON grading_criterion TO ${DEV_USER};
+GRANT SELECT ON faculty TO ${DEV_USER};
+GRANT SELECT ON syllabus_faculty TO ${DEV_USER};
+GRANT SELECT ON requirement TO ${DEV_USER};
+GRANT SELECT ON subject_requirement TO ${DEV_USER};
+GRANT SELECT ON subject_program TO ${DEV_USER};
