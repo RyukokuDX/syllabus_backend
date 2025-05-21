@@ -15,8 +15,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./init/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
-      - ./init/migrations:/docker-entrypoint-initdb.d/02-migrations:ro
+      - ./init/01-init.sh:/docker-entrypoint-initdb.d/01-init.sh:ro
+      - ./init/02-init.sql:/docker-entrypoint-initdb.d/02-init.sql:ro
+      - ./init/migrations:/docker-entrypoint-initdb.d/migrations:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
       - shared-network

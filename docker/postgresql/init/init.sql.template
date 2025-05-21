@@ -1,6 +1,6 @@
 ﻿-- ========== データベースの作成 ==========
 
-CREATE DATABASE syllabus;
+CREATE DATABASE master_db;
 
 -- ========== ユーザーの作成 ==========
 
@@ -16,11 +16,11 @@ CREATE USER ${APP_USER} WITH PASSWORD '${APP_PASSWORD}';
 -- ========== 権限付与 ==========
 
 -- master_user に全DBへのフルアクセス（明示）
-GRANT ALL PRIVILEGES ON DATABASE syllabus TO ${MASTER_USER};
-GRANT ALL PRIVILEGES ON DATABASE syllabus TO ${DEV_USER};
+GRANT ALL PRIVILEGES ON DATABASE master_db TO ${MASTER_USER};
+GRANT ALL PRIVILEGES ON DATABASE master_db TO ${DEV_USER};
 
 -- dev_user に dev_db の全権限
-GRANT ALL PRIVILEGES ON DATABASE syllabus TO ${DEV_USER};
+GRANT ALL PRIVILEGES ON DATABASE master_db TO ${DEV_USER};
 
 -- app_user/dev_user に master_db への読み取り権限のみ
 -- ※ PostgreSQL では DATABASE への GRANT だけではなく、スキーマやテーブルに対する明示的な付与が必要
@@ -28,10 +28,10 @@ GRANT ALL PRIVILEGES ON DATABASE syllabus TO ${DEV_USER};
 -- === master_db に対して dev_user/app_user を読み取り専用で設定 ===
 
 -- 接続切替（master_db）
-\connect syllabus
+\connect master_db
 
 -- 共有スキーマ public に接続・参照許可
-GRANT CONNECT ON DATABASE syllabus TO ${DEV_USER}, ${APP_USER};
+GRANT CONNECT ON DATABASE master_db TO ${DEV_USER}, ${APP_USER};
 GRANT USAGE ON SCHEMA public TO ${DEV_USER}, ${APP_USER};
 
 -- ========== テーブル作成（master_db） ==========
@@ -297,7 +297,7 @@ GRANT SELECT ON pg_catalog.pg_tables TO ${DEV_USER}, ${APP_USER};
 GRANT SELECT ON information_schema.tables TO ${DEV_USER}, ${APP_USER};
 
 -- 接続切替（dev_db）
-\connect syllabus
+\connect master_db
 
 -- dev_user に dev_db の public スキーマ操作権限（必要なら）
 GRANT ALL PRIVILEGES ON SCHEMA public TO ${DEV_USER};
@@ -331,6 +331,5 @@ CREATE INDEX idx_subject_subclass ON subject(subclass_id);
 -- ========== マイグレーションファイルの実行 ==========
 
 -- マイグレーションファイルを実行
-\i /docker-entrypoint-initdb.d/02-migrations/V20250518211454__insert_subjects.sql
-\i /docker-entrypoint-initdb.d/02-migrations/V20250519022619__insert_syllabuss.sql
-\i /docker-entrypoint-initdb.d/02-migrations/V20250519023115__insert_syllabus_times.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250521111859__insert_subject_names.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250521111859__insert_class_notes.sql

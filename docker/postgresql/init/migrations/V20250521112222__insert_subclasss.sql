@@ -11,5 +11,4 @@ INSERT INTO subclass (
     ('コース科目', '2025-05-21T09:59:41.101660', NULL),
     ('保護課程科目', '2025-05-21T09:59:41.101660', NULL)
 ON CONFLICT (subclass_name) DO UPDATE SET
-    updated_at = EXCLUDED.updated_at,
     updated_at = CURRENT_TIMESTAMP;

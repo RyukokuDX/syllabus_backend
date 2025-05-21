@@ -5,11 +5,11 @@ set -e
 cd "$(dirname "$0")"
 
 TEMPLATE_FILE="init/init.sql.template"
-OUTPUT_FILE="init/init.sql"
-ENV_FILE="../.env"
+OUTPUT_FILE="init/01-init.sql"
+ENV_FILE=".env"
 
 if [ ! -f "$ENV_FILE" ]; then
-  echo "Missing .env file."
+  echo "Missing .env file at $ENV_FILE"
   exit 1
 fi
 
@@ -22,18 +22,18 @@ if command -v dos2unix >/dev/null 2>&1; then
 fi
 
 # 環境変数を読み込む
-while IFS= read -r line || [ -n "$line" ]; do
-  # コメントと空行をスキップ
-  [[ $line =~ ^#.*$ ]] && continue
-  [[ -z $line ]] && continue
-  
-  # 変数名と値を分離して設定
-  if [[ $line =~ ^([A-Z][A-Z0-9_]*)=(.*)$ ]]; then
-    export "${BASH_REMATCH[1]}"="${BASH_REMATCH[2]}"
-  fi
-done < "$ENV_FILE"
+export $(grep -v '^#' "$ENV_FILE" | xargs)
 
 # テンプレート変換
-envsubst < "$TEMPLATE_FILE" > "$OUTPUT_FILE"
+cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
+
+# 環境変数を置換
+for var in MASTER_USER MASTER_PASSWORD MASTER_DB DEV_USER DEV_PASSWORD DEV_DB APP_USER APP_PASSWORD; do
+  if [ -n "${!var}" ]; then
+    sed -i "s/\${$var}/${!var}/g" "$OUTPUT_FILE"
+  else
+    echo "Warning: $var is not set"
+  fi
+done
 
 echo "$OUTPUT_FILE generated successfully at $OUTPUT_FILE"

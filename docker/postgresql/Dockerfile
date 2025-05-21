@@ -17,7 +17,7 @@ ENV TZ=Asia/Tokyo
 COPY postgresql.conf /etc/postgresql/postgresql.conf
 
 # マイグレーションスクリプトをコピー
-COPY ./init/init.sh /docker-entrypoint-initdb.d/03-run-migrations.sh
-RUN chmod +x /docker-entrypoint-initdb.d/03-run-migrations.sh
+COPY ./init/init.sh /docker-entrypoint-initdb.d/01-init.sh
+RUN chmod +x /docker-entrypoint-initdb.d/01-init.sh
 
 CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"] 

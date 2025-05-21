@@ -127,5 +127,4 @@ INSERT INTO class (
     ('他学部受講', '2025-05-21T09:57:50.288901', NULL),
     ('本願寺派教師資格', '2025-05-21T09:57:50.288901', NULL)
 ON CONFLICT (class_name) DO UPDATE SET
-    updated_at = EXCLUDED.updated_at,
     updated_at = CURRENT_TIMESTAMP;
