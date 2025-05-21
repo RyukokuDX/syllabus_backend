@@ -31,6 +31,10 @@
 
 ```mermaid
 erDiagram
+    class ||--o{ subject : "has"
+    subclass ||--o{ subject : "has"
+    class_note ||--o{ subject : "has"
+    subject_name ||--o{ subject : "has"
     subject ||--o{ syllabus : "has"
     subject ||--o{ lecture_session : "has"
     subject ||--o{ syllabus_instructor : "has"
@@ -43,13 +47,44 @@ erDiagram
     instructor ||--o{ syllabus_instructor : "teaches"
     book ||--o{ syllabus_book : "used_in"
     requirement ||--o{ subject_requirement : "applies_to"
+    faculty ||--o{ syllabus_faculty : "has"
+    criteria ||--o{ grading_criterion : "has"
+
+    class {
+        INTEGER class_id PK
+        TEXT class_name
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    subclass {
+        INTEGER subclass_id PK
+        TEXT subclass_name
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    class_note {
+        INTEGER class_note_id PK
+        TEXT class_note
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    subject_name {
+        INTEGER subject_name_id PK
+        TEXT name
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
 
     subject {
         TEXT syllabus_code PK
-        TEXT name
-        TEXT class_name
-        TEXT subclass_name
-        TEXT class_note
+        INTEGER subject_name_id FK
+        INTEGER class_id FK
+        INTEGER subclass_id FK
+        INTEGER class_note_id FK
+        TEXT lecture_code
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -70,7 +105,6 @@ erDiagram
         BOOLEAN grade_d3
         TEXT campus
         INTEGER credits
-        TEXT lecture_code
         TEXT summary
         TEXT goals
         TEXT methods
@@ -84,8 +118,8 @@ erDiagram
     lecture_session {
         INTEGER id PK
         TEXT syllabus_code FK
-        TINYINT day_of_week
-        TINYINT period
+        TEXT day_of_week
+        INTEGER period
         TIMESTAMP created_at
     }
 
@@ -126,19 +160,34 @@ erDiagram
         TIMESTAMP created_at
     }
 
+    criteria {
+        INTEGER criteria_id PK
+        TEXT criteria_type
+        TEXT description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
     grading_criterion {
         INTEGER id PK
         TEXT syllabus_code FK
-        TEXT criteria_type
+        INTEGER criteria_id FK
         INTEGER ratio
         TEXT note
         TIMESTAMP created_at
     }
 
+    faculty {
+        INTEGER faculty_id PK
+        TEXT faculty_name
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
     syllabus_faculty {
         INTEGER id PK
         TEXT syllabus_code FK
-        VARCHAR faculty
+        INTEGER faculty_id FK
         TIMESTAMP created_at
     }
 
@@ -174,6 +223,10 @@ erDiagram
 ## テーブル間の関連
 
 ### 1対多の関連
+- class → subject
+- subclass → subject
+- class_note → subject
+- subject_name → subject
 - subject → syllabus
 - subject → lecture_session
 - subject → syllabus_instructor
@@ -185,15 +238,22 @@ erDiagram
 - instructor → syllabus_instructor
 - book → syllabus_book
 - requirement → subject_requirement
+- faculty → syllabus_faculty
+- criteria → grading_criterion
 
 ### 多対多の関連
 - subject ⟷ instructor (syllabus_instructor)
 - subject ⟷ book (syllabus_book)
 - subject ⟷ requirement (subject_requirement)
+- subject ⟷ faculty (syllabus_faculty)
 
 ## 主キーと外部キー
 
 ### 主キー
+- class: class_id
+- subclass: subclass_id
+- class_note: class_note_id
+- subject_name: subject_name_id
 - subject: syllabus_code
 - syllabus: syllabus_code
 - lecture_session: id
@@ -201,13 +261,19 @@ erDiagram
 - syllabus_instructor: id
 - book: id
 - syllabus_book: id
+- criteria: criteria_id
 - grading_criterion: id
+- faculty: faculty_id
 - syllabus_faculty: id
 - requirement: requirement_code
 - subject_requirement: id
 - subject_program: id
 
 ### 外部キー
+- subject.subject_name_id → subject_name.subject_name_id
+- subject.class_id → class.class_id
+- subject.subclass_id → subclass.subclass_id
+- subject.class_note_id → class_note.class_note_id
 - syllabus.syllabus_code → subject.syllabus_code
 - lecture_session.syllabus_code → syllabus.syllabus_code
 - syllabus_instructor.syllabus_code → subject.syllabus_code
@@ -215,7 +281,9 @@ erDiagram
 - syllabus_book.syllabus_code → subject.syllabus_code
 - syllabus_book.book_id → book.id
 - grading_criterion.syllabus_code → syllabus.syllabus_code
+- grading_criterion.criteria_id → criteria.criteria_id
 - syllabus_faculty.syllabus_code → subject.syllabus_code
+- syllabus_faculty.faculty_id → faculty.faculty_id
 - subject_requirement.syllabus_code → subject.syllabus_code
 - subject_requirement.requirement_code → requirement.requirement_code
 - subject_program.syllabus_code → subject.syllabus_code
