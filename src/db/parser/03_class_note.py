@@ -35,11 +35,6 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                         parts = attribute.split('：')
                         class_note = parts[0].strip()
                     
-                    # 「・」があれば、左側をclass_noteに
-                    if class_note and '・' in class_note:
-                        parts = class_note.split('・')
-                        class_note = parts[0].strip()
-                    
                     # 重複チェック
                     if class_note and class_note not in seen_notes:
                         seen_notes.add(class_note)
