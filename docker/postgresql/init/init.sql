@@ -5,7 +5,7 @@ CREATE DATABASE syllabus;
 -- ========== ユーザーの作成 ==========
 
 -- master_user: 全操作
-CREATE USER master_user WITH PASSWORD 'master_pass';
+CREATE USER  WITH PASSWORD 'master_pass';
 
 -- dev_user: dev_db 全操作 + master_db 読み取り専用
 CREATE USER dev_user WITH PASSWORD 'dev_pass';
@@ -16,7 +16,7 @@ CREATE USER app_user WITH PASSWORD 'app_pass';
 -- ========== 権限付与 ==========
 
 -- master_user に全DBへのフルアクセス（明示）
-GRANT ALL PRIVILEGES ON DATABASE syllabus TO master_user;
+GRANT ALL PRIVILEGES ON DATABASE syllabus TO ;
 GRANT ALL PRIVILEGES ON DATABASE syllabus TO dev_user;
 
 -- dev_user に dev_db の全権限
@@ -36,19 +36,55 @@ GRANT USAGE ON SCHEMA public TO dev_user, app_user;
 
 -- ========== テーブル作成（master_db） ==========
 
--- subject（科目基本情報）
-CREATE TABLE IF NOT EXISTS subject (
-    syllabus_code TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
+-- class（科目区分）
+CREATE TABLE IF NOT EXISTS class (
+    class_id SERIAL PRIMARY KEY,
     class_name TEXT NOT NULL,
-    subclass_name TEXT,
-    class_note TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX idx_subject_name ON subject(name);
-CREATE INDEX idx_subject_class ON subject(class_name);
+-- subclass（科目小区分）
+CREATE TABLE IF NOT EXISTS subclass (
+    subclass_id SERIAL PRIMARY KEY,
+    subclass_name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- class_note（科目区分の備考）
+CREATE TABLE IF NOT EXISTS class_note (
+    class_note_id SERIAL PRIMARY KEY,
+    class_note TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- subject_name（科目名マスタ）
+CREATE TABLE IF NOT EXISTS subject_name (
+    subject_name_id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE UNIQUE INDEX idx_subject_name_name ON subject_name(name);
+
+-- subject（科目基本情報）
+CREATE TABLE IF NOT EXISTS subject (
+    syllabus_code TEXT PRIMARY KEY,
+    subject_name_id INTEGER NOT NULL,
+    class_id INTEGER NOT NULL,
+    subclass_id INTEGER,
+    class_note_id INTEGER,
+    lecture_code TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
+    FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE RESTRICT,
+    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id) ON DELETE RESTRICT,
+    FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id) ON DELETE RESTRICT
+);
 
 -- syllabus（シラバス情報）
 CREATE TABLE IF NOT EXISTS syllabus (
@@ -67,7 +103,6 @@ CREATE TABLE IF NOT EXISTS syllabus (
     grade_d3 BOOLEAN NOT NULL,
     campus TEXT NOT NULL,
     credits INTEGER NOT NULL,
-    lecture_code TEXT NOT NULL,
     summary TEXT,
     goals TEXT,
     methods TEXT,
@@ -85,11 +120,11 @@ CREATE INDEX idx_syllabus_term ON syllabus(term);
 CREATE INDEX idx_syllabus_grades ON syllabus(grade_b1, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3);
 CREATE INDEX idx_syllabus_campus ON syllabus(campus);
 
--- syllabus_time（講義時間）
+-- lecture_session（講義時間）
 CREATE TABLE IF NOT EXISTS lecture_session (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
-    day_of_week INTEGER NOT NULL,
+    day_of_week TEXT NOT NULL,
     period INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE
@@ -140,7 +175,7 @@ CREATE TABLE IF NOT EXISTS book (
 CREATE INDEX idx_book_title ON book(title);
 CREATE INDEX idx_book_author ON book(author);
 
--- syllabus_textbook（シラバス-教科書関連）
+-- syllabus_book（シラバス-教科書関連）
 CREATE TABLE IF NOT EXISTS syllabus_book (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
@@ -155,48 +190,54 @@ CREATE TABLE IF NOT EXISTS syllabus_book (
 CREATE INDEX idx_syllabus_book_syllabus ON syllabus_book(syllabus_code);
 CREATE INDEX idx_syllabus_book_book ON syllabus_book(book_id);
 
--- syllabus_reference（シラバス-参考文献関連）
-CREATE TABLE IF NOT EXISTS syllabus_reference (
-    id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    book_id INTEGER NOT NULL,
-    note TEXT,
+-- criteria（評価種別マスタ）
+CREATE TABLE IF NOT EXISTS criteria (
+    criteria_id SERIAL PRIMARY KEY,
+    criteria_type TEXT NOT NULL,
+    description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES subject(syllabus_code) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE
+    updated_at TIMESTAMP
 );
 
-CREATE INDEX idx_syllabus_reference_syllabus ON syllabus_reference(syllabus_code);
-CREATE INDEX idx_syllabus_reference_book ON syllabus_reference(book_id);
+CREATE UNIQUE INDEX idx_criteria_type ON criteria(criteria_type);
 
 -- grading_criterion（成績評価基準）
 CREATE TABLE IF NOT EXISTS grading_criterion (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
-    criteria_type TEXT NOT NULL,
+    criteria_id INTEGER NOT NULL,
     ratio INTEGER,
     note TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
-    CONSTRAINT check_grading_criterion_type_valid CHECK (criteria_type IN ('平常', '小テ', '定期', 'レポ', '他', '自由'))
+    FOREIGN KEY (criteria_id) REFERENCES criteria(criteria_id) ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_grading_criterion_type ON grading_criterion(criteria_type);
-CREATE INDEX idx_grading_criterion_syllabus_type ON grading_criterion(syllabus_code, criteria_type);
+CREATE INDEX idx_grading_criterion_criteria ON grading_criterion(criteria_id);
+CREATE INDEX idx_grading_criterion_syllabus_criteria ON grading_criterion(syllabus_code, criteria_id);
+
+-- faculty（開講学部・課程）
+CREATE TABLE IF NOT EXISTS faculty (
+    faculty_id SERIAL PRIMARY KEY,
+    faculty_name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
 
 -- syllabus_faculty（シラバス-学部関連）
 CREATE TABLE IF NOT EXISTS syllabus_faculty (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
-    faculty VARCHAR(60) NOT NULL,
+    faculty_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES subject(syllabus_code) ON DELETE CASCADE
+    FOREIGN KEY (syllabus_code) REFERENCES subject(syllabus_code) ON DELETE CASCADE,
+    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_syllabus_faculty_syllabus ON syllabus_faculty(syllabus_code);
-CREATE INDEX idx_syllabus_faculty_faculty ON syllabus_faculty(faculty);
+CREATE INDEX idx_syllabus_faculty_faculty ON syllabus_faculty(faculty_id);
 
--- subject_requirement（科目要件）
+-- requirement（科目要件）
 CREATE TABLE IF NOT EXISTS requirement (
     requirement_code TEXT PRIMARY KEY,
     subject_name TEXT NOT NULL,
@@ -214,7 +255,7 @@ CREATE TABLE IF NOT EXISTS requirement (
 CREATE INDEX idx_requirement_type ON requirement(requirement_type);
 CREATE INDEX idx_requirement_restrictions ON requirement(applied_science_available, graduation_credit_limit, year_restriction);
 
--- subject_program（科目-プログラム関連）
+-- subject_requirement（科目-要綱関連）
 CREATE TABLE IF NOT EXISTS subject_requirement (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
@@ -226,6 +267,18 @@ CREATE TABLE IF NOT EXISTS subject_requirement (
 
 CREATE INDEX idx_subject_requirement_syllabus ON subject_requirement(syllabus_code);
 CREATE INDEX idx_subject_requirement_requirement ON subject_requirement(requirement_code);
+
+-- subject_program（科目-プログラム関連）
+CREATE TABLE IF NOT EXISTS subject_program (
+    id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    program_code TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (syllabus_code) REFERENCES subject(syllabus_code) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_subject_program_syllabus ON subject_program(syllabus_code);
+CREATE INDEX idx_subject_program_program ON subject_program(program_code);
 
 -- 全テーブルに SELECT 許可
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO dev_user, app_user;
@@ -255,16 +308,22 @@ GRANT ALL PRIVILEGES ON SCHEMA public TO dev_user;
 -- subject（科目基本情報）
 CREATE TABLE IF NOT EXISTS subject (
     syllabus_code TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    class_name TEXT NOT NULL,
-    subclass_name TEXT,
-    class_note TEXT,
+    subject_name_id INTEGER NOT NULL,
+    class_id INTEGER NOT NULL,
+    subclass_id INTEGER,
+    class_note_id INTEGER,
+    lecture_code TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
+    FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE RESTRICT,
+    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id) ON DELETE RESTRICT,
+    FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id) ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_subject_name ON subject(name);
-CREATE INDEX idx_subject_class ON subject(class_name);
+CREATE INDEX idx_subject_name ON subject(subject_name_id);
+CREATE INDEX idx_subject_class ON subject(class_id);
+CREATE INDEX idx_subject_subclass ON subject(subclass_id);
 
 -- 以下、master_dbと同じテーブル定義を繰り返し...
 -- （以下、上記のテーブル定義と同じ内容を繰り返すため省略）
