@@ -29,12 +29,6 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                     # 属性の変換
                     attribute = row.get('属性', '')
                     subclass_name = None
-                    
-                    # 「：」があれば、右側を取得
-                    if '：' in attribute:
-                        parts = attribute.split('：')
-                        attribute = parts[1].strip() if len(parts) > 1 else parts[0].strip()
-                    
                     # 「・」があれば、右側をsubclass_nameに
                     if '・' in attribute:
                         parts = attribute.split('・')
