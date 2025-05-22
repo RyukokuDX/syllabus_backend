@@ -116,7 +116,7 @@ def generate_sql_insert(table_name, records):
     update_cols = update_columns.get(table_name, [col for col in columns if col not in ['syllabus_code', 'created_at']])
     
     conflict_str = ', '.join(conflict_cols)
-    update_str = ',\n    '.join([f"{col} = EXCLUDED.{col}" for col in update_cols])
+    update_str = ',\n    '.join([f"{col} = EXCLUDED.{col}" for col in update_cols if col != 'updated_at'])
     update_str += ",\n    updated_at = CURRENT_TIMESTAMP"
 
     sql = f"""-- {table_name} テーブルへのデータ挿入

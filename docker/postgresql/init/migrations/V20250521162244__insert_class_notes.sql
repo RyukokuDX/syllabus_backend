@@ -34,5 +34,4 @@ INSERT INTO class_note (
     ('２００６～２０１４年度入学生', '2025-05-21T16:20:31.801621', NULL),
     ('短大', '2025-05-21T16:20:31.801621', NULL)
 ON CONFLICT (class_note) DO UPDATE SET
-    updated_at = EXCLUDED.updated_at,
     updated_at = CURRENT_TIMESTAMP;

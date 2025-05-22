@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${MASTER_USER:-postgres}
+      POSTGRES_PASSWORD: ${MASTER_PASSWORD:-postgres}
+      MASTER_USER: ${MASTER_USER:-postgres}
+      MASTER_PASSWORD: ${MASTER_PASSWORD:-postgres}
+      DEV_USER: ${DEV_USER:-dev_user}
+      DEV_PASSWORD: ${DEV_PASSWORD:-dev_password}
+      APP_USER: ${APP_USER:-app_user}
+      APP_PASSWORD: ${APP_PASSWORD:-app_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgresql/init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: 

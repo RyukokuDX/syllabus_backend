@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 TEMPLATE_FILE="init/init.sql.template"
 OUTPUT_FILE="init/02-init.sql"
-ENV_FILE=".env"
+ENV_FILE="../.env"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing .env file at $ENV_FILE"
@@ -22,7 +22,9 @@ if command -v dos2unix >/dev/null 2>&1; then
 fi
 
 # 環境変数を読み込む
-export $(grep -v '^#' "$ENV_FILE" | xargs)
+set -a
+. "$ENV_FILE"
+set +a
 
 # テンプレート変換
 cp "$TEMPLATE_FILE" "$OUTPUT_FILE"

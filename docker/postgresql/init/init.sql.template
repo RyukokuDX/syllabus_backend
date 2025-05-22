@@ -337,8 +337,10 @@ CREATE INDEX idx_subject_subclass ON subject(subclass_id);
 -- ========== マイグレーションファイルの実行 ==========
 
 -- マイグレーションファイルを実行
-\i /docker-entrypoint-initdb.d/migrations/V20250521111859__insert_subject_names.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250521111859__insert_class_notes.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_subject_names.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_class_notes.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_subclasss.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_classs.sql
 
 -- 各テーブルに明示的に権限を付与
 GRANT SELECT ON class TO ${DEV_USER};
