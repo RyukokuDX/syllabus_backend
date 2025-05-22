@@ -9,12 +9,12 @@ services:
     volumes:
       - ./app:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres-db:5432/master_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-db:5432/syllabus_db
     networks:
-      - shared-network
+      - syllabus-network
     env_file:
       - ../.env
 
 networks:
-  shared-network:
+  syllabus-network:
     external: true
