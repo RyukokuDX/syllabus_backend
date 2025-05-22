@@ -1,23 +1,23 @@
 FROM postgres:15-bullseye
 
-# æ—¥æœ¬èªãƒ­ã‚±ãƒ¼ãƒ«ã‚’ç”Ÿæˆã™ã‚‹
+# ÆüËÜ¸ì¥í¥±¡¼¥ë¤òÀ¸À®¤¹¤ë
 RUN apt-get update && \
     apt-get install -y locales && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i ja_JP -c -f UTF-8 -A /usr/share/locale/locale.alias ja_JP.UTF-8
 
-# LANG ç­‰ã¯ build æ™‚ã«ã¯æŒ‡å®šã›ãšã€ç’°å¢ƒå¤‰æ•°ã¨ã—ã¦ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã«ã™ã‚‹ã ã‘
+# LANG Åù¤Ï build »ş¤Ë¤Ï»ØÄê¤»¤º¡¢´Ä¶­ÊÑ¿ô¤È¤·¤Æ¥Ç¥Õ¥©¥ë¥È¤Ë¤¹¤ë¤À¤±
 ENV LANG=ja_JP.UTF-8
 ENV LC_ALL=ja_JP.UTF-8
 
-# ã‚¿ã‚¤ãƒ ã‚¾ãƒ¼ãƒ³ã‚’è¨­å®š
+# ¥¿¥¤¥à¥¾¡¼¥ó¤òÀßÄê
 ENV TZ=Asia/Tokyo
 
-# PostgreSQLã®è¨­å®šã‚’ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚º
+# PostgreSQL¤ÎÀßÄê¤ò¥«¥¹¥¿¥Ş¥¤¥º
 COPY postgresql.conf /etc/postgresql/postgresql.conf
 
-# ãƒã‚¤ã‚°ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’ã‚³ãƒ”ãƒ¼
-COPY ./init/init.sh /docker-entrypoint-initdb.d/01-init.sh
+# ¥Ş¥¤¥°¥ì¡¼¥·¥ç¥ó¥¹¥¯¥ê¥×¥È¤ò¥³¥Ô¡¼
+COPY ./init/01-init.sh /docker-entrypoint-initdb.d/01-init.sh
 RUN chmod +x /docker-entrypoint-initdb.d/01-init.sh
 
 CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"] 

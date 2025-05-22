@@ -98,7 +98,7 @@ def generate_sql_insert(table_name, records):
     update_columns = {
         'class': [col for col in columns if col not in ['class_name', 'created_at']],
         'subclass': [col for col in columns if col not in ['subclass_name', 'created_at']],
-        'class_note': [col for col in columns if col not in ['class_note', 'created_at']],
+        'class_note': ['updated_at'],  # class_noteはupdated_atのみ更新
         'subject_name': [col for col in columns if col not in ['name', 'created_at']],
         'subject': [col for col in columns if col not in ['syllabus_code', 'created_at']],
         'syllabus': [col for col in columns if col not in ['syllabus_code', 'year', 'term', 'created_at']],
@@ -116,8 +116,13 @@ def generate_sql_insert(table_name, records):
     update_cols = update_columns.get(table_name, [col for col in columns if col not in ['syllabus_code', 'created_at']])
     
     conflict_str = ', '.join(conflict_cols)
-    update_str = ',\n    '.join([f"{col} = EXCLUDED.{col}" for col in update_cols if col != 'updated_at'])
-    update_str += ",\n    updated_at = CURRENT_TIMESTAMP"
+    
+    # update_colsが空の場合はupdated_atのみを更新
+    if not update_cols or (len(update_cols) == 1 and update_cols[0] == 'updated_at'):
+        update_str = "updated_at = CURRENT_TIMESTAMP"
+    else:
+        update_str = ',\n    '.join([f"{col} = EXCLUDED.{col}" for col in update_cols if col != 'updated_at'])
+        update_str += ",\n    updated_at = CURRENT_TIMESTAMP"
 
     sql = f"""-- {table_name} テーブルへのデータ挿入
 INSERT INTO {table_name} (

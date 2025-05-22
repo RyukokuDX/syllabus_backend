@@ -40,10 +40,6 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                         parts = class_name.split('・')
                         class_name = parts[0].strip()
                     
-                    # 法学部専攻科目の例外処理
-                    if class_name == "法学部専攻科目：０８年以降入学":
-                        class_name = "法学部専攻科目"
-                    
                     # 重複チェック
                     if class_name and class_name not in seen_names:
                         seen_names.add(class_name)

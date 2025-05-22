@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")"
 
 TEMPLATE_FILE="init/init.sql.template"
-OUTPUT_FILE="init/02-init.sql"
+OUTPUT_FILE="init/01-init.sql"
 ENV_FILE="../.env"
 
 if [ ! -f "$ENV_FILE" ]; then
@@ -30,7 +30,7 @@ set +a
 cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
 
 # 環境変数を置換
-for var in MASTER_USER MASTER_PASSWORD MASTER_DB DEV_USER DEV_PASSWORD DEV_DB APP_USER APP_PASSWORD; do
+for var in POSTGRES_DB DEV_USER DEV_PASSWORD APP_USER APP_PASSWORD; do
   if [ -n "${!var}" ]; then
     sed -i "s/\${$var}/${!var}/g" "$OUTPUT_FILE"
   else
@@ -38,4 +38,17 @@ for var in MASTER_USER MASTER_PASSWORD MASTER_DB DEV_USER DEV_PASSWORD DEV_DB AP
   fi
 done
 
-echo "$OUTPUT_FILE generated successfully at $OUTPUT_FILE"
+echo "$OUTPUT_FILE generated successfully"
+
+# マイグレーションファイルの自動挿入
+# マイグレーションファイルの自動挿入
+MIGRATIONS_DIR="init/migrations"
+if [ -d "$MIGRATIONS_DIR" ]; then
+  echo "MIGRATIONS_DIR: $MIGRATIONS_DIR"
+  for sqlfile in "$MIGRATIONS_DIR"/*.sql; do
+    [ -e "$sqlfile" ] || { echo "No .sql files found in $MIGRATIONS_DIR"; continue; }
+    filename=$(basename "$sqlfile")
+    echo "Adding migration: $filename"
+    echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$OUTPUT_FILE"
+  done
+fi

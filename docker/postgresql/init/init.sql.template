@@ -1,37 +1,36 @@
-﻿-- ========== データベースの作成 ==========
+﻿-- ========== ユーザーの作成 ==========
 
-CREATE DATABASE syllabus_db;
-
--- ========== ユーザーの作成 ==========
-
--- master_user: 全操作
-CREATE USER ${MASTER_USER} WITH PASSWORD '${MASTER_PASSWORD}';
-
--- dev_user: dev_db 全操作 + syllabus_db 読み取り専用
+-- dev_user: syllabus_db 読み取り専用
 CREATE USER ${DEV_USER} WITH PASSWORD '${DEV_PASSWORD}';
 
 -- app_user: syllabus_db 読み取り専用
 CREATE USER ${APP_USER} WITH PASSWORD '${APP_PASSWORD}';
 
+-- ========== データベースの作成 ==========
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${POSTGRES_DB}') THEN
+        CREATE DATABASE ${POSTGRES_DB} OWNER postgres;
+    END IF;
+END
+$$;
+
 -- ========== 権限付与 ==========
 
--- master_user に全DBへのフルアクセス（明示）
-GRANT ALL PRIVILEGES ON DATABASE syllabus_db TO ${MASTER_USER};
-GRANT ALL PRIVILEGES ON DATABASE syllabus_db TO ${DEV_USER};
-
 -- dev_user に syllabus_db の全権限
-GRANT ALL PRIVILEGES ON DATABASE syllabus_db TO ${DEV_USER};
+GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${DEV_USER};
 
--- app_user/dev_user に syllabus_db への読み取り権限のみ
--- ※ PostgreSQL では DATABASE への GRANT だけではなく、スキーマやテーブルに対する明示的な付与が必要
+-- app_user に syllabus_db への読み取り権限のみ
+GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${APP_USER};
 
--- === syllabus_db に対して dev_user/app_user を読み取り専用で設定 ===
+-- === syllabus_db に対して dev_user/app_user を設定 ===
 
 -- 接続切替（syllabus_db）
-\connect syllabus_db
+\connect ${POSTGRES_DB}
 
 -- 共有スキーマ public に接続・参照許可
-GRANT CONNECT ON DATABASE syllabus_db TO ${DEV_USER}, ${APP_USER};
+GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${DEV_USER}, ${APP_USER};
 GRANT USAGE ON SCHEMA public TO ${DEV_USER}, ${APP_USER};
 
 -- ========== テーブル作成（syllabus_db） ==========
@@ -302,45 +301,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 GRANT SELECT ON pg_catalog.pg_tables TO ${DEV_USER}, ${APP_USER};
 GRANT SELECT ON information_schema.tables TO ${DEV_USER}, ${APP_USER};
 
--- 接続切替（dev_db）
-\connect syllabus_db
-
--- dev_user に dev_db の public スキーマ操作権限（必要なら）
+-- dev_user に public スキーマ操作権限
 GRANT ALL PRIVILEGES ON SCHEMA public TO ${DEV_USER};
-
--- ========== テーブル作成（dev_db） ==========
-
--- 上記と同じテーブル定義を dev_db にも作成
--- subject（科目基本情報）
-CREATE TABLE IF NOT EXISTS subject (
-    syllabus_code TEXT PRIMARY KEY,
-    subject_name_id INTEGER NOT NULL,
-    class_id INTEGER NOT NULL,
-    subclass_id INTEGER,
-    class_note_id INTEGER,
-    lecture_code TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
-    FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE RESTRICT,
-    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id) ON DELETE RESTRICT,
-    FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id) ON DELETE RESTRICT
-);
-
-CREATE INDEX idx_subject_name ON subject(subject_name_id);
-CREATE INDEX idx_subject_class ON subject(class_id);
-CREATE INDEX idx_subject_subclass ON subject(subclass_id);
-
--- 以下、syllabus_dbと同じテーブル定義を繰り返し...
--- （以下、上記のテーブル定義と同じ内容を繰り返すため省略）
-
--- ========== マイグレーションファイルの実行 ==========
-
--- マイグレーションファイルを実行
-\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_subject_names.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_class_notes.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_subclasss.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250521162244__insert_classs.sql
 
 -- 各テーブルに明示的に権限を付与
 GRANT SELECT ON class TO ${DEV_USER};
@@ -361,3 +323,13 @@ GRANT SELECT ON syllabus_faculty TO ${DEV_USER};
 GRANT SELECT ON requirement TO ${DEV_USER};
 GRANT SELECT ON subject_requirement TO ${DEV_USER};
 GRANT SELECT ON subject_program TO ${DEV_USER};
+
+-- テーブル権限の付与
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${DEV_USER};
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${DEV_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO ${DEV_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO ${DEV_USER};
+
+-- ========== マイグレーションファイルの実行 ==========
+
+-- （この部分はgenerate-init.shで自動挿入されます）

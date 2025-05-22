@@ -3668,5 +3668,4 @@ INSERT INTO subject_name (
     ('雑草学', '2025-05-21T16:20:37.622206', NULL),
     ('環境と人間Ａ', '2025-05-21T16:20:37.622206', NULL)
 ON CONFLICT (name) DO UPDATE SET
-    updated_at = EXCLUDED.updated_at,
     updated_at = CURRENT_TIMESTAMP;

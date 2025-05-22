@@ -33,7 +33,11 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                     # 「：」があれば、左側をclass_noteに
                     if '：' in attribute:
                         parts = attribute.split('：')
-                        class_note = parts[0].strip()
+                        # 法学部専攻科目の例外処理
+                        if parts[0].strip() == "法学部専攻科目":
+                            class_note = parts[1].strip()
+                        else:
+                            class_note = parts[0].strip()
                     
                     # 法学部専攻科目の例外処理
                     if attribute == "法学部専攻科目：０８年以降入学":
