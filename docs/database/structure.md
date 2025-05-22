@@ -134,7 +134,7 @@
 | class_id | INTEGER | NO | クラスID（外部キー） | シラバス検索画面 |
 | subclass_id | INTEGER | YES | 小区分ID（外部キー） | シラバス検索画面 |
 | class_note_id | INTEGER | YES | 備考ID（外部キー） | シラバス検索画面 |
-| lecture_code | TEXT | NO | 開講コード | シラバス検索画面 |
+| lecture_code | TEXT | YES | 開講コード | シラバス検索画面 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -275,74 +275,75 @@
 | idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
 | idx_syllabus_subject_name | subject_name_id | 科目名IDでの検索用 |
 
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| subject_name_id | subject_name(subject_name_id) | RESTRICT |
-
-### syllabus_faculty シラバス学部課程関連
-
-#### テーブル概要
-シラバスと学部・課程の関連を管理する中間テーブル。1つのシラバスが複数の学部・課程で開講される場合に対応。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| id | INTEGER | NO | 主キー | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | シラバス検索画面 |
-| faculty_id | INTEGER | NO | 学部ID（外部キー） | シラバス検索画面 |
-| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_syllabus_faculty_syllabus | syllabus_code | シラバス管理番号での検索用 |
-| idx_syllabus_faculty_faculty | faculty_id | 学部IDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| syllabus_code | syllabus(syllabus_code) | CASCADE |
-| faculty_id | faculty(faculty_id) | CASCADE |
+|--ubject_name_id---|------_name--ubject_name_idRESTRICT
+| syllabus_code | subject(syllabus_code) | CASCADE |
+syllabus_faculty シラバス学部課程関連
+### lecture_session（講義時間）
 
-### lecture_session 講義時間
-
-#### テーブル概要
+シラバスと学部・課程の関連要中間1つのシラバスがの学部・課程で開講される場合
 各科目の開講時間情報を管理するテーブル。複数時限に対応。
 
 #### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| id | INTEGER | NO | ID | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| day_of_week | TEXT | NO | 曜日 | Web Syllabus |
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|-主キー---|------|--------|
+| id | INTEGER | NO | ID | システム生成 |（外部キー）シラバス検索画面
+| faculty_if_we TIEGERNYINT | 学部ID（外部キー） | シラバス検索画面labus |
 | period | TINYINT | NO | 時限 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_lecture_session_day_period | (day_of_week, period) | 曜日・時限での検索用 |
+| PRIMsyllabus_faculty_syllabus | syllabus_code | シラバス管理番号
+| idx_day_peri_faculty_facultyod faculty_id | 学部ID| 曜日・時限での検索用 |
 | idx_lecture_session_syllabus | syllabus_code | シラバス管理番号での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_code | syllabus(syllabus_code) | CASCADE |
+| faculty_id | faculty(faculty_id) | CASCADE |
+[目次へ戻る](#目次)
+lecture_session 講義時間
+### instructor（教員）
 
-### syllabus_instructor シラバス教員関連
+各科目の開講時間テーブル概要複数時限に対応。
+教員の基本情報を管理するテーブル。
+
+#### カラム定義
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|------IN|-GER---|----ID----|
+| s員番号 | シ_cod | TEXT | NO | 苗シラバス管理番号| Web Syllabus |
+| day_of_weekEXT | NO |NO | 曜日llabus |
+| period| TEINYIN | YNO | 時限| Web Syllabus |
+| first_name_kana | TEXT | YES | 名前（カナ） | Web Syllabus |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--|
+| PRIMlecture_session_day_period | (day_of_week, period) | 曜日・時限 主キー |
+| idx_lecture_session_syllabus | syllabus_code | シラバス管理番号
+| idx_instructor_name_kana | name_kana | カナ氏名での検索用 |
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| syllabus_code | syllabus(syllabus_code) | CASCADE |
+[目次へ戻る](#目次)
+ 
+### syllabus_instructor（シラバス-教員関連）
 
 #### テーブル概要
 シラバスと教員の関連を管理する中間テーブル。
 
 #### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| instructor_id | INTEGER | NO | 教職員番号 | Web Syllabus |
+| syllabus_coid TEINXTGER NO | シラバス管理番号 | Web Syllabus |
+| instructor_code | TEXT | NO | 教職員番号 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
@@ -357,15 +358,15 @@
 |--------|--------|-------------|
 | syllabus_code | subject(syllabus_code) | CASCADE |
 | instructor_code | instructor(instructor_code) | CASCADE |
-
-### syllabus_book シラバス教科書関連
+llabus |QUE | isb 教科書
+### syllabus_book（シラバス-書籍関連）
 
 #### テーブル概要
 シラバスと教科書の関連を管理する中間テーブル。
 
 #### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
 | syllabus_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
 | book_id | INTEGER | NO | 書籍ID | Web Syllabus |
@@ -385,111 +386,111 @@
 |--------|--------|-------------|
 | syllabus_code | subject(syllabus_code) | CASCADE |
 | book_id | book(id) | CASCADE |
-
-### grading_criterion 成績評価基準
+ 
+### grading_criterion（成績評価基準）
 
 #### テーブル概要
 成績評価の基準と比率を管理するテーブル。
 
 #### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| id | INTEGER | NO | ID | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | シラバス検索画面 |
-| criteria_id | INTEGER | NO | 評価種別ID（外部キー） | シラバス検索画面 |
-| ratio | INTEGER | YES | 評価比率（%） | シラバス検索画面 |
-| note | TEXT | YES | 備考 | シラバス検索画面 |
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
+| id | INTEGER | NO | ID | システム生成 |シラバス検索画面
+| syllabus_id | INTEGER | NO | シラバスID（外部キーシラバス検索画面
+| criteria_type | TEXT | NO | 評価種別：小シラバス検索画面験、'レポ'：レポート、'他'：その他、'自由'：自由記載） | Web Syllabus |
+| ratio | INTEGER | YES | 評シラバス検索画面の場合はNULL | Web Syllabus |
+| note | TEXT | YES | 備考 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_grading_criterion_criteria | criteria_id | 評価種別IDでの検索用 |
-| idx_grading_criterion_subject_criteria | (syllabus_code, criteria_id) | シラバス管理番号・評価種別での検索用 |
+| PRIMARY KEY | id | 主キーcri riaidID
+| idx_grading_criterion_type | ccrireriaria_type | 評価種別での検索用 |id
+| idx_grading_criterion_subject_type | (syllabus_code, criteria_type) | シラバス管理番号・評価種別での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_code | syllabus(syllabus_code) | CASCADE |
-| criteria_id | criteria(criteria_id) | RESTRICT |
+| criteria_id | TRAINT check_gradiid) | RESTRICT |
+[目次へ戻る](#目次)
+ubject_requirement 科目要綱
+### syllabus_faculty（シラバス-学部/課程関連）
 
-### subject_requirement 科目要綱関連
+科目と要綱
+シラバスと開講学部/課程の関連を管理する中間テーブル。1つの科目が複数の学部/課程で開講される場合に対応。
 
-#### テーブル概要
+#### カラム定義
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
+| id | INTEGER | NO | ID | システム生成 |履修要綱
+| requirement_code | TEXT| NO | シ要綱コード | 履修要綱 |
+| faculty | VARCHAR(60) | NO | 開講学部/課程 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMAubject_requirement_syllabus
+| idx_subject_requirement_requirement | requirement_code | 要綱コード シラバス管理番号での検索用 |
+| idx_syllabus_faculty_faculty | faculty | 学部/課程での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+|---------|---------|subject_nam(requinclri_rarde) | CASCADE|
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+ subjecrequimcq学習プログラム
+### subject_requirement（科目-要綱関連）
+
+###学習プログラムテーブル概要。1つの科目が複数の学習プログラムに属する場合に対応
 科目と要綱の関連を管理する中間テーブル。
 
 #### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | 履修要綱 |
+| programde | TEXT | NO | シラバ学習プログラム理番号 | 履修要綱 |
 | requirement_code | TEXT | NO | 要綱コード | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_subject_requirement_syllabus | syllabus_code | シラバス管理番号での検索用 |
+| PRIMARY KEY program_subject
+| idx_subject_program_program | program| シラバス管理プログラムでの検索用 |
 | idx_subject_requirement_requirement | requirement_code | 要綱コードでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_code | subject(syllabus_code) | CASCADE |
-| requirement_code | requirement(requirement_code) | CASCADE |
 
-### subject_program 科目学習プログラム関連
+### syllabus_co 要件属性
+### subject_program（科目-学習プログラム関連）
 
-#### テーブル概要
+##の要件と属性
 科目と学習プログラムの関連を管理する中間テーブル。1つの科目が複数の学習プログラムに属する場合に対応。
 
 #### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
+| カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | 履修要綱 |
+| requirements_code | TEXT | NO |要綱番号 | 履修要綱 |
 | program_code | TEXT | NO | 学習プログラムコード | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_subject_program_subject | syllabus_code | シラバス管理番号での検索用 |
+| PRIMrequirement_syllabus
+| idx_requirement_requirement | requirements_code |要綱管理番号での検索用 |
 | idx_subject_program_program | program_code | プログラムコードでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| syllabus_code | subject(syllabus_code) | CASCADE |
-
-### requirement 科目要件属性
-
-#### テーブル概要
-科目の要件と属性を管理するテーブル。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| id | INTEGER | NO | ID | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | 履修要綱 |
-| requirement_code | TEXT | NO | 要綱コード | 履修要綱 |
-| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_requirement_syllabus | syllabus_code | シラバス管理番号での検索用 |
-| idx_requirement_requirement | requirement_code | 要綱コードでの検索用 |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| syllabus_code | subject(syllabus_code) | CASCADE |
 | requirement_code | requirement(requirement_code) | CASCADE |
+[目次へ戻る](#目次)
 
 ## データソースと更新ポリシー
 
@@ -498,9 +499,9 @@
 #### 1. シラバス検索画面
 - シラバスの検索画面を整形したものをクロール
 
-#### 2. webシラバス
+[目次へ戻る](#目次)
 
 ## 関連ドキュメント
-- [データベース設計ポリシー](policy.md)
-- [データベースER図](er.md)
+- [データベース設計ポリシー]
+- [データベース操作クラス](../python/database.md)
 - [データモデル定義](../python/models.md)

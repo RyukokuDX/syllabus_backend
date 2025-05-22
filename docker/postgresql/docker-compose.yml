@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   postgres-db:
-    image: postgres:16.2
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: postgres-db
     env_file:
       - .env
