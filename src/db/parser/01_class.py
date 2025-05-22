@@ -33,7 +33,10 @@ def parse_csv_file(filepath: str) -> List[Dict[str, Any]]:
                     # 「：」があれば、右側をclass_nameに
                     if '：' in class_name:
                         parts = class_name.split('：')
-                        class_name = parts[1].strip() if len(parts) > 1 else parts[0].strip()
+                        if parts[0].strip() == "法学部専攻科目":
+                            class_name = parts[1].strip()
+                        else:
+                            class_name = parts[0].strip()
                     
                     # 「・」があれば、左側をclass_nameに
                     if '・' in class_name:

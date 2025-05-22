@@ -18,20 +18,37 @@ $$;
 
 -- ========== 権限付与 ==========
 
--- dev_user に syllabus_db の全権限
+-- データベース権限
 GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${DEV_USER};
-
--- app_user に syllabus_db への読み取り権限のみ
 GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${APP_USER};
-
--- === syllabus_db に対して dev_user/app_user を設定 ===
 
 -- 接続切替（syllabus_db）
 \connect ${POSTGRES_DB}
 
--- 共有スキーマ public に接続・参照許可
+-- スキーマ権限
 GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${DEV_USER}, ${APP_USER};
 GRANT USAGE ON SCHEMA public TO ${DEV_USER}, ${APP_USER};
+GRANT ALL PRIVILEGES ON SCHEMA public TO ${DEV_USER};
+
+-- テーブルとシーケンスの権限
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${DEV_USER}, ${APP_USER};
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${DEV_USER}, ${APP_USER};
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${DEV_USER};
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${DEV_USER};
+
+-- デフォルト権限の設定
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT ON TABLES TO ${DEV_USER}, ${APP_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO ${DEV_USER}, ${APP_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON TABLES TO ${DEV_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON SEQUENCES TO ${DEV_USER};
+
+-- カタログ参照権限
+GRANT SELECT ON pg_catalog.pg_tables TO ${DEV_USER}, ${APP_USER};
+GRANT SELECT ON information_schema.tables TO ${DEV_USER}, ${APP_USER};
 
 -- ========== テーブル作成（syllabus_db） ==========
 
@@ -76,7 +93,7 @@ CREATE TABLE IF NOT EXISTS subject (
     class_id INTEGER NOT NULL,
     subclass_id INTEGER,
     class_note_id INTEGER,
-    lecture_code TEXT NOT NULL,
+    lecture_code TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
@@ -284,51 +301,6 @@ CREATE TABLE IF NOT EXISTS subject_program (
 
 CREATE INDEX idx_subject_program_syllabus ON subject_program(syllabus_code);
 CREATE INDEX idx_subject_program_program ON subject_program(program_code);
-
--- 全テーブルに SELECT 許可
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${DEV_USER}, ${APP_USER};
-
--- シーケンス読み取り許可
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${DEV_USER}, ${APP_USER};
-
--- 新規テーブル・シーケンスへの SELECT 自動付与
-ALTER DEFAULT PRIVILEGES IN SCHEMA public
-    GRANT SELECT ON TABLES TO ${DEV_USER}, ${APP_USER};
-ALTER DEFAULT PRIVILEGES IN SCHEMA public
-    GRANT USAGE, SELECT ON SEQUENCES TO ${DEV_USER}, ${APP_USER};
-
--- カタログ参照許可（.tables, PRAGMA 相当）
-GRANT SELECT ON pg_catalog.pg_tables TO ${DEV_USER}, ${APP_USER};
-GRANT SELECT ON information_schema.tables TO ${DEV_USER}, ${APP_USER};
-
--- dev_user に public スキーマ操作権限
-GRANT ALL PRIVILEGES ON SCHEMA public TO ${DEV_USER};
-
--- 各テーブルに明示的に権限を付与
-GRANT SELECT ON class TO ${DEV_USER};
-GRANT SELECT ON subclass TO ${DEV_USER};
-GRANT SELECT ON class_note TO ${DEV_USER};
-GRANT SELECT ON subject_name TO ${DEV_USER};
-GRANT SELECT ON subject TO ${DEV_USER};
-GRANT SELECT ON syllabus TO ${DEV_USER};
-GRANT SELECT ON lecture_session TO ${DEV_USER};
-GRANT SELECT ON instructor TO ${DEV_USER};
-GRANT SELECT ON syllabus_instructor TO ${DEV_USER};
-GRANT SELECT ON book TO ${DEV_USER};
-GRANT SELECT ON syllabus_book TO ${DEV_USER};
-GRANT SELECT ON criteria TO ${DEV_USER};
-GRANT SELECT ON grading_criterion TO ${DEV_USER};
-GRANT SELECT ON faculty TO ${DEV_USER};
-GRANT SELECT ON syllabus_faculty TO ${DEV_USER};
-GRANT SELECT ON requirement TO ${DEV_USER};
-GRANT SELECT ON subject_requirement TO ${DEV_USER};
-GRANT SELECT ON subject_program TO ${DEV_USER};
-
--- テーブル権限の付与
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${DEV_USER};
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${DEV_USER};
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO ${DEV_USER};
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO ${DEV_USER};
 
 -- ========== マイグレーションファイルの実行 ==========
 
