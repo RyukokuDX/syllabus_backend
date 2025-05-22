@@ -50,3 +50,6 @@ log/
 # Local development
 .DS_Store
 Thumbs.db
+
+*.html
+*/*.html
