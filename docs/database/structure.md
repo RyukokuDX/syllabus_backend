@@ -465,7 +465,44 @@ ubject_requirement 科目要綱
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 
-### syllabus_co 要件属性
+#### requirement（科目履修ガイド）
+
+#### テーブル概要
+履修要綱から取得される科目ごとの履修要件、制限事項、属性、および学習プログラムの関連を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|---------|---------|------|------|--------|
+| requirement_id | INTEGER | NO | 要綱番号 | システム生成 |
+| requirement_year | INTEGER | NO | 要項年 | 履修要綱 |
+| faculty_id | INTEGER | NO | 要項学部・課程 | 履修要綱 |
+| subject_id | INTEGER | NO | 科目名ID | 履修要綱 |
+| requirement_type | TEXT | NO | 必要度（必修/選必/選択） | 履修要綱 |
+| applied_science_available | BOOLEAN | NO | 応用科学課程履修可否 | 履修要綱 |
+| graduation_credit_limit | BOOLEAN | NO | 卒業要件単位認定上限の有無 | 履修要綱 |
+| year_restriction | BOOLEAN | NO | 配当年次制限の有無 | 履修要綱 |
+| first_year_only | BOOLEAN | NO | 低学年制限_1年目のみの有無 | 履修要綱 |
+| up_to_second_year | BOOLEAN | NO | 低学年制限_2年目までの有無 | 履修要綱 |
+| guidance_required | BOOLEAN | NO | 履修指導科目の有無 | 履修要綱 |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | subject_code | 主キー |
+| idx_guide_requirement | requirement_type | 必要度での検索用 |
+| idx_guide_restrictions | (applied_science_available, graduation_credit_limit, year_restriction) | 制限条件での検索用 |
+| idx_guide_programs | program_codes | 学習プログラムでの検索用（GINインデックス） |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| subject_code | subject(subject_code) | CASCADE |
+
+[目次へ戻る](#目次)
+
+
 ### subject_program（科目-学習プログラム関連）
 
 ##の要件と属性
@@ -475,8 +512,8 @@ ubject_requirement 科目要綱
 | カラム名 | デ-ー-タ型 | NULL | 説明 | 情報源 |
 |---------|---------|------|------|--------|
 | id | INTEGER | NO | ID | システム生成 |
-| requirements_code | TEXT | NO |要綱番号 | 履修要綱 |
-| program_code | TEXT | NO | 学習プログラムコード | 履修要綱 |
+| requirement_ID | INTEGER | NO |要綱番号 | 履修要綱 |
+| program_id | INTEGER | NO | 学習プログラム番号 | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
@@ -491,6 +528,7 @@ ubject_requirement 科目要綱
 |--------|--------|-------------|
 | requirement_code | requirement(requirement_code) | CASCADE |
 [目次へ戻る](#目次)
+
 
 ## データソースと更新ポリシー
 
