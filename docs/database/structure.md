@@ -14,14 +14,15 @@
 7. [subject 科目基本情報](#subject-科目基本情報)
 8. [instructor 教員](#instructor-教員)
 9. [book 書籍](#book-書籍)
-10. [lecture_session 講義時間](#lecture_session-講義時間)
-11. [syllabus_faculty シラバス学部課程関連](#syllabus_faculty-シラバス学部課程関連)
-12. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
-13. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
-14. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-15. [program 学修プログラム](#program-学修プログラム)
-16. [requirement 科目要件属性](#requirement-科目要件属性)
-17. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
+10. [book_author 書籍著者](#book_author-書籍著者)
+11. [lecture_session 講義時間](#lecture_session-講義時間)
+12. [syllabus_faculty シラバス学部課程関連](#syllabus_faculty-シラバス学部課程関連)
+13. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
+14. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
+15. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+16. [program 学修プログラム](#program-学修プログラム)
+17. [requirement 科目要件属性](#requirement-科目要件属性)
+18. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
 
 ## 更新履歴
 
@@ -288,8 +289,7 @@
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
-| id | INTEGER | NO | 書籍ID | システム生成 |
-| author | TEXT | YES | 著者名 | Web Syllabus |
+| book_id | INTEGER | NO | 書籍ID（主キー） | システム生成 |
 | title | TEXT | NO | 書籍タイトル | Web Syllabus |
 | publisher | TEXT | YES | 出版社名 | Web Syllabus |
 | price | INTEGER | YES | 価格（税抜） | Web Syllabus |
@@ -300,15 +300,41 @@
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
+| PRIMARY KEY | book_id | 主キー |
 | UNIQUE | isbn | ISBN番号の一意性 |
 | idx_book_title | title | 書籍タイトルでの検索用 |
-| idx_book_author | author | 著者名での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | - | - | - |
+
+[目次へ戻る](#目次)
+
+### book_author 書籍著者
+
+#### テーブル概要
+書籍の著者情報を管理するテーブル。1つの書籍に複数の著者が存在する場合に対応。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| book_author_id | INTEGER | NO | 著者ID（主キー） | システム生成 |
+| book_id | INTEGER | NO | 書籍ID（外部キー） | Web Syllabus |
+| author_name | TEXT | NO | 著者名 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | book_author_id | 主キー |
+| idx_book_author_book | book_id | 書籍IDでの検索用 |
+| idx_book_author_name | author_name | 著者名での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| book_id | book(book_id) | CASCADE |
 
 [目次へ戻る](#目次)
 
@@ -424,7 +450,7 @@
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | syllabus_code | subject(syllabus_code) | CASCADE |
-| book_id | book(id) | CASCADE |
+| book_id | book(book_id) | CASCADE |
 
 [目次へ戻る](#目次)
 

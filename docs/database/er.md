@@ -14,14 +14,15 @@
 7. [subject（科目基本情報）](#subject科目基本情報)
 8. [instructor（教員）](#instructor教員)
 9. [book（書籍）](#book書籍)
-10. [lecture_session（講義時間）](#lecture_session講義時間)
-11. [syllabus_faculty（シラバス学部課程関連）](#syllabus_facultyシラバス学部課程関連)
-12. [syllabus_instructor（シラバス教員関連）](#syllabus_instructorシラバス教員関連)
-13. [syllabus_book（シラバス教科書関連）](#syllabus_bookシラバス教科書関連)
-14. [grading_criterion（成績評価基準）](#grading_criterion成績評価基準)
-15. [program（学修プログラム）](#program学修プログラム)
-16. [requirement（科目要件属性）](#requirement科目要件属性)
-17. [subject_program（科目学習プログラム関連）](#subject_program科目学習プログラム関連)
+10. [book_author（書籍著者情報）](#book_author書籍著者情報)
+11. [lecture_session（講義時間）](#lecture_session講義時間)
+12. [syllabus_faculty（シラバス学部課程関連）](#syllabus_facultyシラバス学部課程関連)
+13. [syllabus_instructor（シラバス教員関連）](#syllabus_instructorシラバス教員関連)
+14. [syllabus_book（シラバス教科書関連）](#syllabus_bookシラバス教科書関連)
+15. [grading_criterion（成績評価基準）](#grading_criterion成績評価基準)
+16. [program（学修プログラム）](#program学修プログラム)
+17. [requirement（科目要件属性）](#requirement科目要件属性)
+18. [subject_program（科目学習プログラム関連）](#subject_program科目学習プログラム関連)
 
 ## 更新履歴
 
@@ -72,10 +73,14 @@ erDiagram
         TEXT first_name
     }
     book {
-        INTEGER id PK
-        TEXT author
+        INTEGER book_id PK
         TEXT title
         TEXT isbn
+    }
+    book_author {
+        INTEGER book_author_id PK
+        INTEGER book_id FK
+        TEXT author_name
     }
     program {
         INTEGER program_id PK
@@ -168,6 +173,7 @@ erDiagram
     requirement ||--o{ subject_program : "requirement_id"
     requirement }o--|| faculty : "faculty_id"
     requirement }o--|| subject_name : "subject_name_id"
+    book ||--o{ book_author : "book_id"
 ```
 
 ## テーブル間の関連
@@ -209,7 +215,7 @@ erDiagram
 - syllabus: syllabus_code
 - subject: subject_id
 - instructor: instructor_code
-- book: id
+- book: book_id
 - lecture_session: id
 - syllabus_faculty: id
 - syllabus_instructor: id
@@ -218,6 +224,7 @@ erDiagram
 - program: program_id
 - requirement: requirement_id
 - subject_program: id
+- book_author: book_author_id
 
 ### 外部キー
 - syllabus.subject_name_id → subject_name.subject_name_id
@@ -232,11 +239,12 @@ erDiagram
 - syllabus_instructor.syllabus_code → syllabus.syllabus_code
 - syllabus_instructor.instructor_code → instructor.instructor_code
 - syllabus_book.syllabus_code → syllabus.syllabus_code
-- syllabus_book.book_id → book.id
+- syllabus_book.book_id → book.book_id
 - grading_criterion.syllabus_code → syllabus.syllabus_code
 - subject_program.requirement_id → requirement.requirement_id
 - subject_program.program_id → program.program_id
 - requirement.faculty_id → faculty.faculty_id
 - requirement.subject_name_id → subject_name.subject_name_id
+- book_author.book_id → book.book_id
 
 [目次へ戻る](#目次) 
