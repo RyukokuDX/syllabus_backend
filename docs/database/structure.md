@@ -322,16 +322,18 @@
 |----------|----------|------|------|--------|
 | id | INTEGER | NO | ID（主キー） | システム生成 |
 | syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | Web Syllabus |
+| syllabus_year | INTEGER | NO | 開講年度 | Web Syllabus |
 | day_of_week | TEXT | NO | 曜日 | Web Syllabus |
 | period | TINYINT | NO | 時限 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
 | idx_lecture_session_day_period | (day_of_week, period) | 曜日・時限での検索用 |
-| idx_lecture_session_syllabus | syllabus_code | シラバス管理番号での検索用 |
+| idx_lecture_session_syllabus | (syllabus_code, syllabus_year) | シラバス管理番号と年度での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
