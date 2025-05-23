@@ -20,9 +20,9 @@
 13. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
 14. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
 15. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-16. [subject_requirement 科目要綱関連](#subject_requirement-科目要綱関連)
-17. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
-18. [requirement 科目要件属性](#requirement-科目要件属性)
+16. [requirement 科目要件属性](#requirement-科目要件属性)
+17. [program 学修プログラム](#program-学修プログラム)
+18. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
 
 ## 更新履歴
 
@@ -37,6 +37,7 @@
 | 2025-05-21 | 1.1.5 | 藤原 | subject_requirementテーブルを削除、requirementテーブルにsyllabus_codeを追加 |
 | 2025-05-21 | 1.1.6 | 藤原 | 外部キー制約の整合性を修正、インデックスを最適化 |
 | 2025-05-21 | 1.1.7 | 藤原 | 不要な関連を削除、テーブル間の参照整合性を強化 |
+| 2025-05-21 | 1.1.8 | 藤原 | programテーブルを追加、subject_programテーブルの外部キー制約を修正 |
 
 ## テーブル構成
 
@@ -470,6 +471,32 @@
 
 [目次へ戻る](#目次)
 
+### program 学修プログラム
+
+#### テーブル概要
+学修プログラムの基本情報を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| program_id | INTEGER | NO | プログラムID（主キー） | システム生成 |
+| program_name | TEXT | NO | プログラム名 | シラバス検索画面 |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | program_id | 主キー |
+| idx_program_name | program_name | プログラム名での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| - | - | - |
+
+[目次へ戻る](#目次)
+
 ### subject_program 科目学習プログラム関連
 
 #### テーブル概要
@@ -480,20 +507,21 @@
 |----------|----------|------|------|--------|
 | id | INTEGER | NO | ID（主キー） | システム生成 |
 | requirement_id | INTEGER | NO | 要綱番号（外部キー） | 履修要綱 |
-| program_id | INTEGER | NO | 学習プログラム番号 | 履修要綱 |
+| program_id | INTEGER | NO | プログラムID（外部キー） | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_requirement_requirement | requirement_id | 要綱番号での検索用 |
-| idx_subject_program_program | program_id | プログラム番号での検索用 |
+| idx_subject_program_requirement | requirement_id | 要綱番号での検索用 |
+| idx_subject_program_program | program_id | プログラムIDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | requirement_id | requirement(requirement_id) | CASCADE |
+| program_id | program(program_id) | CASCADE |
 
 [目次へ戻る](#目次)
 
