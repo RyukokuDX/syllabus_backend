@@ -1,15 +1,21 @@
 -- ========== 開発用データベースの作成 ==========
 
 -- syllabus_dbをテンプレートとして使用して開発用データベースを作成
-CREATE DATABASE syllabus_db_dev TEMPLATE syllabus_db;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'syllabus_dev_db') THEN
+    CREATE DATABASE syllabus_dev_db TEMPLATE syllabus_db;
+  END IF;
+END
+$$;
 
 -- ========== 権限付与 ==========
 
 -- 接続切替（syllabus_dev_db）
-\connect syllabus_db_dev
+\connect syllabus_dev_db
 
 -- スキーマ権限
-GRANT CONNECT ON DATABASE syllabus_db_dev TO dev_user, app_user;
+GRANT CONNECT ON DATABASE syllabus_dev_db TO dev_user, app_user;
 GRANT USAGE ON SCHEMA public TO dev_user, app_user;
 GRANT ALL PRIVILEGES ON SCHEMA public TO dev_user;
 
@@ -35,4 +41,4 @@ GRANT SELECT ON information_schema.tables TO dev_user, app_user; \i /docker-entr
 \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_classs.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_subclasss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_subject_names.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250522171503__insert_subjects.sql
+-- \i /docker-entrypoint-initdb.d/migrations/V20250522171503__insert_subjects.sql

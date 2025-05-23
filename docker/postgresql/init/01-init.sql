@@ -309,7 +309,7 @@ CREATE INDEX idx_subject_program_program ON subject_program(program_code);
 \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_classs.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_subclasss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_subject_names.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250522171503__insert_subjects.sql
+-- \i /docker-entrypoint-initdb.d/migrations/V20250522171503__insert_subjects.sql
 
 -- ========== 開発用データベースの初期化 ==========
 

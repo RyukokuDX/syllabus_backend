@@ -34,7 +34,7 @@ cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
 cp "$DEV_TEMPLATE_FILE" "$DEV_OUTPUT_FILE"
 
 # 環境変数を置換
-for var in POSTGRES_DB DEV_USER DEV_PASSWORD APP_USER APP_PASSWORD; do
+for var in POSTGRES_DB DEV_DB DEV_USER DEV_PASSWORD APP_USER APP_PASSWORD; do
   if [ -n "${!var}" ]; then
     sed -i "s/\${$var}/${!var}/g" "$OUTPUT_FILE"
     sed -i "s/\${$var}/${!var}/g" "$DEV_OUTPUT_FILE"

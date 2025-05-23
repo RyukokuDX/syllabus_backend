@@ -1,15 +1,21 @@
 -- ========== 開発用データベースの作成 ==========
 
 -- syllabus_dbをテンプレートとして使用して開発用データベースを作成
-CREATE DATABASE ${POSTGRES_DB}_dev TEMPLATE ${POSTGRES_DB};
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${DEV_DB}') THEN
+    CREATE DATABASE ${DEV_DB} TEMPLATE syllabus_db;
+  END IF;
+END
+$$;
 
 -- ========== 権限付与 ==========
 
 -- 接続切替（syllabus_dev_db）
-\connect ${POSTGRES_DB}_dev
+\connect ${DEV_DB}
 
 -- スキーマ権限
-GRANT CONNECT ON DATABASE ${POSTGRES_DB}_dev TO ${DEV_USER}, ${APP_USER};
+GRANT CONNECT ON DATABASE ${DEV_DB} TO ${DEV_USER}, ${APP_USER};
 GRANT USAGE ON SCHEMA public TO ${DEV_USER}, ${APP_USER};
 GRANT ALL PRIVILEGES ON SCHEMA public TO ${DEV_USER};
 
