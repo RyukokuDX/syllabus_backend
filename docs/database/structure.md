@@ -8,21 +8,20 @@
 1. [class 科目区分](#class-科目区分)
 2. [subclass 科目小区分](#subclass-科目小区分)
 3. [class_note 科目区分の備考](#class_note-科目区分の備考)
-4. [subject_name 科目名マスタ](#subject_name-科目名マスタ)
-5. [subject 科目基本情報](#subject-科目基本情報)
-6. [faculty 開講学部・課程](#faculty-開講学部課程)
-7. [instructor 教員](#instructor-教員)
-8. [criteria 評価種別マスタ](#criteria-評価種別マスタ)
+4. [faculty 開講学部・課程](#faculty-開講学部課程)
+5. [subject_name 科目名マスタ](#subject_name-科目名マスタ)
+6. [syllabus シラバス情報](#syllabus-シラバス情報)
+7. [subject 科目基本情報](#subject-科目基本情報)
+8. [instructor 教員](#instructor-教員)
 9. [book 書籍](#book-書籍)
-10. [syllabus シラバス情報](#syllabus-シラバス情報)
+10. [lecture_session 講義時間](#lecture_session-講義時間)
 11. [syllabus_faculty シラバス学部課程関連](#syllabus_faculty-シラバス学部課程関連)
-12. [lecture_session 講義時間](#lecture_session-講義時間)
-13. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
-14. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
-15. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+12. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
+13. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
+14. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+15. [program 学修プログラム](#program-学修プログラム)
 16. [requirement 科目要件属性](#requirement-科目要件属性)
-17. [program 学修プログラム](#program-学修プログラム)
-18. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
+17. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
 
 ## 更新履歴
 
@@ -38,6 +37,9 @@
 | 2025-05-21 | 1.1.6 | 藤原 | 外部キー制約の整合性を修正、インデックスを最適化 |
 | 2025-05-21 | 1.1.7 | 藤原 | 不要な関連を削除、テーブル間の参照整合性を強化 |
 | 2025-05-21 | 1.1.8 | 藤原 | programテーブルを追加、subject_programテーブルの外部キー制約を修正 |
+| 2025-05-21 | 1.1.9 | 藤原 | subjectテーブルにサロゲートキーを追加、syllabusテーブルとの関連を整理 |
+| 2025-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をsubject_idに変更、syllabusテーブルからyearカラムを移動 |
+| 2025-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
 
 ## テーブル構成
 
@@ -110,6 +112,29 @@
 
 [目次へ戻る](#目次)
 
+### faculty 開講学部・課程
+
+#### テーブル概要
+開講学部・課程を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| faculty_id | INTEGER | NO | 学部ID（主キー） | システム生成 |
+| faculty_name | TEXT | NO | 学部・課程名 | シラバス検索画面 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | faculty_id | 主キー |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| - | - | - |
+
+[目次へ戻る](#目次)
+
 ### subject_name 科目名マスタ
 
 #### テーブル概要
@@ -134,6 +159,54 @@
 
 [目次へ戻る](#目次)
 
+### syllabus シラバス情報
+
+#### テーブル概要
+各科目のシラバス情報を管理するテーブル。Web Syllabusから取得される科目の詳細情報、授業内容、評価方法などを格納。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| syllabus_code | TEXT | NO | シラバス管理番号（主キー） | Web Syllabus |
+| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | Web Syllabus |
+| subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
+| term | TEXT | NO | 開講学期 | Web Syllabus |
+| grade_b1 | BOOLEAN | NO | 学部1年履修可能 | Web Syllabus |
+| grade_b2 | BOOLEAN | NO | 学部2年履修可能 | Web Syllabus |
+| grade_b3 | BOOLEAN | NO | 学部3年履修可能 | Web Syllabus |
+| grade_b4 | BOOLEAN | NO | 学部4年履修可能 | Web Syllabus |
+| grade_m1 | BOOLEAN | NO | 修士1年履修可能 | Web Syllabus |
+| grade_m2 | BOOLEAN | NO | 修士2年履修可能 | Web Syllabus |
+| grade_d1 | BOOLEAN | NO | 博士1年履修可能 | Web Syllabus |
+| grade_d2 | BOOLEAN | NO | 博士2年履修可能 | Web Syllabus |
+| grade_d3 | BOOLEAN | NO | 博士3年履修可能 | Web Syllabus |
+| campus | TEXT | NO | 開講キャンパス | Web Syllabus |
+| credits | INTEGER | NO | 単位数 | Web Syllabus |
+| summary | TEXT | YES | 授業概要 | Web Syllabus |
+| goals | TEXT | YES | 到達目標 | Web Syllabus |
+| methods | TEXT | YES | 授業方法 | Web Syllabus |
+| outside_study | TEXT | YES | 授業外学習 | Web Syllabus |
+| notes | TEXT | YES | 履修上の注意 | Web Syllabus |
+| remarks | TEXT | YES | その他備考 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | syllabus_code | 主キー |
+| idx_syllabus_term | term | 開講学期での検索用 |
+| idx_syllabus_grades | (grade_b1, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3) | 学年での複合検索用 |
+| idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
+| idx_syllabus_subject_name | subject_name_id | 科目名IDでの検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| subject_name_id | subject_name(subject_name_id) | RESTRICT |
+
+[目次へ戻る](#目次)
+
 ### subject 科目基本情報
 
 #### テーブル概要
@@ -142,8 +215,10 @@
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
-| syllabus_code | TEXT | NO | シラバス管理番号 | シラバス検索画面 |
-| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | シラバス検索画面 |
+| subject_id | INTEGER | NO | ID（主キー） | システム生成 |
+| syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | シラバス検索画面 |
+| syllabus_year | INTEGER | NO | 開講年度 | シラバス検索画面 |
+| faculty_id | INTEGER | NO | 開講学部ID（外部キー） | シラバス検索画面 |
 | class_id | INTEGER | NO | クラスID（外部キー） | シラバス検索画面 |
 | subclass_id | INTEGER | YES | 小区分ID（外部キー） | シラバス検索画面 |
 | class_note_id | INTEGER | YES | 備考ID（外部キー） | シラバス検索画面 |
@@ -154,40 +229,24 @@
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | syllabus_code | 主キー |
-| idx_subject_name | subject_name_id | 科目名IDでの検索用 |
+| PRIMARY KEY | subject_id | 主キー |
+| UNIQUE | (syllabus_code, year, faculty_id, class_id, subclass_id, class_note_id) | 科目情報の一意性 |
+| idx_subject_syllabus | syllabus_code | シラバス管理番号での検索用 |
 | idx_subject_class | class_id | クラスIDでの検索用 |
+| idx_subject_faculty | faculty_id | 学部IDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| subject_name_id | subject_name(subject_name_id) | RESTRICT |
+| syllabus_code | syllabus(syllabus_code) | RESTRICT |
+| faculty_id | faculty(faculty_id) | RESTRICT |
 | class_id | class(class_id) | RESTRICT |
 | subclass_id | subclass(subclass_id) | RESTRICT |
 | class_note_id | class_note(class_note_id) | RESTRICT |
 
-[目次へ戻る](#目次)
-
-### faculty 開講学部・課程
-
-#### テーブル概要
-開講学部・課程を管理するテーブル。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| faculty_id | INTEGER | NO | 学部ID（主キー） | システム生成 |
-| faculty_name | TEXT | NO | 学部・課程名 | シラバス検索画面 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | faculty_id | 主キー |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| - | - | - |
+**** 補足
+- 本来は複合キー(syllabus_code, syllabus_year, faculty_id, class_note)
+だが, class_noteにNULLがあるため、サロゲートキー(syllabus_id)を使用
 
 [目次へ戻る](#目次)
 
@@ -213,31 +272,6 @@
 | PRIMARY KEY | instructor_code | 主キー |
 | idx_instructor_name | name | 氏名での検索用 |
 | idx_instructor_name_kana | name_kana | カナ氏名での検索用 |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| - | - | - |
-
-[目次へ戻る](#目次)
-
-### criteria 評価種別マスタ
-
-#### テーブル概要
-成績評価の種別を管理するマスタテーブル。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| criteria_id | INTEGER | NO | 評価種別ID（主キー） | システム生成 |
-| criteria_type | TEXT | NO | 評価種別（ユニーク） | シラバス検索画面 |
-| description | TEXT | YES | 説明 | web syllabus |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | criteria_id | 主キー |
-| UNIQUE | criteria_type | 種別の一意性 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -275,56 +309,6 @@
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | - | - | - |
-
-[目次へ戻る](#目次)
-
-### syllabus シラバス情報
-
-#### テーブル概要
-各科目のシラバス情報を管理するテーブル。Web Syllabusから取得される科目の詳細情報、授業内容、評価方法などを格納。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| syllabus_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | Web Syllabus |
-| year | INTEGER | NO | 開講年度 | Web Syllabus |
-| subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
-| term | TEXT | NO | 開講学期 | Web Syllabus |
-| grade_b1 | BOOLEAN | NO | 学部1年履修可能 | Web Syllabus |
-| grade_b2 | BOOLEAN | NO | 学部2年履修可能 | Web Syllabus |
-| grade_b3 | BOOLEAN | NO | 学部3年履修可能 | Web Syllabus |
-| grade_b4 | BOOLEAN | NO | 学部4年履修可能 | Web Syllabus |
-| grade_m1 | BOOLEAN | NO | 修士1年履修可能 | Web Syllabus |
-| grade_m2 | BOOLEAN | NO | 修士2年履修可能 | Web Syllabus |
-| grade_d1 | BOOLEAN | NO | 博士1年履修可能 | Web Syllabus |
-| grade_d2 | BOOLEAN | NO | 博士2年履修可能 | Web Syllabus |
-| grade_d3 | BOOLEAN | NO | 博士3年履修可能 | Web Syllabus |
-| campus | TEXT | NO | 開講キャンパス | Web Syllabus |
-| credits | INTEGER | NO | 単位数 | Web Syllabus |
-| summary | TEXT | YES | 授業概要 | Web Syllabus |
-| goals | TEXT | YES | 到達目標 | Web Syllabus |
-| methods | TEXT | YES | 授業方法 | Web Syllabus |
-| outside_study | TEXT | YES | 授業外学習 | Web Syllabus |
-| notes | TEXT | YES | 履修上の注意 | Web Syllabus |
-| remarks | TEXT | YES | その他備考 | Web Syllabus |
-| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | syllabus_code | 主キー |
-| idx_syllabus_year | year | 開講年度での検索用 |
-| idx_syllabus_term | term | 開講学期での検索用 |
-| idx_syllabus_grades | (grade_b1, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3) | 学年での複合検索用 |
-| idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
-| idx_syllabus_subject_name | subject_name_id | 科目名IDでの検索用 |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|----------|----------|-------------|
-| syllabus_code | subject(syllabus_code) | CASCADE |
 
 [目次へ戻る](#目次)
 
