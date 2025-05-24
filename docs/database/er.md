@@ -303,4 +303,43 @@ erDiagram
   - 例：学部1-2年生のみ履修可能 = 3 (1 + 2)
   - 例：学部3-4年生と修士1年生が履修可能 = 28 (4 + 8 + 16)
 
+### syllabus_grade シラバス履修可能学年
+
+#### テーブル概要
+シラバスの履修可能学年を管理する中間テーブル。1つのシラバスが複数の学年で履修可能な場合に対応。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | ID（主キー） | システム生成 |
+| syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | Web Syllabus |
+| syllabus_year | INTEGER | NO | 開講年度 | Web Syllabus |
+| grade | TEXT | NO | 履修可能学年 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| UNIQUE | (syllabus_code, syllabus_year, grade) | シラバス、年度、学年の組み合わせの一意性 |
+| idx_syllabus_grade_syllabus | (syllabus_code, syllabus_year) | シラバス管理番号と年度での検索用 |
+| idx_syllabus_grade_grade | grade | 学年での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| (syllabus_code, syllabus_year) | subject(syllabus_code, syllabus_year) | CASCADE |
+
+#### 補足
+gradeの値は以下のいずれか：
+- B1: 学部1年生
+- B2: 学部2年生
+- B3: 学部3年生
+- B4: 学部4年生
+- M1: 修士1年生
+- M2: 修士2年生
+- D1: 博士1年生
+- D2: 博士2年生
+- D3: 博士3年生
+
 [目次へ戻る](#目次) 
