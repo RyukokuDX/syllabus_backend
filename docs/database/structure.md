@@ -350,7 +350,7 @@
 | id | INTEGER | NO | ID（主キー） | システム生成 |
 | syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | Web Syllabus |
 | syllabus_year | INTEGER | NO | 開講年度 | Web Syllabus |
-| day_of_week | TEXT | NO | 曜日 | Web Syllabus |
+| day_of_week | TEXT | NO | 曜日 or 集中 | Web Syllabus |
 | period | TINYINT | NO | 時限 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
@@ -366,6 +366,10 @@
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | syllabus_code | syllabus(syllabus_code) | CASCADE |
+
+#### 補足
+day_of_weekの値は集中講義ならは"集中"とし,
+periodiは"0"とする.
 
 [目次へ戻る](#目次)
 

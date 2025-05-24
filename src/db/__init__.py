@@ -2,15 +2,14 @@ from .models import (
     Base,
     Subject,
     Syllabus,
-    SyllabusTime,
+    LectureSession,
     Instructor,
     SyllabusInstructor,
-    LectureSession,
     Book,
     SyllabusBook,
     GradingCriterion,
     SyllabusFaculty,
-    SubjectRequirement,
+    Requirement,
     SubjectProgram
 )
 
@@ -18,14 +17,13 @@ __all__ = [
     'Base',
     'Subject',
     'Syllabus',
-    'SyllabusTime',
+    'LectureSession',
     'Instructor',
     'SyllabusInstructor',
-    'LectureSession',
     'Book',
     'SyllabusBook',
     'GradingCriterion',
     'SyllabusFaculty',
-    'SubjectRequirement',
+    'Requirement',
     'SubjectProgram'
 ] 
