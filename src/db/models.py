@@ -8,57 +8,147 @@ from typing import Optional, List
 Base = declarative_base()
 
 # SQLAlchemyモデル
-class Subject(Base):
-    __tablename__ = 'subject'
+class Class(Base):
+    __tablename__ = 'class'
 
-    syllabus_code = Column(Text, primary_key=True)
-    name = Column(Text, nullable=False)
+    class_id = Column(Integer, primary_key=True)
     class_name = Column(Text, nullable=False)
-    subclass_name = Column(Text)
-    class_note = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
+
+class Subclass(Base):
+    __tablename__ = 'subclass'
+
+    subclass_id = Column(Integer, primary_key=True)
+    subclass_name = Column(Text, nullable=False)
+
+class ClassNote(Base):
+    __tablename__ = 'class_note'
+
+    class_note_id = Column(Integer, primary_key=True)
+    class_note = Column(Text, nullable=False)
+
+class Faculty(Base):
+    __tablename__ = 'faculty'
+
+    faculty_id = Column(Integer, primary_key=True)
+    faculty_name = Column(Text, nullable=False)
+
+    __table_args__ = (
+        Index('idx_faculty_name', 'faculty_name'),
+    )
+
+class SubjectName(Base):
+    __tablename__ = 'subject_name'
+
+    subject_name_id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+
+    __table_args__ = (
+        Index('idx_subject_name', 'name', unique=True),
+    )
 
 class Syllabus(Base):
     __tablename__ = 'syllabus'
 
-    syllabus_code = Column(Text, primary_key=True)
-    year = Column(Integer, primary_key=True)
-    subtitle = Column(Text)
-    term = Column(String(10), nullable=False)
-    grade_b1 = Column(Boolean, nullable=False)
-    grade_b2 = Column(Boolean, nullable=False)
-    grade_b3 = Column(Boolean, nullable=False)
-    grade_b4 = Column(Boolean, nullable=False)
-    grade_m1 = Column(Boolean, nullable=False)
-    grade_m2 = Column(Boolean, nullable=False)
-    grade_d1 = Column(Boolean, nullable=False)
-    grade_d2 = Column(Boolean, nullable=False)
-    grade_d3 = Column(Boolean, nullable=False)
-    campus = Column(Text, nullable=False)
+    syllabus_code = Column(String, primary_key=True)
+    subject_name_id = Column(Integer, ForeignKey("subject_name.subject_name_id", ondelete="RESTRICT"), nullable=False)
+    subtitle = Column(String)
+    term = Column(String, nullable=False)
+    grade_mask = Column(Integer, nullable=False)  # ビットマスクで履修可能学年を表現
+    campus = Column(String, nullable=False)
     credits = Column(Integer, nullable=False)
-    lecture_code = Column(Text, nullable=False)
-    summary = Column(Text)
-    goals = Column(Text)
-    methods = Column(Text)
-    outside_study = Column(Text)
-    notes = Column(Text)
-    remarks = Column(Text)
+    summary = Column(String)
+    goals = Column(String)
+    methods = Column(String)
+    outside_study = Column(String)
+    notes = Column(String)
+    remarks = Column(String)
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.now)
+
+    # インデックス
+    __table_args__ = (
+        Index("idx_syllabus_term", "term"),
+        Index("idx_syllabus_grade_mask", "grade_mask"),  # ビットマスク用のインデックス
+        Index("idx_syllabus_campus", "campus"),
+        Index("idx_syllabus_subject_name", "subject_name_id"),
+    )
+
+    # リレーション
+    subject_name = relationship("SubjectName", back_populates="syllabi")
+    subjects = relationship("Subject", back_populates="syllabus")
+    lecture_sessions = relationship("LectureSession", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_faculties = relationship("SyllabusFaculty", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_instructors = relationship("SyllabusInstructor", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_books = relationship("SyllabusBook", back_populates="syllabus", cascade="all, delete-orphan")
+    grading_criteria = relationship("GradingCriterion", back_populates="syllabus", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Syllabus(syllabus_code='{self.syllabus_code}', term='{self.term}')>"
+
+    @property
+    def available_grades(self) -> List[str]:
+        """履修可能学年のリストを返す"""
+        grades = []
+        if self.grade_mask & 1:  # B1
+            grades.append("B1")
+        if self.grade_mask & 2:  # B2
+            grades.append("B2")
+        if self.grade_mask & 4:  # B3
+            grades.append("B3")
+        if self.grade_mask & 8:  # B4
+            grades.append("B4")
+        if self.grade_mask & 16:  # M1
+            grades.append("M1")
+        if self.grade_mask & 32:  # M2
+            grades.append("M2")
+        if self.grade_mask & 64:  # D1
+            grades.append("D1")
+        if self.grade_mask & 128:  # D2
+            grades.append("D2")
+        if self.grade_mask & 256:  # D3
+            grades.append("D3")
+        return grades
+
+    @classmethod
+    def create_grade_mask(cls, grades: List[str]) -> int:
+        """履修可能学年のリストからビットマスクを生成する"""
+        mask = 0
+        grade_to_bit = {
+            "B1": 1,
+            "B2": 2,
+            "B3": 4,
+            "B4": 8,
+            "M1": 16,
+            "M2": 32,
+            "D1": 64,
+            "D2": 128,
+            "D3": 256
+        }
+        for grade in grades:
+            if grade in grade_to_bit:
+                mask |= grade_to_bit[grade]
+        return mask
+
+class Subject(Base):
+    __tablename__ = 'subject'
+
+    subject_id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code'), nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
+    class_id = Column(Integer, ForeignKey('class.class_id'), nullable=False)
+    subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'))
+    class_note_id = Column(Integer, ForeignKey('class_note.class_note_id'))
+    lecture_code = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        ForeignKeyConstraint(['syllabus_code'], ['subject.syllabus_code'], ondelete='CASCADE'),
+        Index('idx_subject_syllabus', 'syllabus_code'),
+        Index('idx_subject_class', 'class_id'),
+        Index('idx_subject_faculty', 'faculty_id'),
+        Index('idx_subject_unique', 'syllabus_code', 'syllabus_year', 'faculty_id', 'class_id', 'subclass_id', 'class_note_id', unique=True),
     )
-
-class SyllabusTime(Base):
-    __tablename__ = 'syllabus_time'
-
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('subject.syllabus_code', ondelete='CASCADE'), nullable=False)
-    day_of_week = Column(Integer, nullable=False)
-    period = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
 class Instructor(Base):
     __tablename__ = 'instructor'
@@ -79,25 +169,66 @@ class Instructor(Base):
 class Book(Base):
     __tablename__ = 'book'
 
-    id = Column(Integer, primary_key=True)
-    author = Column(Text)
+    book_id = Column(Integer, primary_key=True)
     title = Column(Text, nullable=False)
     publisher = Column(Text)
     price = Column(Integer)
-    isbn = Column(String(20))
+    isbn = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
         Index('idx_book_title', 'title'),
-        Index('idx_book_author', 'author'),
+        Index('idx_book_isbn', 'isbn', unique=True),
+    )
+
+class BookAuthor(Base):
+    __tablename__ = 'book_author'
+
+    book_author_id = Column(Integer, primary_key=True)
+    book_id = Column(Integer, ForeignKey('book.book_id', ondelete='CASCADE'), nullable=False)
+    author_name = Column(Text, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_book_author_book', 'book_id'),
+        Index('idx_book_author_name', 'author_name'),
+    )
+
+class LectureSession(Base):
+    __tablename__ = 'lecture_session'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    day_of_week = Column(Text, nullable=False)
+    period = Column(Integer, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_lecture_session_day_period', 'day_of_week', 'period'),
+        Index('idx_lecture_session_syllabus', 'syllabus_code', 'syllabus_year'),
+    )
+
+class SyllabusFaculty(Base):
+    __tablename__ = 'syllabus_faculty'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_syllabus_faculty_syllabus', 'syllabus_code'),
+        Index('idx_syllabus_faculty_faculty', 'faculty_id'),
     )
 
 class SyllabusInstructor(Base):
     __tablename__ = 'syllabus_instructor'
 
     id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('subject.syllabus_code', ondelete='CASCADE'), nullable=False)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
     instructor_code = Column(Text, ForeignKey('instructor.instructor_code', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
@@ -106,26 +237,12 @@ class SyllabusInstructor(Base):
         Index('idx_syllabus_instructor_instructor', 'instructor_code'),
     )
 
-class LectureSession(Base):
-    __tablename__ = 'lecture_session'
-
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
-    day_of_week = Column(Integer, nullable=False)
-    period = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_lecture_session_day_period', 'day_of_week', 'period'),
-        Index('idx_lecture_session_syllabus', 'syllabus_code'),
-    )
-
 class SyllabusBook(Base):
     __tablename__ = 'syllabus_book'
 
     id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('subject.syllabus_code', ondelete='CASCADE'), nullable=False)
-    book_id = Column(Integer, ForeignKey('book.id', ondelete='CASCADE'), nullable=False)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    book_id = Column(Integer, ForeignKey('book.book_id', ondelete='CASCADE'), nullable=False)
     role = Column(Integer, nullable=False)  # 1: 教科書, 2: 参考書
     note = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
@@ -147,41 +264,28 @@ class GradingCriterion(Base):
 
     __table_args__ = (
         Index('idx_grading_criterion_type', 'criteria_type'),
-        Index('idx_grading_criterion_syllabus_type', 'syllabus_code', 'criteria_type'),
-        CheckConstraint(
-            "criteria_type IN ('平常', '小テ', '定期', 'レポ', '他', '自由')",
-            name='check_grading_criterion_type_valid'
-        ),
+        Index('idx_grading_criterion_syllabus', 'syllabus_code'),
     )
 
-class Faculty(Base):
-    __tablename__ = 'faculty'
+class Program(Base):
+    __tablename__ = 'program'
 
-    faculty_id = Column(Integer, primary_key=True)
-    faculty_name = Column(Text, nullable=False)
-
-    __table_args__ = (
-        Index('idx_faculty_name', 'faculty_name'),
-    )
-
-class SyllabusFaculty(Base):
-    __tablename__ = 'syllabus_faculty'
-
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
-    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
+    program_id = Column(Integer, primary_key=True)
+    program_name = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        Index('idx_syllabus_faculty_syllabus', 'syllabus_code'),
-        Index('idx_syllabus_faculty_faculty', 'faculty_id'),
+        Index('idx_program_name', 'program_name'),
     )
 
 class Requirement(Base):
     __tablename__ = 'requirement'
 
-    requirement_code = Column(Text, primary_key=True)
-    subject_name = Column(Text, nullable=False)
+    requirement_id = Column(Integer, primary_key=True)
+    requirement_year = Column(Integer, nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
+    subject_name_id = Column(Integer, ForeignKey('subject_name.subject_name_id'), nullable=False)
     requirement_type = Column(Text, nullable=False)
     applied_science_available = Column(Boolean, nullable=False)
     graduation_credit_limit = Column(Boolean, nullable=False)
@@ -195,65 +299,62 @@ class Requirement(Base):
     __table_args__ = (
         Index('idx_requirement_type', 'requirement_type'),
         Index('idx_requirement_restrictions', 'applied_science_available', 'graduation_credit_limit', 'year_restriction'),
-    )
-
-class SubjectRequirement(Base):
-    __tablename__ = 'subject_requirement'
-
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('subject.syllabus_code', ondelete='CASCADE'), nullable=False)
-    requirement_code = Column(Text, ForeignKey('requirement.requirement_code', ondelete='CASCADE'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_subject_requirement_syllabus', 'syllabus_code'),
-        Index('idx_subject_requirement_requirement', 'requirement_code'),
+        Index('idx_requirement_subject', 'subject_name_id'),
     )
 
 class SubjectProgram(Base):
     __tablename__ = 'subject_program'
 
     id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('subject.syllabus_code', ondelete='CASCADE'), nullable=False)
-    program_code = Column(Text, nullable=False)
+    requirement_id = Column(Integer, ForeignKey('requirement.requirement_id', ondelete='CASCADE'), nullable=False)
+    program_id = Column(Integer, ForeignKey('program.program_id', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
     __table_args__ = (
-        Index('idx_subject_program_syllabus', 'syllabus_code'),
-        Index('idx_subject_program_program', 'program_code'),
+        Index('idx_subject_program_requirement', 'requirement_id'),
+        Index('idx_subject_program_program', 'program_id'),
     )
 
 # データクラス（JSONシリアライズ用）
 @dataclass
-class Subject:
-    """科目基本情報モデル"""
-    syllabus_code: str
-    name: str
+class Class:
+    """科目区分モデル"""
+    class_id: int
     class_name: str
-    subclass_name: Optional[str]
-    class_note: Optional[str]
-    created_at: datetime
-    updated_at: Optional[datetime]
 
 @dataclass
-class Syllabus:
-    """シラバス情報モデル"""
+class Subclass:
+    """科目小区分モデル"""
+    subclass_id: int
+    subclass_name: str
+
+@dataclass
+class ClassNote:
+    """科目区分の備考モデル"""
+    class_note_id: int
+    class_note: str
+
+@dataclass
+class Faculty:
+    """開講学部・課程モデル"""
+    faculty_id: int
+    faculty_name: str
+
+@dataclass
+class SubjectName:
+    """科目名マスタモデル"""
+    subject_name_id: int
+    name: str
+
+@dataclass
+class SyllabusData:
     syllabus_code: str
-    year: int
+    subject_name_id: int
     subtitle: Optional[str]
     term: str
-    grade_b1: bool
-    grade_b2: bool
-    grade_b3: bool
-    grade_b4: bool
-    grade_m1: bool
-    grade_m2: bool
-    grade_d1: bool
-    grade_d2: bool
-    grade_d3: bool
+    grade_mask: int  # ビットマスクで履修可能学年を表現
     campus: str
     credits: int
-    lecture_code: str
     summary: Optional[str]
     goals: Optional[str]
     methods: Optional[str]
@@ -263,14 +364,63 @@ class Syllabus:
     created_at: datetime
     updated_at: Optional[datetime]
 
+    @property
+    def available_grades(self) -> List[str]:
+        """履修可能学年のリストを返す"""
+        grades = []
+        if self.grade_mask & 1:  # B1
+            grades.append("B1")
+        if self.grade_mask & 2:  # B2
+            grades.append("B2")
+        if self.grade_mask & 4:  # B3
+            grades.append("B3")
+        if self.grade_mask & 8:  # B4
+            grades.append("B4")
+        if self.grade_mask & 16:  # M1
+            grades.append("M1")
+        if self.grade_mask & 32:  # M2
+            grades.append("M2")
+        if self.grade_mask & 64:  # D1
+            grades.append("D1")
+        if self.grade_mask & 128:  # D2
+            grades.append("D2")
+        if self.grade_mask & 256:  # D3
+            grades.append("D3")
+        return grades
+
+    @classmethod
+    def create_grade_mask(cls, grades: List[str]) -> int:
+        """履修可能学年のリストからビットマスクを生成する"""
+        mask = 0
+        grade_to_bit = {
+            "B1": 1,
+            "B2": 2,
+            "B3": 4,
+            "B4": 8,
+            "M1": 16,
+            "M2": 32,
+            "D1": 64,
+            "D2": 128,
+            "D3": 256
+        }
+        for grade in grades:
+            if grade in grade_to_bit:
+                mask |= grade_to_bit[grade]
+        return mask
+
 @dataclass
-class SyllabusTime:
-    """講義時間モデル"""
+class Subject:
+    """科目基本情報モデル"""
+    subject_id: int
     syllabus_code: str
-    day_of_week: int
-    period: int
-    id: Optional[int] = None
-    created_at: datetime = field(default_factory=datetime.now)
+    syllabus_year: int
+    faculty_id: int
+    class_id: int
+    subclass_id: Optional[int]
+    class_note_id: Optional[int]
+    lecture_code: Optional[str]
+    created_at: datetime
+    updated_at: Optional[datetime]
 
 @dataclass
 class Instructor:
@@ -286,14 +436,48 @@ class Instructor:
 @dataclass
 class Book:
     """書籍モデル"""
-    id: int
-    author: Optional[str]
+    book_id: int
     title: str
     publisher: Optional[str]
     price: Optional[int]
     isbn: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime]
+
+@dataclass
+class BookAuthor:
+    """書籍著者モデル"""
+    book_author_id: int
+    book_id: int
+    author_name: str
+    created_at: datetime
+
+@dataclass
+class LectureSession:
+    """講義時間モデル"""
+    id: int
+    syllabus_code: str
+    syllabus_year: int
+    day_of_week: str
+    period: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+@dataclass
+class SyllabusFaculty:
+    """シラバス-学部課程関連モデル"""
+    id: int
+    syllabus_code: str
+    faculty_id: int
+    created_at: datetime
+
+@dataclass
+class SyllabusInstructor:
+    """シラバス-教員関連モデル"""
+    id: int
+    syllabus_code: str
+    instructor_code: str
+    created_at: datetime
 
 @dataclass
 class SyllabusBook:
@@ -316,26 +500,20 @@ class GradingCriterion:
     created_at: datetime
 
 @dataclass
-class SyllabusInstructor:
-    """シラバス-教員関連モデル"""
-    id: int
-    syllabus_code: str
-    instructor_code: str
+class Program:
+    """学修プログラムモデル"""
+    program_id: int
+    program_name: str
     created_at: datetime
-
-@dataclass
-class SyllabusFaculty:
-    """シラバス-学部/課程関連モデル"""
-    id: int
-    syllabus_code: str
-    faculty: str
-    created_at: datetime
+    updated_at: Optional[datetime]
 
 @dataclass
 class Requirement:
-    """科目要件・属性モデル"""
-    requirement_code: str
-    subject_name: str
+    """科目要件属性モデル"""
+    requirement_id: int
+    requirement_year: int
+    faculty_id: int
+    subject_name_id: int
     requirement_type: str
     applied_science_available: bool
     graduation_credit_limit: bool
@@ -347,17 +525,9 @@ class Requirement:
     updated_at: Optional[datetime]
 
 @dataclass
-class SubjectRequirement:
-    """科目-要綱関連モデル"""
-    id: int
-    syllabus_code: str
-    requirement_code: str
-    created_at: datetime
-
-@dataclass
 class SubjectProgram:
     """科目-学習プログラム関連モデル"""
     id: int
-    syllabus_code: str
-    program_code: str
+    requirement_id: int
+    program_id: int
     created_at: datetime 

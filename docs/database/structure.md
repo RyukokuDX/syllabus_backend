@@ -41,6 +41,7 @@
 | 2025-05-21 | 1.1.9 | 藤原 | subjectテーブルにサロゲートキーを追加、syllabusテーブルとの関連を整理 |
 | 2025-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をsubject_idに変更、syllabusテーブルからyearカラムを移動 |
 | 2025-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
+| 2025-05-21 | 1.1.12 | 藤原 | syllabusテーブルの履修可能学年フィールドをビットマスク方式に変更、パフォーマンスと拡張性を改善 |
 
 ## テーブル構成
 
@@ -172,15 +173,7 @@
 | subject_name_id | INTEGER | NO | 科目名ID（外部キー） | Web Syllabus |
 | subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
 | term | TEXT | NO | 開講学期 | Web Syllabus |
-| grade_b1 | BOOLEAN | NO | 学部1年履修可能 | Web Syllabus |
-| grade_b2 | BOOLEAN | NO | 学部2年履修可能 | Web Syllabus |
-| grade_b3 | BOOLEAN | NO | 学部3年履修可能 | Web Syllabus |
-| grade_b4 | BOOLEAN | NO | 学部4年履修可能 | Web Syllabus |
-| grade_m1 | BOOLEAN | NO | 修士1年履修可能 | Web Syllabus |
-| grade_m2 | BOOLEAN | NO | 修士2年履修可能 | Web Syllabus |
-| grade_d1 | BOOLEAN | NO | 博士1年履修可能 | Web Syllabus |
-| grade_d2 | BOOLEAN | NO | 博士2年履修可能 | Web Syllabus |
-| grade_d3 | BOOLEAN | NO | 博士3年履修可能 | Web Syllabus |
+| grade_mask | INTEGER | NO | 履修可能学年のビットマスク | Web Syllabus |
 | campus | TEXT | NO | 開講キャンパス | Web Syllabus |
 | credits | INTEGER | NO | 単位数 | Web Syllabus |
 | summary | TEXT | YES | 授業概要 | Web Syllabus |
@@ -197,7 +190,7 @@
 |---------------|--------|------|
 | PRIMARY KEY | syllabus_code | 主キー |
 | idx_syllabus_term | term | 開講学期での検索用 |
-| idx_syllabus_grades | (grade_b1, grade_b2, grade_b3, grade_b4, grade_m1, grade_m2, grade_d1, grade_d2, grade_d3) | 学年での複合検索用 |
+| idx_syllabus_grade_mask | grade_mask | 履修可能学年での検索用 |
 | idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
 | idx_syllabus_subject_name | subject_name_id | 科目名IDでの検索用 |
 
@@ -205,6 +198,14 @@
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | subject_name_id | subject_name(subject_name_id) | RESTRICT |
+
+#### 補足
+- grade_maskはビットマスクで履修可能学年を表現
+  - B1: 1, B2: 2, B3: 4, B4: 8
+  - M1: 16, M2: 32
+  - D1: 64, D2: 128, D3: 256
+  - 例：学部1-2年生のみ履修可能 = 3 (1 + 2)
+  - 例：学部3-4年生と修士1年生が履修可能 = 28 (4 + 8 + 16)
 
 [目次へ戻る](#目次)
 
