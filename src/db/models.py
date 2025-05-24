@@ -53,7 +53,6 @@ class Syllabus(Base):
     subject_name_id = Column(Integer, ForeignKey("subject_name.subject_name_id", ondelete="RESTRICT"), nullable=False)
     subtitle = Column(String)
     term = Column(String, nullable=False)
-    grade_mask = Column(Integer, nullable=False)  # ビットマスクで履修可能学年を表現
     campus = Column(String, nullable=False)
     credits = Column(Integer, nullable=False)
     summary = Column(String)
@@ -68,7 +67,6 @@ class Syllabus(Base):
     # インデックス
     __table_args__ = (
         Index("idx_syllabus_term", "term"),
-        Index("idx_syllabus_grade_mask", "grade_mask"),  # ビットマスク用のインデックス
         Index("idx_syllabus_campus", "campus"),
         Index("idx_syllabus_subject_name", "subject_name_id"),
     )
@@ -81,6 +79,7 @@ class Syllabus(Base):
     syllabus_instructors = relationship("SyllabusInstructor", back_populates="syllabus", cascade="all, delete-orphan")
     syllabus_books = relationship("SyllabusBook", back_populates="syllabus", cascade="all, delete-orphan")
     grading_criteria = relationship("GradingCriterion", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_grades = relationship("SyllabusGrade", back_populates="syllabus", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Syllabus(syllabus_code='{self.syllabus_code}', term='{self.term}')>"
@@ -88,46 +87,7 @@ class Syllabus(Base):
     @property
     def available_grades(self) -> List[str]:
         """履修可能学年のリストを返す"""
-        grades = []
-        if self.grade_mask & 1:  # B1
-            grades.append("B1")
-        if self.grade_mask & 2:  # B2
-            grades.append("B2")
-        if self.grade_mask & 4:  # B3
-            grades.append("B3")
-        if self.grade_mask & 8:  # B4
-            grades.append("B4")
-        if self.grade_mask & 16:  # M1
-            grades.append("M1")
-        if self.grade_mask & 32:  # M2
-            grades.append("M2")
-        if self.grade_mask & 64:  # D1
-            grades.append("D1")
-        if self.grade_mask & 128:  # D2
-            grades.append("D2")
-        if self.grade_mask & 256:  # D3
-            grades.append("D3")
-        return grades
-
-    @classmethod
-    def create_grade_mask(cls, grades: List[str]) -> int:
-        """履修可能学年のリストからビットマスクを生成する"""
-        mask = 0
-        grade_to_bit = {
-            "B1": 1,
-            "B2": 2,
-            "B3": 4,
-            "B4": 8,
-            "M1": 16,
-            "M2": 32,
-            "D1": 64,
-            "D2": 128,
-            "D3": 256
-        }
-        for grade in grades:
-            if grade in grade_to_bit:
-                mask |= grade_to_bit[grade]
-        return mask
+        return [grade.grade for grade in self.syllabus_grades]
 
 class Subject(Base):
     __tablename__ = 'subject'
@@ -315,6 +275,23 @@ class SubjectProgram(Base):
         Index('idx_subject_program_program', 'program_id'),
     )
 
+class SyllabusGrade(Base):
+    __tablename__ = 'syllabus_grade'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    grade = Column(Text, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_syllabus_grade_syllabus', 'syllabus_code'),
+        Index('idx_syllabus_grade_unique', 'syllabus_code', 'syllabus_year', 'grade', unique=True),
+    )
+
+    syllabus = relationship("Syllabus", back_populates="syllabus_grades")
+
 # データクラス（JSONシリアライズ用）
 @dataclass
 class Class:
@@ -352,7 +329,6 @@ class SyllabusData:
     subject_name_id: int
     subtitle: Optional[str]
     term: str
-    grade_mask: int  # ビットマスクで履修可能学年を表現
     campus: str
     credits: int
     summary: Optional[str]
@@ -363,50 +339,12 @@ class SyllabusData:
     remarks: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime]
+    grades: List[str] = field(default_factory=list)
 
     @property
     def available_grades(self) -> List[str]:
         """履修可能学年のリストを返す"""
-        grades = []
-        if self.grade_mask & 1:  # B1
-            grades.append("B1")
-        if self.grade_mask & 2:  # B2
-            grades.append("B2")
-        if self.grade_mask & 4:  # B3
-            grades.append("B3")
-        if self.grade_mask & 8:  # B4
-            grades.append("B4")
-        if self.grade_mask & 16:  # M1
-            grades.append("M1")
-        if self.grade_mask & 32:  # M2
-            grades.append("M2")
-        if self.grade_mask & 64:  # D1
-            grades.append("D1")
-        if self.grade_mask & 128:  # D2
-            grades.append("D2")
-        if self.grade_mask & 256:  # D3
-            grades.append("D3")
-        return grades
-
-    @classmethod
-    def create_grade_mask(cls, grades: List[str]) -> int:
-        """履修可能学年のリストからビットマスクを生成する"""
-        mask = 0
-        grade_to_bit = {
-            "B1": 1,
-            "B2": 2,
-            "B3": 4,
-            "B4": 8,
-            "M1": 16,
-            "M2": 32,
-            "D1": 64,
-            "D2": 128,
-            "D3": 256
-        }
-        for grade in grades:
-            if grade in grade_to_bit:
-                mask |= grade_to_bit[grade]
-        return mask
+        return self.grades
 
 @dataclass
 class Subject:

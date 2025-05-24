@@ -93,7 +93,6 @@ erDiagram
         INTEGER subject_name_id FK
         TEXT subtitle
         TEXT term
-        INTEGER grade_mask
         TEXT campus
         INTEGER credits
         TEXT summary
@@ -117,6 +116,12 @@ erDiagram
     }
 
     %% 関連テーブル
+    syllabus_grade {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        INTEGER syllabus_year
+        TEXT grade
+    }
     lecture_session {
         INTEGER id PK
         TEXT syllabus_code FK
@@ -168,6 +173,7 @@ erDiagram
     class_note }o--o| subject : "class_note_id"
 
     %% 基本テーブル → 関連テーブル
+    syllabus ||--o{ syllabus_grade : "syllabus_code"
     syllabus ||--o{ lecture_session : "syllabus_code"
     syllabus ||--o{ syllabus_faculty : "syllabus_code"
     syllabus ||--o{ syllabus_instructor : "syllabus_code"
@@ -190,6 +196,7 @@ erDiagram
 
 ### 1対多の関連
 - subject_name → syllabus
+- syllabus → syllabus_grade
 - syllabus → lecture_session
 - syllabus → syllabus_faculty
 - syllabus → syllabus_instructor
@@ -226,6 +233,7 @@ erDiagram
 - subject: subject_id
 - instructor: instructor_code
 - book: book_id
+- syllabus_grade: id
 - lecture_session: id
 - syllabus_faculty: id
 - syllabus_instructor: id
@@ -243,6 +251,7 @@ erDiagram
 - subject.class_id → class.class_id
 - subject.subclass_id → subclass.subclass_id
 - subject.class_note_id → class_note.class_note_id
+- syllabus_grade.syllabus_code → syllabus.syllabus_code
 - lecture_session.syllabus_code → syllabus.syllabus_code
 - syllabus_faculty.syllabus_code → syllabus.syllabus_code
 - syllabus_faculty.faculty_id → faculty.faculty_id
@@ -269,7 +278,6 @@ erDiagram
 | subject_name_id | INTEGER | NO | 科目名ID（外部キー） | Web Syllabus |
 | subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
 | term | TEXT | NO | 開講学期 | Web Syllabus |
-| grade_mask | INTEGER | NO | 履修可能学年のビットマスク | Web Syllabus |
 | campus | TEXT | NO | 開講キャンパス | Web Syllabus |
 | credits | INTEGER | NO | 単位数 | Web Syllabus |
 | summary | TEXT | YES | 授業概要 | Web Syllabus |
@@ -286,7 +294,6 @@ erDiagram
 |---------------|--------|------|
 | PRIMARY KEY | syllabus_code | 主キー |
 | idx_syllabus_term | term | 開講学期での検索用 |
-| idx_syllabus_grade_mask | grade_mask | 履修可能学年での検索用 |
 | idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
 | idx_syllabus_subject_name | subject_name_id | 科目名IDでの検索用 |
 
@@ -296,12 +303,7 @@ erDiagram
 | subject_name_id | subject_name(subject_name_id) | RESTRICT |
 
 #### 補足
-- grade_maskはビットマスクで履修可能学年を表現
-  - B1: 1, B2: 2, B3: 4, B4: 8
-  - M1: 16, M2: 32
-  - D1: 64, D2: 128, D3: 256
-  - 例：学部1-2年生のみ履修可能 = 3 (1 + 2)
-  - 例：学部3-4年生と修士1年生が履修可能 = 28 (4 + 8 + 16)
+- syllabus_gradeテーブルはシラバスの履修可能学年を管理する中間テーブル。1つのシラバスが複数の学年で履修可能な場合に対応。
 
 ### syllabus_grade シラバス履修可能学年
 

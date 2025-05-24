@@ -26,9 +26,10 @@ CREATE TABLE syllabus_grade (
     syllabus_year INTEGER NOT NULL,
     grade TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
     PRIMARY KEY (id),
-    FOREIGN KEY (syllabus_code, syllabus_year) REFERENCES subject(syllabus_code, syllabus_year) ON DELETE CASCADE,
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
     UNIQUE KEY uix_syllabus_grade (syllabus_code, syllabus_year, grade),
-    INDEX idx_syllabus_grade_syllabus (syllabus_code, syllabus_year),
+    INDEX idx_syllabus_grade_syllabus (syllabus_code),
     INDEX idx_syllabus_grade_grade (grade)
 ); 
