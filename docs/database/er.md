@@ -93,7 +93,17 @@ erDiagram
         INTEGER subject_name_id FK
         TEXT subtitle
         TEXT term
+        INTEGER grade_mask
+        TEXT campus
         INTEGER credits
+        TEXT summary
+        TEXT goals
+        TEXT methods
+        TEXT outside_study
+        TEXT notes
+        TEXT remarks
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
     subject {
         INTEGER subject_id PK
@@ -246,5 +256,51 @@ erDiagram
 - requirement.faculty_id → faculty.faculty_id
 - requirement.subject_name_id → subject_name.subject_name_id
 - book_author.book_id → book.book_id
+
+### syllabus シラバス情報
+
+#### テーブル概要
+各科目のシラバス情報を管理するテーブル。Web Syllabusから取得される科目の詳細情報、授業内容、評価方法などを格納。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| syllabus_code | TEXT | NO | シラバス管理番号（主キー） | Web Syllabus |
+| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | Web Syllabus |
+| subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
+| term | TEXT | NO | 開講学期 | Web Syllabus |
+| grade_mask | INTEGER | NO | 履修可能学年のビットマスク | Web Syllabus |
+| campus | TEXT | NO | 開講キャンパス | Web Syllabus |
+| credits | INTEGER | NO | 単位数 | Web Syllabus |
+| summary | TEXT | YES | 授業概要 | Web Syllabus |
+| goals | TEXT | YES | 到達目標 | Web Syllabus |
+| methods | TEXT | YES | 授業方法 | Web Syllabus |
+| outside_study | TEXT | YES | 授業外学習 | Web Syllabus |
+| notes | TEXT | YES | 履修上の注意 | Web Syllabus |
+| remarks | TEXT | YES | その他備考 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | syllabus_code | 主キー |
+| idx_syllabus_term | term | 開講学期での検索用 |
+| idx_syllabus_grade_mask | grade_mask | 履修可能学年での検索用 |
+| idx_syllabus_campus | campus | 開講キャンパスでの検索用 |
+| idx_syllabus_subject_name | subject_name_id | 科目名IDでの検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| subject_name_id | subject_name(subject_name_id) | RESTRICT |
+
+#### 補足
+- grade_maskはビットマスクで履修可能学年を表現
+  - B1: 1, B2: 2, B3: 4, B4: 8
+  - M1: 16, M2: 32
+  - D1: 64, D2: 128, D3: 256
+  - 例：学部1-2年生のみ履修可能 = 3 (1 + 2)
+  - 例：学部3-4年生と修士1年生が履修可能 = 28 (4 + 8 + 16)
 
 [目次へ戻る](#目次) 
