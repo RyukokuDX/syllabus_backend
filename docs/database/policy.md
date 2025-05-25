@@ -42,16 +42,41 @@
     - 外部キーとして使用される場合：`id`（INTEGER型）
     - 外部キーとして使用されない場合：`id`（INTEGER型）
 - 外部キー：参照先テーブル名の単数形 + `_id`（例：`subject_name_id`）
-- 作成日時：`created_at`
-- 更新日時：`updated_at`（必要な場合のみ）
 
-#### updated_atの使用方針
-- 以下の条件に該当するテーブルには`updated_at`を設ける
-  - データの更新が頻繁に発生する可能性がある
-  - データの更新履歴を追跡する必要がある
-  - データの整合性確認が必要
-- `updated_at`はNULLを許容する（`TIMESTAMP NULL`）
-- 更新時はマイグレーションファイルで明示的に時刻を設定
+#### タイムスタンプカラムの使用方針
+1. マスターテーブル
+   - `created_at`と`updated_at`は不要
+   - 変更履歴はマイグレーションファイルで管理
+   - マスターテーブルの例：
+     - `class`
+     - `subclass`
+     - `class_note`
+     - `faculty`
+     - `subject_name`
+     - `program`
+
+2. トランザクションテーブル
+   - `created_at`：必須（NOT NULL）
+   - `updated_at`：必須（NULL許容）
+   - データの変更履歴を追跡する必要がある
+   - トランザクションテーブルの例：
+     - `syllabus`
+     - `syllabus_grade`
+     - `subject`
+     - `instructor`
+     - `book`
+     - `book_author`
+     - `lecture_session`
+     - `syllabus_faculty`
+     - `syllabus_instructor`
+     - `syllabus_book`
+     - `grading_criterion`
+     - `requirement`
+     - `subject_program`
+
+#### タイムスタンプの更新ルール
+- `created_at`はレコード作成時に自動設定
+- `updated_at`はレコード更新時に自動更新
 - 年度ごとのデータ管理が必要な場合は、年度フィールドを追加して更新頻度を抑制
 
 #### 複合キーの使用方針
