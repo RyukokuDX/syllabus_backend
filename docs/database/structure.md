@@ -29,20 +29,20 @@
 
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
-| 2025-05-19 | 1.0.0 | 藤原 | 初版作成 |
-| 2025-05-20 | 1.1.0 | 藤原 | テーブル名・カラム名の統一（subject_code → syllabus_code） |
-| 2025-05-20 | 1.1.1 | 藤原 | requirementテーブルの主キーをrequirement_codeに修正 |
-| 2025-05-20 | 1.1.2 | 藤原 | インデックス名の統一、外部キー制約の整理 |
-| 2025-05-21 | 1.1.3 | 藤原 | 正規化を強化。facultyテーブルをsubjectテーブルの直後に移動、目次・本文順序修正 |
-| 2025-05-21 | 1.1.4 | 藤原 | requirementテーブルの主キーをrequirement_idに変更、関連テーブルの外部キー制約を修正 |
-| 2025-05-21 | 1.1.5 | 藤原 | subject_requirementテーブルを削除、requirementテーブルにsyllabus_codeを追加 |
-| 2025-05-21 | 1.1.6 | 藤原 | 外部キー制約の整合性を修正、インデックスを最適化 |
-| 2025-05-21 | 1.1.7 | 藤原 | 不要な関連を削除、テーブル間の参照整合性を強化 |
-| 2025-05-21 | 1.1.8 | 藤原 | programテーブルを追加、subject_programテーブルの外部キー制約を修正 |
-| 2025-05-21 | 1.1.9 | 藤原 | subjectテーブルにサロゲートキーを追加、syllabusテーブルとの関連を整理 |
-| 2025-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をsubject_idに変更、syllabusテーブルからyearカラムを移動 |
-| 2025-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
-| 2025-05-21 | 1.1.12 | 藤原 | syllabusテーブルの履修可能学年フィールドをビットマスク方式に変更、パフォーマンスと拡張性を改善 |
+| 2024-05-19 | 1.0.0 | 藤原 | 初版作成 |
+| 2024-05-20 | 1.1.0 | 藤原 | テーブル名・カラム名の統一（subject_code → syllabus_code） |
+| 2024-05-20 | 1.1.1 | 藤原 | requirementテーブルの主キーをrequirement_codeに修正 |
+| 2024-05-20 | 1.1.2 | 藤原 | インデックス名の統一、外部キー制約の整理 |
+| 2024-05-21 | 1.1.3 | 藤原 | 正規化を強化。facultyテーブルをsubjectテーブルの直後に移動、目次・本文順序修正 |
+| 2024-05-21 | 1.1.4 | 藤原 | requirementテーブルの主キーをrequirement_idに変更、関連テーブルの外部キー制約を修正 |
+| 2024-05-21 | 1.1.5 | 藤原 | subject_requirementテーブルを削除、requirementテーブルにsyllabus_codeを追加 |
+| 2024-05-21 | 1.1.6 | 藤原 | 外部キー制約の整合性を修正、インデックスを最適化 |
+| 2024-05-21 | 1.1.7 | 藤原 | 不要な関連を削除、テーブル間の参照整合性を強化 |
+| 2024-05-21 | 1.1.8 | 藤原 | programテーブルを追加、subject_programテーブルの外部キー制約を修正 |
+| 2024-05-21 | 1.1.9 | 藤原 | subjectテーブルにサロゲートキーを追加、syllabusテーブルとの関連を整理 |
+| 2024-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をidに変更、syllabusテーブルからyearカラムを移動 |
+| 2024-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
+| 2024-05-21 | 1.1.12 | 藤原 | syllabusテーブルの履修可能学年フィールドをビットマスク方式に変更、パフォーマンスと拡張性を改善 |
 
 ## テーブル構成
 
@@ -61,6 +61,7 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | class_id | 主キー |
+| idx_class_name | class_name | クラス名での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -196,7 +197,7 @@
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| subject_name_id | subject_name(subject_name_id) | RESTRICT |
+| subject_name_id | subject_name(subject_name_id) | CASCADE |
 
 [目次へ戻る](#目次)
 
@@ -258,7 +259,7 @@ gradeの値は以下の形式で、学生の学年を表します：
 | idx_syllabus_faculty_enrollment_syllabus | syllabus_code | シラバスコードでの検索用 |
 | idx_syllabus_faculty_enrollment_faculty | faculty_id | 学部IDでの検索用 |
 | idx_syllabus_faculty_enrollment_syllabus_year | syllabus_year | シラバス年度での検索用 |
-| idx_syllabus_faculty_enrollment_unique | syllabus_code, enrollment_year, syllabus_year, faculty_id | 一意制約 |
+| idx_syllabus_faculty_enrollment_unique | (syllabus_code, enrollment_year, syllabus_year, faculty_id) | 一意制約 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -276,7 +277,7 @@ gradeの値は以下の形式で、学生の学年を表します：
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
-| subject_id | INTEGER | NO | ID（主キー） | システム生成 |
+| id | INTEGER | NO | ID（主キー） | システム生成 |
 | syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | シラバス検索画面 |
 | syllabus_year | INTEGER | NO | 開講年度 | シラバス検索画面 |
 | faculty_id | INTEGER | NO | 開講学部ID（外部キー） | シラバス検索画面 |
@@ -290,8 +291,8 @@ gradeの値は以下の形式で、学生の学年を表します：
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | subject_id | 主キー |
-| UNIQUE | (syllabus_code, syllabus_year, faculty_id, class_id, subclass_id, class_note_id) | 科目情報の一意性 |
+| PRIMARY KEY | id | 主キー |
+| idx_subject_unique | (syllabus_code, syllabus_year, faculty_id, class_id, subclass_id, class_note_id) | 科目情報の一意性 |
 | idx_subject_syllabus | syllabus_code | シラバス管理番号での検索用 |
 | idx_subject_class | class_id | クラスIDでの検索用 |
 | idx_subject_faculty | faculty_id | 学部IDでの検索用 |
@@ -307,7 +308,7 @@ gradeの値は以下の形式で、学生の学年を表します：
 
 **** 補足
 - 本来は複合キー(syllabus_code, syllabus_year, faculty_id, class_note)
-だが, class_noteにNULLがあるため、サロゲートキー(syllabus_id)を使用
+だが, class_noteにNULLがあるため、サロゲートキー(id)を使用
 
 [目次へ戻る](#目次)
 
@@ -611,7 +612,7 @@ periodは"0"とする.
 
 **** 補足
 - 本来は複合キー(syllabus_code, syllabus_year, faculty_id, class_note)
-だが, class_noteにNULLがあるため、サロゲートキー(subject_id)を使用
+だが, class_noteにNULLがあるため、サロゲートキー(id)を使用
 
 [目次へ戻る](#目次)
 
