@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 
 # エラーが発生したら即座に終了
 $ErrorActionPreference = "Stop"
