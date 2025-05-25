@@ -11,19 +11,20 @@
 4. [faculty 開講学部・課程](#faculty-開講学部課程)
 5. [subject_name 科目名マスタ](#subject_name-科目名マスタ)
 6. [syllabus シラバス情報](#syllabus-シラバス情報)
-7. [syllabus_grade シラバス履修可能学年](#syllabus_grade-シラバス履修可能学年)
-8. [subject 科目基本情報](#subject-科目基本情報)
-9. [instructor 教員](#instructor-教員)
-10. [book 書籍](#book-書籍)
-11. [book_author 書籍著者](#book_author-書籍著者)
-12. [lecture_session 講義時間](#lecture_session-講義時間)
-13. [syllabus_faculty シラバス学部課程関連](#syllabus_faculty-シラバス学部課程関連)
-14. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
-15. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
-16. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-17. [program 学修プログラム](#program-学修プログラム)
-18. [requirement 科目要件属性](#requirement-科目要件属性)
-19. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
+7. [syllabus_eligible_grade シラバス履修可能学年](#syllabus_eligible_grade-シラバス履修可能学年)
+8. [syllabus_enrollment_year シラバス入学年度制限](#syllabus_enrollment_year-シラバス入学年度制限)
+9. [subject 科目基本情報](#subject-科目基本情報)
+10. [instructor 教員](#instructor-教員)
+11. [book 書籍](#book-書籍)
+12. [book_author 書籍著者](#book_author-書籍著者)
+13. [lecture_session 講義時間](#lecture_session-講義時間)
+14. [syllabus_faculty シラバス学部課程関連](#syllabus_faculty-シラバス学部課程関連)
+15. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
+16. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
+17. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+18. [program 学修プログラム](#program-学修プログラム)
+19. [requirement 科目要件属性](#requirement-科目要件属性)
+20. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
 
 ## 更新履歴
 
@@ -200,7 +201,7 @@
 
 [目次へ戻る](#目次)
 
-### syllabus_grade シラバス履修可能学年
+### syllabus_eligible_grade シラバス履修可能学年
 
 #### テーブル概要
 シラバスの履修可能学年を管理するテーブル。1つのシラバスが複数の学年で履修可能な場合に対応。
@@ -219,9 +220,9 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| uix_syllabus_grade | syllabus_code, syllabus_year, grade | 一意制約 |
-| idx_syllabus_grade_syllabus | syllabus_code | シラバスコードでの検索用 |
-| idx_syllabus_grade_grade | grade | 学年での検索用 |
+| uix_syllabus_eligible_grade | syllabus_code, syllabus_year, grade | 一意制約 |
+| idx_syllabus_eligible_grade_syllabus | syllabus_code | シラバスコードでの検索用 |
+| idx_syllabus_eligible_grade_grade | grade | 学年での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -239,6 +240,32 @@ gradeの値は以下のいずれか：
 - D1: 博士1年生
 - D2: 博士2年生
 - D3: 博士3年生
+
+[目次へ戻る](#目次)
+
+### syllabus_enrollment_year シラバス入学年度制限
+
+#### テーブル概要
+シラバスの入学年度制限を管理するテーブル。Web Syllabusから取得される入学年度制限情報を格納。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | 主キー | システム生成 |
+| syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | Web Syllabus |
+| enrollment_year | INTEGER | NO | 入学年度 | Web Syllabus |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_syllabus_enrollment_year_syllabus | syllabus_code | シラバスコードでの検索用 |
+| idx_syllabus_enrollment_year_year | enrollment_year | 入学年度での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| syllabus_code | syllabus(syllabus_code) | CASCADE |
 
 [目次へ戻る](#目次)
 

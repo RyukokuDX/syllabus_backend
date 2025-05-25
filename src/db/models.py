@@ -79,7 +79,8 @@ class Syllabus(Base):
     syllabus_instructors = relationship("SyllabusInstructor", back_populates="syllabus", cascade="all, delete-orphan")
     syllabus_books = relationship("SyllabusBook", back_populates="syllabus", cascade="all, delete-orphan")
     grading_criteria = relationship("GradingCriterion", back_populates="syllabus", cascade="all, delete-orphan")
-    syllabus_grades = relationship("SyllabusGrade", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_eligible_grades = relationship("SyllabusEligibleGrade", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_enrollment_years = relationship("SyllabusEnrollmentYear", back_populates="syllabus", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Syllabus(syllabus_code='{self.syllabus_code}', term='{self.term}')>"
@@ -87,7 +88,7 @@ class Syllabus(Base):
     @property
     def available_grades(self) -> List[str]:
         """履修可能学年のリストを返す"""
-        return [grade.grade for grade in self.syllabus_grades]
+        return [grade.grade for grade in self.syllabus_eligible_grades]
 
 class Subject(Base):
     __tablename__ = 'subject'
@@ -275,8 +276,8 @@ class SubjectProgram(Base):
         Index('idx_subject_program_program', 'program_id'),
     )
 
-class SyllabusGrade(Base):
-    __tablename__ = 'syllabus_grade'
+class SyllabusEligibleGrade(Base):
+    __tablename__ = 'syllabus_eligible_grade'
 
     id = Column(Integer, primary_key=True)
     syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
@@ -286,11 +287,26 @@ class SyllabusGrade(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        Index('idx_syllabus_grade_syllabus', 'syllabus_code'),
-        Index('idx_syllabus_grade_unique', 'syllabus_code', 'syllabus_year', 'grade', unique=True),
+        Index('idx_syllabus_eligible_grade_syllabus', 'syllabus_code'),
+        Index('idx_syllabus_eligible_grade_unique', 'syllabus_code', 'syllabus_year', 'grade', unique=True),
     )
 
-    syllabus = relationship("Syllabus", back_populates="syllabus_grades")
+    syllabus = relationship("Syllabus", back_populates="syllabus_eligible_grades")
+
+class SyllabusEnrollmentYear(Base):
+    __tablename__ = 'syllabus_enrollment_year'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    enrollment_year = Column(Integer, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_syllabus_enrollment_year_syllabus', 'syllabus_code'),
+        Index('idx_syllabus_enrollment_year_unique', 'syllabus_code', 'enrollment_year', unique=True),
+    )
+
+    syllabus = relationship("Syllabus", back_populates="syllabus_enrollment_years")
 
 # データクラス（JSONシリアライズ用）
 @dataclass
@@ -468,4 +484,22 @@ class SubjectProgram:
     id: int
     requirement_id: int
     program_id: int
+    created_at: datetime
+
+@dataclass
+class SyllabusEligibleGrade:
+    """シラバス履修可能学年モデル"""
+    id: int
+    syllabus_code: str
+    syllabus_year: int
+    grade: str
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+@dataclass
+class SyllabusEnrollmentYear:
+    """シラバス入学年度制限モデル"""
+    id: int
+    syllabus_code: str
+    enrollment_year: int
     created_at: datetime 

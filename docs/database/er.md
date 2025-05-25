@@ -86,11 +86,16 @@ erDiagram
     }
 
     %% 関連テーブル
-    syllabus_grade {
+    syllabus_eligible_grade {
         INTEGER id PK
         TEXT syllabus_code FK
         INTEGER syllabus_year
         TEXT grade
+    }
+    syllabus_enrollment_year {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        INTEGER enrollment_year
     }
     lecture_session {
         INTEGER id PK
@@ -143,7 +148,8 @@ erDiagram
     class_note }o--o| subject : "class_note_id"
 
     %% 基本テーブル → 関連テーブル
-    syllabus ||--o{ syllabus_grade : "syllabus_code"
+    syllabus ||--o{ syllabus_eligible_grade : "syllabus_code"
+    syllabus ||--o{ syllabus_enrollment_year : "syllabus_code"
     syllabus ||--o{ lecture_session : "syllabus_code"
     syllabus ||--o{ syllabus_faculty : "syllabus_code"
     syllabus ||--o{ syllabus_instructor : "syllabus_code"

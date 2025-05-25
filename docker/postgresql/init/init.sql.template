@@ -102,7 +102,6 @@ CREATE TABLE IF NOT EXISTS syllabus (
     subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
     subtitle TEXT,
     term TEXT NOT NULL,
-    grade_mask INTEGER NOT NULL,  -- ビットマスクで履修可能学年を表現
     campus TEXT NOT NULL,
     credits INTEGER NOT NULL,
     summary TEXT,
@@ -116,17 +115,8 @@ CREATE TABLE IF NOT EXISTS syllabus (
 );
 
 CREATE INDEX idx_syllabus_term ON syllabus(term);
-CREATE INDEX idx_syllabus_grade_mask ON syllabus(grade_mask);  -- ビットマスク用のインデックス
 CREATE INDEX idx_syllabus_campus ON syllabus(campus);
 CREATE INDEX idx_syllabus_subject_name ON syllabus(subject_name_id);
-
--- ビットマスクの定義をコメントとして追加
-COMMENT ON COLUMN syllabus.grade_mask IS '履修可能学年のビットマスク
-B1: 1, B2: 2, B3: 4, B4: 8
-M1: 16, M2: 32
-D1: 64, D2: 128, D3: 256
-例：学部1-2年生のみ履修可能 = 3 (1 + 2)
-例：学部3-4年生と修士1年生が履修可能 = 28 (4 + 8 + 16)';
 
 -- subject（科目基本情報）
 CREATE TABLE IF NOT EXISTS subject (
@@ -307,6 +297,32 @@ CREATE TABLE IF NOT EXISTS subject_program (
 
 CREATE INDEX idx_subject_program_requirement ON subject_program(requirement_id);
 CREATE INDEX idx_subject_program_program ON subject_program(program_id);
+
+-- syllabus_eligible_grade（シラバス履修可能学年）
+CREATE TABLE IF NOT EXISTS syllabus_eligible_grade (
+    id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    grade TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_syllabus_eligible_grade_syllabus ON syllabus_eligible_grade(syllabus_code);
+CREATE UNIQUE INDEX idx_syllabus_eligible_grade_unique ON syllabus_eligible_grade(syllabus_code, syllabus_year, grade);
+
+-- syllabus_enrollment_year（シラバス入学年度制限）
+CREATE TABLE IF NOT EXISTS syllabus_enrollment_year (
+    id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    enrollment_year INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_syllabus_enrollment_year_syllabus ON syllabus_enrollment_year(syllabus_code);
+CREATE UNIQUE INDEX idx_syllabus_enrollment_year_unique ON syllabus_enrollment_year(syllabus_code, enrollment_year);
 
 -- ========== マイグレーションファイルの実行 ==========
 
