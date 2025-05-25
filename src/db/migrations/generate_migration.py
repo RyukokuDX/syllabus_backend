@@ -91,7 +91,7 @@ def generate_sql_insert(table_name, records):
         'book': ['isbn'],
         'syllabus_book': ['syllabus_code', 'isbn'],
         'grading_criterion': ['syllabus_code', 'criteria_id'],
-        'syllabus_faculty': ['syllabus_code', 'faculty_id']
+        'syllabus_faculty_enrollment': ['syllabus_code', 'enrollment_year', 'syllabus_year', 'faculty_id']
     }
     
     # 更新対象のカラムを設定
@@ -108,7 +108,7 @@ def generate_sql_insert(table_name, records):
         'book': [col for col in columns if col not in ['isbn', 'created_at']],
         'syllabus_book': [col for col in columns if col not in ['syllabus_code', 'isbn', 'created_at']],
         'grading_criterion': [col for col in columns if col not in ['syllabus_code', 'criteria_id', 'created_at']],
-        'syllabus_faculty': [col for col in columns if col not in ['syllabus_code', 'faculty_id', 'created_at']]
+        'syllabus_faculty_enrollment': [col for col in columns if col not in ['syllabus_code', 'enrollment_year', 'syllabus_year', 'faculty_id', 'created_at']]
     }
 
     # ON CONFLICT句を生成
@@ -286,14 +286,17 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
     FOREIGN KEY (syllabus_code, year) REFERENCES syllabus(syllabus_code, year) ON DELETE CASCADE,
     FOREIGN KEY (criteria_id) REFERENCES criteria(criteria_id) ON DELETE RESTRICT
 );""",
-        'syllabus_faculty': """
-CREATE TABLE IF NOT EXISTS syllabus_faculty (
+        'syllabus_faculty_enrollment': """
+CREATE TABLE IF NOT EXISTS syllabus_faculty_enrollment (
     id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
+    enrollment_year INTEGER NOT NULL,
+    syllabus_year INTEGER NOT NULL,
     faculty_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES subject(syllabus_code) ON DELETE CASCADE,
-    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
+    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE,
+    UNIQUE (syllabus_code, enrollment_year, syllabus_year, faculty_id)
 );"""
     }
     
@@ -329,9 +332,9 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_book_book ON syllabus_book(book_id);""",
         'grading_criterion': """
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_criteria ON grading_criterion(criteria_id);
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus_criteria ON grading_criterion(syllabus_code, year, criteria_id);""",
-        'syllabus_faculty': """
-CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_syllabus ON syllabus_faculty(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_faculty ON syllabus_faculty(faculty_id);"""
+        'syllabus_faculty_enrollment': """
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_enrollment_syllabus ON syllabus_faculty_enrollment(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_enrollment_faculty ON syllabus_faculty_enrollment(faculty_id);"""
     }
     
     # テーブル定義とインデックスを結合
@@ -405,8 +408,8 @@ def generate_migration():
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'syllabus_faculty' / 'add',
-                'table_name': 'syllabus_faculty',
+                'json_dir': project_root / 'updates' / 'syllabus_faculty_enrollment' / 'add',
+                'table_name': 'syllabus_faculty_enrollment',
                 'source': 'web_syllabus'
             },
             {
@@ -572,10 +575,16 @@ CREATE TABLE IF NOT EXISTS syllabus (
 );
 
 -- シラバス学部課程関連テーブル
-CREATE TABLE IF NOT EXISTS syllabus_faculty (
-    syllabus_code TEXT REFERENCES syllabus(syllabus_code),
-    faculty_id INTEGER REFERENCES faculty(faculty_id),
-    PRIMARY KEY (syllabus_code, faculty_id)
+CREATE TABLE IF NOT EXISTS syllabus_faculty_enrollment (
+    id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    enrollment_year INTEGER NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    faculty_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
+    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE,
+    UNIQUE (syllabus_code, enrollment_year, syllabus_year, faculty_id)
 );
 
 -- 講義時間テーブル

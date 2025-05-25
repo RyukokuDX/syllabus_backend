@@ -92,10 +92,12 @@ erDiagram
         INTEGER syllabus_year
         TEXT grade
     }
-    syllabus_enrollment_year {
+    syllabus_faculty_enrollment {
         INTEGER id PK
         TEXT syllabus_code FK
         INTEGER enrollment_year
+        INTEGER syllabus_year
+        INTEGER faculty_id FK
     }
     lecture_session {
         INTEGER id PK
@@ -103,11 +105,6 @@ erDiagram
         INTEGER syllabus_year
         TEXT day_of_week
         TINYINT period
-    }
-    syllabus_faculty {
-        INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER faculty_id FK
     }
     syllabus_instructor {
         INTEGER id PK
@@ -149,16 +146,14 @@ erDiagram
 
     %% 基本テーブル → 関連テーブル
     syllabus ||--o{ syllabus_eligible_grade : "syllabus_code"
-    syllabus ||--o{ syllabus_enrollment_year : "syllabus_code"
+    syllabus ||--o{ syllabus_faculty_enrollment : "syllabus_code"
     syllabus ||--o{ lecture_session : "syllabus_code"
-    syllabus ||--o{ syllabus_faculty : "syllabus_code"
     syllabus ||--o{ syllabus_instructor : "syllabus_code"
     syllabus ||--o{ syllabus_book : "syllabus_code"
     syllabus ||--o{ grading_criterion : "syllabus_code"
     subject ||--|| syllabus : "syllabus_code"
 
     %% 関連テーブルの外部キー
-    syllabus_faculty }o--|| faculty : "faculty_id"
     syllabus_instructor }o--|| instructor : "instructor_code"
     syllabus_book }o--|| book : "book_id"
     program ||--o{ subject_program : "program_id"
@@ -166,6 +161,7 @@ erDiagram
     requirement }o--|| faculty : "faculty_id"
     requirement }o--|| subject_name : "subject_name_id"
     book ||--o{ book_author : "book_id"
+    faculty }o--|| syllabus_faculty_enrollment : "faculty_id"
 ```
 
 ## 更新履歴
@@ -186,5 +182,6 @@ erDiagram
 | 2025-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をsubject_idに変更、syllabusテーブルからyearカラムを移動 |
 | 2025-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
 | 2025-05-21 | 1.1.12 | 藤原 | ER図の凡例を追加、関連の説明を明確化 |
+| 2025-05-21 | 1.1.13 | 藤原 | syllabus_enrollment_yearテーブルにsyllabus_yearとfaculty_idカラムを追加、関連を更新 |
 
 [目次へ戻る](#目次) 

@@ -36,6 +36,8 @@ class Faculty(Base):
         Index('idx_faculty_name', 'faculty_name'),
     )
 
+    syllabus_enrollment_years = relationship("SyllabusEnrollmentYear", back_populates="faculty", cascade="all, delete-orphan")
+
 class SubjectName(Base):
     __tablename__ = 'subject_name'
 
@@ -75,12 +77,11 @@ class Syllabus(Base):
     subject_name = relationship("SubjectName", back_populates="syllabi")
     subjects = relationship("Subject", back_populates="syllabus")
     lecture_sessions = relationship("LectureSession", back_populates="syllabus", cascade="all, delete-orphan")
-    syllabus_faculties = relationship("SyllabusFaculty", back_populates="syllabus", cascade="all, delete-orphan")
     syllabus_instructors = relationship("SyllabusInstructor", back_populates="syllabus", cascade="all, delete-orphan")
     syllabus_books = relationship("SyllabusBook", back_populates="syllabus", cascade="all, delete-orphan")
     grading_criteria = relationship("GradingCriterion", back_populates="syllabus", cascade="all, delete-orphan")
     syllabus_eligible_grades = relationship("SyllabusEligibleGrade", back_populates="syllabus", cascade="all, delete-orphan")
-    syllabus_enrollment_years = relationship("SyllabusEnrollmentYear", back_populates="syllabus", cascade="all, delete-orphan")
+    syllabus_faculty_enrollments = relationship("SyllabusFacultyEnrollment", back_populates="syllabus", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Syllabus(syllabus_code='{self.syllabus_code}', term='{self.term}')>"
@@ -170,19 +171,6 @@ class LectureSession(Base):
     __table_args__ = (
         Index('idx_lecture_session_day_period', 'day_of_week', 'period'),
         Index('idx_lecture_session_syllabus', 'syllabus_code', 'syllabus_year'),
-    )
-
-class SyllabusFaculty(Base):
-    __tablename__ = 'syllabus_faculty'
-
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
-    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_syllabus_faculty_syllabus', 'syllabus_code'),
-        Index('idx_syllabus_faculty_faculty', 'faculty_id'),
     )
 
 class SyllabusInstructor(Base):
@@ -299,14 +287,39 @@ class SyllabusEnrollmentYear(Base):
     id = Column(Integer, primary_key=True)
     syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
     enrollment_year = Column(Integer, nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
     __table_args__ = (
         Index('idx_syllabus_enrollment_year_syllabus', 'syllabus_code'),
-        Index('idx_syllabus_enrollment_year_unique', 'syllabus_code', 'enrollment_year', unique=True),
+        Index('idx_syllabus_enrollment_year_faculty', 'faculty_id'),
+        Index('idx_syllabus_enrollment_year_syllabus_year', 'syllabus_year'),
+        Index('idx_syllabus_enrollment_year_unique', 'syllabus_code', 'enrollment_year', 'syllabus_year', 'faculty_id', unique=True),
     )
 
     syllabus = relationship("Syllabus", back_populates="syllabus_enrollment_years")
+    faculty = relationship("Faculty", back_populates="syllabus_enrollment_years")
+
+class SyllabusFacultyEnrollment(Base):
+    __tablename__ = 'syllabus_faculty_enrollment'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
+    enrollment_year = Column(Integer, nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_syllabus_faculty_enrollment_syllabus', 'syllabus_code'),
+        Index('idx_syllabus_faculty_enrollment_faculty', 'faculty_id'),
+        Index('idx_syllabus_faculty_enrollment_syllabus_year', 'syllabus_year'),
+        Index('idx_syllabus_faculty_enrollment_unique', 'syllabus_code', 'enrollment_year', 'syllabus_year', 'faculty_id', unique=True),
+    )
+
+    syllabus = relationship("Syllabus", back_populates="syllabus_faculty_enrollments")
+    faculty = relationship("Faculty", back_populates="syllabus_faculty_enrollments")
 
 # データクラス（JSONシリアライズ用）
 @dataclass
@@ -418,14 +431,6 @@ class LectureSession:
     updated_at: Optional[datetime]
 
 @dataclass
-class SyllabusFaculty:
-    """シラバス-学部課程関連モデル"""
-    id: int
-    syllabus_code: str
-    faculty_id: int
-    created_at: datetime
-
-@dataclass
 class SyllabusInstructor:
     """シラバス-教員関連モデル"""
     id: int
@@ -502,4 +507,16 @@ class SyllabusEnrollmentYear:
     id: int
     syllabus_code: str
     enrollment_year: int
+    syllabus_year: int
+    faculty_id: int
+    created_at: datetime
+
+@dataclass
+class SyllabusFacultyEnrollment:
+    """シラバス学部課程入学年度制限モデル"""
+    id: int
+    syllabus_code: str
+    enrollment_year: int
+    syllabus_year: int
+    faculty_id: int
     created_at: datetime 
