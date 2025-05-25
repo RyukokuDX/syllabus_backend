@@ -94,7 +94,7 @@ class Syllabus(Base):
 class Subject(Base):
     __tablename__ = 'subject'
 
-    subject_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code'), nullable=False)
     syllabus_year = Column(Integer, nullable=False)
     faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
@@ -378,7 +378,7 @@ class SyllabusData:
 @dataclass
 class Subject:
     """科目基本情報モデル"""
-    subject_id: int
+    id: int
     syllabus_code: str
     syllabus_year: int
     faculty_id: int

@@ -167,18 +167,22 @@ CREATE TABLE IF NOT EXISTS subject_name (
 );""",
         'subject': """
 CREATE TABLE IF NOT EXISTS subject (
-    syllabus_code TEXT PRIMARY KEY,
-    subject_name_id INTEGER NOT NULL,
+    id INTEGER PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    faculty_id INTEGER NOT NULL,
     class_id INTEGER NOT NULL,
     subclass_id INTEGER,
     class_note_id INTEGER,
-    lecture_code TEXT NOT NULL,
+    lecture_code TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
-    FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE RESTRICT,
-    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id) ON DELETE RESTRICT,
-    FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id) ON DELETE RESTRICT
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code),
+    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id),
+    FOREIGN KEY (class_id) REFERENCES class(class_id),
+    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id),
+    FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id),
+    UNIQUE(syllabus_code, syllabus_year, faculty_id, class_id, subclass_id, class_note_id)
 );""",
         'faculty': """
 CREATE TABLE IF NOT EXISTS faculty (
@@ -305,8 +309,9 @@ CREATE TABLE IF NOT EXISTS syllabus_faculty_enrollment (
         'subject_name': """
 CREATE UNIQUE INDEX IF NOT EXISTS idx_subject_name_name ON subject_name(name);""",
         'subject': """
-CREATE INDEX IF NOT EXISTS idx_subject_name ON subject(subject_name_id);
-CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);""",
+CREATE INDEX IF NOT EXISTS idx_subject_syllabus ON subject(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
+CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);""",
         'instructor': """
 CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(last_name, first_name);
 CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(last_name_kana, first_name_kana);""",
@@ -515,14 +520,17 @@ CREATE TABLE IF NOT EXISTS subject_name (
 
 -- 科目基本情報テーブル
 CREATE TABLE IF NOT EXISTS subject (
-    syllabus_code TEXT PRIMARY KEY,
-    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id),
+    id INTEGER PRIMARY KEY,
+    syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code),
+    syllabus_year INTEGER NOT NULL,
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id),
     class_id INTEGER NOT NULL REFERENCES class(class_id),
     subclass_id INTEGER REFERENCES subclass(subclass_id),
     class_note_id INTEGER REFERENCES class_note(class_note_id),
-    lecture_code TEXT NOT NULL,
+    lecture_code TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_code, syllabus_year, faculty_id, class_id, subclass_id, class_note_id)
 );
 
 -- 開講学部・課程テーブル
@@ -561,17 +569,31 @@ CREATE TABLE IF NOT EXISTS book (
 
 -- シラバス情報テーブル
 CREATE TABLE IF NOT EXISTS syllabus (
-    syllabus_code TEXT PRIMARY KEY REFERENCES subject(syllabus_code),
-    year INTEGER NOT NULL,
-    term TEXT NOT NULL,
+    syllabus_code TEXT,
+    year INTEGER,
     subtitle TEXT,
+    term TEXT NOT NULL,
+    grade_b1 BOOLEAN NOT NULL,
+    grade_b2 BOOLEAN NOT NULL,
+    grade_b3 BOOLEAN NOT NULL,
+    grade_b4 BOOLEAN NOT NULL,
+    grade_m1 BOOLEAN NOT NULL,
+    grade_m2 BOOLEAN NOT NULL,
+    grade_d1 BOOLEAN NOT NULL,
+    grade_d2 BOOLEAN NOT NULL,
+    grade_d3 BOOLEAN NOT NULL,
+    campus TEXT NOT NULL,
+    credits INTEGER NOT NULL,
+    summary TEXT,
     goals TEXT,
     methods TEXT,
     outside_study TEXT,
     notes TEXT,
     remarks TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    PRIMARY KEY (syllabus_code, year),
+    FOREIGN KEY (syllabus_code) REFERENCES subject(syllabus_code) ON DELETE CASCADE
 );
 
 -- シラバス学部課程関連テーブル
@@ -644,8 +666,9 @@ CREATE TABLE IF NOT EXISTS requirement (
 );
 
 -- インデックスの作成
-CREATE INDEX IF NOT EXISTS idx_subject_name ON subject(subject_name_id);
+CREATE INDEX IF NOT EXISTS idx_subject_syllabus ON subject(syllabus_code);
 CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
+CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);
 CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(last_name, first_name);
 CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(last_name_kana, first_name_kana);
 """)

@@ -107,7 +107,7 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_subject_name ON syllabus(subject_name_id
 
 -- subject（科目基本情報）
 CREATE TABLE IF NOT EXISTS subject (
-    subject_id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code),
     syllabus_year INTEGER NOT NULL,
     faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id),
