@@ -52,9 +52,9 @@ erDiagram
         INTEGER book_id FK
         TEXT author_name
     }
-    program {
-        INTEGER program_id PK
-        TEXT program_name
+    requirement_attribute {
+        INTEGER requirement_attribute_id PK
+        TEXT name
     }
 
     %% 基本テーブル
@@ -83,6 +83,14 @@ erDiagram
         INTEGER subclass_id FK
         INTEGER class_note_id FK
         TEXT lecture_code
+    }
+    requirement_header {
+        INTEGER requirement_header_id PK
+        INTEGER requirement_year
+        INTEGER faculty_id FK
+        INTEGER subject_name_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     %% 関連テーブル
@@ -125,15 +133,11 @@ erDiagram
     }
     requirement {
         INTEGER requirement_id PK
-        INTEGER requirement_year
-        INTEGER faculty_id FK
-        INTEGER subject_name_id FK
-        TEXT requirement_type
-    }
-    subject_program {
-        INTEGER id PK
-        INTEGER requirement_id FK
-        INTEGER program_id FK
+        INTEGER requirement_header_id FK
+        INTEGER requirement_attribute_id FK
+        TEXT text
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     %% 関連の定義
@@ -143,6 +147,9 @@ erDiagram
     class }o--|| subject : "class_id"
     subclass }o--o| subject : "subclass_id"
     class_note }o--o| subject : "class_note_id"
+    faculty }o--|| requirement_header : "faculty_id"
+    subject_name }o--|| requirement_header : "subject_name_id"
+    requirement_attribute ||--o{ requirement : "requirement_attribute_id"
 
     %% 基本テーブル → 関連テーブル
     syllabus ||--o{ syllabus_eligible_grade : "syllabus_code"
@@ -152,14 +159,11 @@ erDiagram
     syllabus ||--o{ syllabus_book : "syllabus_code"
     syllabus ||--o{ grading_criterion : "syllabus_code"
     subject ||--|| syllabus : "syllabus_code"
+    requirement_header ||--o{ requirement : "requirement_header_id"
 
     %% 関連テーブルの外部キー
     syllabus_instructor }o--|| instructor : "instructor_code"
     syllabus_book }o--|| book : "book_id"
-    program ||--o{ subject_program : "program_id"
-    requirement ||--o{ subject_program : "requirement_id"
-    requirement }o--|| faculty : "faculty_id"
-    requirement }o--|| subject_name : "subject_name_id"
     book ||--o{ book_author : "book_id"
     faculty }o--|| syllabus_faculty_enrollment : "faculty_id"
 ```
@@ -182,6 +186,6 @@ erDiagram
 | 2024-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をidに変更、syllabusテーブルからyearカラムを移動 |
 | 2024-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
 | 2024-05-21 | 1.1.12 | 藤原 | ER図の凡例を追加、関連の説明を明確化 |
-| 2024-05-21 | 1.1.13 | 藤原 | syllabus_enrollment_yearテーブルにsyllabus_yearとfaculty_idカラムを追加、関連を更新 |
+| 2024-05-21 | 1.1.13 | 藤原 | requirementテーブルをEAVパターンに変更、programテーブルとsubject_programテーブルを削除 |
 
 [目次へ戻る](#目次) 

@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -37,6 +37,7 @@ class Faculty(Base):
     )
 
     syllabus_enrollment_years = relationship("SyllabusEnrollmentYear", back_populates="faculty", cascade="all, delete-orphan")
+    requirement_headers = relationship("RequirementHeaderModel", back_populates="faculty")
 
 class SubjectName(Base):
     __tablename__ = 'subject_name'
@@ -47,6 +48,8 @@ class SubjectName(Base):
     __table_args__ = (
         Index('idx_subject_name', 'name', unique=True),
     )
+
+    requirement_headers = relationship("RequirementHeaderModel", back_populates="subject_name")
 
 class Syllabus(Base):
     __tablename__ = 'syllabus'
@@ -215,71 +218,6 @@ class GradingCriterion(Base):
         Index('idx_grading_criterion_type', 'criteria_type'),
         Index('idx_grading_criterion_syllabus', 'syllabus_code'),
     )
-
-class Program(Base):
-    __tablename__ = 'program'
-
-    program_id = Column(Integer, primary_key=True)
-    program_name = Column(Text, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
-
-    __table_args__ = (
-        Index('idx_program_name', 'program_name'),
-    )
-
-class Requirement(Base):
-    __tablename__ = 'requirement'
-
-    requirement_id = Column(Integer, primary_key=True)
-    requirement_year = Column(Integer, nullable=False)
-    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
-    subject_name_id = Column(Integer, ForeignKey('subject_name.subject_name_id'), nullable=False)
-    requirement_type = Column(Text, nullable=False)
-    applied_science_available = Column(Boolean, nullable=False)
-    graduation_credit_limit = Column(Boolean, nullable=False)
-    year_restriction = Column(Boolean, nullable=False)
-    first_year_only = Column(Boolean, nullable=False)
-    up_to_second_year = Column(Boolean, nullable=False)
-    guidance_required = Column(Boolean, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
-
-    __table_args__ = (
-        Index('idx_requirement_type', 'requirement_type'),
-        Index('idx_requirement_restrictions', 'applied_science_available', 'graduation_credit_limit', 'year_restriction'),
-        Index('idx_requirement_subject', 'subject_name_id'),
-    )
-
-class SubjectProgram(Base):
-    __tablename__ = 'subject_program'
-
-    id = Column(Integer, primary_key=True)
-    requirement_id = Column(Integer, ForeignKey('requirement.requirement_id', ondelete='CASCADE'), nullable=False)
-    program_id = Column(Integer, ForeignKey('program.program_id', ondelete='CASCADE'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_subject_program_requirement', 'requirement_id'),
-        Index('idx_subject_program_program', 'program_id'),
-    )
-
-class SyllabusEligibleGrade(Base):
-    __tablename__ = 'syllabus_eligible_grade'
-
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
-    syllabus_year = Column(Integer, nullable=False)
-    grade = Column(Text, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
-
-    __table_args__ = (
-        Index('idx_syllabus_eligible_grade_syllabus', 'syllabus_code'),
-        Index('idx_syllabus_eligible_grade_unique', 'syllabus_code', 'syllabus_year', 'grade', unique=True),
-    )
-
-    syllabus = relationship("Syllabus", back_populates="syllabus_eligible_grades")
 
 class SyllabusEnrollmentYear(Base):
     __tablename__ = 'syllabus_enrollment_year'
@@ -459,64 +397,82 @@ class GradingCriterion:
     created_at: datetime
 
 @dataclass
-class Program:
-    """学修プログラムモデル"""
-    program_id: int
-    program_name: str
-    created_at: datetime
-    updated_at: Optional[datetime]
-
-@dataclass
-class Requirement:
-    """科目要件属性モデル"""
-    requirement_id: int
+class RequirementHeader:
+    requirement_header_id: int
     requirement_year: int
     faculty_id: int
     subject_name_id: int
-    requirement_type: str
-    applied_science_available: bool
-    graduation_credit_limit: bool
-    year_restriction: bool
-    first_year_only: bool
-    up_to_second_year: bool
-    guidance_required: bool
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: Optional[datetime] = None
+
+class RequirementHeaderModel(Base):
+    __tablename__ = "requirement_header"
+
+    requirement_header_id = Column(Integer, primary_key=True)
+    requirement_year = Column(Integer, nullable=False)
+    faculty_id = Column(Integer, ForeignKey("faculty.faculty_id"), nullable=False)
+    subject_name_id = Column(Integer, ForeignKey("subject_name.subject_name_id"), nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=True)
+
+    # 一意制約
+    __table_args__ = (
+        UniqueConstraint("requirement_year", "faculty_id", "subject_name_id", name="uix_requirement_header_unique"),
+        Index("idx_requirement_header_faculty", "faculty_id"),
+        Index("idx_requirement_header_subject", "subject_name_id"),
+    )
+
+    # リレーションシップ
+    faculty = relationship("Faculty", back_populates="requirement_headers")
+    subject_name = relationship("SubjectName", back_populates="requirement_headers")
+    requirements = relationship("RequirementModel", back_populates="requirement_header", cascade="all, delete-orphan")
 
 @dataclass
-class SubjectProgram:
-    """科目-学習プログラム関連モデル"""
-    id: int
+class RequirementAttribute:
+    requirement_attribute_id: int
+    name: str
+    created_at: datetime
+
+class RequirementAttributeModel(Base):
+    __tablename__ = "requirement_attribute"
+
+    requirement_attribute_id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+
+    # 一意制約
+    __table_args__ = (
+        UniqueConstraint("name", name="uix_requirement_attribute_name"),
+    )
+
+    # リレーションシップ
+    requirements = relationship("RequirementModel", back_populates="requirement_attribute")
+
+@dataclass
+class Requirement:
     requirement_id: int
-    program_id: int
+    requirement_header_id: int
+    requirement_attribute_id: int
+    text: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
-@dataclass
-class SyllabusEligibleGrade:
-    """シラバス履修可能学年モデル"""
-    id: int
-    syllabus_code: str
-    syllabus_year: int
-    grade: str
-    created_at: datetime
-    updated_at: Optional[datetime]
+class RequirementModel(Base):
+    __tablename__ = "requirement"
 
-@dataclass
-class SyllabusEnrollmentYear:
-    """シラバス入学年度制限モデル"""
-    id: int
-    syllabus_code: str
-    enrollment_year: int
-    syllabus_year: int
-    faculty_id: int
-    created_at: datetime
+    requirement_id = Column(Integer, primary_key=True)
+    requirement_header_id = Column(Integer, ForeignKey("requirement_header.requirement_header_id"), nullable=False)
+    requirement_attribute_id = Column(Integer, ForeignKey("requirement_attribute.requirement_attribute_id"), nullable=False)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=True)
 
-@dataclass
-class SyllabusFacultyEnrollment:
-    """シラバス学部課程入学年度制限モデル"""
-    id: int
-    syllabus_code: str
-    enrollment_year: int
-    syllabus_year: int
-    faculty_id: int
-    created_at: datetime 
+    # インデックス
+    __table_args__ = (
+        Index("idx_requirement_header", "requirement_header_id"),
+        Index("idx_requirement_attribute", "requirement_attribute_id"),
+    )
+
+    # リレーションシップ
+    requirement_header = relationship("RequirementHeaderModel", back_populates="requirements")
+    requirement_attribute = relationship("RequirementAttributeModel", back_populates="requirements") 

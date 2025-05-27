@@ -21,9 +21,9 @@
 14. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
 15. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
 16. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-17. [program 学修プログラム](#program-学修プログラム)
-18. [requirement 科目要件属性](#requirement-科目要件属性)
-19. [subject_program 科目学習プログラム関連](#subject_program-科目学習プログラム関連)
+17. [requirement_header 科目要件ヘッダー](#requirement_header-科目要件ヘッダー)
+18. [requirement_attribute 科目要件属性](#requirement_attribute-科目要件属性)
+19. [requirement 科目要件値](#requirement-科目要件値)
 
 ## 更新履歴
 
@@ -43,6 +43,7 @@
 | 2024-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をidに変更、syllabusテーブルからyearカラムを移動 |
 | 2024-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
 | 2024-05-21 | 1.1.12 | 藤原 | syllabusテーブルの履修可能学年フィールドをビットマスク方式に変更、パフォーマンスと拡張性を改善 |
+| 2024-05-21 | 1.1.13 | 藤原 | requirementテーブルをEAVパターンに変更、programテーブルとsubject_programテーブルを削除 |
 
 ## テーブル構成
 
@@ -520,24 +521,54 @@ periodは"0"とする.
 
 [目次へ戻る](#目次)
 
-### program 学修プログラム
+### requirement_header 科目要件ヘッダー
 
 #### テーブル概要
-学修プログラムの基本情報を管理するテーブル。
+科目要件の基本情報を管理するテーブル。年度、学部、科目の組み合わせごとに1レコードが作成される。
 
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
-| program_id | INTEGER | NO | プログラムID（主キー） | システム生成 |
-| program_name | TEXT | NO | プログラム名 | シラバス検索画面 |
+| requirement_header_id | INTEGER | NO | 要件ヘッダーID（主キー） | システム生成 |
+| requirement_year | INTEGER | NO | 要項年 | 履修要綱 |
+| faculty_id | INTEGER | NO | 要項学部・課程 | 履修要綱 |
+| subject_name_id | INTEGER | NO | 科目名ID | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
-| PRIMARY KEY | program_id | 主キー |
-| idx_program_name | program_name | プログラム名での検索用 |
+| PRIMARY KEY | requirement_header_id | 主キー |
+| UNIQUE | (requirement_year, faculty_id, subject_name_id) | 年度・学部・科目の一意性 |
+| idx_requirement_header_faculty | faculty_id | 学部IDでの検索用 |
+| idx_requirement_header_subject | subject_name_id | 科目名IDでの検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| faculty_id | faculty(faculty_id) | RESTRICT |
+| subject_name_id | subject_name(subject_name_id) | RESTRICT |
+
+[目次へ戻る](#目次)
+
+### requirement_attribute 科目要件属性
+
+#### テーブル概要
+科目要件の属性名を管理するマスターテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| requirement_attribute_id | INTEGER | NO | 属性ID（主キー） | システム生成 |
+| name | TEXT | NO | 属性名 | システム定義 |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | requirement_attribute_id | 主キー |
+| UNIQUE | name | 属性名の一意性 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -546,53 +577,18 @@ periodは"0"とする.
 
 [目次へ戻る](#目次)
 
-### subject_program 科目学習プログラム関連
+### requirement 科目要件値
 
 #### テーブル概要
-科目と学習プログラムの関連を管理する中間テーブル。1つの科目が複数の学習プログラムに属する場合に対応。
+科目要件の属性値を管理するテーブル。EAVパターンを使用して、柔軟な属性値の管理を実現。
 
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
-| id | INTEGER | NO | ID（主キー） | システム生成 |
-| requirement_id | INTEGER | NO | 要綱番号（外部キー） | 履修要綱 |
-| program_id | INTEGER | NO | プログラムID（外部キー） | 履修要綱 |
-| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | id | 主キー |
-| idx_subject_program_requirement | requirement_id | 要綱番号での検索用 |
-| idx_subject_program_program | program_id | プログラムIDでの検索用 |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| requirement_id | requirement(requirement_id) | CASCADE |
-| program_id | program(program_id) | CASCADE |
-
-[目次へ戻る](#目次)
-
-### requirement 科目要件属性
-
-#### テーブル概要
-履修要綱から取得される科目ごとの履修要件、制限事項、属性、および学習プログラムの関連を管理するテーブル。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| requirement_id | INTEGER | NO | 要綱番号（主キー） | 履修要綱 |
-| requirement_year | INTEGER | NO | 要項年 | 履修要綱 |
-| faculty_id | INTEGER | NO | 要項学部・課程 | 履修要綱 |
-| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | 履修要綱 |
-| requirement_type | TEXT | NO | 必要度（必修/選必/選択） | 履修要綱 |
-| applied_science_available | BOOLEAN | NO | 応用科学課程履修可否 | 履修要綱 |
-| graduation_credit_limit | BOOLEAN | NO | 卒業要件単位認定上限の有無 | 履修要綱 |
-| year_restriction | BOOLEAN | NO | 配当年次制限の有無 | 履修要綱 |
-| first_year_only | BOOLEAN | NO | 低学年制限_1年目のみの有無 | 履修要綱 |
-| up_to_second_year | BOOLEAN | NO | 低学年制限_2年目までの有無 | 履修要綱 |
-| guidance_required | BOOLEAN | NO | 履修指導科目の有無 | 履修要綱 |
+| requirement_id | INTEGER | NO | ID（主キー） | システム生成 |
+| requirement_header_id | INTEGER | NO | 要件ヘッダーID（外部キー） | 履修要綱 |
+| requirement_attribute_id | INTEGER | NO | 属性ID（外部キー） | 履修要綱 |
+| text | TEXT | NO | 属性値 | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -600,19 +596,14 @@ periodは"0"とする.
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | requirement_id | 主キー |
-| idx_requirement_type | requirement_type | 必要度での検索用 |
-| idx_requirement_restrictions | (applied_science_available, graduation_credit_limit, year_restriction) | 制限条件での検索用 |
-| idx_requirement_subject | subject_name_id | 科目名IDでの検索用 |
+| idx_requirement_header | requirement_header_id | 要件ヘッダーIDでの検索用 |
+| idx_requirement_attribute | requirement_attribute_id | 属性IDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| faculty_id | faculty(faculty_id) | RESTRICT |
-| subject_name_id | subject_name(subject_name_id) | RESTRICT |
-
-**** 補足
-- 本来は複合キー(syllabus_code, syllabus_year, faculty_id, class_note)
-だが, class_noteにNULLがあるため、サロゲートキー(id)を使用
+| requirement_header_id | requirement_header(requirement_header_id) | CASCADE |
+| requirement_attribute_id | requirement_attribute(requirement_attribute_id) | RESTRICT |
 
 [目次へ戻る](#目次)
 

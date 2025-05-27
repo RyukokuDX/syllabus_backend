@@ -224,47 +224,44 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_type ON grading_criterion(criteria_type);
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(syllabus_code);
 
--- program（学修プログラム）
-CREATE TABLE IF NOT EXISTS program (
-    program_id INTEGER PRIMARY KEY,
-    program_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
+-- 削除: programテーブルとsubject_programテーブル
+DROP TABLE IF EXISTS subject_program;
+DROP TABLE IF EXISTS program;
 
-CREATE INDEX IF NOT EXISTS idx_program_name ON program(program_name);
+-- 削除: 古いrequirementテーブル
+DROP TABLE IF EXISTS requirement;
 
--- requirement（科目要件属性）
-CREATE TABLE IF NOT EXISTS requirement (
-    requirement_id INTEGER PRIMARY KEY,
+-- 追加: 新しい要件テーブル
+CREATE TABLE IF NOT EXISTS requirement_header (
+    requirement_header_id INTEGER PRIMARY KEY,
     requirement_year INTEGER NOT NULL,
-    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id),
-    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id),
-    requirement_type TEXT NOT NULL,
-    applied_science_available BOOLEAN NOT NULL,
-    graduation_credit_limit BOOLEAN NOT NULL,
-    year_restriction BOOLEAN NOT NULL,
-    first_year_only BOOLEAN NOT NULL,
-    up_to_second_year BOOLEAN NOT NULL,
-    guidance_required BOOLEAN NOT NULL,
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE RESTRICT,
+    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(requirement_year, faculty_id, subject_name_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_requirement_type ON requirement(requirement_type);
-CREATE INDEX IF NOT EXISTS idx_requirement_restrictions ON requirement(applied_science_available, graduation_credit_limit, year_restriction);
-CREATE INDEX IF NOT EXISTS idx_requirement_subject ON requirement(subject_name_id);
+CREATE INDEX IF NOT EXISTS idx_requirement_header_faculty ON requirement_header(faculty_id);
+CREATE INDEX IF NOT EXISTS idx_requirement_header_subject ON requirement_header(subject_name_id);
 
--- subject_program（科目-学習プログラム関連）
-CREATE TABLE IF NOT EXISTS subject_program (
-    id INTEGER PRIMARY KEY,
-    requirement_id INTEGER NOT NULL REFERENCES requirement(requirement_id) ON DELETE CASCADE,
-    program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS requirement_attribute (
+    requirement_attribute_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_subject_program_requirement ON subject_program(requirement_id);
-CREATE INDEX IF NOT EXISTS idx_subject_program_program ON subject_program(program_id);
+CREATE TABLE IF NOT EXISTS requirement (
+    requirement_id INTEGER PRIMARY KEY,
+    requirement_header_id INTEGER NOT NULL REFERENCES requirement_header(requirement_header_id) ON DELETE CASCADE,
+    requirement_attribute_id INTEGER NOT NULL REFERENCES requirement_attribute(requirement_attribute_id) ON DELETE RESTRICT,
+    text TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_requirement_header ON requirement(requirement_header_id);
+CREATE INDEX IF NOT EXISTS idx_requirement_attribute ON requirement(requirement_attribute_id);
 
 -- syllabus_eligible_grade（シラバス履修可能学年）
 CREATE TABLE IF NOT EXISTS syllabus_eligible_grade (
