@@ -62,15 +62,15 @@ def parse_enrollment_years(note: str) -> List[int]:
     
     return years
 
-def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[List[Dict], List[Dict], List[Dict], List[Dict], List[Dict], List[Dict]]:
+def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[List[Dict], List[Dict], List[Dict], List[Dict], List[Dict], List[Dict], List[Dict]]:
     """CSVファイルを解析して各データを抽出
     Args:
         file_path (str): CSVファイルのパス
         logger (logging.Logger): ロガー
         year (int): 処理対象の年度
     Returns:
-        Tuple[List[Dict], List[Dict], List[Dict], List[Dict], List[Dict], List[Dict]]: 
-            科目区分、科目小区分、科目区分の備考、科目名、履修可能学年、入学年度制限のリスト
+        Tuple[List[Dict], List[Dict], List[Dict], List[Dict], List[Dict], List[Dict], List[Dict]]: 
+            科目区分、科目小区分、科目区分の備考、科目名、履修可能学年、入学年度制限、学部のリスト
     """
     class_entries = []
     subclass_entries = []
@@ -78,11 +78,13 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
     subject_name_entries = []
     syllabus_eligible_grade_entries = []
     syllabus_enrollment_year_entries = []
+    faculty_entries = []
 
     seen_classes = set()
     seen_subclasses = set()
     seen_class_notes = set()
     seen_subject_names = set()
+    seen_faculties = set()
 
     def is_subclass_name(name: str) -> bool:
         """科目小区分かどうかを判定"""
@@ -187,7 +189,14 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
                     })
                     logger.info(f"履修可能学年を追加: 学部{grade}年")
 
-    return class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_enrollment_year_entries
+            # 学部の処理
+            faculty = row.get("学部", "").strip()
+            if faculty and faculty not in seen_faculties:
+                faculty_entries.append({"faculty_name": faculty})
+                seen_faculties.add(faculty)
+                logger.info(f"学部を追加: {faculty}")
+
+    return class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_enrollment_year_entries, faculty_entries
 
 def save_json(data: List[Dict], data_type: str, year: int, logger: logging.Logger) -> None:
     """データをJSONファイルとして保存"""
@@ -213,7 +222,7 @@ def process_syllabus_list_data(year: int) -> None:
         return
 
     try:
-        class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_enrollment_year_entries = parse_csv_file(input_file, logger, year)
+        class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_enrollment_year_entries, faculty_entries = parse_csv_file(input_file, logger, year)
 
         # 各データをJSONファイルとして保存
         save_json(class_entries, "class", year, logger)
@@ -222,6 +231,7 @@ def process_syllabus_list_data(year: int) -> None:
         save_json(subject_name_entries, "subject_name", year, logger)
         save_json(syllabus_eligible_grade_entries, "syllabus_eligible_grade", year, logger)
         save_json(syllabus_enrollment_year_entries, "syllabus_enrollment_year", year, logger)
+        save_json(faculty_entries, "faculty", year, logger)
 
         # 処理結果のサマリーを標準出力に表示
         print("\n処理結果サマリー:")
@@ -231,6 +241,7 @@ def process_syllabus_list_data(year: int) -> None:
         print(f"科目名: {len(subject_name_entries)}件")
         print(f"履修可能学年: {len(syllabus_eligible_grade_entries)}件")
         print(f"入学年度制限: {len(syllabus_enrollment_year_entries)}件")
+        print(f"学部: {len(faculty_entries)}件")
         print("処理が正常に完了しました")
 
         # 処理結果のログを出力
@@ -241,6 +252,7 @@ def process_syllabus_list_data(year: int) -> None:
         logger.info(f"科目名: {len(subject_name_entries)}件")
         logger.info(f"履修可能学年: {len(syllabus_eligible_grade_entries)}件")
         logger.info(f"入学年度制限: {len(syllabus_enrollment_year_entries)}件")
+        logger.info(f"学部: {len(faculty_entries)}件")
         logger.info("処理が正常に完了しました")
 
     except Exception as e:
