@@ -4,6 +4,7 @@ import json
 import sys
 import csv
 import logging
+import re
 from datetime import datetime
 
 def setup_logger(year: int) -> logging.Logger:
@@ -49,6 +50,16 @@ def parse_csv_file(file_path: str, logger: logging.Logger) -> Tuple[List[Dict], 
         """科目小区分かどうかを判定"""
         return any(name.endswith(suffix) for suffix in ["系", "コース", "分野", "専攻"])
 
+    def is_enrollment_note(note: str) -> bool:
+        """年度入学生に関する情報かどうかを判定"""
+        patterns = [
+            r'\d{4}年度(以降|以前)?入学生',
+            r'\d{4}年(以降|以前)?入学生',
+            r'[０-９]{4}年度(以降|以前)?入学生',
+            r'[０-９]{4}年(以降|以前)?入学生'
+        ]
+        return any(re.search(pattern, note) for pattern in patterns)
+
     with open(file_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -60,11 +71,13 @@ def parse_csv_file(file_path: str, logger: logging.Logger) -> Tuple[List[Dict], 
                     class_note = attribute.split("：")[0].strip()
                     attribute = attribute.split("：")[1].strip()
                     if class_note and class_note not in seen_class_notes:
-                        # 学年指定が含まれている場合はclass_noteとして登録しない
-                        if "年度入学生" not in class_note:
+                        # 年度入学生に関する情報は除外
+                        if not is_enrollment_note(class_note):
                             class_note_entries.append({"class_note": class_note})
                             seen_class_notes.add(class_note)
                             logger.info(f"科目区分の備考を追加: {class_note}")
+                        else:
+                            logger.info(f"年度入学生に関する情報を除外: {class_note}")
 
                 # 「・」がある場合は右をsubclass、左をclass
                 if "・" in attribute:

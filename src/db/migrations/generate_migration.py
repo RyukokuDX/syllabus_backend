@@ -33,7 +33,10 @@ def read_json_files(directory, table_name):
                 # テーブル名に応じた配列名を取得
                 array_name = {
                     'class': 'classes',
-                    'subclass': 'subclasses'
+                    'subclass': 'subclasses',
+                    'class_note': 'class_notes',
+                    'subject_name': 'subject_names',
+                    'faculty': 'faculties'
                 }.get(table_name, f"{table_name}s")
                 
                 if array_name in json_data:
@@ -381,9 +384,6 @@ def generate_migration():
         # プロジェクトルートからの相対パス
         project_root = Path(__file__).parent.parent.parent.parent
         
-        # テーブル定義を生成
-        table_definitions = generate_table_definitions()
-        
         # 処理対象のディレクトリとテーブル名のマッピング
         targets = [
             {
@@ -469,11 +469,6 @@ def generate_migration():
         
         # 現在のタイムスタンプを取得
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        
-        # テーブル定義を含むSQLファイルを生成
-        init_sql_path = project_root / 'docker' / 'postgresql' / 'init' / '02-init.sql'
-        with open(init_sql_path, 'w', encoding='utf-8') as f:
-            f.write(table_definitions)
         
         # 各テーブルのデータ挿入用SQLを生成
         for target in targets:
