@@ -77,7 +77,7 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
     class_note_entries = []
     subject_name_entries = []
     syllabus_eligible_grade_entries = []
-    syllabus_enrollment_year_entries = []
+    syllabus_faculty_enrollment_entries = []
     faculty_entries = []
 
     seen_classes = set()
@@ -85,6 +85,7 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
     seen_class_notes = set()
     seen_subject_names = set()
     seen_faculties = set()
+    faculty_id_map = {}  # 学部名からIDへのマッピング
 
     def is_subclass_name(name: str) -> bool:
         """科目小区分かどうかを判定"""
@@ -101,7 +102,7 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
                     class_note = attribute.split("：")[0].strip()
                     attribute = attribute.split("：")[1].strip()
                     if class_note and class_note not in seen_class_notes:
-                        # 学年指定が含まれている場合はclass_noteとして登録せず、syllabus_enrollment_yearに追加
+                        # 学年指定が含まれている場合はclass_noteとして登録せず、syllabus_faculty_enrollmentに追加
                         if "年度入学生" in class_note:
                             # 全角数字を半角数字に変換
                             class_note = convert_fullwidth_to_halfwidth(class_note)
@@ -110,17 +111,23 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
                                 start_year = int(class_note.split("～")[0].replace("年度入学生", "").replace("年度", "").strip())
                                 end_year = int(class_note.split("～")[1].replace("年度入学生", "").replace("年度", "").strip())
                                 for year in range(start_year, end_year + 1):
-                                    syllabus_enrollment_year_entries.append({
+                                    syllabus_faculty_enrollment_entries.append({
                                         "syllabus_code": row["シラバス管理番号"],
-                                        "enrollment_year": year
+                                        "enrollment_year": year,
+                                        "syllabus_year": year,
+                                        "faculty_id": faculty_id_map.get(row.get("学部", "").strip(), 1),  # デフォルトは1
+                                        "created_at": datetime.now().isoformat()
                                     })
                                     logger.info(f"入学年度制限を追加: {year}年度")
                             # 単一年度の処理（例：２０１５年度入学生）
                             else:
                                 year = int(class_note.replace("年度入学生", "").replace("年度", "").strip())
-                                syllabus_enrollment_year_entries.append({
+                                syllabus_faculty_enrollment_entries.append({
                                     "syllabus_code": row["シラバス管理番号"],
-                                    "enrollment_year": year
+                                    "enrollment_year": year,
+                                    "syllabus_year": year,
+                                    "faculty_id": faculty_id_map.get(row.get("学部", "").strip(), 1),  # デフォルトは1
+                                    "created_at": datetime.now().isoformat()
                                 })
                                 logger.info(f"入学年度制限を追加: {year}年度")
                         else:
@@ -176,7 +183,8 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
                         syllabus_eligible_grade_entries.append({
                             "syllabus_code": row["シラバス管理番号"],
                             "syllabus_year": year,
-                            "grade": f"学部{g}年"
+                            "grade": f"学部{g}年",
+                            "created_at": datetime.now().isoformat()
                         })
                         logger.info(f"履修可能学年を追加: 学部{g}年")
                 # 単一年度の処理（例：「1年次」）
@@ -185,18 +193,21 @@ def parse_csv_file(file_path: str, logger: logging.Logger, year: int) -> Tuple[L
                     syllabus_eligible_grade_entries.append({
                         "syllabus_code": row["シラバス管理番号"],
                         "syllabus_year": year,
-                        "grade": f"学部{grade}年"
+                        "grade": f"学部{grade}年",
+                        "created_at": datetime.now().isoformat()
                     })
                     logger.info(f"履修可能学年を追加: 学部{grade}年")
 
             # 学部の処理
             faculty = row.get("学部", "").strip()
             if faculty and faculty not in seen_faculties:
+                faculty_id = len(faculty_entries) + 1  # 連番でIDを生成
                 faculty_entries.append({"faculty_name": faculty})
+                faculty_id_map[faculty] = faculty_id
                 seen_faculties.add(faculty)
                 logger.info(f"学部を追加: {faculty}")
 
-    return class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_enrollment_year_entries, faculty_entries
+    return class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_faculty_enrollment_entries, faculty_entries
 
 def save_json(data: List[Dict], data_type: str, year: int, logger: logging.Logger) -> None:
     """データをJSONファイルとして保存"""
@@ -222,7 +233,7 @@ def process_syllabus_list_data(year: int) -> None:
         return
 
     try:
-        class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_enrollment_year_entries, faculty_entries = parse_csv_file(input_file, logger, year)
+        class_entries, subclass_entries, class_note_entries, subject_name_entries, syllabus_eligible_grade_entries, syllabus_faculty_enrollment_entries, faculty_entries = parse_csv_file(input_file, logger, year)
 
         # 各データをJSONファイルとして保存
         save_json(class_entries, "class", year, logger)
@@ -230,7 +241,7 @@ def process_syllabus_list_data(year: int) -> None:
         save_json(class_note_entries, "class_note", year, logger)
         save_json(subject_name_entries, "subject_name", year, logger)
         save_json(syllabus_eligible_grade_entries, "syllabus_eligible_grade", year, logger)
-        save_json(syllabus_enrollment_year_entries, "syllabus_enrollment_year", year, logger)
+        save_json(syllabus_faculty_enrollment_entries, "syllabus_faculty_enrollment", year, logger)
         save_json(faculty_entries, "faculty", year, logger)
 
         # 処理結果のサマリーを標準出力に表示
@@ -240,7 +251,7 @@ def process_syllabus_list_data(year: int) -> None:
         print(f"科目区分の備考: {len(class_note_entries)}件")
         print(f"科目名: {len(subject_name_entries)}件")
         print(f"履修可能学年: {len(syllabus_eligible_grade_entries)}件")
-        print(f"入学年度制限: {len(syllabus_enrollment_year_entries)}件")
+        print(f"入学年度制限: {len(syllabus_faculty_enrollment_entries)}件")
         print(f"学部: {len(faculty_entries)}件")
         print("処理が正常に完了しました")
 
@@ -251,7 +262,7 @@ def process_syllabus_list_data(year: int) -> None:
         logger.info(f"科目区分の備考: {len(class_note_entries)}件")
         logger.info(f"科目名: {len(subject_name_entries)}件")
         logger.info(f"履修可能学年: {len(syllabus_eligible_grade_entries)}件")
-        logger.info(f"入学年度制限: {len(syllabus_enrollment_year_entries)}件")
+        logger.info(f"入学年度制限: {len(syllabus_faculty_enrollment_entries)}件")
         logger.info(f"学部: {len(faculty_entries)}件")
         logger.info("処理が正常に完了しました")
 
