@@ -1,7 +1,45 @@
-# シラバスバックエンド
+# Syllabus Backend
 
 ## 概要
-シラバス情報を管理するバックエンドシステム
+シラバス情報を管理するバックエンドシステム。Web Syllabusから取得したシラバス情報をデータベースに格納し、APIを通じて提供します。
+
+### 主な機能
+- Web Syllabusからのシラバス情報の取得と保存
+- シラバス情報の検索・参照APIの提供
+- データベースの自動更新とバックアップ
+- 複数年度のシラバス情報の管理
+
+### システム構成
+- バックエンド: FastAPI (Python 3.11)
+  - APIサーバー
+  - バッチ処理（Pythonスクリプト）
+  - 監視・ログ（Docker logs）
+- データベース: PostgreSQL
+  - データベースサーバー
+  - バックアップ
+- コンテナ化: Docker
+  - コンテナ管理
+  - 環境分離
+
+### 開発環境
+- バックエンド開発
+  - Python 3.11
+  - FastAPI
+  - 仮想環境（venv）
+- データベース開発
+  - PostgreSQL
+  - SQLite（開発用）
+- コンテナ開発
+  - Docker
+  - docker-compose
+- ログ管理
+  - ログディレクトリ（log/）
+  - ログローテーション
+
+### 運用環境
+- VPN内のサーバーで運用
+- 手動デプロイによる更新
+- バックアップはVPN内のストレージに保存
 
 ## ディレクトリ構造
 ```
@@ -12,10 +50,7 @@
 ├── docs/                    # ドキュメント
 │   ├── database/           # データベース関連
 │   ├── python/             # Python関連
-│   ├── docker/             # Docker関連
-│   ├── githelp.md          # Git操作ガイド
-│   ├── cursor.md           # Cursorへの指示
-│   └── doc.md              # ドキュメント
+│   └── docker/             # Docker関連
 ├── docker/                  # Docker関連
 │   ├── postgresql/         # PostgreSQL設定
 │   │   ├── init/          # 初期化スクリプト
@@ -37,14 +72,12 @@
 │   ├── course_guide/       # 要項関連
 │   ├── syllabus/           # シラバス関連
 │   └── __init__.py         # パッケージ定義
+├── python/                  # Pythonスクリプト
+├── log/                     # ログファイル
 ├── updates/                 # 更新用ファイル
+├── init.sql.template       # データベース初期化テンプレート
 └── README.md               # 本ドキュメント
 ```
-
-## 開発環境
-- Python 3.11
-- SQLite 3
-- FastAPI
 
 ## セットアップ
 1. リポジトリのクローン
@@ -67,6 +100,9 @@ pip install -r requirements.txt
 
 4. データベースの初期化
 ```bash
+# init.sql.templateをコピーしてinit.sqlを作成
+cp init.sql.template init.sql
+# データベースの初期化
 python src/db/init_db.py
 ```
 
@@ -74,8 +110,26 @@ python src/db/init_db.py
 - [データベース設計ポリシー](docs/database/policy.md)
 - [API仕様](docs/api/openapi.yaml)
 - [データベース構造定義](docs/database/structure.md)
-- [Git操作ガイド](docs/githelp.md)
-- [Cursorへの指示](docs/cursor.md)
 
 ## ライセンス
 MIT License
+
+## ドキュメント
+
+### データベース関連
+- [ER図](docs/database/er.md) - データベースのER図
+- [設計ポリシー](docs/database/policy.md) - データベース設計のポリシー
+- [構造定義](docs/database/structure.md) - データベースの構造定義
+
+### Docker関連
+- [Docker基本](docs/docker/docker.md) - Dockerの基本設定と使用方法
+- [PostgreSQL](docs/docker/postgresql.md) - PostgreSQLの設定と使用方法
+- [FastAPI](docs/docker/fastapi.md) - FastAPIの設定と使用方法
+
+### Python関連
+- [モデル定義](docs/python/models.md) - データベースモデルの定義
+- [マイグレーション生成](docs/python/generate_migration.py.md) - マイグレーションファイルの生成方法
+- [手動マイグレーション](docs/python/manual_migrate.md) - 手動マイグレーションの手順
+
+### その他
+- [ドキュメント作成ガイド](docs/doc.md) - ドキュメント作成のガイドライン

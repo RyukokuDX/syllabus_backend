@@ -1,0 +1,35 @@
+CREATE TABLE syllabus (
+    syllabus_code TEXT NOT NULL,
+    subject_name_id INTEGER NOT NULL,
+    subtitle TEXT,
+    term TEXT NOT NULL,
+    campus TEXT NOT NULL,
+    credits INTEGER NOT NULL,
+    summary TEXT,
+    goals TEXT,
+    methods TEXT,
+    outside_study TEXT,
+    notes TEXT,
+    remarks TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    PRIMARY KEY (syllabus_code),
+    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
+    INDEX idx_syllabus_term (term),
+    INDEX idx_syllabus_campus (campus),
+    INDEX idx_syllabus_subject_name (subject_name_id)
+);
+
+CREATE TABLE syllabus_grade (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    syllabus_code TEXT NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    grade TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
+    UNIQUE KEY uix_syllabus_grade (syllabus_code, syllabus_year, grade),
+    INDEX idx_syllabus_grade_syllabus (syllabus_code),
+    INDEX idx_syllabus_grade_grade (grade)
+); 

@@ -14,50 +14,60 @@
 ```mermaid
 erDiagram
 
-    %% 独立テーブル
-    subject_name {
-        INTEGER subject_name_id PK
-        TEXT name
-    }
-    faculty {
-        INTEGER faculty_id PK
-        TEXT faculty_name
-    }
+    %% マスターテーブル
     class {
         INTEGER class_id PK
         TEXT class_name
+        TIMESTAMP created_at
     }
     subclass {
         INTEGER subclass_id PK
         TEXT subclass_name
+        TIMESTAMP created_at
     }
-    class_note {
-        INTEGER class_note_id PK
-        TEXT class_note
+    faculty {
+        INTEGER faculty_id PK
+        TEXT faculty_name
+        TIMESTAMP created_at
+    }
+    subject_name {
+        INTEGER subject_name_id PK
+        TEXT name
+        TIMESTAMP created_at
     }
     instructor {
-        TEXT instructor_code PK
+        INTEGER instructor_id PK
+        TEXT instructor_code
         TEXT last_name
         TEXT first_name
         TEXT last_name_kana
         TEXT first_name_kana
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
     book {
         INTEGER book_id PK
         TEXT title
+        TEXT publisher
+        INTEGER price
         TEXT isbn
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
     book_author {
         INTEGER book_author_id PK
         INTEGER book_id FK
         TEXT author_name
+        TIMESTAMP created_at
     }
-    program {
-        INTEGER program_id PK
-        TEXT program_name
+    subject_attribute {
+        INTEGER attribute_id PK
+        TEXT attribute_name
+        TEXT description
+        TIMESTAMP created_at
     }
 
-    %% 基本テーブル
+    %% トランザクションテーブル
     syllabus {
         TEXT syllabus_code PK
         INTEGER subject_name_id FK
@@ -74,30 +84,12 @@ erDiagram
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
-    subject {
+    subject_grade {
         INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER syllabus_year
-        INTEGER faculty_id FK
-        INTEGER class_id FK
-        INTEGER subclass_id FK
-        INTEGER class_note_id FK
-        TEXT lecture_code
-    }
-
-    %% 関連テーブル
-    syllabus_eligible_grade {
-        INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER syllabus_year
+        INTEGER subject_id FK
         TEXT grade
-    }
-    syllabus_faculty_enrollment {
-        INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER enrollment_year
-        INTEGER syllabus_year
-        INTEGER faculty_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
     lecture_session {
         INTEGER id PK
@@ -105,63 +97,86 @@ erDiagram
         INTEGER syllabus_year
         TEXT day_of_week
         TINYINT period
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
     syllabus_instructor {
         INTEGER id PK
         TEXT syllabus_code FK
-        TEXT instructor_code FK
+        INTEGER instructor_id FK
+        TIMESTAMP created_at
     }
     syllabus_book {
         INTEGER id PK
         TEXT syllabus_code FK
         INTEGER book_id FK
-        TINYINT role
+        TEXT role
+        TEXT note
+        TIMESTAMP created_at
     }
     grading_criterion {
         INTEGER id PK
         TEXT syllabus_code FK
         TEXT criteria_type
         INTEGER ratio
+        TEXT note
+        TIMESTAMP created_at
     }
-    requirement {
-        INTEGER requirement_id PK
-        INTEGER requirement_year
-        INTEGER faculty_id FK
+
+    %% 基本テーブル
+    subject {
+        INTEGER subject_id PK
         INTEGER subject_name_id FK
-        TEXT requirement_type
+        INTEGER faculty_id FK
+        INTEGER class_id FK
+        INTEGER subclass_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
-    subject_program {
+
+    %% 関連テーブル
+    subject_syllabus {
         INTEGER id PK
-        INTEGER requirement_id FK
-        INTEGER program_id FK
+        INTEGER subject_id FK
+        TEXT syllabus_code FK
+        INTEGER syllabus_year
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    subject_attribute_value {
+        INTEGER id PK
+        INTEGER subject_id FK
+        INTEGER attribute_id FK
+        TEXT value
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     %% 関連の定義
-    %% 独立テーブル → 基本テーブル
-    subject_name ||--o{ syllabus : "subject_name_id"
-    faculty }o--|| subject : "faculty_id"
-    class }o--|| subject : "class_id"
+    %% マスターテーブル → 基本テーブル
+    subject_name ||--o{ subject : "subject_name_id"
+    faculty ||--o{ subject : "faculty_id"
+    class ||--o{ subject : "class_id"
     subclass }o--o| subject : "subclass_id"
-    class_note }o--o| subject : "class_note_id"
+
+    %% マスターテーブル → トランザクションテーブル
+    subject_name ||--o{ syllabus : "subject_name_id"
+    instructor ||--o{ syllabus_instructor : "instructor_id"
+    book ||--o{ syllabus_book : "book_id"
+    book ||--o{ book_author : "book_id"
+    subject_attribute ||--o{ subject_attribute_value : "attribute_id"
 
     %% 基本テーブル → 関連テーブル
-    syllabus ||--o{ syllabus_eligible_grade : "syllabus_code"
-    syllabus ||--o{ syllabus_faculty_enrollment : "syllabus_code"
+    subject ||--o{ subject_grade : "subject_id"
+    subject ||--o{ subject_syllabus : "subject_id"
+    subject ||--o{ subject_attribute_value : "subject_id"
+
+    %% トランザクションテーブル → 関連テーブル
     syllabus ||--o{ lecture_session : "syllabus_code"
     syllabus ||--o{ syllabus_instructor : "syllabus_code"
     syllabus ||--o{ syllabus_book : "syllabus_code"
     syllabus ||--o{ grading_criterion : "syllabus_code"
-    subject ||--|| syllabus : "syllabus_code"
-
-    %% 関連テーブルの外部キー
-    syllabus_instructor }o--|| instructor : "instructor_code"
-    syllabus_book }o--|| book : "book_id"
-    program ||--o{ subject_program : "program_id"
-    requirement ||--o{ subject_program : "requirement_id"
-    requirement }o--|| faculty : "faculty_id"
-    requirement }o--|| subject_name : "subject_name_id"
-    book ||--o{ book_author : "book_id"
-    faculty }o--|| syllabus_faculty_enrollment : "faculty_id"
+    syllabus ||--o{ subject_syllabus : "syllabus_code"
 ```
 
 ## 更新履歴
@@ -181,7 +196,9 @@ erDiagram
 | 2024-05-21 | 1.1.9 | 藤原 | subjectテーブルにサロゲートキーを追加、syllabusテーブルとの関連を整理 |
 | 2024-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をidに変更、syllabusテーブルからyearカラムを移動 |
 | 2024-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
-| 2024-05-21 | 1.1.12 | 藤原 | ER図の凡例を追加、関連の説明を明確化 |
-| 2024-05-21 | 1.1.13 | 藤原 | syllabus_enrollment_yearテーブルにsyllabus_yearとfaculty_idカラムを追加、関連を更新 |
+| 2024-05-21 | 1.1.12 | 藤原 | syllabusテーブルの履修可能学年フィールドをビットマスク方式に変更、パフォーマンスと拡張性を改善 |
+| 2024-05-21 | 1.1.13 | 藤原 | requirementテーブルをEAVパターンに変更、programテーブルとsubject_programテーブルを削除 |
+| 2024-05-29 | 1.1.14 | 藤原 | マスターテーブルのタイムスタンプカラムを整理、instructorテーブルの主キーをinstructor_idに変更 |
+| 2024-05-29 | 1.1.15 | 藤原 | syllabus_bookテーブルのroleカラムをTEXT型に変更、subject_syllabusテーブルからlecture_codeを削除 |
 
 [目次へ戻る](#目次) 

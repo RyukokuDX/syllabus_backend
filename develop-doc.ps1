@@ -1,3 +1,5 @@
+#!/usr/bin/env pwsh
+
 # PowerShellスクリプトの実行ポリシーを確認
 $executionPolicy = Get-ExecutionPolicy
 if ($executionPolicy -eq "Restricted") {
@@ -39,7 +41,6 @@ try {
         throw "developブランチとの差分の取得に失敗しました"
     }
 
-    # データベースドキュメントの変更を抽出
     $databaseDocs = $changedFiles | Where-Object { $_ -match "^docs/database/.*\.md$" }
 
     if (-not $databaseDocs) {
@@ -47,23 +48,8 @@ try {
         exit 0
     }
 
-    # ファイルの存在確認
-    $existingDocs = @()
-    foreach ($file in $databaseDocs) {
-        if (Test-Path $file) {
-            $existingDocs += $file
-        } else {
-            Write-Host "警告: ファイルが存在しません: $file"
-        }
-    }
-
-    if (-not $existingDocs) {
-        Write-Host "マージ可能なファイルが見つかりません"
-        exit 0
-    }
-
     Write-Host "`nマージ対象のファイル:"
-    $existingDocs | ForEach-Object { Write-Host "- $_" }
+    $databaseDocs | ForEach-Object { Write-Host "- $_" }
 
     # 確認プロンプト
     $confirmation = Read-Host "`nこれらのファイルをdevelopブランチにマージしますか？ (y/N)"
@@ -81,7 +67,7 @@ try {
 
     # 変更をマージ
     Write-Host "`nファイルをマージ中..."
-    foreach ($file in $existingDocs) {
+    foreach ($file in $databaseDocs) {
         git checkout $currentBranch -- $file
         if (-not $?) {
             throw "ファイルのマージに失敗しました: $file"
@@ -92,7 +78,7 @@ try {
     # 変更をコミット
     $commitMessage = "docs: データベース設計ドキュメントの更新"
     Write-Host "`n変更をコミット中..."
-    git add $existingDocs
+    git add $databaseDocs
     if (-not $?) {
         throw "ファイルのステージングに失敗しました"
     }
