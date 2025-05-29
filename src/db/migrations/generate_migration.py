@@ -142,61 +142,70 @@ def generate_table_definitions():
     table_definitions = {
         'class': """
 CREATE TABLE IF NOT EXISTS class (
-    class_id SERIAL PRIMARY KEY,
+    class_id INTEGER PRIMARY KEY,
     class_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'subclass': """
 CREATE TABLE IF NOT EXISTS subclass (
-    subclass_id SERIAL PRIMARY KEY,
+    subclass_id INTEGER PRIMARY KEY,
     subclass_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);""",
-        'class_note': """
-CREATE TABLE IF NOT EXISTS class_note (
-    class_note_id SERIAL PRIMARY KEY,
-    class_note TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);""",
-        'subject_name': """
-CREATE TABLE IF NOT EXISTS subject_name (
-    subject_name_id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'faculty': """
 CREATE TABLE IF NOT EXISTS faculty (
-    faculty_id SERIAL PRIMARY KEY,
+    faculty_id INTEGER PRIMARY KEY,
     faculty_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);""",
+        'subject_name': """
+CREATE TABLE IF NOT EXISTS subject_name (
+    subject_name_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'subject': """
 CREATE TABLE IF NOT EXISTS subject (
-    id INTEGER PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    syllabus_year INTEGER NOT NULL,
-    faculty_id INTEGER NOT NULL,
-    class_id INTEGER NOT NULL,
-    subclass_id INTEGER,
-    class_note_id INTEGER,
-    lecture_code TEXT,
+    subject_id INTEGER PRIMARY KEY,
+    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id),
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id),
+    class_id INTEGER NOT NULL REFERENCES class(class_id),
+    subclass_id INTEGER REFERENCES subclass(subclass_id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code),
-    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id),
-    FOREIGN KEY (class_id) REFERENCES class(class_id),
-    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id),
-    FOREIGN KEY (class_note_id) REFERENCES class_note(class_note_id),
-    UNIQUE(syllabus_code, syllabus_year, faculty_id, class_id, subclass_id, class_note_id)
+    UNIQUE(subject_name_id, faculty_id, class_id, subclass_id)
+);""",
+        'subject_syllabus': """
+CREATE TABLE IF NOT EXISTS subject_syllabus (
+    id INTEGER PRIMARY KEY,
+    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
+    syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code) ON DELETE RESTRICT,
+    syllabus_year INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(subject_id, syllabus_year)
+);""",
+        'subject_attribute': """
+CREATE TABLE IF NOT EXISTS subject_attribute (
+    attribute_id INTEGER PRIMARY KEY,
+    attribute_name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);""",
+        'subject_attribute_value': """
+CREATE TABLE IF NOT EXISTS subject_attribute_value (
+    id INTEGER PRIMARY KEY,
+    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
+    attribute_id INTEGER NOT NULL REFERENCES subject_attribute(attribute_id) ON DELETE RESTRICT,
+    value TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(subject_id, attribute_id)
 );""",
         'instructor': """
 CREATE TABLE IF NOT EXISTS instructor (
-    instructor_code TEXT PRIMARY KEY,
+    instructor_id INTEGER PRIMARY KEY,
+    instructor_code TEXT NOT NULL UNIQUE,
     last_name TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name_kana TEXT,
@@ -206,7 +215,7 @@ CREATE TABLE IF NOT EXISTS instructor (
 );""",
         'book': """
 CREATE TABLE IF NOT EXISTS book (
-    book_id SERIAL PRIMARY KEY,
+    book_id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     publisher TEXT,
     price INTEGER,
@@ -216,16 +225,15 @@ CREATE TABLE IF NOT EXISTS book (
 );""",
         'book_author': """
 CREATE TABLE IF NOT EXISTS book_author (
-    book_author_id SERIAL PRIMARY KEY,
-    book_id INTEGER NOT NULL,
+    book_author_id INTEGER PRIMARY KEY,
+    book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
     author_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (book_id) REFERENCES book(book_id) ON DELETE CASCADE
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'syllabus': """
 CREATE TABLE IF NOT EXISTS syllabus (
     syllabus_code TEXT PRIMARY KEY,
-    subject_name_id INTEGER NOT NULL,
+    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
     subtitle TEXT,
     term TEXT NOT NULL,
     campus TEXT NOT NULL,
@@ -237,90 +245,42 @@ CREATE TABLE IF NOT EXISTS syllabus (
     notes TEXT,
     remarks TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT
+    updated_at TIMESTAMP
 );""",
         'lecture_session': """
 CREATE TABLE IF NOT EXISTS lecture_session (
-    id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
+    id INTEGER PRIMARY KEY,
+    syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
     syllabus_year INTEGER NOT NULL,
     day_of_week TEXT NOT NULL,
     period INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE
+    updated_at TIMESTAMP
 );""",
         'syllabus_instructor': """
 CREATE TABLE IF NOT EXISTS syllabus_instructor (
-    id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    instructor_code TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
-    FOREIGN KEY (instructor_code) REFERENCES instructor(instructor_code) ON DELETE CASCADE
+    id INTEGER PRIMARY KEY,
+    syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
+    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'syllabus_book': """
 CREATE TABLE IF NOT EXISTS syllabus_book (
-    id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    book_id INTEGER NOT NULL,
-    role INTEGER NOT NULL,
+    id INTEGER PRIMARY KEY,
+    syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
+    book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
+    role TEXT NOT NULL,
     note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES book(book_id) ON DELETE CASCADE
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'grading_criterion': """
 CREATE TABLE IF NOT EXISTS grading_criterion (
-    id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
+    id INTEGER PRIMARY KEY,
+    syllabus_code TEXT NOT NULL REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
     criteria_type TEXT NOT NULL,
     ratio INTEGER,
     note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE
-);""",
-        'syllabus_faculty_enrollment': """
-CREATE TABLE IF NOT EXISTS syllabus_faculty_enrollment (
-    id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    enrollment_year INTEGER NOT NULL,
-    syllabus_year INTEGER NOT NULL,
-    faculty_id INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (syllabus_code) REFERENCES syllabus(syllabus_code) ON DELETE CASCADE,
-    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE,
-    UNIQUE (syllabus_code, enrollment_year, syllabus_year, faculty_id)
-);""",
-        'requirement_header': """
-CREATE TABLE IF NOT EXISTS requirement_header (
-    requirement_header_id SERIAL PRIMARY KEY,
-    requirement_year INTEGER NOT NULL,
-    faculty_id INTEGER NOT NULL,
-    subject_name_id INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id),
-    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id),
-    UNIQUE (requirement_year, faculty_id, subject_name_id)
-);""",
-        'requirement_attribute': """
-CREATE TABLE IF NOT EXISTS requirement_attribute (
-    requirement_attribute_id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);""",
-        'requirement': """
-CREATE TABLE IF NOT EXISTS requirement (
-    requirement_id SERIAL PRIMARY KEY,
-    requirement_header_id INTEGER NOT NULL,
-    requirement_attribute_id INTEGER NOT NULL,
-    text TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (requirement_header_id) REFERENCES requirement_header(requirement_header_id),
-    FOREIGN KEY (requirement_attribute_id) REFERENCES requirement_attribute(requirement_attribute_id)
 );"""
     }
     
@@ -329,15 +289,20 @@ CREATE TABLE IF NOT EXISTS requirement (
         'subject_name': """
 CREATE UNIQUE INDEX IF NOT EXISTS idx_subject_name ON subject_name(name);""",
         'subject': """
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus ON subject(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_subject_subject_name ON subject(subject_name_id);
 CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
 CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);""",
+        'subject_syllabus': """
+CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
+CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_code);""",
+        'subject_attribute_value': """
+CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
+CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);""",
         'instructor': """
 CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(last_name, first_name);
 CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(last_name_kana, first_name_kana);""",
         'book': """
-CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
-CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);""",
+CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);""",
         'book_author': """
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
 CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);""",
@@ -350,33 +315,43 @@ CREATE INDEX IF NOT EXISTS idx_lecture_session_day_period ON lecture_session(day
 CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_code, syllabus_year);""",
         'syllabus_instructor': """
 CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_syllabus ON syllabus_instructor(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_instructor ON syllabus_instructor(instructor_code);""",
+CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_instructor ON syllabus_instructor(instructor_id);""",
         'syllabus_book': """
 CREATE INDEX IF NOT EXISTS idx_syllabus_book_syllabus ON syllabus_book(syllabus_code);
 CREATE INDEX IF NOT EXISTS idx_syllabus_book_book ON syllabus_book(book_id);""",
         'grading_criterion': """
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_type ON grading_criterion(criteria_type);
-CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(syllabus_code);""",
-        'syllabus_faculty_enrollment': """
-CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_enrollment_syllabus ON syllabus_faculty_enrollment(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_enrollment_faculty ON syllabus_faculty_enrollment(faculty_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_enrollment_syllabus_year ON syllabus_faculty_enrollment(syllabus_year);""",
-        'requirement_header': """
-CREATE INDEX IF NOT EXISTS idx_requirement_header_faculty ON requirement_header(faculty_id);
-CREATE INDEX IF NOT EXISTS idx_requirement_header_subject ON requirement_header(subject_name_id);""",
-        'requirement': """
-CREATE INDEX IF NOT EXISTS idx_requirement_header ON requirement(requirement_header_id);
-CREATE INDEX IF NOT EXISTS idx_requirement_attribute ON requirement(requirement_attribute_id);"""
+CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(syllabus_code);"""
     }
     
-    # テーブル定義とインデックスを結合
     sql = []
-    for table_name in table_definitions.keys():
+    for table_name in table_definitions:
         sql.append(table_definitions[table_name])
         if table_name in index_definitions:
             sql.append(index_definitions[table_name])
     
     return '\n\n'.join(sql)
+
+def move_json_to_registered(json_dir: Path, table_name: str) -> None:
+    """JSONファイルをregisteredディレクトリに移動する"""
+    add_dir = json_dir.parent / 'add'
+    if not add_dir.exists():
+        print(f"No add directory found for {table_name}")
+        return
+
+    # registeredディレクトリが存在しない場合は作成
+    json_dir.mkdir(parents=True, exist_ok=True)
+
+    # addディレクトリ内のJSONファイルを移動
+    for json_file in add_dir.glob('*.json'):
+        try:
+            # 移動先のファイルパスを生成
+            dest_file = json_dir / json_file.name
+            # ファイルを移動
+            json_file.rename(dest_file)
+            print(f"Moved {json_file} to {dest_file}")
+        except Exception as e:
+            print(f"Error moving {json_file}: {str(e)}")
 
 def generate_migration():
     """マイグレーションファイルを生成"""
@@ -387,77 +362,62 @@ def generate_migration():
         # 処理対象のディレクトリとテーブル名のマッピング
         targets = [
             {
-                'json_dir': project_root / 'updates' / 'class' / 'add',
+                'json_dir': project_root / 'updates' / 'class' / 'registered',
                 'table_name': 'class',
                 'source': 'syllabus_search'
             },
             {
-                'json_dir': project_root / 'updates' / 'subclass' / 'add',
+                'json_dir': project_root / 'updates' / 'subclass' / 'registered',
                 'table_name': 'subclass',
                 'source': 'syllabus_search'
             },
             {
-                'json_dir': project_root / 'updates' / 'class_note' / 'add',
-                'table_name': 'class_note',
-                'source': 'syllabus_search'
-            },
-            {
-                'json_dir': project_root / 'updates' / 'subject_name' / 'add',
+                'json_dir': project_root / 'updates' / 'subject_name' / 'registered',
                 'table_name': 'subject_name',
                 'source': 'syllabus_search'
             },
             {
-                'json_dir': project_root / 'updates' / 'subject' / 'add',
+                'json_dir': project_root / 'updates' / 'subject' / 'registered',
                 'table_name': 'subject',
                 'source': 'syllabus_search'
             },
             {
-                'json_dir': project_root / 'updates' / 'faculty' / 'add',
+                'json_dir': project_root / 'updates' / 'faculty' / 'registered',
                 'table_name': 'faculty',
                 'source': 'syllabus_search'
             },
             {
-                'json_dir': project_root / 'updates' / 'instructor' / 'add',
+                'json_dir': project_root / 'updates' / 'instructor' / 'registered',
                 'table_name': 'instructor',
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'criteria' / 'add',
-                'table_name': 'criteria',
-                'source': 'web_syllabus'
-            },
-            {
-                'json_dir': project_root / 'updates' / 'book' / 'add',
+                'json_dir': project_root / 'updates' / 'book' / 'registered',
                 'table_name': 'book',
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'syllabus' / 'add',
+                'json_dir': project_root / 'updates' / 'syllabus' / 'registered',
                 'table_name': 'syllabus',
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'syllabus_faculty_enrollment' / 'add',
-                'table_name': 'syllabus_faculty_enrollment',
-                'source': 'web_syllabus'
-            },
-            {
-                'json_dir': project_root / 'updates' / 'lecture_session' / 'add',
+                'json_dir': project_root / 'updates' / 'lecture_session' / 'registered',
                 'table_name': 'lecture_session',
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'syllabus_instructor' / 'add',
+                'json_dir': project_root / 'updates' / 'syllabus_instructor' / 'registered',
                 'table_name': 'syllabus_instructor',
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'syllabus_book' / 'add',
+                'json_dir': project_root / 'updates' / 'syllabus_book' / 'registered',
                 'table_name': 'syllabus_book',
                 'source': 'web_syllabus'
             },
             {
-                'json_dir': project_root / 'updates' / 'grading_criterion' / 'add',
+                'json_dir': project_root / 'updates' / 'grading_criterion' / 'registered',
                 'table_name': 'grading_criterion',
                 'source': 'web_syllabus'
             }
@@ -500,6 +460,9 @@ def generate_migration():
                 f.write(sql)
             
             print(f"Generated migration file: {migration_file}")
+            
+            # マイグレーションファイル生成が成功したら、JSONファイルを移動
+            move_json_to_registered(json_dir, table_name)
         
         print("Migration files generation completed successfully")
         

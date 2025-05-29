@@ -461,10 +461,11 @@ periodは"0"とする.
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | subject_id | INTEGER | NO | ID（主キー） | システム生成 |
-| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | シラバス検索画面 |
-| faculty_id | INTEGER | NO | 開講学部ID（外部キー） | シラバス検索画面 |
-| class_id | INTEGER | NO | クラスID（外部キー） | シラバス検索画面 |
-| subclass_id | INTEGER | YES | 小区分ID（外部キー） | シラバス検索画面 |
+| subject_name_id | INTEGER | NO | 科目名ID（外部キー） | 履修要綱 |
+| faculty_id | INTEGER | NO | 開講学部ID（外部キー） | 履修要綱 |
+| class_id | INTEGER | NO | クラスID（外部キー） | 履修要綱 |
+| subclass_id | INTEGER | YES | 小区分ID（外部キー） | 履修要綱 |
+| curriculum_year | INTEGER | NO | 要綱年 | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -472,10 +473,11 @@ periodは"0"とする.
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | subject_id | 主キー |
-| idx_subject_unique | (subject_name_id, faculty_id, class_id, subclass_id) | 科目情報の一意性 |
+| idx_subject_unique | (subject_name_id, faculty_id, class_id, subclass_id, curriculum_year) | 科目情報の一意性 |
 | idx_subject_subject_name | subject_name_id | 科目名IDでの検索用 |
 | idx_subject_class | class_id | クラスIDでの検索用 |
 | idx_subject_faculty | faculty_id | 学部IDでの検索用 |
+| idx_subject_curriculum_year | curriculum_year | 要綱年での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -486,7 +488,7 @@ periodは"0"とする.
 | subclass_id | subclass(subclass_id) | RESTRICT |
 
 #### 補足
-- 本来は複合キー(subject_name_id, faculty_id)
+- 本来は複合キー(subject_name_id, faculty_id, curriculum_year)
 だが、サロゲートキー(subject_id)を使用
 
 ### subject_syllabus 科目シラバス関連
@@ -522,6 +524,7 @@ periodは"0"とする.
 - 一つの科目に対して複数のシラバスが存在する可能性がある
 - 年度ごとにシラバス情報が異なる場合に対応
 - シラバスコードと科目の関連を直接管理
+- curriculum_year+8までは追跡しないといけない
 
 ### subject_attribute_value 科目属性値
 
@@ -542,7 +545,7 @@ periodは"0"とする.
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_subject_attribute_value_unique | (subject_id, attribute_id, syllabus_year) | 科目・属性・年度の一意性 |
+| idx_subject_attribute_value_unique | (subject_id, attribute_id) | 科目・属性の一意性 |
 | idx_subject_attribute_value_subject | subject_id | 科目IDでの検索用 |
 | idx_subject_attribute_value_attribute | attribute_id | 属性IDでの検索用 |
 

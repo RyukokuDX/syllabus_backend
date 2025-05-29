@@ -130,6 +130,7 @@ erDiagram
         INTEGER faculty_id FK
         INTEGER class_id FK
         INTEGER subclass_id FK
+        INTEGER curriculum_year
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }

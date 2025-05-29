@@ -105,15 +105,24 @@ class Subject(Base):
     subject_name_id = Column(Integer, ForeignKey('subject_name.subject_name_id'), nullable=False)
     faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
     class_id = Column(Integer, ForeignKey('class.class_id'), nullable=False)
-    subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'))
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
+    subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'), nullable=True)
+    curriculum_year = Column(Integer, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
 
     __table_args__ = (
-        Index('idx_subject_subject_name', 'subject_name_id'),
-        Index('idx_subject_class', 'class_id'),
-        Index('idx_subject_faculty', 'faculty_id'),
-        Index('idx_subject_unique', 'subject_name_id', 'faculty_id', 'class_id', 'subclass_id', unique=True),
+        UniqueConstraint(
+            "subject_name_id",
+            "faculty_id",
+            "class_id",
+            "subclass_id",
+            "curriculum_year",
+            name="idx_subject_unique",
+        ),
+        Index("idx_subject_subject_name", "subject_name_id"),
+        Index("idx_subject_class", "class_id"),
+        Index("idx_subject_faculty", "faculty_id"),
+        Index("idx_subject_curriculum_year", "curriculum_year"),
     )
 
 class SubjectSyllabus(Base):
