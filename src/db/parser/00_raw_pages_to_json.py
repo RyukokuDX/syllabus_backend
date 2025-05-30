@@ -73,37 +73,22 @@ def parse_book_td(td, role):
     }
 
 def extract_books_from_table(soup, label, role, year, log_path, syllabus_code, file_path):
-    # すべてのthタグを取得し、内容をログに出力
-    all_ths = soup.find_all('th')
-    with open(log_path, 'a', encoding='utf-8') as logf:
-        logf.write(f"\n[syllabus_code={syllabus_code}] file={file_path}\n[{role}] 全thタグ内容:\n")
-        for th in all_ths:
-            logf.write(f"  th: {th.get_text(strip=True)}\n")
     # ラベルを部分一致で探す
     th = None
-    for t in all_ths:
+    for t in soup.find_all('th'):
         if label in t.get_text():
             th = t
             break
     if not th:
-        with open(log_path, 'a', encoding='utf-8') as logf:
-            logf.write(f"[{role}] ラベル'{label}'を含むthが見つかりませんでした\n")
         return []
     table = th.find_parent('table')
     if not table:
-        with open(log_path, 'a', encoding='utf-8') as logf:
-            logf.write(f"[{role}] thの親tableが見つかりませんでした\n")
         return []
     books = []
     for tr in table.find_all('tr'):
-        tr_html = str(tr)
-        with open(log_path, 'a', encoding='utf-8') as logf:
-            logf.write(f"\n[syllabus_code={syllabus_code}] file={file_path}\n[{role}] tr: {tr_html}\n")
         tds = tr.find_all('td')
         for td in tds:
             block = ' '.join([t.strip() for t in td.strings if t.strip()])
-            with open(log_path, 'a', encoding='utf-8') as logf:
-                logf.write(f"[{role}] block: {block}\n")
             book = parse_book_td(td, role)
             if book["title"] or book["publisher"] or book["price"]:
                 books.append(book)
@@ -117,6 +102,11 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
     # シラバス管理番号をファイル名から取得
     syllabus_code = os.path.splitext(os.path.basename(file_path))[0]
     
+    # デバッグログ用の関数
+    def log_debug(message):
+        with open(f"src/syllabus/{syllabus_code.split('_')[0]}/data/debug.log", "a", encoding="utf-8") as f:
+            f.write(f"[{syllabus_code}] {message}\n")
+    
     # 基本情報の抽出
     info = {
         "syllabus_code": syllabus_code,
@@ -129,16 +119,18 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
         "credits": 0,
         "summary": "",
         "goals": "",
+        "attainment": "",
         "methods": "",
         "outside_study": "",
         "notes": "",
-        "remarks": "",
+        "remarks": "",  # advicesからremarksに変更
         # 関連情報
         "grades": [],
         "lecture_sessions": [],
         "instructors": [],
         "books": [],
-        "grading_criteria": []
+        "grading_criteria": [],
+        "study_system": []
     }
     
     # シラバス情報テーブルから基本情報を抽出
@@ -216,60 +208,105 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                 })
     
     # 講義概要セクションから情報を抽出
-    for section in soup.find_all('div', class_='section'):
-        title = section.find('h3')
-        if not title:
-            continue
+    for form in soup.find_all('form'):
+        for table in form.find_all('table'):
+            # テーブルのヘッダーを探す
+            header = table.find('th')
+            if not header:
+                continue
+                
+            header_text = header.get_text(strip=True)
+            log_debug(f"処理中のセクション: {header_text}")
             
-        title_text = title.get_text(strip=True)
-        content = section.find('div', class_='content')
-        if not content:
-            continue
+            # 内容を取得（spanタグ内のテキストを優先）
+            content = table.find('td')
+            if not content:
+                continue
+                
+            # spanタグ内のテキストを取得
+            span = content.find('span')
+            if span:
+                content_text = span.get_text(strip=True)
+            else:
+                content_text = content.get_text(strip=True)
             
-        content_text = content.get_text(strip=True)
-        
-        if "講義概要" in title_text:
-            info["summary"] = content_text
-        elif "到達目標" in title_text:
-            info["goals"] = content_text
-        elif "講義方法" in title_text:
-            info["methods"] = content_text
-        elif "授業外学習" in title_text:
-            info["outside_study"] = content_text
-        elif "履修上の注意" in title_text:
-            info["notes"] = content_text
-        elif "その他備考" in title_text:
-            info["remarks"] = content_text
-        elif "成績評価" in title_text:
-            # 成績評価基準の解析
-            for row in content.find_all('tr'):
-                cells = row.find_all(['th', 'td'])
-                if len(cells) >= 2:
-                    criteria = cells[0].get_text(strip=True)
-                    ratio = cells[1].get_text(strip=True)
-                    if criteria and ratio.strip():
-                        try:
-                            info["grading_criteria"].append({
-                                "criteria_type": criteria,
-                                "ratio": int(ratio)
-                            })
-                        except ValueError:
-                            continue
-        elif "テキスト" in title_text or "参考文献" in title_text:
-            role = "教科書" if "テキスト" in title_text else "参考書"
-            next_td = content.find('td')
-            if next_td:
-                if next_td.get_text(strip=True) != "特になし":
-                    book = parse_book_td(next_td, role)
+            # セクションタイトルに基づいて情報を分類
+            if any(keyword in header_text for keyword in ["目的・ねらい", "Goal(s)", "目的"]):
+                info["goals"] = content_text
+            elif any(keyword in header_text for keyword in ["講義概要", "Course outline", "概要"]):
+                info["summary"] = content_text
+            elif any(keyword in header_text for keyword in ["到達目標", "Attainment objectives", "到達"]):
+                info["attainment"] = content_text
+            elif any(keyword in header_text for keyword in ["講義方法", "Teaching methods", "方法"]):
+                info["methods"] = content_text
+            elif any(keyword in header_text for keyword in ["授業外学習", "Outside study", "学習"]):
+                info["outside_study"] = content_text
+            elif any(keyword in header_text for keyword in ["履修上の注意", "Notes", "注意"]):
+                info["notes"] = content_text
+            elif any(keyword in header_text for keyword in ["履修上の注意・担当者からの一言", "Advice to students", "担当者からの一言"]):
+                info["remarks"] = content_text  # advicesからremarksに変更
+            elif any(keyword in header_text for keyword in ["成績評価", "Grading", "評価"]):
+                # 成績評価基準の解析
+                log_debug("成績評価基準の解析開始")
+                for row in table.find_all('tr'):
+                    cells = row.find_all(['th', 'td'])
+                    if len(cells) >= 2:
+                        criteria = cells[0].get_text(strip=True)
+                        ratio = cells[1].get_text(strip=True)
+                        log_debug(f"評価基準: {criteria}, 比率: {ratio}")
+                        if criteria and ratio.strip():
+                            try:
+                                # 比率から数値のみを抽出
+                                ratio_value = re.search(r'\d+', ratio)
+                                if ratio_value:
+                                    info["grading_criteria"].append({
+                                        "criteria_type": criteria,
+                                        "ratio": int(ratio_value.group(0))
+                                    })
+                                    log_debug(f"評価基準を追加: {criteria} ({ratio_value.group(0)}%)")
+                            except ValueError as e:
+                                log_debug(f"評価基準の解析エラー: {str(e)}")
+            elif any(keyword in header_text for keyword in ["テキスト", "Textbooks"]):
+                # 教科書情報の解析
+                if content_text != "特になし":
+                    book = parse_book_td(content, "教科書")
                     if book["title"]:
                         info["books"].append(book)
-    
-    # 新しい書籍抽出方式
-    log_path = clear_debug_log(info['syllabus_year'])
-    books_text = extract_books_from_table(soup, "テキスト／Textbooks", "教科書", info['syllabus_year'], log_path, info['syllabus_code'], file_path)
-    books_ref = extract_books_from_table(soup, "参考文献／Reference books", "参考書", info['syllabus_year'], log_path, info['syllabus_code'], file_path)
-    info["books"].extend(books_text)
-    info["books"].extend(books_ref)
+            elif any(keyword in header_text for keyword in ["参考文献", "Reference books"]):
+                # 参考文献情報の解析
+                if content_text != "特になし":
+                    book = parse_book_td(content, "参考書")
+                    if book["title"]:
+                        info["books"].append(book)
+            elif any(keyword in header_text for keyword in ["履修条件", "Prerequisites", "条件"]):
+                # 履修条件から系統的履修情報を抽出
+                log_debug("履修条件の解析開始")
+                for row in table.find_all('tr'):
+                    cells = row.find_all(['th', 'td'])
+                    if len(cells) >= 2:
+                        condition = cells[0].get_text(strip=True)
+                        value = cells[1].get_text(strip=True)
+                        log_debug(f"条件: {condition}, 値: {value}")
+                        if condition and value:
+                            # 履修条件の種類を判定
+                            if any(keyword in condition for keyword in ["履修済みであること", "履修していること"]):
+                                # 科目コードを抽出（例: "ABC123"）
+                                code_match = re.search(r'[A-Z]{2,3}\d{3}', value)
+                                if code_match:
+                                    info["study_system"].append({
+                                        "target_syllabus_code": code_match.group(0),
+                                        "condition_type": "prerequisite"  # 前提条件
+                                    })
+                                    log_debug(f"前提条件を追加: {code_match.group(0)}")
+                            elif any(keyword in condition for keyword in ["履修すること", "履修することを推奨"]):
+                                # 科目コードを抽出
+                                code_match = re.search(r'[A-Z]{2,3}\d{3}', value)
+                                if code_match:
+                                    info["study_system"].append({
+                                        "target_syllabus_code": code_match.group(0),
+                                        "condition_type": "recommended"  # 推奨科目
+                                    })
+                                    log_debug(f"推奨科目を追加: {code_match.group(0)}")
     
     return info
 

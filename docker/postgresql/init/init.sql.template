@@ -286,6 +286,20 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_enrollment_year_syllabus ON syllabus_enr
 CREATE INDEX IF NOT EXISTS idx_syllabus_enrollment_year_faculty ON syllabus_enrollment_year(faculty_id);
 CREATE INDEX IF NOT EXISTS idx_syllabus_enrollment_year_syllabus_year ON syllabus_enrollment_year(syllabus_year);
 
+-- syllabus_study_system（シラバス系統的履修）
+-- Web Syllabusの「履修条件」から取得される情報を格納
+CREATE TABLE IF NOT EXISTS syllabus_study_system (
+    id INTEGER PRIMARY KEY,
+    source_syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    target_syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(source_syllabus_id, target_syllabus_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_source ON syllabus_study_system(source_syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_system(target_syllabus_id);
+
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）

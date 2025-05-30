@@ -178,6 +178,8 @@ erDiagram
     syllabus ||--o{ syllabus_book : "syllabus_code"
     syllabus ||--o{ grading_criterion : "syllabus_code"
     syllabus ||--o{ subject_syllabus : "syllabus_code"
+    syllabus ||--o{ syllabus_study_system : "source_syllabus_id"
+    syllabus ||--o{ syllabus_study_system : "target_syllabus_id"
 ```
 
 ## 更新履歴
