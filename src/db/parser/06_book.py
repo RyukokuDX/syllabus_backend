@@ -92,6 +92,40 @@ def extract_book_info(html_content: str, file_path: str) -> List[Dict]:
     
     return books
 
+def get_latest_json(year: int) -> str:
+    """指定された年度の最新のJSONファイルを取得する"""
+    data_dir = os.path.join("src", "syllabus", str(year), "data")
+    if not os.path.exists(data_dir):
+        raise FileNotFoundError(f"ディレクトリが見つかりません: {data_dir}")
+    
+    json_files = [f for f in os.listdir(data_dir) if f.startswith('syllabus_') and f.endswith('.json')]
+    if not json_files:
+        raise FileNotFoundError(f"JSONファイルが見つかりません: {data_dir}")
+    
+    # ファイル名のタイムスタンプでソートして最新のものを取得
+    latest_json = sorted(json_files)[-1]
+    return os.path.join(data_dir, latest_json)
+
+def extract_book_info_from_json(json_data: Dict) -> List[Dict]:
+    """JSONデータから書籍情報を抽出する"""
+    books = []
+    
+    for syllabus in json_data.get("content", []):
+        for book in syllabus.get("books", []):
+            book_info = {
+                'title': book.get('title', ''),
+                'author': book.get('author', ''),
+                'publisher': book.get('publisher', ''),
+                'price': book.get('price', 0),
+                'isbn': book.get('isbn', ''),
+                'role': book.get('role', '')
+            }
+            # タイトルが空の書籍情報は除外
+            if book_info['title']:
+                books.append(book_info)
+    
+    return books
+
 def create_book_json(books: Set[Dict]) -> str:
     """書籍情報のJSONファイルを作成する"""
     output_dir = os.path.join("updates", "book", "add")
@@ -102,60 +136,16 @@ def create_book_json(books: Set[Dict]) -> str:
     filename = f"book_{current_time.strftime('%Y%m%d_%H%M')}.json"
     output_file = os.path.join(output_dir, filename)
     
-    # 書籍情報を整理
-    book_data = []
-    for book in sorted(books, key=lambda x: (x['role'], x['title'])):
-        # タイトルから著者名、出版社、価格、ISBNを抽出
-        title = book['title']
-        author_name = None
-        publisher = None
-        price = None
-        isbn = None
-        
-        # 著者名の抽出（「著者：」や「編著：」などのパターン）
-        author_match = re.search(r'(?:著者|編著|共著|監修|訳者)[：:]\s*([^、。]+)', title)
-        if author_match:
-            author_name = author_match.group(1).strip()
-        
-        # 出版社の抽出（「出版社：」や「出版元：」などのパターン）
-        publisher_match = re.search(r'(?:出版社|出版元)[：:]\s*([^、。]+)', title)
-        if publisher_match:
-            publisher = publisher_match.group(1).strip()
-        
-        # 価格の抽出（「価格：」や「定価：」などのパターン）
-        price_match = re.search(r'(?:価格|定価)[：:]\s*(\d+(?:,\d+)*)円', title)
-        if price_match:
-            price_str = price_match.group(1).replace(',', '')
-            try:
-                price = int(price_str)
-            except ValueError:
-                pass
-        
-        # ISBNの抽出（ISBN-10またはISBN-13のパターン）
-        isbn_match = re.search(r'ISBN[：:]\s*(\d{10}|\d{13})', title)
-        if isbn_match:
-            isbn = isbn_match.group(1)
-        
-        book_data.append({
-            'book': {
-                'title': title,
-                'publisher': publisher,
-                'price': price,
-                'isbn': isbn,
-                'created_at': current_time.isoformat()
-            },
-            'book_author': {
-                'author_name': author_name
-            } if author_name else None,
-            'syllabus_book': {
-                'role': book['role'],
-                'note': book['note']
-            }
-        })
-    
     data = {
-        'books': book_data,
-        'created_at': current_time.isoformat()
+        "books": [{
+            "title": book["title"],
+            "author": book["author"],
+            "publisher": book["publisher"],
+            "price": book["price"],
+            "isbn": book["isbn"],
+            "role": book["role"],
+            "created_at": current_time.isoformat()
+        } for book in sorted(books, key=lambda x: (x["title"], x["author"]))]
     }
     
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -196,22 +186,22 @@ def main():
         year = get_year_from_user()
         print(f"処理対象年度: {year}")
         
-        # HTMLファイルの取得
-        html_files = get_html_files(year)
-        print(f"処理対象ファイル: {len(html_files)}件")
+        # 最新のJSONファイルを取得
+        json_file = get_latest_json(year)
+        print(f"処理対象ファイル: {json_file}")
+        
+        # JSONファイルを読み込む
+        with open(json_file, 'r', encoding='utf-8') as f:
+            json_data = json.load(f)
         
         # 書籍情報の抽出
         all_books = set()
-        for html_file in tqdm(html_files, desc="書籍情報を抽出中"):
-            try:
-                books = process_html_file(html_file)
-                # 各書籍の情報をタプルに変換してセットに追加（重複を防ぐため）
-                for book in books:
-                    book_tuple = tuple(sorted(book.items()))
-                    all_books.add(book_tuple)
-            except Exception as e:
-                print(f"エラー: {html_file}の処理中にエラーが発生しました: {str(e)}")
-                raise  # エラーを発生させて処理を停止
+        books = extract_book_info_from_json(json_data)
+        
+        # 各書籍の情報をタプルに変換してセットに追加（重複を防ぐため）
+        for book in books:
+            book_tuple = tuple(sorted(book.items()))
+            all_books.add(book_tuple)
         
         # タプルを辞書に戻す
         book_dicts = [dict(t) for t in all_books]

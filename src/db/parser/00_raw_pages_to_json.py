@@ -26,8 +26,8 @@ def get_html_files(year: int, test_mode: bool = False) -> List[str]:
     files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith('.html')]
     
     if test_mode:
-        print("テストモード: 最初の10件のファイルのみ処理します")
-        return files[:10]
+        print("テストモード: 最初の100件のファイルのみ処理します")
+        return files[:100]
     
     return files
 
@@ -45,21 +45,46 @@ def parse_instructor_name(name: str) -> Dict:
         }
     return {"last_name": name, "first_name": ""}
 
-def log_debug(message, year):
-    """評価基準に関するログのみを出力"""
-    if not any(keyword in message for keyword in ["評価基準", "成績評価"]):
-        return
+def log_null_fields(syllabus_code: str, null_fields: List[str], year: int):
+    """NOT NULL項目がNULLの場合にログを出力"""
     log_dir = f"src/syllabus/{year}/data"
     os.makedirs(log_dir, exist_ok=True)
-    with open(f"{log_dir}/debug_scores.log", "a", encoding='utf-8') as f:
-        f.write(f"{message}\n")
+    with open(f"{log_dir}/null_fields.log", "a", encoding='utf-8') as f:
+        f.write(f"syllabus_code: {syllabus_code}, null_fields: {', '.join(null_fields)}\n")
 
-def clear_debug_log(year):
-    """ログファイルをクリア"""
-    log_dir = f"src/syllabus/{year}/data"
-    os.makedirs(log_dir, exist_ok=True)
-    with open(f"{log_dir}/debug_scores.log", "w", encoding='utf-8') as f:
-        f.write("")
+def check_null_fields(info: Dict, year: int):
+    """NOT NULL項目のNULLチェック"""
+    # NOT NULL項目のリスト
+    not_null_fields = [
+        "syllabus_code",
+        "syllabus_year",
+        "subject_name",
+        "faculty",
+        "term",
+        "campus",
+        "credits",
+        "summary",
+        "goals",
+        "attainment",
+        "methods",
+        "outside_study",
+        "notes",
+        "remarks",
+        "grades",
+        "lecture_times",
+        "instructors",
+        "books",
+        "grading_criteria",
+        "study_system",
+        "lecture_sessions"
+    ]
+    
+    # NULLの項目をチェック
+    null_fields = [field for field in not_null_fields if not info.get(field)]
+    
+    # NULLの項目がある場合はログを出力
+    if null_fields:
+        log_null_fields(info["syllabus_code"], null_fields, year)
 
 def parse_book_td(td, role):
     block = ' '.join([t.strip() for t in td.strings if t.strip()])
@@ -216,22 +241,17 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
     
     # 講義概要セクションから情報を抽出
     for form in soup.find_all('form'):
-        log_debug("フォームを発見", year)
         for table in form.find_all('table'):
-            log_debug("テーブルを発見", year)
             # テーブルのヘッダーを探す
             header = table.find('th')
             if not header:
-                log_debug("ヘッダーなし", year)
                 continue
                 
             header_text = header.get_text(strip=True)
-            log_debug(f"ヘッダーテキスト: {header_text}", year)
             
             # 内容を取得（spanタグ内のテキストを優先）
             content = table.find('td')
             if not content:
-                log_debug("コンテンツなし", year)
                 continue
                 
             # spanタグ内のテキストを取得
@@ -240,8 +260,6 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                 content_text = span.get_text(strip=True)
             else:
                 content_text = content.get_text(strip=True)
-            
-            log_debug(f"コンテンツテキスト: {content_text}", year)
             
             # セクションタイトルに基づいて情報を分類
             if any(keyword in header_text for keyword in ["目的・ねらい", "Goal(s)", "目的"]):
@@ -259,15 +277,12 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
             elif any(keyword in header_text for keyword in ["履修上の注意・担当者からの一言", "Advice to students", "担当者からの一言"]):
                 info["remarks"] = content_text  # advicesからremarksに変更
             elif "種別" in header_text or "Kind" in header_text:
-                log_debug(f"成績評価セクションを発見: {header_text}", year)
-                
                 # 評価基準テーブルを探す
                 content = table.find('td')
                 if content:
                     # テーブルを探す
                     grading_table = content.find('table')
                     if grading_table:
-                        log_debug("評価基準テーブルを発見", year)
                         rows = grading_table.find_all('tr')
                         for row in rows:
                             cells = row.find_all(['th', 'td'])
@@ -310,14 +325,13 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                     ratio = int(ratio_match.group(1))
                                     # 重複チェック
                                     if not any(c["criteria_type"] == kind_text and c["ratio"] == ratio for c in info["grading_criteria"]):
-                                        log_debug(f"評価基準を追加: {kind_text} ({ratio}%) - {note_text}", year)
                                         info["grading_criteria"].append({
                                             "criteria_type": kind_text,
                                             "ratio": ratio,
                                             "note": note_text
                                         })
                     else:
-                        log_debug("評価基準テーブルが見つかりません", year)
+                        pass
             elif any(keyword in header_text for keyword in ["テキスト", "Textbooks"]):
                 # 教科書情報の解析
                 if content_text != "特になし":
@@ -332,21 +346,18 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                         info["books"].append(book)
             elif any(keyword in header_text for keyword in ["履修条件", "Prerequisites", "条件"]):
                 # 履修条件から系統的履修情報を抽出
-                log_debug("履修条件の解析開始", year)
                 study_system_text = ""
                 for row in table.find_all('tr'):
                     cells = row.find_all(['th', 'td'])
                     if len(cells) >= 2:
                         condition = cells[0].get_text(strip=True)
                         value = cells[1].get_text(strip=True)
-                        log_debug(f"条件: {condition}, 値: {value}", year)
                         if condition and value:
                             # 履修条件の種類を判定
                             if any(keyword in condition for keyword in ["履修済みであること", "履修していること", "履修すること", "履修することを推奨"]):
                                 if study_system_text:
                                     study_system_text += "、"
                                 study_system_text += value
-                                log_debug(f"系統的履修情報を追加: {value}", year)
                 info["study_system"] = study_system_text
     
     # 講義計画セクションの解析（最後に実行）
@@ -399,6 +410,27 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                                     "other_info": other_info
                                                 })
     
+    # --- 系統的履修（System of study）セクションの抽出 ---
+    for form in soup.find_all('form'):
+        for table in form.find_all('table'):
+            header = table.find('th')
+            if not header:
+                continue
+            header_text = header.get_text(strip=True)
+            if any(keyword in header_text for keyword in ["系統的履修", "System of study"]):
+                # 内容を取得（spanタグ内のテキストを優先）
+                content = table.find('td')
+                if content:
+                    span = content.find('span')
+                    if span:
+                        info["study_system"] = span.get_text(strip=True)
+                    else:
+                        info["study_system"] = content.get_text(strip=True)
+                break  # 最初に見つかったもののみ処理
+    
+    # NOT NULL項目のチェック
+    check_null_fields(info, year)
+    
     return info
 
 def save_to_json(data: List[Dict], year: int) -> str:
@@ -408,23 +440,6 @@ def save_to_json(data: List[Dict], year: int) -> str:
     
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     output_file = os.path.join(output_dir, f"syllabus_{timestamp}.json")
-    
-    # 特定のシラバスのデータを確認
-    for syllabus in data:
-        if syllabus.get('syllabus_code') == '4792000':
-            print("\n=== 問題のシラバス（4792000）のデータ ===")
-            print(f"キー一覧: {list(syllabus.keys())}")
-            print(f"lecture_sessions: {syllabus.get('lecture_sessions')}")
-            if syllabus.get('lecture_sessions'):
-                print(f"lecture_sessionsの型: {type(syllabus['lecture_sessions'])}")
-                print(f"lecture_sessionsの内容: {syllabus['lecture_sessions']}")
-                # 各セッションの詳細を確認
-                for i, session in enumerate(syllabus['lecture_sessions']):
-                    print(f"\nセッション {i+1}:")
-                    print(f"  型: {type(session)}")
-                    print(f"  キー: {list(session.keys())}")
-                    for key, value in session.items():
-                        print(f"  {key}: {value} (型: {type(value)})")
     
     # データの前処理
     processed_data = []
@@ -474,7 +489,7 @@ def save_pretty_html_onefile(pretty_html: str, year: int):
 def main():
     """メイン処理"""
     parser = argparse.ArgumentParser(description='Web SyllabusのHTMLファイルをJSONに変換')
-    parser.add_argument('--test', action='store_true', help='テストモード（最初の10件のみ処理）')
+    parser.add_argument('--test', action='store_true', help='テストモード（Y005079070.htmlのみ処理）')
     parser.add_argument('--year', '-y', type=int, help='処理する年度（例: 2025）')
     args = parser.parse_args()
     
@@ -496,7 +511,6 @@ def main():
     print(f"出力先ディレクトリ: src/syllabus/{year}/data/")
     
     all_syllabus_info = []
-    clear_debug_log(year)  # ログファイルをクリア
     for html_file in tqdm(html_files, desc="HTMLファイル処理中"):
         try:
             # 1. 元HTMLをprettifyしてpretty.htmlに上書き保存
@@ -511,7 +525,7 @@ def main():
                 pretty_content = f.read()
             pretty_soup = BeautifulSoup(pretty_content, 'html.parser')
 
-            # 3. pretty_soupを使って抽出・ログ出力
+            # 3. pretty_soupを使って抽出
             syllabus_info = extract_syllabus_info(pretty_content, html_file, soup=pretty_soup)
             all_syllabus_info.append(syllabus_info)
         except Exception as e:
