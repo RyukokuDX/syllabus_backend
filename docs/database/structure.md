@@ -249,8 +249,9 @@
 | term | TEXT | NO | 開講学期 | Web Syllabus |
 | campus | TEXT | NO | 開講キャンパス | Web Syllabus |
 | credits | INTEGER | NO | 単位数 | Web Syllabus |
+| goals | TEXT | YES | 目的 | Web Syllabus |
 | summary | TEXT | YES | 授業概要 | Web Syllabus |
-| goals | TEXT | YES | 到達目標 | Web Syllabus |
+| attainment | TEXT | YES | 到達目標 | Web Syllabus |
 | methods | TEXT | YES | 授業方法 | Web Syllabus |
 | outside_study | TEXT | YES | 授業外学習 | Web Syllabus |
 | notes | TEXT | YES | 履修上の注意 | Web Syllabus |

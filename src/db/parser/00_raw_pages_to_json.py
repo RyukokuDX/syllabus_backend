@@ -45,9 +45,74 @@ def parse_instructor_name(name: str) -> Dict:
         }
     return {"last_name": name, "first_name": ""}
 
-def extract_syllabus_info(html_content: str, file_path: str) -> Dict:
+def clear_debug_log(year):
+    log_path = f"src/syllabus/{year}/data/debug_books.log"
+    os.makedirs(f"src/syllabus/{year}/data", exist_ok=True)
+    with open(log_path, 'w', encoding='utf-8') as f:
+        f.write("")
+    return log_path
+
+def parse_book_td(td, role):
+    block = ' '.join([t.strip() for t in td.strings if t.strip()])
+    # タイトル
+    title_match = re.search(r'『(.+?)』', block)
+    title = title_match.group(1).strip() if title_match else ""
+    # 出版社
+    publisher_match = re.search(r'（(.+?)）', block)
+    publisher = publisher_match.group(1).strip() if publisher_match else ""
+    # 価格
+    price_match = re.search(r'([0-9,]+)円', block)
+    price = int(price_match.group(1).replace(',', '')) if price_match else 0
+    return {
+        "title": title,
+        "author": "",
+        "publisher": publisher,
+        "price": price,
+        "isbn": "",
+        "role": role
+    }
+
+def extract_books_from_table(soup, label, role, year, log_path, syllabus_code, file_path):
+    # すべてのthタグを取得し、内容をログに出力
+    all_ths = soup.find_all('th')
+    with open(log_path, 'a', encoding='utf-8') as logf:
+        logf.write(f"\n[syllabus_code={syllabus_code}] file={file_path}\n[{role}] 全thタグ内容:\n")
+        for th in all_ths:
+            logf.write(f"  th: {th.get_text(strip=True)}\n")
+    # ラベルを部分一致で探す
+    th = None
+    for t in all_ths:
+        if label in t.get_text():
+            th = t
+            break
+    if not th:
+        with open(log_path, 'a', encoding='utf-8') as logf:
+            logf.write(f"[{role}] ラベル'{label}'を含むthが見つかりませんでした\n")
+        return []
+    table = th.find_parent('table')
+    if not table:
+        with open(log_path, 'a', encoding='utf-8') as logf:
+            logf.write(f"[{role}] thの親tableが見つかりませんでした\n")
+        return []
+    books = []
+    for tr in table.find_all('tr'):
+        tr_html = str(tr)
+        with open(log_path, 'a', encoding='utf-8') as logf:
+            logf.write(f"\n[syllabus_code={syllabus_code}] file={file_path}\n[{role}] tr: {tr_html}\n")
+        tds = tr.find_all('td')
+        for td in tds:
+            block = ' '.join([t.strip() for t in td.strings if t.strip()])
+            with open(log_path, 'a', encoding='utf-8') as logf:
+                logf.write(f"[{role}] block: {block}\n")
+            book = parse_book_td(td, role)
+            if book["title"] or book["publisher"] or book["price"]:
+                books.append(book)
+    return books
+
+def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
     """HTMLからシラバス情報を抽出"""
-    soup = BeautifulSoup(html_content, 'html.parser')
+    if soup is None:
+        soup = BeautifulSoup(html_content, 'html.parser')
     
     # シラバス管理番号をファイル名から取得
     syllabus_code = os.path.splitext(os.path.basename(file_path))[0]
@@ -55,9 +120,9 @@ def extract_syllabus_info(html_content: str, file_path: str) -> Dict:
     # 基本情報の抽出
     info = {
         "syllabus_code": syllabus_code,
-        "syllabus_year": int(re.search(r'/(\d{4})/', file_path).group(1)),
-        "subject_name": "",  # 科目名を文字列で取得
-        "faculty": "",  # 対象学部
+        "syllabus_year": int(re.search(r'/\d{4}/', file_path).group(0).strip('/')),
+        "subject_name": "",
+        "faculty": "",
         "subtitle": "",
         "term": "",
         "campus": "",
@@ -68,14 +133,12 @@ def extract_syllabus_info(html_content: str, file_path: str) -> Dict:
         "outside_study": "",
         "notes": "",
         "remarks": "",
-        "created_at": datetime.now().isoformat(),
-        "updated_at": None,
         # 関連情報
-        "grades": [],  # 履修可能学年
-        "lecture_sessions": [],  # 講義時間
-        "instructors": [],  # 教員情報
-        "books": [],  # 教科書・参考書情報
-        "grading_criteria": []  # 成績評価基準
+        "grades": [],
+        "lecture_sessions": [],
+        "instructors": [],
+        "books": [],
+        "grading_criteria": []
     }
     
     # シラバス情報テーブルから基本情報を抽出
@@ -193,50 +256,20 @@ def extract_syllabus_info(html_content: str, file_path: str) -> Dict:
                         except ValueError:
                             continue
         elif "テキスト" in title_text or "参考文献" in title_text:
-            # 書籍情報の解析
             role = "教科書" if "テキスト" in title_text else "参考書"
-            # テキスト/参考文献の次のtdを取得
             next_td = content.find('td')
             if next_td:
-                text = next_td.get_text(strip=True)
-                if text and text != "特になし":
-                    # 著者名、タイトル、出版社、価格、ISBNを抽出
-                    parts = text.split('『')
-                    if len(parts) >= 2:
-                        author = parts[0].strip()
-                        title_parts = parts[1].split('』')
-                        if len(title_parts) >= 2:
-                            title = title_parts[0].strip()
-                            remaining = title_parts[1].strip()
-                            
-                            # 出版社、価格、ISBNを抽出
-                            publisher = ""
-                            price = 0
-                            isbn = ""
-                            
-                            if "（" in remaining:
-                                publisher = remaining.split("（")[0].strip()
-                                remaining = remaining.split("（")[1].strip("）")
-                            
-                            if "円" in remaining:
-                                price_str = remaining.split("円")[0].strip()
-                                try:
-                                    price = int(price_str.replace(",", ""))
-                                except ValueError:
-                                    pass
-                                remaining = remaining.split("円")[1].strip()
-                            
-                            if "ISBN:" in remaining:
-                                isbn = remaining.split("ISBN:")[1].strip()
-                            
-                            info["books"].append({
-                                "title": title,
-                                "author": author,
-                                "publisher": publisher,
-                                "price": price,
-                                "isbn": isbn,
-                                "role": role
-                            })
+                if next_td.get_text(strip=True) != "特になし":
+                    book = parse_book_td(next_td, role)
+                    if book["title"]:
+                        info["books"].append(book)
+    
+    # 新しい書籍抽出方式
+    log_path = clear_debug_log(info['syllabus_year'])
+    books_text = extract_books_from_table(soup, "テキスト／Textbooks", "教科書", info['syllabus_year'], log_path, info['syllabus_code'], file_path)
+    books_ref = extract_books_from_table(soup, "参考文献／Reference books", "参考書", info['syllabus_year'], log_path, info['syllabus_code'], file_path)
+    info["books"].extend(books_text)
+    info["books"].extend(books_ref)
     
     return info
 
@@ -254,18 +287,32 @@ def save_to_json(data: List[Dict], year: int) -> str:
     print(f"保存先: {output_file}")
     return output_file
 
+def save_pretty_html_onefile(pretty_html: str, year: int):
+    """1ファイル分の整形済みHTMLをpretty.htmlに上書き保存"""
+    output_dir = f"src/syllabus/{year}/data"
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, "pretty.html")
+    # <!-- -->だけの行を除外
+    lines = pretty_html.splitlines()
+    filtered = [line for line in lines if not (line.strip() == '<!-- -->')]
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(filtered))
+
 def main():
     """メイン処理"""
     parser = argparse.ArgumentParser(description='Web SyllabusのHTMLファイルをJSONに変換')
     parser.add_argument('--test', action='store_true', help='テストモード（最初の10件のみ処理）')
+    parser.add_argument('--year', '-y', type=int, help='処理する年度（例: 2025）')
     args = parser.parse_args()
     
-    # オプションが指定されていない場合は確認（デフォルトはy）
     if not args.test:
         response = input("テストモードで実行しますか？ (y/n) [y]: ").strip().lower()
-        args.test = response != 'n'  # 空文字列またはyの場合はテストモード
+        args.test = response != 'n'
     
-    year = get_year_from_user()
+    if args.year:
+        year = args.year
+    else:
+        year = get_year_from_user()
     html_files = get_html_files(year, args.test)
     
     if not html_files:
@@ -276,14 +323,24 @@ def main():
     print(f"出力先ディレクトリ: src/syllabus/{year}/data/")
     
     all_syllabus_info = []
+    log_path = clear_debug_log(year)
     for html_file in tqdm(html_files, desc="HTMLファイル処理中"):
         try:
+            # 1. 元HTMLをprettifyしてpretty.htmlに上書き保存
             with open(html_file, 'r', encoding='utf-8') as f:
                 html_content = f.read()
-            
-            syllabus_info = extract_syllabus_info(html_content, html_file)
+            soup = BeautifulSoup(html_content, 'html.parser')
+            save_pretty_html_onefile(soup.prettify(), year)
+
+            # 2. pretty.htmlを再度読み込み直してパース
+            pretty_path = f"src/syllabus/{year}/data/pretty.html"
+            with open(pretty_path, 'r', encoding='utf-8') as f:
+                pretty_content = f.read()
+            pretty_soup = BeautifulSoup(pretty_content, 'html.parser')
+
+            # 3. pretty_soupを使って抽出・ログ出力
+            syllabus_info = extract_syllabus_info(pretty_content, html_file, soup=pretty_soup)
             all_syllabus_info.append(syllabus_info)
-            
         except Exception as e:
             print(f"エラー: {html_file} の処理中にエラーが発生しました: {str(e)}")
             continue
