@@ -300,6 +300,44 @@ CREATE TABLE IF NOT EXISTS syllabus_study_system (
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_source ON syllabus_study_system(source_syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_system(target_syllabus_id);
 
+-- 講義時間テーブル
+CREATE TABLE lecture_time (
+    id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    day_of_week TEXT NOT NULL,
+    period SMALLINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX idx_lecture_time_day_period ON lecture_time(day_of_week, period);
+CREATE INDEX idx_lecture_time_syllabus ON lecture_time(syllabus_id);
+
+-- 講義回数テーブル
+CREATE TABLE lecture_session (
+    lecture_session_id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    session_number INTEGER NOT NULL,
+    contents TEXT,
+    other_info TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX idx_lecture_session_syllabus ON lecture_session(syllabus_id);
+CREATE INDEX idx_lecture_session_number ON lecture_session(session_number);
+
+-- 講義回数担当者テーブル
+CREATE TABLE lecture_session_instructor (
+    id SERIAL PRIMARY KEY,
+    lecture_session_id INTEGER NOT NULL REFERENCES lecture_session(lecture_session_id) ON DELETE CASCADE,
+    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_lecture_session_instructor_session ON lecture_session_instructor(lecture_session_id);
+CREATE INDEX idx_lecture_session_instructor_instructor ON lecture_session_instructor(instructor_id);
+
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）

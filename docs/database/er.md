@@ -180,6 +180,37 @@ erDiagram
     syllabus ||--o{ subject_syllabus : "syllabus_code"
     syllabus ||--o{ syllabus_study_system : "source_syllabus_id"
     syllabus ||--o{ syllabus_study_system : "target_syllabus_id"
+
+    lecture_time ||--o{ syllabus_master : "belongs to"
+    lecture_session ||--o{ syllabus_master : "belongs to"
+    lecture_session ||--o{ lecture_session_instructor : "has"
+    lecture_session_instructor ||--o{ instructor : "references"
+
+    lecture_time {
+        integer id PK
+        integer syllabus_id FK
+        text day_of_week
+        tinyint period
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    lecture_session {
+        integer lecture_session_id PK
+        integer syllabus_id FK
+        integer session_number
+        text contents
+        text other_info
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    lecture_session_instructor {
+        integer id PK
+        integer lecture_session_id FK
+        integer instructor_id FK
+        timestamp created_at
+    }
 ```
 
 ## 更新履歴

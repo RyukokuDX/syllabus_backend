@@ -132,11 +132,12 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
         "notes": "",
         "remarks": "",
         "grades": [],
-        "lecture_sessions": [],
+        "lecture_times": [],  # 講義時間のリスト
         "instructors": [],
         "books": [],
         "grading_criteria": [],
-        "study_system": []
+        "study_system": [],
+        "lecture_sessions": []  # 講義回数のリスト
     }
     
     # シラバス情報テーブルから基本情報を抽出
@@ -178,7 +179,7 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                             day_match = re.search(r'([月火水木金土日])', time_info)
                             period_match = re.search(r'(\d+)', time_info)
                             if day_match and period_match:
-                                info["lecture_sessions"].append({
+                                info["lecture_times"].append({
                                     "day_of_week": day_match.group(1),
                                     "period": int(period_match.group(1))
                                 })
@@ -359,6 +360,42 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                     })
                                     log_debug(f"推奨科目を追加: {code_match.group(0)}", year)
     
+    # 講義計画セクションの解析（最後に実行）
+    for form in soup.find_all('form'):
+        for table in form.find_all('table'):
+            # 講義計画テーブルを探す
+            # 1. まずcolgroupを持つテーブルを探す
+            if table.find('colgroup'):
+                # 2. 最初の行の最初のセルを確認
+                first_row = table.find('tr')
+                if first_row:
+                    first_cell = first_row.find('td')
+                    if first_cell and first_cell.find('a'):
+                        # 3. 講義回数の形式を確認（例：「第1回」または「1回目」）
+                        cell_text = first_cell.get_text(strip=True)
+                        if re.match(r'第\d+回|^\d+回目', cell_text):
+                            # 4. 講義回数の解析
+                            for row in table.find_all('tr'):
+                                cells = row.find_all('td')
+                                if len(cells) >= 3:  # 最低3列（回数、担当者、内容）必要
+                                    session_text = cells[0].get_text(strip=True)
+                                    instructor = cells[1].get_text(strip=True)
+                                    contents = cells[2].get_text(strip=True)
+                                    other_info = cells[3].get_text(strip=True) if len(cells) > 3 else ""
+                                    
+                                    # 回数が数字の場合のみ追加（「第1回」または「1回目」の両方に対応）
+                                    number_match = re.search(r'第?(\d+)回目?', session_text)
+                                    if number_match:
+                                        session_num = int(number_match.group(1))
+                                        # 重複チェック
+                                        if not any(s["session_number"] == session_num for s in info["lecture_sessions"]):
+                                            info["lecture_sessions"].append({
+                                                "session_number": session_num,
+                                                "contents": contents,
+                                                "other_info": other_info,
+                                                "instructor": instructor
+                                            })
+    
     return info
 
 def save_to_json(data: List[Dict], year: int) -> str:
@@ -369,15 +406,46 @@ def save_to_json(data: List[Dict], year: int) -> str:
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     output_file = os.path.join(output_dir, f"syllabus_{timestamp}.json")
     
-    # 評価基準のログ出力
+    # 特定のシラバスのデータを確認
     for syllabus in data:
-        if syllabus.get("grading_criteria"):
-            log_debug(f"シラバス {syllabus['syllabus_code']} の評価基準:", year)
-            for criterion in syllabus["grading_criteria"]:
-                log_debug(f"  - {criterion['criteria_type']} ({criterion['ratio']}%): {criterion.get('note', '備考なし')}", year)
+        if syllabus.get('syllabus_code') == '4792000':
+            print("\n=== 問題のシラバス（4792000）のデータ ===")
+            print(f"キー一覧: {list(syllabus.keys())}")
+            print(f"lecture_sessions: {syllabus.get('lecture_sessions')}")
+            if syllabus.get('lecture_sessions'):
+                print(f"lecture_sessionsの型: {type(syllabus['lecture_sessions'])}")
+                print(f"lecture_sessionsの内容: {syllabus['lecture_sessions']}")
+                # 各セッションの詳細を確認
+                for i, session in enumerate(syllabus['lecture_sessions']):
+                    print(f"\nセッション {i+1}:")
+                    print(f"  型: {type(session)}")
+                    print(f"  キー: {list(session.keys())}")
+                    for key, value in session.items():
+                        print(f"  {key}: {value} (型: {type(value)})")
+    
+    # データの前処理
+    processed_data = []
+    for syllabus in data:
+        processed_syllabus = syllabus.copy()
+        if processed_syllabus.get('syllabus_code') == '4792000':
+            # 問題のシラバスの場合、lecture_sessionsを明示的に処理
+            if 'lecture_sessions' in processed_syllabus:
+                sessions = processed_syllabus['lecture_sessions']
+                if sessions:
+                    processed_sessions = []
+                    for session in sessions:
+                        processed_session = {
+                            'session_number': int(session['session_number']),
+                            'contents': str(session['contents']),
+                            'other_info': str(session.get('other_info', '')),
+                            'instructor': str(session.get('instructor', ''))
+                        }
+                        processed_sessions.append(processed_session)
+                    processed_syllabus['lecture_sessions'] = processed_sessions
+        processed_data.append(processed_syllabus)
     
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({"content": data}, f, ensure_ascii=False, indent=2)
+        json.dump({"content": processed_data}, f, ensure_ascii=False, indent=2)
     
     print(f"保存先: {output_file}")
     return output_file

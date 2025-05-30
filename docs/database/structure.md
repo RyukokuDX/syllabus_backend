@@ -15,15 +15,17 @@
 8. [syllabus_master シラバスマスタ](#syllabus_master-シラバスマスタ)
 9. [syllabus シラバス情報](#syllabus-シラバス情報)
 10. [subject_grade 科目履修可能学年](#subject_grade-科目履修可能学年)
-11. [lecture_session 講義時間](#lecture_session-講義時間)
-12. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
-13. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
-14. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-15. [subject_attribute 科目属性](#subject_attribute-科目属性)
-16. [subject 科目基本情報](#subject-科目基本情報)
-17. [subject_syllabus 科目シラバス関連](#subject_syllabus-科目シラバス関連)
-18. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
-19. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
+11. [lecture_time 講義時間](#lecture_time-講義時間)
+12. [lecture_session 講義回数](#lecture_session-講義回数)
+13. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
+14. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
+15. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+16. [subject_attribute 科目属性](#subject_attribute-科目属性)
+17. [subject 科目基本情報](#subject-科目基本情報)
+18. [subject_syllabus 科目シラバス関連](#subject_syllabus-科目シラバス関連)
+19. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
+20. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
+21. [lecture_session_instructor 講義回数担当者](#lecture_session_instructor-講義回数担当者)
 
 ## 更新履歴
 
@@ -47,6 +49,7 @@
 | 2024-05-29 | 1.1.14 | 藤原 | マスターテーブルのタイムスタンプカラムを整理、instructorテーブルの主キーをinstructor_idに変更 |
 | 2024-05-29 | 1.1.15 | 藤原 | syllabus_bookテーブルのroleカラムをTEXT型に変更、subject_syllabusテーブルからlecture_codeを削除 |
 | 2024-05-29 | 1.1.16 | 藤原 | syllabus_study_systemテーブルの説明を更新、Web Syllabusを情報源として明記 |
+| 2024-05-29 | 1.1.17 | 藤原 | 講義時間管理のテーブル構造を改善、lecture_timeとlecture_sessionテーブルを追加 |
 
 ## テーブル構成
 
@@ -338,7 +341,7 @@ gradeの値は以下の形式で、学生の学年を表します：
 - 修士課程: 修士1年生, 修士2年生
 - 博士課程: 博士1年生, 博士2年生, 博士3年生
 
-### lecture_session 講義時間
+### lecture_time 講義時間
 
 #### テーブル概要
 各科目の開講時間情報を管理するテーブル。複数時限に対応。
@@ -357,8 +360,8 @@ gradeの値は以下の形式で、学生の学年を表します：
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_lecture_session_day_period | (day_of_week, period) | 曜日・時限での検索用 |
-| idx_lecture_session_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_lecture_time_day_period | (day_of_week, period) | 曜日・時限での検索用 |
+| idx_lecture_time_syllabus | syllabus_id | シラバスIDでの検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -368,6 +371,60 @@ gradeの値は以下の形式で、学生の学年を表します：
 #### 補足
 day_of_weekの値は集中講義ならは"集中"とし,
 periodは"0"とする.
+
+### lecture_session 講義回数
+
+#### テーブル概要
+各科目の講義回数ごとの情報を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| lecture_session_id | INTEGER | NO | 講義回数ID（主キー） | システム生成 |
+| syllabus_id | INTEGER | NO | シラバスID（外部キー） | システム生成 |
+| session_number | INTEGER | NO | 回数 | Web Syllabus |
+| contents | TEXT | YES | 学修内容 | Web Syllabus |
+| other_info | TEXT | YES | その他情報 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | lecture_session_id | 主キー |
+| idx_lecture_session_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_lecture_session_number | session_number | 回数での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| syllabus_id | syllabus_master(syllabus_id) | CASCADE |
+
+### lecture_session_instructor 講義回数担当者
+
+#### テーブル概要
+講義回数ごとの担当者情報を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | ID（主キー） | システム生成 |
+| lecture_session_id | INTEGER | NO | 講義回数ID（外部キー） | システム生成 |
+| instructor_id | INTEGER | NO | 担当者ID（外部キー） | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_lecture_session_instructor_session | lecture_session_id | 講義回数IDでの検索用 |
+| idx_lecture_session_instructor_instructor | instructor_id | 担当者IDでの検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| lecture_session_id | lecture_session(lecture_session_id) | CASCADE |
+| instructor_id | instructor(instructor_id) | CASCADE |
 
 [目次へ戻る](#目次)
 

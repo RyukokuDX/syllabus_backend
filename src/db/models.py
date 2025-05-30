@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -107,8 +107,8 @@ class Subject(Base):
     class_id = Column(Integer, ForeignKey('class.class_id'), nullable=False)
     subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'), nullable=True)
     curriculum_year = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at = Column(TIMESTAMP, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
+    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    updated_at = Column(TIMESTAMP, nullable=True, onupdate=func.now())
 
     __table_args__ = (
         UniqueConstraint(
@@ -215,20 +215,51 @@ class BookAuthor(Base):
         Index('idx_book_author_name', 'author_name'),
     )
 
+class LectureTime(Base):
+    __tablename__ = 'lecture_time'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    day_of_week = Column(Text, nullable=False)
+    period = Column(SmallInteger, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+    # インデックス
+    __table_args__ = (
+        Index('idx_lecture_time_day_period', 'day_of_week', 'period'),
+        Index('idx_lecture_time_syllabus', 'syllabus_id'),
+    )
+
 class LectureSession(Base):
     __tablename__ = 'lecture_session'
 
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
-    syllabus_year = Column(Integer, nullable=False)
-    day_of_week = Column(Text, nullable=False)
-    period = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
+    lecture_session_id = Column(Integer, primary_key=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    session_number = Column(Integer, nullable=False)
+    contents = Column(Text)
+    other_info = Column(Text)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
 
+    # インデックス
     __table_args__ = (
-        Index('idx_lecture_session_day_period', 'day_of_week', 'period'),
-        Index('idx_lecture_session_syllabus', 'syllabus_code', 'syllabus_year'),
+        Index('idx_lecture_session_syllabus', 'syllabus_id'),
+        Index('idx_lecture_session_number', 'session_number'),
+    )
+
+class LectureSessionInstructor(Base):
+    __tablename__ = 'lecture_session_instructor'
+
+    id = Column(Integer, primary_key=True)
+    lecture_session_id = Column(Integer, ForeignKey('lecture_session.lecture_session_id', ondelete='CASCADE'), nullable=False)
+    instructor_id = Column(Integer, ForeignKey('instructor.instructor_id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+
+    # インデックス
+    __table_args__ = (
+        Index('idx_lecture_session_instructor_session', 'lecture_session_id'),
+        Index('idx_lecture_session_instructor_instructor', 'instructor_id'),
     )
 
 class SyllabusInstructor(Base):
