@@ -243,6 +243,7 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | syllabus_code | TEXT | NO | シラバス管理番号（主キー） | Web Syllabus |
+| syllabus_year | INTEGER | NO | シラバス年 | web syllabus |
 | subject_name_id | INTEGER | NO | 科目名ID（外部キー） | Web Syllabus |
 | subtitle | TEXT | YES | 科目サブタイトル | Web Syllabus |
 | term | TEXT | NO | 開講学期 | Web Syllabus |
@@ -281,8 +282,9 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | id | INTEGER | NO | 主キー | システム生成 |
-| subject_id | INTEGER | NO | 科目ID（外部キー） | 履修要綱 |
-| grade | TEXT | NO | 履修可能学年 | 履修要綱 |
+| syllabus_code | TEXT | NO | シラバス管理番号（外部キー） | web syllabus |
+| syllabus_year | INTEGER | NO | シラバス年 | web syllabus |
+| grade | TEXT | NO | 履修可能学年 | web syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 

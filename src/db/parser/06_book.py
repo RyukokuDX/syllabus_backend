@@ -163,6 +163,32 @@ def create_book_json(books: Set[Dict]) -> str:
     
     return output_file
 
+def get_pretty_html_path(raw_html_path: str) -> str:
+    """raw_htmlのパスからpretty_htmlのパスを生成する"""
+    return raw_html_path.replace('raw_html', 'pretty_html')
+
+def process_html_file(html_file: str) -> List[Dict]:
+    """HTMLファイルを処理して書籍情報を抽出する"""
+    # 元のHTMLファイルを読み込む
+    with open(html_file, 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    
+    # pretty_htmlのパスを生成
+    pretty_html_path = get_pretty_html_path(html_file)
+    
+    # pretty_htmlが存在しない場合、または元のHTMLファイルより新しい場合は作成
+    if not os.path.exists(pretty_html_path) or \
+       os.path.getmtime(html_file) > os.path.getmtime(pretty_html_path):
+        create_pretty_html(html_content, pretty_html_path)
+        html_content = BeautifulSoup(html_content, 'html.parser').prettify()
+    else:
+        # 既存のpretty_htmlを読み込む
+        with open(pretty_html_path, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+    
+    # 書籍情報を抽出
+    return extract_book_info(html_content, html_file)
+
 def main():
     """メイン処理"""
     try:
@@ -178,23 +204,11 @@ def main():
         all_books = set()
         for html_file in tqdm(html_files, desc="書籍情報を抽出中"):
             try:
-                # 元のHTMLファイルを読み込む
-                with open(html_file, 'r', encoding='utf-8') as f:
-                    html_content = f.read()
-                
-                # 整形したHTMLを保存
-                pretty_html_path = html_file.replace('raw_html', 'pretty_html')
-                create_pretty_html(html_content, pretty_html_path)
-                
-                # 整形したHTMLを読み込んで解析
-                with open(pretty_html_path, 'r', encoding='utf-8') as f:
-                    pretty_html_content = f.read()
-                    books = extract_book_info(pretty_html_content, html_file)
-                    
-                    # 各書籍の情報をタプルに変換してセットに追加（重複を防ぐため）
-                    for book in books:
-                        book_tuple = tuple(sorted(book.items()))
-                        all_books.add(book_tuple)
+                books = process_html_file(html_file)
+                # 各書籍の情報をタプルに変換してセットに追加（重複を防ぐため）
+                for book in books:
+                    book_tuple = tuple(sorted(book.items()))
+                    all_books.add(book_tuple)
             except Exception as e:
                 print(f"エラー: {html_file}の処理中にエラーが発生しました: {str(e)}")
                 raise  # エラーを発生させて処理を停止
