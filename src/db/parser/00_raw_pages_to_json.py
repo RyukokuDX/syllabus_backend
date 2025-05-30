@@ -378,7 +378,12 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                             for row in table.find_all('tr'):
                                 cells = row.find_all('td')
                                 if len(cells) >= 3:  # 最低3列（回数、担当者、内容）必要
-                                    session_text = cells[0].get_text(strip=True)
+                                    # 回数の取得（aタグ内のテキスト）
+                                    session_cell = cells[0]
+                                    session_link = session_cell.find('a')
+                                    session_text = session_link.get_text(strip=True) if session_link else session_cell.get_text(strip=True)
+                                    
+                                    # 担当者と内容の取得
                                     instructor = cells[1].get_text(strip=True)
                                     contents = cells[2].get_text(strip=True)
                                     other_info = cells[3].get_text(strip=True) if len(cells) > 3 else ""
@@ -389,12 +394,21 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                         session_num = int(number_match.group(1))
                                         # 重複チェック
                                         if not any(s["session_number"] == session_num for s in info["lecture_sessions"]):
-                                            info["lecture_sessions"].append({
-                                                "session_number": session_num,
-                                                "contents": contents,
-                                                "other_info": other_info,
-                                                "instructor": instructor
-                                            })
+                                            # 1回目のデータの場合、値が入れ替わっているので修正
+                                            if session_num == 1:
+                                                info["lecture_sessions"].append({
+                                                    "session_number": session_num,
+                                                    "instructor": contents,  # 内容が担当者
+                                                    "contents": other_info,  # その他情報が内容
+                                                    "other_info": ""        # 空にする
+                                                })
+                                            else:
+                                                info["lecture_sessions"].append({
+                                                    "session_number": session_num,
+                                                    "instructor": instructor,
+                                                    "contents": contents,
+                                                    "other_info": other_info
+                                                })
     
     return info
 
@@ -427,21 +441,28 @@ def save_to_json(data: List[Dict], year: int) -> str:
     processed_data = []
     for syllabus in data:
         processed_syllabus = syllabus.copy()
-        if processed_syllabus.get('syllabus_code') == '4792000':
-            # 問題のシラバスの場合、lecture_sessionsを明示的に処理
-            if 'lecture_sessions' in processed_syllabus:
-                sessions = processed_syllabus['lecture_sessions']
-                if sessions:
-                    processed_sessions = []
-                    for session in sessions:
+        if 'lecture_sessions' in processed_syllabus:
+            sessions = processed_syllabus['lecture_sessions']
+            if sessions:
+                processed_sessions = []
+                for session in sessions:
+                    # 1回目のデータの場合、特別な処理
+                    if session['session_number'] == 1:
                         processed_session = {
                             'session_number': int(session['session_number']),
-                            'contents': str(session['contents']),
-                            'other_info': str(session.get('other_info', '')),
-                            'instructor': str(session.get('instructor', ''))
+                            'instructor': str(session.get('instructor', '')),
+                            'contents': str(session.get('contents', '')),
+                            'other_info': str(session.get('other_info', ''))
                         }
-                        processed_sessions.append(processed_session)
-                    processed_syllabus['lecture_sessions'] = processed_sessions
+                    else:
+                        processed_session = {
+                            'session_number': int(session['session_number']),
+                            'instructor': str(session.get('instructor', '')),
+                            'contents': str(session.get('contents', '')),
+                            'other_info': str(session.get('other_info', ''))
+                        }
+                    processed_sessions.append(processed_session)
+                processed_syllabus['lecture_sessions'] = processed_sessions
         processed_data.append(processed_syllabus)
     
     with open(output_file, 'w', encoding='utf-8') as f:
