@@ -45,12 +45,21 @@ def parse_instructor_name(name: str) -> Dict:
         }
     return {"last_name": name, "first_name": ""}
 
+def log_debug(message, year):
+    """評価基準に関するログのみを出力"""
+    if not any(keyword in message for keyword in ["評価基準", "成績評価"]):
+        return
+    log_dir = f"src/syllabus/{year}/data"
+    os.makedirs(log_dir, exist_ok=True)
+    with open(f"{log_dir}/debug_scores.log", "a", encoding='utf-8') as f:
+        f.write(f"{message}\n")
+
 def clear_debug_log(year):
-    log_path = f"src/syllabus/{year}/data/debug_books.log"
-    os.makedirs(f"src/syllabus/{year}/data", exist_ok=True)
-    with open(log_path, 'w', encoding='utf-8') as f:
+    """ログファイルをクリア"""
+    log_dir = f"src/syllabus/{year}/data"
+    os.makedirs(log_dir, exist_ok=True)
+    with open(f"{log_dir}/debug_scores.log", "w", encoding='utf-8') as f:
         f.write("")
-    return log_path
 
 def parse_book_td(td, role):
     block = ' '.join([t.strip() for t in td.strings if t.strip()])
@@ -97,20 +106,18 @@ def extract_books_from_table(soup, label, role, year, log_path, syllabus_code, f
 def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
     """HTMLからシラバス情報を抽出"""
     if soup is None:
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, 'html.parser', from_encoding='utf-8')
     
     # シラバス管理番号をファイル名から取得
     syllabus_code = os.path.splitext(os.path.basename(file_path))[0]
     
-    # デバッグログ用の関数
-    def log_debug(message):
-        with open(f"src/syllabus/{syllabus_code.split('_')[0]}/data/debug.log", "a", encoding="utf-8") as f:
-            f.write(f"[{syllabus_code}] {message}\n")
+    # 年度をファイルパスから抽出
+    year = int(re.search(r'/\d{4}/', file_path).group(0).strip('/'))
     
     # 基本情報の抽出
     info = {
         "syllabus_code": syllabus_code,
-        "syllabus_year": int(re.search(r'/\d{4}/', file_path).group(0).strip('/')),
+        "syllabus_year": year,
         "subject_name": "",
         "faculty": "",
         "subtitle": "",
@@ -123,8 +130,7 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
         "methods": "",
         "outside_study": "",
         "notes": "",
-        "remarks": "",  # advicesからremarksに変更
-        # 関連情報
+        "remarks": "",
         "grades": [],
         "lecture_sessions": [],
         "instructors": [],
@@ -209,18 +215,22 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
     
     # 講義概要セクションから情報を抽出
     for form in soup.find_all('form'):
+        log_debug("フォームを発見", year)
         for table in form.find_all('table'):
+            log_debug("テーブルを発見", year)
             # テーブルのヘッダーを探す
             header = table.find('th')
             if not header:
+                log_debug("ヘッダーなし", year)
                 continue
                 
             header_text = header.get_text(strip=True)
-            log_debug(f"処理中のセクション: {header_text}")
+            log_debug(f"ヘッダーテキスト: {header_text}", year)
             
             # 内容を取得（spanタグ内のテキストを優先）
             content = table.find('td')
             if not content:
+                log_debug("コンテンツなし", year)
                 continue
                 
             # spanタグ内のテキストを取得
@@ -229,6 +239,8 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                 content_text = span.get_text(strip=True)
             else:
                 content_text = content.get_text(strip=True)
+            
+            log_debug(f"コンテンツテキスト: {content_text}", year)
             
             # セクションタイトルに基づいて情報を分類
             if any(keyword in header_text for keyword in ["目的・ねらい", "Goal(s)", "目的"]):
@@ -245,27 +257,66 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                 info["notes"] = content_text
             elif any(keyword in header_text for keyword in ["履修上の注意・担当者からの一言", "Advice to students", "担当者からの一言"]):
                 info["remarks"] = content_text  # advicesからremarksに変更
-            elif any(keyword in header_text for keyword in ["成績評価", "Grading", "評価"]):
-                # 成績評価基準の解析
-                log_debug("成績評価基準の解析開始")
-                for row in table.find_all('tr'):
-                    cells = row.find_all(['th', 'td'])
-                    if len(cells) >= 2:
-                        criteria = cells[0].get_text(strip=True)
-                        ratio = cells[1].get_text(strip=True)
-                        log_debug(f"評価基準: {criteria}, 比率: {ratio}")
-                        if criteria and ratio.strip():
-                            try:
-                                # 比率から数値のみを抽出
-                                ratio_value = re.search(r'\d+', ratio)
-                                if ratio_value:
-                                    info["grading_criteria"].append({
-                                        "criteria_type": criteria,
-                                        "ratio": int(ratio_value.group(0))
-                                    })
-                                    log_debug(f"評価基準を追加: {criteria} ({ratio_value.group(0)}%)")
-                            except ValueError as e:
-                                log_debug(f"評価基準の解析エラー: {str(e)}")
+            elif "種別" in header_text or "Kind" in header_text:
+                log_debug(f"成績評価セクションを発見: {header_text}", year)
+                
+                # 評価基準テーブルを探す
+                content = table.find('td')
+                if content:
+                    # テーブルを探す
+                    grading_table = content.find('table')
+                    if grading_table:
+                        log_debug("評価基準テーブルを発見", year)
+                        rows = grading_table.find_all('tr')
+                        for row in rows:
+                            cells = row.find_all(['th', 'td'])
+                            if len(cells) >= 2:  # 2列以上あれば処理
+                                kind_cell = cells[0]
+                                ratio_cell = cells[1]
+                                note_cell = cells[2] if len(cells) > 2 else None
+                                
+                                kind_text = kind_cell.get_text(strip=True)
+                                ratio_text = ratio_cell.get_text(strip=True)
+                                note_text = note_cell.get_text(strip=True) if note_cell else ""
+                                
+                                # 種別行はスキップ
+                                if kind_text == "種別" or not kind_text:
+                                    continue
+                                    
+                                # 種別名の統一
+                                if "その他" in kind_text:
+                                    kind_text = "その他"
+                                elif "自由記載" in kind_text or "Notebook" in kind_text:
+                                    kind_text = "自由記載"
+                                    # 次のtdの内容を取得
+                                    next_td = row.find('td')
+                                    if next_td:
+                                        note_text = next_td.get_text(strip=True)
+                                        if note_text:
+                                            info["grading_criteria"].append({
+                                                "criteria_type": kind_text,
+                                                "ratio": None,
+                                                "note": note_text
+                                            })
+                                    continue
+                                    
+                                # 割合が空の場合はスキップ
+                                if not ratio_text.strip():
+                                    continue
+                                    
+                                ratio_match = re.search(r'(\d+)', ratio_text)
+                                if ratio_match:
+                                    ratio = int(ratio_match.group(1))
+                                    # 重複チェック
+                                    if not any(c["criteria_type"] == kind_text and c["ratio"] == ratio for c in info["grading_criteria"]):
+                                        log_debug(f"評価基準を追加: {kind_text} ({ratio}%) - {note_text}", year)
+                                        info["grading_criteria"].append({
+                                            "criteria_type": kind_text,
+                                            "ratio": ratio,
+                                            "note": note_text
+                                        })
+                    else:
+                        log_debug("評価基準テーブルが見つかりません", year)
             elif any(keyword in header_text for keyword in ["テキスト", "Textbooks"]):
                 # 教科書情報の解析
                 if content_text != "特になし":
@@ -280,13 +331,13 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                         info["books"].append(book)
             elif any(keyword in header_text for keyword in ["履修条件", "Prerequisites", "条件"]):
                 # 履修条件から系統的履修情報を抽出
-                log_debug("履修条件の解析開始")
+                log_debug("履修条件の解析開始", year)
                 for row in table.find_all('tr'):
                     cells = row.find_all(['th', 'td'])
                     if len(cells) >= 2:
                         condition = cells[0].get_text(strip=True)
                         value = cells[1].get_text(strip=True)
-                        log_debug(f"条件: {condition}, 値: {value}")
+                        log_debug(f"条件: {condition}, 値: {value}", year)
                         if condition and value:
                             # 履修条件の種類を判定
                             if any(keyword in condition for keyword in ["履修済みであること", "履修していること"]):
@@ -297,7 +348,7 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                         "target_syllabus_code": code_match.group(0),
                                         "condition_type": "prerequisite"  # 前提条件
                                     })
-                                    log_debug(f"前提条件を追加: {code_match.group(0)}")
+                                    log_debug(f"前提条件を追加: {code_match.group(0)}", year)
                             elif any(keyword in condition for keyword in ["履修すること", "履修することを推奨"]):
                                 # 科目コードを抽出
                                 code_match = re.search(r'[A-Z]{2,3}\d{3}', value)
@@ -306,7 +357,7 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                                         "target_syllabus_code": code_match.group(0),
                                         "condition_type": "recommended"  # 推奨科目
                                     })
-                                    log_debug(f"推奨科目を追加: {code_match.group(0)}")
+                                    log_debug(f"推奨科目を追加: {code_match.group(0)}", year)
     
     return info
 
@@ -317,6 +368,13 @@ def save_to_json(data: List[Dict], year: int) -> str:
     
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     output_file = os.path.join(output_dir, f"syllabus_{timestamp}.json")
+    
+    # 評価基準のログ出力
+    for syllabus in data:
+        if syllabus.get("grading_criteria"):
+            log_debug(f"シラバス {syllabus['syllabus_code']} の評価基準:", year)
+            for criterion in syllabus["grading_criteria"]:
+                log_debug(f"  - {criterion['criteria_type']} ({criterion['ratio']}%): {criterion.get('note', '備考なし')}", year)
     
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump({"content": data}, f, ensure_ascii=False, indent=2)
@@ -360,7 +418,7 @@ def main():
     print(f"出力先ディレクトリ: src/syllabus/{year}/data/")
     
     all_syllabus_info = []
-    log_path = clear_debug_log(year)
+    clear_debug_log(year)  # ログファイルをクリア
     for html_file in tqdm(html_files, desc="HTMLファイル処理中"):
         try:
             # 1. 元HTMLをprettifyしてpretty.htmlに上書き保存
