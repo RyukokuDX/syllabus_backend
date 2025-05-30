@@ -660,7 +660,7 @@ periodは"0"とする.
 |----------|----------|------|------|--------|
 | id | INTEGER | NO | ID（主キー） | システム生成 |
 | source_syllabus_id | INTEGER | NO | 引用元シラバスID（外部キー） | Web Syllabus |
-| target_syllabus_id | INTEGER | NO | 引用先シラバスID（外部キー） | Web Syllabus |
+| target | TEXT | NO | 引用先科目 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -669,14 +669,43 @@ periodは"0"とする.
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
 | idx_syllabus_study_system_source | source_syllabus_id | 引用元シラバスIDでの検索用 |
-| idx_syllabus_study_system_target | target_syllabus_id | 引用先シラバスIDでの検索用 |
-| UNIQUE | (source_syllabus_id, target_syllabus_id) | 引用関係の一意性 |
+| idx_syllabus_study_system_target | target | 引用先科目での検索用 |
+| UNIQUE | (source_syllabus_id, target) | 引用関係の一意性 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | source_syllabus_id | syllabus_master(syllabus_id) | CASCADE |
-| target_syllabus_id | syllabus_master(syllabus_id) | CASCADE |
+
+#### 補足
+- 引用先の科目は、Web Syllabusの「履修条件」から取得した生のテキストをそのまま保存
+- 科目の分解や正規化は行わない
+
+### lecture_session_instructor 講義回数担当者
+
+#### テーブル概要
+講義回数ごとの担当者情報を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | ID（主キー） | システム生成 |
+| lecture_session_id | INTEGER | NO | 講義回数ID（外部キー） | システム生成 |
+| instructor_id | INTEGER | NO | 担当者ID（外部キー） | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_lecture_session_instructor_session | lecture_session_id | 講義回数IDでの検索用 |
+| idx_lecture_session_instructor_instructor | instructor_id | 担当者IDでの検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| lecture_session_id | lecture_session(lecture_session_id) | CASCADE |
+| instructor_id | instructor(instructor_id) | CASCADE |
 
 [目次へ戻る](#目次)
 

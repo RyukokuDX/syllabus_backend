@@ -179,7 +179,6 @@ erDiagram
     syllabus ||--o{ grading_criterion : "syllabus_code"
     syllabus ||--o{ subject_syllabus : "syllabus_code"
     syllabus ||--o{ syllabus_study_system : "source_syllabus_id"
-    syllabus ||--o{ syllabus_study_system : "target_syllabus_id"
 
     lecture_time ||--o{ syllabus_master : "belongs to"
     lecture_session ||--o{ syllabus_master : "belongs to"
@@ -210,6 +209,14 @@ erDiagram
         integer lecture_session_id FK
         integer instructor_id FK
         timestamp created_at
+    }
+
+    syllabus_study_system {
+        INTEGER id PK
+        INTEGER source_syllabus_id FK
+        TEXT target
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 ```
 

@@ -136,7 +136,7 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
         "instructors": [],
         "books": [],
         "grading_criteria": [],
-        "study_system": [],
+        "study_system": "",  # 系統的履修情報をテキストとして保存
         "lecture_sessions": []  # 講義回数のリスト
     }
     
@@ -333,6 +333,7 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
             elif any(keyword in header_text for keyword in ["履修条件", "Prerequisites", "条件"]):
                 # 履修条件から系統的履修情報を抽出
                 log_debug("履修条件の解析開始", year)
+                study_system_text = ""
                 for row in table.find_all('tr'):
                     cells = row.find_all(['th', 'td'])
                     if len(cells) >= 2:
@@ -341,24 +342,12 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                         log_debug(f"条件: {condition}, 値: {value}", year)
                         if condition and value:
                             # 履修条件の種類を判定
-                            if any(keyword in condition for keyword in ["履修済みであること", "履修していること"]):
-                                # 科目コードを抽出（例: "ABC123"）
-                                code_match = re.search(r'[A-Z]{2,3}\d{3}', value)
-                                if code_match:
-                                    info["study_system"].append({
-                                        "target_syllabus_code": code_match.group(0),
-                                        "condition_type": "prerequisite"  # 前提条件
-                                    })
-                                    log_debug(f"前提条件を追加: {code_match.group(0)}", year)
-                            elif any(keyword in condition for keyword in ["履修すること", "履修することを推奨"]):
-                                # 科目コードを抽出
-                                code_match = re.search(r'[A-Z]{2,3}\d{3}', value)
-                                if code_match:
-                                    info["study_system"].append({
-                                        "target_syllabus_code": code_match.group(0),
-                                        "condition_type": "recommended"  # 推奨科目
-                                    })
-                                    log_debug(f"推奨科目を追加: {code_match.group(0)}", year)
+                            if any(keyword in condition for keyword in ["履修済みであること", "履修していること", "履修すること", "履修することを推奨"]):
+                                if study_system_text:
+                                    study_system_text += "、"
+                                study_system_text += value
+                                log_debug(f"系統的履修情報を追加: {value}", year)
+                info["study_system"] = study_system_text
     
     # 講義計画セクションの解析（最後に実行）
     for form in soup.find_all('form'):

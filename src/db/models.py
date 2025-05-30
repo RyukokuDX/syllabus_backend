@@ -570,26 +570,23 @@ class SyllabusStudySystem(Base):
 
     id = Column(Integer, primary_key=True)
     source_syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
-    target_syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    target = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
         Index('idx_syllabus_study_system_source', 'source_syllabus_id'),
-        Index('idx_syllabus_study_system_target', 'target_syllabus_id'),
-        UniqueConstraint('source_syllabus_id', 'target_syllabus_id', name='uix_syllabus_study_system_unique'),
+        Index('idx_syllabus_study_system_target', 'target'),
     )
 
     source_syllabus = relationship("SyllabusMaster", foreign_keys=[source_syllabus_id], back_populates="source_study_systems")
-    target_syllabus = relationship("SyllabusMaster", foreign_keys=[target_syllabus_id], back_populates="target_study_systems")
 
 @dataclass
 class SyllabusStudySystemData:
     """シラバス系統的履修モデル"""
     id: int
     source_syllabus_id: int
-    target_syllabus_id: int
+    target: str
     created_at: datetime
     updated_at: Optional[datetime] = None
-    source_syllabus: Optional[SyllabusData] = None  # Web Syllabusの情報
-    target_syllabus: Optional[SyllabusData] = None  # Web Syllabusの情報 
+    source_syllabus: Optional[SyllabusData] = None  # Web Syllabusの情報 
