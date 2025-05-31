@@ -1,4 +1,4 @@
-# PostgreSQLコンテナが実行中か確認
+﻿# PostgreSQLコンテナが実行中か確認
 $containerName = "postgres-db"
 $containerStatus = docker ps -f "name=$containerName" --format "{{.Status}}"
 
