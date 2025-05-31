@@ -160,7 +160,6 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | instructor_id | INTEGER | NO | 教員ID（主キー） | システム生成 |
-| instructor_code | TEXT | NO | 独自教職員番号 | システム生成 |
 | last_name | TEXT | NO | 苗字 | Web Syllabus |
 | first_name | TEXT | NO | 名前 | Web Syllabus |
 | last_name_kana | TEXT | YES | 苗字（カナ） | Web Syllabus |

@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -173,12 +173,11 @@ class Instructor(Base):
     __tablename__ = 'instructor'
 
     instructor_id = Column(Integer, primary_key=True)
-    instructor_code = Column(Text, nullable=False, unique=True)
-    last_name = Column(Text, nullable=False)
-    first_name = Column(Text, nullable=False)
-    last_name_kana = Column(Text)
-    first_name_kana = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    last_name = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name_kana = Column(String)
+    first_name_kana = Column(String)
+    created_at = Column(DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
 
     __table_args__ = (
         Index('idx_instructor_name', 'last_name', 'first_name'),
@@ -416,7 +415,6 @@ class Subject:
 class Instructor:
     """教員モデル"""
     instructor_id: int
-    instructor_code: str
     last_name: str
     first_name: str
     last_name_kana: Optional[str]

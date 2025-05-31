@@ -1,16 +1,28 @@
 -- ========== 開発用データベースの作成 ==========
 
+-- syllabus_dbが作成されるまで待機
+DO $$
+BEGIN
+    WHILE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}') LOOP
+        PERFORM pg_sleep(1);
+    END LOOP;
+END
+$$;
+
+-- 既存の開発用データベースを削除
+DROP DATABASE IF EXISTS ${DEV_DB};
+
 -- 開発用データベースの作成
-CREATE DATABASE ${POSTGRES_DB}_dev WITH TEMPLATE ${POSTGRES_DB};
+CREATE DATABASE ${DEV_DB} WITH TEMPLATE ${POSTGRES_DB};
 
 -- ========== 権限付与 ==========
 
 -- 開発用データベースへの権限付与
-GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB}_dev TO dev_user;
-GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB}_dev TO app_user;
+GRANT ALL PRIVILEGES ON DATABASE ${DEV_DB} TO dev_user;
+GRANT ALL PRIVILEGES ON DATABASE ${DEV_DB} TO app_user;
 
 -- 開発用データベースのスキーマ権限付与
-\c ${POSTGRES_DB}_dev
+\c ${DEV_DB}
 GRANT ALL ON SCHEMA public TO dev_user;
 GRANT ALL ON SCHEMA public TO app_user;
 
@@ -28,4 +40,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO app_user;
 
 -- 開発用データベースのカタログ参照権限付与
 GRANT USAGE ON SCHEMA public TO dev_user;
-GRANT USAGE ON SCHEMA public TO app_user; 
+GRANT USAGE ON SCHEMA public TO app_user;
+
+\i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_classs.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_subclasss.sql 

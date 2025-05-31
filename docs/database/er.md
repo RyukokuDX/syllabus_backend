@@ -37,7 +37,6 @@ erDiagram
     }
     instructor {
         INTEGER instructor_id PK
-        TEXT instructor_code
         TEXT last_name
         TEXT first_name
         TEXT last_name_kana

@@ -109,87 +109,76 @@ def generate_sql_insert(table_name, records):
 
     values_str = ',\n'.join(values)
 
-    # テーブルごとのON CONFLICT句を設定（structure.mdに準拠）
+    # テーブルごとの設定
     conflict_columns = {
-        'class': ['class_name'],
-        'subclass': ['subclass_name'],
-        'faculty': ['faculty_name'],
-        'subject_name': ['name'],
-        'instructor': ['instructor_code'],
-        'book': ['isbn'],
-        'book_author': ['book_id', 'author_name'],
-        'syllabus_master': ['syllabus_code', 'syllabus_year'],
-        'syllabus': ['syllabus_id'],
-        'subject_grade': ['syllabus_id', 'grade'],
-        'lecture_time': ['syllabus_id', 'day_of_week', 'period'],
-        'lecture_session': ['lecture_session_id'],
-        'lecture_session_instructor': ['lecture_session_id', 'instructor_id'],
-        'syllabus_instructor': ['syllabus_id', 'instructor_id'],
-        'syllabus_book': ['syllabus_id', 'book_id'],
-        'grading_criterion': ['syllabus_id', 'criteria_type'],
-        'subject_attribute': ['attribute_name'],
-        'subject': ['subject_name_id', 'faculty_id', 'class_id', 'subclass_id', 'curriculum_year'],
-        'subject_syllabus': ['subject_id', 'syllabus_id'],
-        'subject_attribute_value': ['subject_id', 'attribute_id'],
-        'syllabus_study_system': ['source_syllabus_id', 'target']
-    }
-    
-    # 更新対象のカラムを設定（structure.mdに準拠）
-    update_columns = {
-        'class': None,  # 更新しない
-        'subclass': None,  # 更新しない
-        'faculty': None,  # 更新しない
-        'subject_name': None,  # 更新しない
-        'instructor': ['last_name', 'first_name', 'last_name_kana', 'first_name_kana', 'updated_at'],
-        'book': ['title', 'publisher', 'price', 'updated_at'],
-        'book_author': None,  # 更新しない
-        'syllabus_master': ['updated_at'],
-        'syllabus': ['subject_name_id', 'subtitle', 'term', 'campus', 'credits', 'goals', 'summary', 'attainment', 'methods', 'outside_study', 'notes', 'remarks', 'updated_at'],
-        'subject_grade': ['updated_at'],
-        'lecture_time': ['updated_at'],
-        'lecture_session': ['session_number', 'contents', 'other_info', 'updated_at'],
-        'lecture_session_instructor': None,  # 更新しない
-        'syllabus_instructor': None,  # 更新しない
-        'syllabus_book': ['role', 'note'],
-        'grading_criterion': ['ratio', 'note'],
-        'subject_attribute': None,  # 更新しない
-        'subject': ['updated_at'],
-        'subject_syllabus': ['updated_at'],
-        'subject_attribute_value': ['value', 'updated_at'],
-        'syllabus_study_system': ['updated_at']
+        "class": ["class_name"],
+        "subclass": ["subclass_name"],
+        "faculty": ["faculty_name"],
+        "subject_name": ["name"],
+        "syllabus_master": ["syllabus_code", "syllabus_year"],
+        "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
+        "subject_syllabus": ["subject_id", "syllabus_id"],
+        "subject_attribute": ["attribute_name"],
+        "subject_attribute_value": ["subject_id", "attribute_id"],
+        "instructor": ["last_name", "first_name"],
+        "book": None,
+        "book_author": ["book_id", "author_name"],
+        "lecture_time": ["syllabus_id", "day_of_week", "period"],
+        "lecture_session": ["syllabus_id", "session_number"],
+        "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
+        "syllabus_instructor": ["syllabus_id", "instructor_id"],
+        "syllabus_book": ["syllabus_id", "book_id"],
+        "grading_criterion": ["syllabus_id", "criteria_type"],
+        "syllabus_study_system": ["source_syllabus_id", "target"],
+        "subject_grade": ["syllabus_id", "grade"]
     }
 
-    # ON CONFLICT句を生成
+    # 更新対象カラムの設定
+    update_columns = {
+        "class": ["class_name"],
+        "subclass": ["subclass_name"],
+        "faculty": ["faculty_name"],
+        "subject_name": ["name"],
+        "syllabus_master": ["syllabus_code", "syllabus_year"],
+        "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
+        "subject_syllabus": ["subject_id", "syllabus_id"],
+        "subject_attribute": ["attribute_name", "description"],
+        "subject_attribute_value": ["value"],
+        "instructor": ["last_name", "first_name", "last_name_kana", "first_name_kana"],
+        "book": None,
+        "book_author": ["book_id", "author_name"],
+        "lecture_time": ["day_of_week", "period"],
+        "lecture_session": ["session_number", "contents", "other_info"],
+        "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
+        "syllabus_instructor": ["syllabus_id", "instructor_id"],
+        "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
+        "grading_criterion": ["criteria_type", "ratio", "note"],
+        "syllabus_study_system": ["target"],
+        "subject_grade": ["grade"]
+    }
+
+    # ON CONFLICT句の生成
     conflict_cols = conflict_columns.get(table_name, [])
     update_cols = update_columns.get(table_name, [])
     
-    if not conflict_cols:
-        return f"""-- {table_name} テーブルへのデータ挿入
-INSERT INTO {table_name} (
-    {columns_str}
-) VALUES
-{values_str};
-"""
-    
-    conflict_str = ', '.join(conflict_cols)
-    
-    # update_colsがNoneの場合はON CONFLICT DO NOTHINGを使用
-    if update_cols is None:
-        update_str = "DO NOTHING"
-    # update_colsが空の場合はupdated_atのみを更新
-    elif not update_cols:
-        update_str = "DO NOTHING"
+    if conflict_cols:
+        conflict_str = f"ON CONFLICT ({', '.join(conflict_cols)})"
+        if update_cols:
+            update_str = "DO UPDATE SET " + ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
+            if "updated_at" in columns and "updated_at" not in update_cols:
+                update_str += ", updated_at = CURRENT_TIMESTAMP"
+        else:
+            update_str = "DO NOTHING"
+        conflict_str += f" {update_str}"
     else:
-        update_str = ',\n    '.join([f"{col} = EXCLUDED.{col}" for col in update_cols if col != 'updated_at'])
-        if 'updated_at' in columns:
-            update_str += ",\n    updated_at = CURRENT_TIMESTAMP"
+        conflict_str = ""
 
     sql = f"""-- {table_name} テーブルへのデータ挿入
 INSERT INTO {table_name} (
     {columns_str}
 ) VALUES
 {values_str}
-ON CONFLICT ({conflict_str}) {update_str};
+{conflict_str};
 """
     return sql
 
@@ -198,31 +187,31 @@ def generate_table_definitions():
     table_definitions = {
         'class': """
 CREATE TABLE IF NOT EXISTS class (
-    class_id INTEGER PRIMARY KEY,
-    class_name TEXT NOT NULL,
+    class_id SERIAL PRIMARY KEY,
+    class_name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'subclass': """
 CREATE TABLE IF NOT EXISTS subclass (
-    subclass_id INTEGER PRIMARY KEY,
-    subclass_name TEXT NOT NULL,
+    subclass_id SERIAL PRIMARY KEY,
+    subclass_name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'faculty': """
 CREATE TABLE IF NOT EXISTS faculty (
-    faculty_id INTEGER PRIMARY KEY,
-    faculty_name TEXT NOT NULL,
+    faculty_id SERIAL PRIMARY KEY,
+    faculty_name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'subject_name': """
 CREATE TABLE IF NOT EXISTS subject_name (
-    subject_name_id INTEGER PRIMARY KEY,
+    subject_name_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'instructor': """
 CREATE TABLE IF NOT EXISTS instructor (
-    instructor_id INTEGER PRIMARY KEY,
+    instructor_id SERIAL PRIMARY KEY,
     instructor_code TEXT NOT NULL UNIQUE,
     last_name TEXT NOT NULL,
     first_name TEXT NOT NULL,
@@ -233,28 +222,26 @@ CREATE TABLE IF NOT EXISTS instructor (
 );""",
         'book': """
 CREATE TABLE IF NOT EXISTS book (
-    book_id INTEGER PRIMARY KEY,
+    book_id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     publisher TEXT,
     price INTEGER,
-    isbn TEXT UNIQUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    isbn TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'book_author': """
 CREATE TABLE IF NOT EXISTS book_author (
-    book_author_id INTEGER PRIMARY KEY,
+    book_author_id SERIAL PRIMARY KEY,
     book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
     author_name TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'syllabus_master': """
 CREATE TABLE IF NOT EXISTS syllabus_master (
-    syllabus_id INTEGER PRIMARY KEY,
+    syllabus_id SERIAL PRIMARY KEY,
     syllabus_code TEXT NOT NULL,
     syllabus_year INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
     UNIQUE(syllabus_code, syllabus_year)
 );""",
         'syllabus': """
@@ -277,7 +264,7 @@ CREATE TABLE IF NOT EXISTS syllabus (
 );""",
         'subject_grade': """
 CREATE TABLE IF NOT EXISTS subject_grade (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     grade TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -286,7 +273,7 @@ CREATE TABLE IF NOT EXISTS subject_grade (
 );""",
         'lecture_time': """
 CREATE TABLE IF NOT EXISTS lecture_time (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     day_of_week TEXT NOT NULL,
     period SMALLINT NOT NULL,
@@ -295,7 +282,7 @@ CREATE TABLE IF NOT EXISTS lecture_time (
 );""",
         'lecture_session': """
 CREATE TABLE IF NOT EXISTS lecture_session (
-    lecture_session_id INTEGER PRIMARY KEY,
+    lecture_session_id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     session_number INTEGER NOT NULL,
     contents TEXT,
@@ -305,21 +292,21 @@ CREATE TABLE IF NOT EXISTS lecture_session (
 );""",
         'lecture_session_instructor': """
 CREATE TABLE IF NOT EXISTS lecture_session_instructor (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     lecture_session_id INTEGER NOT NULL REFERENCES lecture_session(lecture_session_id) ON DELETE CASCADE,
     instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'syllabus_instructor': """
 CREATE TABLE IF NOT EXISTS syllabus_instructor (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'syllabus_book': """
 CREATE TABLE IF NOT EXISTS syllabus_book (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
     role TEXT NOT NULL,
@@ -328,7 +315,7 @@ CREATE TABLE IF NOT EXISTS syllabus_book (
 );""",
         'grading_criterion': """
 CREATE TABLE IF NOT EXISTS grading_criterion (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     criteria_type TEXT NOT NULL,
     ratio INTEGER,
@@ -337,14 +324,14 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
 );""",
         'subject_attribute': """
 CREATE TABLE IF NOT EXISTS subject_attribute (
-    attribute_id INTEGER PRIMARY KEY,
+    attribute_id SERIAL PRIMARY KEY,
     attribute_name TEXT NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'subject': """
 CREATE TABLE IF NOT EXISTS subject (
-    subject_id INTEGER PRIMARY KEY,
+    subject_id SERIAL PRIMARY KEY,
     subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
     faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE RESTRICT,
     class_id INTEGER NOT NULL REFERENCES class(class_id) ON DELETE RESTRICT,
@@ -356,7 +343,7 @@ CREATE TABLE IF NOT EXISTS subject (
 );""",
         'subject_syllabus': """
 CREATE TABLE IF NOT EXISTS subject_syllabus (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -365,7 +352,7 @@ CREATE TABLE IF NOT EXISTS subject_syllabus (
 );""",
         'subject_attribute_value': """
 CREATE TABLE IF NOT EXISTS subject_attribute_value (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
     attribute_id INTEGER NOT NULL REFERENCES subject_attribute(attribute_id) ON DELETE RESTRICT,
     value TEXT NOT NULL,
@@ -375,7 +362,7 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
 );""",
         'syllabus_study_system': """
 CREATE TABLE IF NOT EXISTS syllabus_study_system (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     source_syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     target TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -592,260 +579,6 @@ def generate_migration():
     except Exception as e:
         print(f"Error generating migration files: {str(e)}")
         raise
-
-def generate_migration_sql() -> str:
-    """マイグレーションSQLを生成"""
-    sql = []
-    
-    # テーブル作成
-    sql.append("""
--- 科目区分テーブル
-CREATE TABLE IF NOT EXISTS class (
-    class_id INTEGER PRIMARY KEY,
-    class_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- 科目小区分テーブル
-CREATE TABLE IF NOT EXISTS subclass (
-    subclass_id INTEGER PRIMARY KEY,
-    subclass_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- 開講学部・課程テーブル
-CREATE TABLE IF NOT EXISTS faculty (
-    faculty_id INTEGER PRIMARY KEY,
-    faculty_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- 科目名マスタテーブル
-CREATE TABLE IF NOT EXISTS subject_name (
-    subject_name_id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- 教員テーブル
-CREATE TABLE IF NOT EXISTS instructor (
-    instructor_id INTEGER PRIMARY KEY,
-    instructor_code TEXT NOT NULL UNIQUE,
-    last_name TEXT NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name_kana TEXT,
-    first_name_kana TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
-
--- 書籍テーブル
-CREATE TABLE IF NOT EXISTS book (
-    book_id INTEGER PRIMARY KEY,
-    title TEXT NOT NULL,
-    publisher TEXT,
-    price INTEGER,
-    isbn TEXT UNIQUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
-
--- 書籍著者テーブル
-CREATE TABLE IF NOT EXISTS book_author (
-    book_author_id INTEGER PRIMARY KEY,
-    book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
-    author_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- シラバスマスタテーブル
-CREATE TABLE IF NOT EXISTS syllabus_master (
-    syllabus_id INTEGER PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    syllabus_year INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(syllabus_code, syllabus_year)
-);
-
--- シラバス情報テーブル
-CREATE TABLE IF NOT EXISTS syllabus (
-    syllabus_id INTEGER PRIMARY KEY REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
-    subtitle TEXT,
-    term TEXT NOT NULL,
-    campus TEXT NOT NULL,
-    credits INTEGER NOT NULL,
-    goals TEXT,
-    summary TEXT,
-    attainment TEXT,
-    methods TEXT,
-    outside_study TEXT,
-    notes TEXT,
-    remarks TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
-
--- 科目基本情報テーブル
-CREATE TABLE IF NOT EXISTS subject (
-    subject_id INTEGER PRIMARY KEY,
-    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id),
-    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id),
-    class_id INTEGER NOT NULL REFERENCES class(class_id),
-    subclass_id INTEGER REFERENCES subclass(subclass_id),
-    curriculum_year INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_name_id, faculty_id, class_id, subclass_id, curriculum_year)
-);
-
--- 科目シラバス関連テーブル
-CREATE TABLE IF NOT EXISTS subject_syllabus (
-    id INTEGER PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, syllabus_id)
-);
-
--- 科目属性テーブル
-CREATE TABLE IF NOT EXISTS subject_attribute (
-    attribute_id INTEGER PRIMARY KEY,
-    attribute_name TEXT NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- 科目属性値テーブル
-CREATE TABLE IF NOT EXISTS subject_attribute_value (
-    id INTEGER PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    attribute_id INTEGER NOT NULL REFERENCES subject_attribute(attribute_id) ON DELETE RESTRICT,
-    value TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
-);
-
--- 講義時間テーブル
-CREATE TABLE IF NOT EXISTS lecture_time (
-    id INTEGER PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    day_of_week TEXT NOT NULL,
-    period SMALLINT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
-
--- 講義セッションテーブル
-CREATE TABLE IF NOT EXISTS lecture_session (
-    lecture_session_id INTEGER PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    session_number INTEGER NOT NULL,
-    contents TEXT,
-    other_info TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
-
--- 講義セッション教員テーブル
-CREATE TABLE IF NOT EXISTS lecture_session_instructor (
-    id INTEGER PRIMARY KEY,
-    lecture_session_id INTEGER NOT NULL REFERENCES lecture_session(lecture_session_id) ON DELETE CASCADE,
-    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- シラバス教員関連テーブル
-CREATE TABLE IF NOT EXISTS syllabus_instructor (
-    id INTEGER PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- シラバス教科書関連テーブル
-CREATE TABLE IF NOT EXISTS syllabus_book (
-    id INTEGER PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
-    role TEXT NOT NULL,
-    note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- 成績評価基準テーブル
-CREATE TABLE IF NOT EXISTS grading_criterion (
-    id INTEGER PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    criteria_type TEXT NOT NULL,
-    ratio INTEGER,
-    note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- シラバス学習システムテーブル
-CREATE TABLE IF NOT EXISTS syllabus_study_system (
-    id INTEGER PRIMARY KEY,
-    source_syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    target TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(source_syllabus_id, target)
-);
-
--- 科目履修可能学年テーブル
-CREATE TABLE IF NOT EXISTS subject_grade (
-    id INTEGER PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    grade TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(syllabus_id, grade)
-);
-
--- インデックスの作成
-CREATE INDEX IF NOT EXISTS idx_class_name ON class(class_name);
-CREATE INDEX IF NOT EXISTS idx_faculty_name ON faculty(faculty_name);
-CREATE INDEX IF NOT EXISTS idx_subject_subject_name ON subject(subject_name_id);
-CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
-CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);
-CREATE INDEX IF NOT EXISTS idx_subject_curriculum_year ON subject(curriculum_year);
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);
-CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(last_name, first_name);
-CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(last_name_kana, first_name_kana);
-CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
-CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
-CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
-CREATE INDEX IF NOT EXISTS idx_syllabus_term ON syllabus(term);
-CREATE INDEX IF NOT EXISTS idx_syllabus_campus ON syllabus(campus);
-CREATE INDEX IF NOT EXISTS idx_syllabus_subject_name ON syllabus(subject_name_id);
-CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
-CREATE INDEX IF NOT EXISTS idx_lecture_time_syllabus ON lecture_time(syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session_number);
-CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_session ON lecture_session_instructor(lecture_session_id);
-CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_instructor ON lecture_session_instructor(instructor_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_syllabus ON syllabus_instructor(syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_instructor ON syllabus_instructor(instructor_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_book_syllabus ON syllabus_book(syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_book_book ON syllabus_book(book_id);
-CREATE INDEX IF NOT EXISTS idx_grading_criterion_type ON grading_criterion(criteria_type);
-CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_source ON syllabus_study_system(source_syllabus_id);
-CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_system(target);
-CREATE INDEX IF NOT EXISTS idx_subject_grade_grade ON subject_grade(grade);
-CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_id);
-""")
-    
-    return '\n'.join(sql)
 
 if __name__ == '__main__':
     generate_migration() 
