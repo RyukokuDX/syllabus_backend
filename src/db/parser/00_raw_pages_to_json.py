@@ -96,18 +96,55 @@ def parse_book_td(td, role):
     # タイトル
     title_match = re.search(r'『(.+?)』', block)
     title = title_match.group(1).strip() if title_match else ""
-    # 出版社
-    publisher_match = re.search(r'（(.+?)）', block)
-    publisher = publisher_match.group(1).strip() if publisher_match else ""
-    # 価格
+    # 出版社（タイトルの後の部分から抽出）
+    publisher = ""
+    if title_match:
+        after_title = block[title_match.end():].strip()
+        publisher_match = re.search(r'（(.+?)）', after_title)
+        if publisher_match:
+            publisher = publisher_match.group(1).strip()
+    # 価格（より柔軟なパターンに対応）
+    price = 0
+    # 1. 通常の「数字円」パターン
     price_match = re.search(r'([0-9,]+)円', block)
-    price = int(price_match.group(1).replace(',', '')) if price_match else 0
+    if price_match:
+        price = int(price_match.group(1).replace(',', ''))
+    else:
+        # 2. 「\数字」パターン
+        price_match = re.search(r'\\?([0-9,]+)', block)
+        if price_match:
+            price = int(price_match.group(1).replace(',', ''))
+        else:
+            # 3. 「￥数字」パターン
+            price_match = re.search(r'￥([0-9,]+)', block)
+            if price_match:
+                price = int(price_match.group(1).replace(',', ''))
+    # 著者（タイトルの前の部分から抽出）
+    author = ""
+    if title_match:
+        before_title = block[:title_match.start()].strip()
+        # 著者名のパターン（例：山田太郎著、山田太郎・鈴木花子著、山田太郎[著]）
+        author_match = re.search(r'(.+?)(?:著|\[著\]|編|\[編\]|共著|共編)', before_title)
+        if author_match:
+            author = author_match.group(1).strip()
+            # 括弧を除去
+            author = re.sub(r'[（(].*?[)）]', '', author).strip()
+            # 複数著者の場合（・で区切られている）
+            if '・' in author:
+                authors = [a.strip() for a in author.split('・')]
+                author = '・'.join(authors)
+    # ISBN
+    isbn_match = re.search(r'ISBN[- ]?(?:13|10)?[: ]?([0-9-]+)', block)
+    isbn = isbn_match.group(1).replace('-', '') if isbn_match else ""
+    # 価格とISBNが同じ場合は価格を0に設定
+    if str(price) == isbn:
+        price = 0
     return {
         "title": title,
-        "author": "",
+        "author": author,
         "publisher": publisher,
         "price": price,
-        "isbn": "",
+        "isbn": isbn,
         "role": role
     }
 
