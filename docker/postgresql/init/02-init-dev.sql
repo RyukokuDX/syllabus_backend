@@ -44,7 +44,6 @@ GRANT USAGE ON SCHEMA public TO app_user;
 
 \i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_classs.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_facultys.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_subclasss.sql \i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_books.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_classs.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250531143002__insert_subclasss.sql \i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_classs.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_facultys.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_subclasss.sql

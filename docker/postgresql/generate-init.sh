@@ -9,6 +9,11 @@ OUTPUT_FILE="init/01-init.sql"
 DEV_TEMPLATE_FILE="init/init-dev.sql.template"
 DEV_OUTPUT_FILE="init/02-init-dev.sql"
 ENV_FILE="../.env"
+MIGRATIONS_DIR="init/migrations"
+DOCKER_MIGRATIONS_DIR="init/docker-entrypoint-initdb.d/migrations"
+
+# マイグレーションディレクトリの作成
+mkdir -p "$DOCKER_MIGRATIONS_DIR"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing .env file at $ENV_FILE"
@@ -46,14 +51,15 @@ done
 echo "$OUTPUT_FILE generated successfully"
 echo "$DEV_OUTPUT_FILE generated successfully"
 
-# マイグレーションファイルの自動挿入
-MIGRATIONS_DIR="init/migrations"
+# マイグレーションファイルの自動挿入とコピー
 if [ -d "$MIGRATIONS_DIR" ]; then
   echo "MIGRATIONS_DIR: $MIGRATIONS_DIR"
   for sqlfile in "$MIGRATIONS_DIR"/*.sql; do
     [ -e "$sqlfile" ] || { echo "No .sql files found in $MIGRATIONS_DIR"; continue; }
     filename=$(basename "$sqlfile")
     echo "Adding migration: $filename"
+    # マイグレーションファイルをコピー
+    cp "$sqlfile" "$DOCKER_MIGRATIONS_DIR/"
     echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$OUTPUT_FILE"
     echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$DEV_OUTPUT_FILE"
   done

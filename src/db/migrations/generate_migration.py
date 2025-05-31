@@ -534,7 +534,7 @@ def generate_migration():
         ]
         
         # マイグレーションファイルの出力先ディレクトリ
-        migrations_dir = project_root / 'docker' / 'postgresql' / 'init' / 'migrations'
+        migrations_dir = project_root / 'docker' / 'postgresql' / 'init' / 'migrations_dev'
         migrations_dir.mkdir(parents=True, exist_ok=True)
         
         # 現在のタイムスタンプを取得
