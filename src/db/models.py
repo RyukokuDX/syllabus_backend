@@ -179,7 +179,6 @@ class Instructor(Base):
     last_name_kana = Column(Text)
     first_name_kana = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
         Index('idx_instructor_name', 'last_name', 'first_name'),
@@ -195,7 +194,6 @@ class Book(Base):
     price = Column(Integer)
     isbn = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
         Index('idx_book_title', 'title'),
@@ -424,7 +422,6 @@ class Instructor:
     last_name_kana: Optional[str]
     first_name_kana: Optional[str]
     created_at: datetime
-    updated_at: Optional[datetime]
 
 @dataclass
 class Book:
@@ -435,7 +432,6 @@ class Book:
     price: Optional[int]
     isbn: Optional[str]
     created_at: datetime
-    updated_at: Optional[datetime]
 
 @dataclass
 class BookAuthor:
@@ -565,6 +561,21 @@ class RequirementModel(Base):
     requirement_header = relationship("RequirementHeaderModel", back_populates="requirements")
     requirement_attribute = relationship("RequirementAttributeModel", back_populates="requirements")
 
+class SyllabusMaster(Base):
+    __tablename__ = 'syllabus_master'
+
+    syllabus_id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        UniqueConstraint('syllabus_code', 'syllabus_year', name='uix_syllabus_master_code_year'),
+        Index('idx_syllabus_master_code', 'syllabus_code'),
+        Index('idx_syllabus_master_year', 'syllabus_year'),
+    )
+
 class SyllabusStudySystem(Base):
     __tablename__ = 'syllabus_study_system'
 
@@ -575,6 +586,7 @@ class SyllabusStudySystem(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
+        UniqueConstraint('source_syllabus_id', 'target', name='uix_syllabus_study_system_source_target'),
         Index('idx_syllabus_study_system_source', 'source_syllabus_id'),
         Index('idx_syllabus_study_system_target', 'target'),
     )

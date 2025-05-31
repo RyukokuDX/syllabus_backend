@@ -28,7 +28,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO app_user;
 
 -- 開発用データベースのカタログ参照権限付与
 GRANT USAGE ON SCHEMA public TO dev_user;
-GRANT USAGE ON SCHEMA public TO app_user; \i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_class_notes.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_classs.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_subclasss.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250522111408__insert_subject_names.sql
+GRANT USAGE ON SCHEMA public TO app_user; \i /docker-entrypoint-initdb.d/migrations/V20250531094558__insert_classs.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250531094558__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250531094558__insert_instructors.sql

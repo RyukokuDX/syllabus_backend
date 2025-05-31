@@ -36,6 +36,11 @@ def parse_instructor_name(name: str) -> Dict:
     if not name:
         return {"last_name": "", "first_name": ""}
     
+    # 全角スペースを半角スペースに変換
+    name = name.replace('　', ' ')
+    # 連続するスペースを1つに置換
+    name = ' '.join(name.split())
+    
     # 空白で姓と名に分割
     name_parts = name.split()
     if len(name_parts) >= 2:
@@ -215,29 +220,40 @@ def extract_syllabus_info(html_content: str, file_path: str, soup=None) -> Dict:
                         info["credits"] = 0
                 elif "担当者Instructorカナ氏名" in key:
                     if value:
-                        # カンマで分割して複数の教員を処理
-                        for instructor in value.split(','):
-                            instructor = instructor.strip()
-                            if instructor:
-                                name_info = parse_instructor_name(instructor)
-                                info["instructors"].append({
-                                    "last_name_kana": name_info["last_name"],
-                                    "first_name_kana": name_info["first_name"],
-                                    "last_name_kanji": "",
-                                    "first_name_kanji": ""
-                                })
+                        # 全角スペース、半角スペース、カンマを「;」に変換
+                        value = value.replace('　', ';').replace(' ', ';').replace(',', ';')
+                        # 連続する「;」を1つに置換
+                        value = ';'.join(filter(None, value.split(';')))
+                        # 「;」で分割して複数の教員を処理
+                        parts = value.split(';')
+                        for i in range(0, len(parts)-1, 2):
+                            if i+1 < len(parts):
+                                last_name = parts[i].strip()
+                                first_name = parts[i+1].strip()
+                                if last_name or first_name:
+                                    info["instructors"].append({
+                                        "last_name_kana": last_name,
+                                        "first_name_kana": first_name,
+                                        "last_name_kanji": "",
+                                        "first_name_kanji": ""
+                                    })
                 elif "担当者Instructor漢字氏名" in key:
                     if value:
-                        # カンマで分割して複数の教員を処理
-                        instructors = value.split(',')
-                        for i, instructor in enumerate(instructors):
-                            instructor = instructor.strip()
-                            if instructor and i < len(info["instructors"]):
-                                name_info = parse_instructor_name(instructor)
-                                info["instructors"][i].update({
-                                    "last_name_kanji": name_info["last_name"],
-                                    "first_name_kanji": name_info["first_name"]
-                                })
+                        # 全角スペース、半角スペース、カンマを「;」に変換
+                        value = value.replace('　', ';').replace(' ', ';').replace(',', ';')
+                        # 連続する「;」を1つに置換
+                        value = ';'.join(filter(None, value.split(';')))
+                        # 「;」で分割して複数の教員を処理
+                        parts = value.split(';')
+                        for i in range(0, len(parts)-1, 2):
+                            if i+1 < len(parts) and i//2 < len(info["instructors"]):
+                                last_name = parts[i].strip()
+                                first_name = parts[i+1].strip()
+                                if last_name or first_name:
+                                    info["instructors"][i//2].update({
+                                        "last_name_kanji": last_name,
+                                        "first_name_kanji": first_name
+                                    })
     
     # 講義概要セクションから情報を抽出
     for form in soup.find_all('form'):

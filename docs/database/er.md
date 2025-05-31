@@ -43,7 +43,6 @@ erDiagram
         TEXT last_name_kana
         TEXT first_name_kana
         TIMESTAMP created_at
-        TIMESTAMP updated_at
     }
     book {
         INTEGER book_id PK
@@ -52,7 +51,6 @@ erDiagram
         INTEGER price
         TEXT isbn
         TIMESTAMP created_at
-        TIMESTAMP updated_at
     }
     book_author {
         INTEGER book_author_id PK

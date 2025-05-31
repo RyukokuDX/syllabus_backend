@@ -166,7 +166,6 @@
 | last_name_kana | TEXT | YES | 苗字（カナ） | Web Syllabus |
 | first_name_kana | TEXT | YES | 名前（カナ） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
@@ -197,7 +196,6 @@
 | price | INTEGER | YES | 価格（税抜） | Web Syllabus |
 | isbn | TEXT | YES | ISBN番号 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
 #### インデックス
 | インデックス名 | カラム | 説明 |
