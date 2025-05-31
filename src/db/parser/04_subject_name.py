@@ -66,7 +66,7 @@ def extract_subject_names(csv_files: List[str]) -> Set[str]:
 
 def create_subject_name_json(subject_names: Set[str]) -> None:
     """科目名のJSONファイルを作成する"""
-    output_dir = os.path.join("updates", "subject", "add")
+    output_dir = os.path.join("updates", "subject_name", "add")
     os.makedirs(output_dir, exist_ok=True)
     
     # 現在の日時を取得してファイル名を生成

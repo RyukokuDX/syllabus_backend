@@ -21,58 +21,60 @@ def read_json_files(directory, table_name):
     """指定されたディレクトリ内のすべてのJSONファイルを読み込む"""
     data = []
     base_dir = Path(directory)
+    add_dir = base_dir / 'add'
     
-    # registeredディレクトリとaddディレクトリの両方を処理
-    for subdir in ['registered', 'add']:
-        json_dir = base_dir / subdir
-        if not json_dir.exists():
-            print(f"Directory not found: {json_dir}")
-            continue
+    if not add_dir.exists():
+        print(f"Directory not found: {add_dir}")
+        return data
             
-        json_files = list(json_dir.glob('*.json'))
-        if not json_files:
-            print(f"No JSON files found in {json_dir}")
-            continue
+    json_files = list(add_dir.glob('*.json'))
+    if not json_files:
+        print(f"No JSON files found in {add_dir}")
+        return data
             
-        for file in json_files:
-            try:
-                with open(file, 'r', encoding='utf-8') as f:
-                    json_data = json.load(f)
-                    # テーブル名に応じた配列名を取得
-                    array_name = {
-                        'class': 'classes',
-                        'subclass': 'subclasses',
-                        'faculty': 'faculties',
-                        'subject_name': 'subject_names',
-                        'subject': 'subjects',
-                        'instructor': 'instructors',
-                        'book': 'books',
-                        'syllabus': 'syllabuses',
-                        'lecture_session': 'lecture_sessions',
-                        'syllabus_instructor': 'syllabus_instructors',
-                        'syllabus_book': 'syllabus_books',
-                        'grading_criterion': 'grading_criteria',
-                        'subject_grade': 'subject_grades',
-                        'subject_attribute': 'subject_attributes',
-                        'subject_attribute_value': 'subject_attribute_values',
-                        'subject_syllabus': 'subject_syllabuses',
-                        'syllabus_study_system': 'syllabus_study_systems',
-                        'lecture_session_instructor': 'lecture_session_instructors',
-                        'lecture_time': 'lecture_times',
-                        'book_author': 'book_authors'
-                    }.get(table_name, f"{table_name}s")
-                    
-                    if array_name in json_data:
-                        records = json_data[array_name]
-                        # bookテーブルの場合、roleカラムを除外
-                        if table_name == 'book':
-                            records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
-                        print(f"Found {len(records)} records in {file}")
-                        data.extend(records)
-                    else:
-                        print(f"Warning: {file} does not contain '{array_name}' array")
-            except Exception as e:
-                print(f"Error reading {file}: {str(e)}")
+    for file in json_files:
+        try:
+            with open(file, 'r', encoding='utf-8') as f:
+                json_data = json.load(f)
+                # テーブル名に応じた配列名を取得
+                array_name = {
+                    'class': 'classes',
+                    'subclass': 'subclasses',
+                    'faculty': 'faculties',
+                    'subject_name': 'subject_names',
+                    'subject': 'subjects',
+                    'instructor': 'instructors',
+                    'book': 'books',
+                    'syllabus': 'syllabuses',
+                    'lecture_session': 'lecture_sessions',
+                    'syllabus_instructor': 'syllabus_instructors',
+                    'syllabus_book': 'syllabus_books',
+                    'grading_criterion': 'grading_criteria',
+                    'subject_grade': 'subject_grades',
+                    'subject_attribute': 'subject_attributes',
+                    'subject_attribute_value': 'subject_attribute_values',
+                    'subject_syllabus': 'subject_syllabuses',
+                    'syllabus_study_system': 'syllabus_study_systems',
+                    'lecture_session_instructor': 'lecture_session_instructors',
+                    'lecture_time': 'lecture_times',
+                    'book_author': 'book_authors',
+                    'syllabus_master': 'syllabus_masters',
+                    'requirement_header': 'requirement_headers',
+                    'requirement_attribute': 'requirement_attributes',
+                    'requirement': 'requirements'
+                }.get(table_name, f"{table_name}s")
+                
+                if array_name in json_data:
+                    records = json_data[array_name]
+                    # bookテーブルの場合、roleカラムを除外
+                    if table_name == 'book':
+                        records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
+                    print(f"Found {len(records)} records in {file}")
+                    data.extend(records)
+                else:
+                    print(f"Warning: {file} does not contain '{array_name}' array")
+        except Exception as e:
+            print(f"Error reading {file}: {str(e)}")
     
     print(f"Total records found for {table_name}: {len(data)}")
     return data
@@ -441,24 +443,50 @@ CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_
 
 def move_json_to_registered(json_dir: Path, table_name: str) -> None:
     """JSONファイルをregisteredディレクトリに移動する"""
-    add_dir = json_dir.parent / 'add'
+    # パスの設定
+    add_dir = json_dir / 'add'
+    registered_dir = json_dir / 'registered'
+    
+    print(f"\n=== Moving files for {table_name} ===")
+    print(f"Add directory: {add_dir}")
+    print(f"Registered directory: {registered_dir}")
+    
     if not add_dir.exists():
-        print(f"No add directory found for {table_name}")
+        print(f"Warning: Add directory not found: {add_dir}")
         return
 
     # registeredディレクトリが存在しない場合は作成
-    json_dir.mkdir(parents=True, exist_ok=True)
+    registered_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Registered directory created/verified: {registered_dir}")
 
     # addディレクトリ内のJSONファイルを移動
-    for json_file in add_dir.glob('*.json'):
+    moved_files = False
+    json_files = list(add_dir.glob('*.json'))
+    print(f"Found {len(json_files)} JSON files in {add_dir}")
+    
+    for json_file in json_files:
         try:
             # 移動先のファイルパスを生成
-            dest_file = json_dir / json_file.name
+            dest_file = registered_dir / json_file.name
+            print(f"\nMoving file:")
+            print(f"  From: {json_file}")
+            print(f"  To: {dest_file}")
+            
             # ファイルを移動
             json_file.rename(dest_file)
-            print(f"Moved {json_file} to {dest_file}")
+            print(f"Successfully moved: {json_file.name}")
+            moved_files = True
         except Exception as e:
-            print(f"Error moving {json_file}: {str(e)}")
+            print(f"Error moving {json_file.name}: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+    
+    if not moved_files:
+        print(f"Warning: No JSON files found to move in {add_dir}")
+    else:
+        print(f"Successfully moved all JSON files for {table_name}")
+    print("=== End of file moving ===\n")
 
 def generate_migration():
     """マイグレーションファイルを生成"""
@@ -505,15 +533,40 @@ def generate_migration():
                 'table_name': 'book',
                 'source': 'web_syllabus'
             },
+            {
+                'json_dir': project_root / 'updates' / 'book_author',
+                'table_name': 'book_author',
+                'source': 'web_syllabus'
+            },
             # シラバス関連テーブル
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_master',
+                'table_name': 'syllabus_master',
+                'source': 'web_syllabus'
+            },
             {
                 'json_dir': project_root / 'updates' / 'syllabus',
                 'table_name': 'syllabus',
                 'source': 'web_syllabus'
             },
             {
+                'json_dir': project_root / 'updates' / 'subject_grade',
+                'table_name': 'subject_grade',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'lecture_time',
+                'table_name': 'lecture_time',
+                'source': 'web_syllabus'
+            },
+            {
                 'json_dir': project_root / 'updates' / 'lecture_session',
                 'table_name': 'lecture_session',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'lecture_session_instructor',
+                'table_name': 'lecture_session_instructor',
                 'source': 'web_syllabus'
             },
             {
@@ -530,11 +583,47 @@ def generate_migration():
                 'json_dir': project_root / 'updates' / 'grading_criterion',
                 'table_name': 'grading_criterion',
                 'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'subject_attribute',
+                'table_name': 'subject_attribute',
+                'source': 'syllabus_search'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'subject_attribute_value',
+                'table_name': 'subject_attribute_value',
+                'source': 'syllabus_search'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'subject_syllabus',
+                'table_name': 'subject_syllabus',
+                'source': 'syllabus_search'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_study_system',
+                'table_name': 'syllabus_study_system',
+                'source': 'web_syllabus'
+            },
+            # 要件関連テーブル
+            {
+                'json_dir': project_root / 'updates' / 'requirement_header',
+                'table_name': 'requirement_header',
+                'source': 'syllabus_search'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'requirement_attribute',
+                'table_name': 'requirement_attribute',
+                'source': 'syllabus_search'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'requirement',
+                'table_name': 'requirement',
+                'source': 'syllabus_search'
             }
         ]
         
         # マイグレーションファイルの出力先ディレクトリ
-        migrations_dir = project_root / 'docker' / 'postgresql' / 'init' / 'migrations_dev'
+        migrations_dir = project_root / 'docker' / 'postgresql' / 'migrations_dev'
         migrations_dir.mkdir(parents=True, exist_ok=True)
         
         # 現在のタイムスタンプを取得
@@ -545,6 +634,8 @@ def generate_migration():
             json_dir = target['json_dir']
             table_name = target['table_name']
             source = target['source']
+            
+            print(f"\nProcessing {table_name}...")
             
             if not json_dir.exists():
                 print(f"Directory not found: {json_dir}")
@@ -572,9 +663,10 @@ def generate_migration():
             print(f"Generated migration file: {migration_file}")
             
             # マイグレーションファイル生成が成功したら、JSONファイルを移動
+            print(f"\nMoving JSON files for {table_name}...")
             move_json_to_registered(json_dir, table_name)
         
-        print("Migration files generation completed successfully")
+        print("\nMigration files generation completed successfully")
         
     except Exception as e:
         print(f"Error generating migration files: {str(e)}")
