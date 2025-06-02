@@ -37,10 +37,8 @@ erDiagram
     }
     instructor {
         INTEGER instructor_id PK
-        TEXT last_name
-        TEXT first_name
-        TEXT last_name_kana
-        TEXT first_name_kana
+        TEXT name
+        TEXT name_kana
         TIMESTAMP created_at
     }
     book {

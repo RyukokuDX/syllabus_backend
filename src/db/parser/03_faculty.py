@@ -1,9 +1,8 @@
 import os
 import json
-import csv
+import sqlite3
 from typing import List, Set
 from datetime import datetime
-import chardet
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -23,44 +22,37 @@ def get_year_from_user() -> int:
         except ValueError:
             print("有効な数値を入力してください。")
 
-def get_csv_files(year: int) -> List[str]:
-    """指定された年度のCSVファイルのパスを取得する"""
-    base_dir = os.path.join("src", "syllabus", str(year), "search_page")
-    if not os.path.exists(base_dir):
-        raise FileNotFoundError(f"ディレクトリが見つかりません: {base_dir}")
-    
-    csv_files = [f for f in os.listdir(base_dir) if f.endswith('.csv')]
-    if not csv_files:
-        raise FileNotFoundError(f"CSVファイルが見つかりません: {base_dir}")
-    
-    return [os.path.join(base_dir, f) for f in csv_files]
-
-def detect_encoding(file_path: str) -> str:
-    """ファイルのエンコーディングを検出する"""
-    with open(file_path, 'rb') as f:
-        raw_data = f.read()
-        result = chardet.detect(raw_data)
-        return result['encoding']
-
-def extract_faculty_names(csv_files: List[str]) -> Set[str]:
-    """CSVファイルから学部名を抽出する"""
+def get_faculty_names(year: int) -> Set[str]:
+    """SQLiteデータベースから学部名を抽出する"""
     faculty_names = set()
+    db_path = os.path.join("src", "syllabus", str(year), "data", f"syllabus_{year}.db")
     
-    for csv_file in csv_files:
-        try:
-            # エンコーディングを自動検出
-            encoding = detect_encoding(csv_file)
-            if not encoding:
-                encoding = 'utf-8'  # デフォルトはUTF-8
-            
-            with open(csv_file, 'r', encoding=encoding, errors='replace') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    if '学部' in row and row['学部']:
-                        faculty_names.add(row['学部'].strip())
-        except Exception as e:
-            print(f"警告: {csv_file}の処理中にエラーが発生しました: {str(e)}")
-            continue
+    if not os.path.exists(db_path):
+        raise FileNotFoundError(f"データベースファイルが見つかりません: {db_path}")
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # departmentsカラムから学部名を取得
+        cursor.execute("SELECT DISTINCT departments FROM syllabus_basic WHERE departments IS NOT NULL")
+        rows = cursor.fetchall()
+        
+        for row in rows:
+            if row[0]:  # NULLでない場合
+                # カンマで区切られた学部名を分割して追加
+                departments = row[0].split(',')
+                for dept in departments:
+                    dept = dept.strip()
+                    if dept:  # 空文字でない場合のみ追加
+                        faculty_names.add(dept)
+        
+    except sqlite3.Error as e:
+        print(f"データベースエラー: {str(e)}")
+        raise
+    finally:
+        if conn:
+            conn.close()
     
     return faculty_names
 
@@ -93,12 +85,8 @@ def main():
         year = get_year_from_user()
         print(f"処理対象年度: {year}")
         
-        # CSVファイルの取得
-        csv_files = get_csv_files(year)
-        print(f"処理対象ファイル: {len(csv_files)}件")
-        
         # 学部名の抽出
-        faculty_names = extract_faculty_names(csv_files)
+        faculty_names = get_faculty_names(year)
         print(f"抽出された学部名: {len(faculty_names)}件")
         
         # JSONファイルの作成

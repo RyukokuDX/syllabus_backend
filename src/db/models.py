@@ -173,15 +173,13 @@ class Instructor(Base):
     __tablename__ = 'instructor'
 
     instructor_id = Column(Integer, primary_key=True)
-    last_name = Column(String, nullable=False)
-    first_name = Column(String, nullable=False)
-    last_name_kana = Column(String)
-    first_name_kana = Column(String)
+    name = Column(String, nullable=False)  # 名前 (漢字かカナ)
+    name_kana = Column(String)  # 名前（カナ）
     created_at = Column(DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
 
     __table_args__ = (
-        Index('idx_instructor_name', 'last_name', 'first_name'),
-        Index('idx_instructor_name_kana', 'last_name_kana', 'first_name_kana'),
+        Index('idx_instructor_name', 'name'),
+        Index('idx_instructor_name_kana', 'name_kana'),
     )
 
 class Book(Base):
@@ -415,10 +413,8 @@ class Subject:
 class Instructor:
     """教員モデル"""
     instructor_id: int
-    last_name: str
-    first_name: str
-    last_name_kana: Optional[str]
-    first_name_kana: Optional[str]
+    name: str
+    name_kana: Optional[str]
     created_at: datetime
 
 @dataclass

@@ -23,44 +23,32 @@ def get_year_from_user() -> int:
         except ValueError:
             print("有効な数値を入力してください。")
 
-def get_csv_files(year: int) -> List[str]:
-    """指定された年度のCSVファイルのパスを取得する"""
-    base_dir = os.path.join("src", "syllabus", str(year), "search_page")
-    if not os.path.exists(base_dir):
-        raise FileNotFoundError(f"ディレクトリが見つかりません: {base_dir}")
-    
-    csv_files = [f for f in os.listdir(base_dir) if f.endswith('.csv')]
-    if not csv_files:
-        raise FileNotFoundError(f"CSVファイルが見つかりません: {base_dir}")
-    
-    return [os.path.join(base_dir, f) for f in csv_files]
-
-def detect_encoding(file_path: str) -> str:
-    """ファイルのエンコーディングを検出する"""
-    with open(file_path, 'rb') as f:
-        raw_data = f.read()
-        result = chardet.detect(raw_data)
-        return result['encoding']
-
-def extract_subject_names(csv_files: List[str]) -> Set[str]:
-    """CSVファイルから科目名を抽出する（重複を除く）"""
+def get_subject_names(year: int) -> Set[str]:
+    """SQLiteデータベースから科目名を抽出する"""
     subject_names = set()
+    db_path = os.path.join("src", "syllabus", str(year), "data", f"syllabus_{year}.db")
     
-    for csv_file in csv_files:
-        try:
-            # エンコーディングを自動検出
-            encoding = detect_encoding(csv_file)
-            if not encoding:
-                encoding = 'utf-8'  # デフォルトはUTF-8
-            
-            with open(csv_file, 'r', encoding=encoding, errors='replace') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    if '科目名' in row and row['科目名']:
-                        subject_names.add(row['科目名'].strip())
-        except Exception as e:
-            print(f"警告: {csv_file}の処理中にエラーが発生しました: {str(e)}")
-            continue
+    if not os.path.exists(db_path):
+        raise FileNotFoundError(f"データベースファイルが見つかりません: {db_path}")
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # course_titleカラムから科目名を取得
+        cursor.execute("SELECT DISTINCT course_title FROM syllabus_basic WHERE course_title IS NOT NULL")
+        rows = cursor.fetchall()
+        
+        for row in rows:
+            if row[0]:  # NULLでない場合
+                subject_names.add(row[0].strip())
+        
+    except sqlite3.Error as e:
+        print(f"データベースエラー: {str(e)}")
+        raise
+    finally:
+        if conn:
+            conn.close()
     
     return subject_names
 
@@ -93,12 +81,8 @@ def main():
         year = get_year_from_user()
         print(f"処理対象年度: {year}")
         
-        # CSVファイルの取得
-        csv_files = get_csv_files(year)
-        print(f"処理対象ファイル: {len(csv_files)}件")
-        
         # 科目名の抽出
-        subject_names = extract_subject_names(csv_files)
+        subject_names = get_subject_names(year)
         print(f"抽出された科目名: {len(subject_names)}件")
         
         # JSONファイルの作成
