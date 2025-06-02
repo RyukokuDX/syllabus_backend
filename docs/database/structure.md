@@ -160,10 +160,8 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | instructor_id | INTEGER | NO | 教員ID（主キー） | システム生成 |
-| last_name | TEXT | NO | 苗字 | Web Syllabus |
-| first_name | TEXT | NO | 名前 | Web Syllabus |
-| last_name_kana | TEXT | YES | 苗字（カナ） | Web Syllabus |
-| first_name_kana | TEXT | YES | 名前（カナ） | Web Syllabus |
+| name | TEXT | NO | 名前 (漢字かカナ) | Web Syllabus |
+| name_kana | TEXT | YES | 名前（カナ） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 
 #### インデックス

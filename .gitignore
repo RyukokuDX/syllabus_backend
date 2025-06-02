@@ -53,3 +53,6 @@ Thumbs.db
 
 *.html
 */*.html
+
+# binary files
+*.sql
