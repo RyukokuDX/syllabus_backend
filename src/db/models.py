@@ -186,6 +186,7 @@ class Book(Base):
     __tablename__ = 'book'
 
     book_id = Column(Integer, primary_key=True)
+    url = Column(Text, nullable=False, unique=True)
     title = Column(Text, nullable=False)
     publisher = Column(Text)
     price = Column(Integer)
@@ -421,6 +422,7 @@ class Instructor:
 class Book:
     """書籍モデル"""
     book_id: int
+    url: str
     title: str
     publisher: Optional[str]
     price: Optional[int]

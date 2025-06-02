@@ -190,6 +190,7 @@ CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);
 -- book（書籍）
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
+    url TEXT NOT NULL UNIQUE,
     title TEXT NOT NULL,
     publisher TEXT,
     price INTEGER,
@@ -198,6 +199,7 @@ CREATE TABLE IF NOT EXISTS book (
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
+CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
 
 -- book_author（書籍著者）
 CREATE TABLE IF NOT EXISTS book_author (

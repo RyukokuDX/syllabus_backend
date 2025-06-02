@@ -43,6 +43,7 @@ erDiagram
     }
     book {
         INTEGER book_id PK
+        TEXT url
         TEXT title
         TEXT publisher
         INTEGER price
