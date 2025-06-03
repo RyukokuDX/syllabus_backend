@@ -285,8 +285,9 @@
 | attainment | TEXT | YES | 到達目標 | Web Syllabus |
 | methods | TEXT | YES | 授業方法 | Web Syllabus |
 | outside_study | TEXT | YES | 授業外学習 | Web Syllabus |
-| notes | TEXT | YES | 履修上の注意 | Web Syllabus |
-| remarks | TEXT | YES | その他備考 | Web Syllabus |
+| textbook_comment | TEXT | YES | 教科書に関するコメント | Web Syllabus |
+| reference_comment | TEXT | YES | 参考文献に関するコメント | Web Syllabus |
+| advice | TEXT | YES | 履修上の注意 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 

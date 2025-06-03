@@ -214,35 +214,37 @@ class BookAuthor(Base):
 class LectureTime(Base):
     __tablename__ = 'lecture_time'
 
-    id = Column(Integer, primary_key=True)
+    lecture_time_id = Column(Integer, primary_key=True)
     syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
-    day_of_week = Column(Text, nullable=False)
-    period = Column(SmallInteger, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    updated_at = Column(DateTime, onupdate=func.now())
+    day_of_week = Column(SmallInteger, nullable=False)  # 1-7 (Monday-Sunday)
+    period = Column(SmallInteger, nullable=False)  # 1-6 (1st-6th period)
+    room = Column(Text)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
 
-    # インデックス
     __table_args__ = (
-        Index('idx_lecture_time_day_period', 'day_of_week', 'period'),
         Index('idx_lecture_time_syllabus', 'syllabus_id'),
+        Index('idx_lecture_time_day_period', 'day_of_week', 'period'),
     )
+
+    syllabus = relationship("SyllabusMaster", back_populates="lecture_times")
 
 class LectureSession(Base):
     __tablename__ = 'lecture_session'
 
     lecture_session_id = Column(Integer, primary_key=True)
-    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
-    session_number = Column(Integer, nullable=False)
-    contents = Column(Text)
-    other_info = Column(Text)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    updated_at = Column(DateTime, onupdate=func.now())
+    lecture_time_id = Column(Integer, ForeignKey('lecture_time.lecture_time_id', ondelete='CASCADE'), nullable=False)
+    session_number = Column(SmallInteger, nullable=False)  # 1-15 (1st-15th week)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
 
-    # インデックス
     __table_args__ = (
-        Index('idx_lecture_session_syllabus', 'syllabus_id'),
+        Index('idx_lecture_session_time', 'lecture_time_id'),
         Index('idx_lecture_session_number', 'session_number'),
     )
+
+    lecture_time = relationship("LectureTime", back_populates="sessions")
+    instructors = relationship("LectureSessionInstructor", back_populates="session", cascade="all, delete-orphan")
 
 class LectureSessionInstructor(Base):
     __tablename__ = 'lecture_session_instructor'
@@ -250,13 +252,15 @@ class LectureSessionInstructor(Base):
     id = Column(Integer, primary_key=True)
     lecture_session_id = Column(Integer, ForeignKey('lecture_session.lecture_session_id', ondelete='CASCADE'), nullable=False)
     instructor_id = Column(Integer, ForeignKey('instructor.instructor_id', ondelete='CASCADE'), nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
-    # インデックス
     __table_args__ = (
         Index('idx_lecture_session_instructor_session', 'lecture_session_id'),
         Index('idx_lecture_session_instructor_instructor', 'instructor_id'),
     )
+
+    session = relationship("LectureSession", back_populates="instructors")
+    instructor = relationship("Instructor")
 
 class SyllabusInstructor(Base):
     __tablename__ = 'syllabus_instructor'
@@ -571,6 +575,9 @@ class SyllabusMaster(Base):
         Index('idx_syllabus_master_code', 'syllabus_code'),
         Index('idx_syllabus_master_year', 'syllabus_year'),
     )
+
+    lecture_times = relationship("LectureTime", back_populates="syllabus", cascade="all, delete-orphan")
+    source_study_systems = relationship("SyllabusStudySystem", foreign_keys="SyllabusStudySystem.source_syllabus_id", back_populates="source_syllabus")
 
 class SyllabusStudySystem(Base):
     __tablename__ = 'syllabus_study_system'

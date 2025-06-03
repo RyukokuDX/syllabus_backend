@@ -214,29 +214,28 @@ CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);
 
 -- lecture_time（講義時間）
 CREATE TABLE IF NOT EXISTS lecture_time (
-    id SERIAL PRIMARY KEY,
+    lecture_time_id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    day_of_week TEXT NOT NULL,
-    period SMALLINT NOT NULL,
+    day_of_week SMALLINT NOT NULL,  -- 1-7 (Monday-Sunday)
+    period SMALLINT NOT NULL,  -- 1-6 (1st-6th period)
+    room TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
 CREATE INDEX IF NOT EXISTS idx_lecture_time_syllabus ON lecture_time(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
 
 -- lecture_session（講義セッション）
 CREATE TABLE IF NOT EXISTS lecture_session (
     lecture_session_id SERIAL PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    session_number INTEGER NOT NULL,
-    contents TEXT,
-    other_info TEXT,
+    lecture_time_id INTEGER NOT NULL REFERENCES lecture_time(lecture_time_id) ON DELETE CASCADE,
+    session_number SMALLINT NOT NULL,  -- 1-15 (1st-15th week)
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_session_time ON lecture_session(lecture_time_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session_number);
 
 -- lecture_session_instructor（講義セッション教員）
