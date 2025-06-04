@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
+from dotenv import load_dotenv
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -85,6 +86,11 @@ def get_subject_name_id_from_db(session, name: str) -> int:
             return result[0]
         else:
             print(f"科目名が見つかりません: {name}")
+            # デバッグ用：テーブルの内容を確認
+            all_names = session.execute(text("SELECT name FROM subject_name")).fetchall()
+            print("登録されている科目名:")
+            for n in all_names:
+                print(f"  - {n[0]}")
             return None
             
     except Exception as e:
@@ -112,6 +118,11 @@ def get_faculty_id_from_db(session, faculty_name: str) -> int:
             return result[0]
         else:
             print(f"学部が見つかりません: {faculty_name}")
+            # デバッグ用：テーブルの内容を確認
+            all_faculties = session.execute(text("SELECT faculty_name FROM faculty")).fetchall()
+            print("登録されている学部名:")
+            for f in all_faculties:
+                print(f"  - {f[0]}")
             return None
             
     except Exception as e:
@@ -277,12 +288,16 @@ def main(db_config: Dict[str, str]):
         raise
 
 if __name__ == "__main__":
-    # デフォルトの設定（開発用）
-    default_config = {
-        'user': 'postgres',
-        'password': 'postgres',
-        'host': 'localhost',
-        'port': '5432',
-        'db': 'syllabus_db'
+    # .envファイルから設定を読み込む
+    load_dotenv()
+    
+    # データベース設定を取得（デフォルト値を設定）
+    db_config = {
+        'user': os.getenv('POSTGRES_USER', 'postgres'),
+        'password': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+        'host': os.getenv('POSTGRES_HOST', 'localhost'),
+        'port': os.getenv('POSTGRES_PORT', '5432'),
+        'db': os.getenv('POSTGRES_DB', 'syllabus_db')
     }
-    main(default_config) 
+    
+    main(db_config) 

@@ -6,27 +6,35 @@ PARSER_DIR="$SCRIPT_DIR/../src/db/parser"
 VENV_DIR="$SCRIPT_DIR/../syllabus_backend_venv"
 PYTHON="$VENV_DIR/bin/python"
 
-# 利用可能なパーサーの一覧
-declare -A PARSERS=(
-    ["06"]="06_book.py"
-    ["17"]="17_subject.py"
-    ["book"]="06_book.py"
-    ["syllabus"]="17_subject.py"
-)
+# 利用可能なパーサーの一覧を動的に生成
+declare -A PARSERS
+for file in "$PARSER_DIR"/*.py; do
+    if [ -f "$file" ]; then
+        filename=$(basename "$file")
+        number=${filename%%_*}  # ファイル名の先頭の数字を取得
+        name=${filename%%.py}   # .pyを除いたファイル名
+        PARSERS["$number"]="$filename"
+        PARSERS["$name"]="$filename"
+    fi
+done
 
 # ヘルプメッセージを表示
 show_help() {
     echo "Usage: $0 [PARSER_NAME_OR_NUMBER]"
     echo
     echo "Available parsers:"
-    echo "  06 or book     - Book parser"
-    echo "  17 or syllabus - Subject parser"
+    for number in "${!PARSERS[@]}"; do
+        if [[ $number =~ ^[0-9]+$ ]]; then  # 数字の場合のみ表示
+            name=${PARSERS[$number]%%.py}   # .pyを除いたファイル名
+            echo "  $number or $name - ${name#*_} parser"  # 数字と_を除いた名前を表示
+        fi
+    done | sort -n  # 数字でソート
     echo
     echo "Examples:"
-    echo "  $0 06          # Run book parser"
-    echo "  $0 book        # Run book parser"
-    echo "  $0 17          # Run subject parser"
-    echo "  $0 syllabus    # Run subject parser"
+    echo "  $0 01          # Run class parser"
+    echo "  $0 class       # Run class parser"
+    echo "  $0 02          # Run subclass parser"
+    echo "  $0 subclass    # Run subclass parser"
 }
 
 # 引数が指定されていない場合はヘルプを表示

@@ -25,11 +25,16 @@ def get_year_from_user() -> int:
 def get_faculty_names(year: int) -> Set[str]:
     """SQLiteデータベースから学部名を抽出する"""
     faculty_names = set()
-    db_path = os.path.join("src", "syllabus", str(year), "data", f"syllabus_{year}.db")
+    # スクリプトのディレクトリを基準にパスを生成
+    script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    db_path = os.path.join(script_dir, "syllabus", str(year), "data", f"syllabus_{year}.db")
+    
+    print(f"データベースパス: {db_path}")
     
     if not os.path.exists(db_path):
         raise FileNotFoundError(f"データベースファイルが見つかりません: {db_path}")
     
+    conn = None
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()

@@ -5,6 +5,16 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VENV_DIR="$SCRIPT_DIR/syllabus_backend_venv"
 PYTHON="$VENV_DIR/bin/python"
 
+# .envファイルの読み込み
+ENV_FILE="$SCRIPT_DIR/.env"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "Error: Missing .env file at $ENV_FILE"
+    exit 1
+fi
+set -a
+. "$ENV_FILE"
+set +a
+
 # 仮想環境の初期化
 init_venv() {
     echo "Initializing virtual environment..."
@@ -49,6 +59,9 @@ show_help() {
     echo "  shell          Open shell in PostgreSQL service"
     echo "  records        Show record counts for all tables"
     echo "  parser         Run parser script for specified table"
+    echo "  generate       Generate data for specified table"
+    echo "  check          Check data for specified table"
+    echo "  deploy         Deploy data to specified table"
     echo
     echo "Examples:"
     echo "  $0 venv-init             # Initialize Python virtual environment"
@@ -58,6 +71,9 @@ show_help() {
     echo "  $0 -p records            # Show record counts"
     echo "  $0 parser book           # Run book parser"
     echo "  $0 parser syllabus       # Run syllabus parser"
+    echo "  $0 -p generate           # Generate data for specified table"
+    echo "  $0 -p check              # Check data for specified table"
+    echo "  $0 -p deploy             # Deploy data to specified table"
 }
 
 # コマンドライン引数の解析
@@ -117,14 +133,22 @@ case $COMMAND in
         fi
         ;;
     ps)
-        docker-compose ps
+        docker ps
         ;;
     logs)
-        docker-compose logs -f
+        if [ "$SERVICE" = "postgres" ]; then
+            docker logs -f postgres-db
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
         ;;
     shell)
         if [ "$SERVICE" = "postgres" ]; then
-            docker-compose exec postgres-db psql -U postgres -d syllabus
+            # .envファイルからデータベース名とユーザー名を取得
+            DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
+            DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME"
         else
             echo "Error: Service not specified. Use -p for PostgreSQL service."
             exit 1
@@ -132,9 +156,10 @@ case $COMMAND in
         ;;
     records)
         if [ "$SERVICE" = "postgres" ]; then
-            # .envファイルからデータベース名を取得
+            # .envファイルからデータベース名とユーザー名を取得
             DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-            docker exec postgres-db psql -U postgres -d "$DB_NAME" -c "
+            DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
                 SELECT 
                     schemaname || '.' || relname as table_name,
                     n_live_tup as record_count
@@ -153,6 +178,49 @@ case $COMMAND in
             exit 1
         fi
         "$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
+        ;;
+    generate)
+        if [ "$SERVICE" = "postgres" ]; then
+            if [ ${#ARGS[@]} -eq 0 ]; then
+                echo "Error: Generate type not specified"
+                echo "Usage: $0 -p generate [init|migration]"
+                exit 1
+            fi
+            case "${ARGS[0]}" in
+                init)
+                    echo "Generating initialization data..."
+                    "$SCRIPT_DIR/bin/generate-init.sh"
+                    ;;
+                migration)
+                    echo "Generating migration data..."
+                    "$SCRIPT_DIR/bin/generate-migration.sh"
+                    ;;
+                *)
+                    echo "Error: Unknown generate type '${ARGS[0]}'"
+                    echo "Usage: $0 -p generate [init|migration]"
+                    exit 1
+                    ;;
+            esac
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
+        ;;
+    check)
+        if [ "$SERVICE" = "postgres" ]; then
+            "$SCRIPT_DIR/bin/check-with-dev-db.sh"
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
+        ;;
+    deploy)
+        if [ "$SERVICE" = "postgres" ]; then
+            "$SCRIPT_DIR/bin/deploy-migration.sh"
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
         ;;
     *)
         echo "Error: Unknown command '$COMMAND'"

@@ -9,10 +9,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./init/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
-      - ./init/02-init-dev.sql:/docker-entrypoint-initdb.d/02-init-dev.sql
-      - ./init/migrations:/docker-entrypoint-initdb.d/migrations
-      - ./migrations_dev:/docker-entrypoint-initdb.d/migrations_dev
+      - ./init/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./init/02-init-dev.sql:/docker-entrypoint-initdb.d/02-init-dev.sql:ro
+      - ./init/migrations:/docker-entrypoint-initdb.d/migrations:ro
+      - ./migrations_dev:/docker-entrypoint-initdb.d/migrations_dev:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s

@@ -124,9 +124,10 @@ CREATE TABLE IF NOT EXISTS subject (
     subject_id SERIAL PRIMARY KEY,
     subject_name_id INTEGER NOT NULL,
     faculty_id INTEGER NOT NULL,
+    curriculum_year INTEGER NOT NULL,
     class_id INTEGER NOT NULL,
     subclass_id INTEGER,
-    curriculum_year INTEGER NOT NULL,
+    requirement_type TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id),
@@ -315,6 +316,12 @@ CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）
+\i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_classs.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subclasss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subject_names.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604112913__insert_instructors.sql
+
+-- ========== 開発用データベースの初期化 ==========
+
+\i /docker-entrypoint-initdb.d/02-init-dev.sql
