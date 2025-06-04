@@ -315,8 +315,6 @@ CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）
+\i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subject_names.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_syllabus_masters.sql
-
--- ========== 開発用データベースの初期化 ==========
-
-\i /docker-entrypoint-initdb.d/02-init-dev.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250604112913__insert_instructors.sql
