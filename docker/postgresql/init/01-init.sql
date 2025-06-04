@@ -179,20 +179,18 @@ CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attr
 -- instructor（教員）
 CREATE TABLE IF NOT EXISTS instructor (
     instructor_id SERIAL PRIMARY KEY,
-    last_name TEXT NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name_kana TEXT,
-    first_name_kana TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(last_name, first_name)
+    name TEXT NOT NULL,
+    name_kana TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(last_name, first_name);
-CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(last_name_kana, first_name_kana);
+CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(name);
+CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);
 
 -- book（書籍）
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
+    url TEXT NOT NULL UNIQUE,
     title TEXT NOT NULL,
     publisher TEXT,
     price INTEGER,
@@ -201,6 +199,7 @@ CREATE TABLE IF NOT EXISTS book (
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
+CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
 
 -- book_author（書籍著者）
 CREATE TABLE IF NOT EXISTS book_author (
@@ -215,29 +214,28 @@ CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);
 
 -- lecture_time（講義時間）
 CREATE TABLE IF NOT EXISTS lecture_time (
-    id SERIAL PRIMARY KEY,
+    lecture_time_id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    day_of_week TEXT NOT NULL,
-    period SMALLINT NOT NULL,
+    day_of_week SMALLINT NOT NULL,  -- 1-7 (Monday-Sunday)
+    period SMALLINT NOT NULL,  -- 1-6 (1st-6th period)
+    room TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
 CREATE INDEX IF NOT EXISTS idx_lecture_time_syllabus ON lecture_time(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
 
 -- lecture_session（講義セッション）
 CREATE TABLE IF NOT EXISTS lecture_session (
     lecture_session_id SERIAL PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    session_number INTEGER NOT NULL,
-    contents TEXT,
-    other_info TEXT,
+    lecture_time_id INTEGER NOT NULL REFERENCES lecture_time(lecture_time_id) ON DELETE CASCADE,
+    session_number SMALLINT NOT NULL,  -- 1-15 (1st-15th week)
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_session_time ON lecture_session(lecture_time_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session_number);
 
 -- lecture_session_instructor（講義セッション教員）
@@ -317,8 +315,7 @@ CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）
-\i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_classs.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_facultys.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_instructors.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250531153113__insert_subclasss.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250531192920__insert_syllabus_masters.sql
+
+-- ========== 開発用データベースの初期化 ==========
+
+\i /docker-entrypoint-initdb.d/02-init-dev.sql

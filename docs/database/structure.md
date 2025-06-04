@@ -168,9 +168,8 @@
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | instructor_id | 主キー |
-| UNIQUE | instructor_code | 教職員番号の一意性 |
-| idx_instructor_name | (last_name, first_name) | 氏名での検索用 |
-| idx_instructor_name_kana | (last_name_kana, first_name_kana) | カナ氏名での検索用 |
+| idx_instructor_name | name | 名前での検索用 |
+| idx_instructor_name_kana | name_kana | カナ名前での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |

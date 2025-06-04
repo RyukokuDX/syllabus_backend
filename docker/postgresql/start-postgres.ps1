@@ -6,12 +6,13 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # 0. Change to target directory
 Write-Host "0. Changing to target directory..."
-$workspacePath = Join-Path $env:USERPROFILE "Documents\github\syllabus_backend"
-Set-Location (Join-Path $workspacePath "docker\postgresql")
+$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location $scriptPath
 
 # 1. Execute generate-init.sh in WSL
 Write-Host "`n1. Executing generate-init.sh in WSL..."
-wsl bash -c "cd /mnt/c/Users/$env:USERNAME/Documents/github/syllabus_backend/docker/postgresql && ./generate-init.sh"
+$wslPath = wsl wslpath -a $scriptPath
+wsl bash -c "cd '$wslPath' && dos2unix generate-init.sh && chmod +x generate-init.sh && ./generate-init.sh"
 
 # 2. Start PostgreSQL with Docker Compose
 Write-Host "`n2. Starting PostgreSQL with Docker Compose..."

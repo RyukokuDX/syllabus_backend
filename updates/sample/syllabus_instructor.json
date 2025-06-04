@@ -2,14 +2,14 @@
   "syllabus_instructors": [
     {
       "id": 1,
-      "syllabus_code": "K250622250",
-      "instructor_code": "INS001",
+      "syllabus_id": 1,
+      "instructor_id": 1,
       "created_at": "2025-03-20T00:00:00"
     },
     {
       "id": 2,
-      "syllabus_code": "EU25731000",
-      "instructor_code": "INS002",
+      "syllabus_id": 2,
+      "instructor_id": 2,
       "created_at": "2025-03-20T00:00:00"
     }
   ]

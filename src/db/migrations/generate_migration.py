@@ -122,7 +122,7 @@ def generate_sql_insert(table_name, records):
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name"],
         "subject_attribute_value": ["subject_id", "attribute_id"],
-        "instructor": ["last_name", "first_name"],
+        "instructor": ["name"],
         "book": None,
         "book_author": ["book_id", "author_name"],
         "lecture_time": ["syllabus_id", "day_of_week", "period"],
@@ -146,7 +146,7 @@ def generate_sql_insert(table_name, records):
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name", "description"],
         "subject_attribute_value": ["value"],
-        "instructor": ["last_name", "first_name", "last_name_kana", "first_name_kana"],
+        "instructor": ["name", "name_kana"],
         "book": None,
         "book_author": ["book_id", "author_name"],
         "lecture_time": ["day_of_week", "period"],
@@ -214,13 +214,9 @@ CREATE TABLE IF NOT EXISTS subject_name (
         'instructor': """
 CREATE TABLE IF NOT EXISTS instructor (
     instructor_id SERIAL PRIMARY KEY,
-    instructor_code TEXT NOT NULL UNIQUE,
-    last_name TEXT NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name_kana TEXT,
-    first_name_kana TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    name TEXT NOT NULL,
+    name_kana TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );""",
         'book': """
 CREATE TABLE IF NOT EXISTS book (
@@ -393,8 +389,8 @@ CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syl
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);""",
         'instructor': """
-CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(last_name, first_name);
-CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(last_name_kana, first_name_kana);""",
+CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(name);
+CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);""",
         'book': """
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);""",
         'book_author': """

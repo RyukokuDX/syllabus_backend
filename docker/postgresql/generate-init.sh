@@ -2,7 +2,9 @@
 
 set -e
 
-cd "$(dirname "$0")"
+# スクリプトの絶対パスを取得
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR"
 
 TEMPLATE_FILE="init/init.sql.template"
 OUTPUT_FILE="init/01-init.sql"
