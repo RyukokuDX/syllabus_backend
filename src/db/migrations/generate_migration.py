@@ -122,7 +122,7 @@ def generate_sql_insert(table_name, records):
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name"],
         "subject_attribute_value": ["subject_id", "attribute_id"],
-        "instructor": ["name"],
+        "instructor": None,  # 一意性制約がないため、ON CONFLICT句は不要
         "book": None,
         "book_author": ["book_id", "author_name"],
         "lecture_time": ["syllabus_id", "day_of_week", "period"],
@@ -146,7 +146,7 @@ def generate_sql_insert(table_name, records):
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name", "description"],
         "subject_attribute_value": ["value"],
-        "instructor": ["name", "name_kana"],
+        "instructor": None,  # 一意性制約がないため、更新対象カラムも不要
         "book": None,
         "book_author": ["book_id", "author_name"],
         "lecture_time": ["day_of_week", "period"],
