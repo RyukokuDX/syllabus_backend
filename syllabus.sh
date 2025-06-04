@@ -37,13 +37,13 @@ show_help() {
     echo
     echo "Options:"
     echo "  -h, --help     Show this help message"
-    echo "  -p, --postgres Run command in PostgreSQL service"
+    echo "  -p, --postgresql Run command in PostgreSQL service"
     echo
     echo "Commands:"
     echo "  help           Show this help message"
     echo "  venv-init      Initialize Python virtual environment"
-    echo "  up             Start all services"
-    echo "  down           Stop all services"
+    echo "  start          Start the specified service"
+    echo "  stop           Stop the specified service"
     echo "  ps             Show service status"
     echo "  logs           Show service logs"
     echo "  shell          Open shell in PostgreSQL service"
@@ -52,7 +52,8 @@ show_help() {
     echo
     echo "Examples:"
     echo "  $0 venv-init             # Initialize Python virtual environment"
-    echo "  $0 up                    # Start all services"
+    echo "  $0 -p start              # Start PostgreSQL service"
+    echo "  $0 -p stop               # Stop PostgreSQL service"
     echo "  $0 -p shell              # Open shell in PostgreSQL service"
     echo "  $0 -p records            # Show record counts"
     echo "  $0 parser book           # Run book parser"
@@ -70,7 +71,7 @@ while [[ $# -gt 0 ]]; do
             show_help
             exit 0
             ;;
-        -p|--postgres)
+        -p|--postgresql)
             SERVICE="postgres"
             shift
             ;;
@@ -99,11 +100,21 @@ case $COMMAND in
     venv-init)
         init_venv
         ;;
-    up)
-        docker-compose up -d
+    start)
+        if [ "$SERVICE" = "postgres" ]; then
+            "$SCRIPT_DIR/bin/start-postgres.sh"
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
         ;;
-    down)
-        docker-compose down
+    stop)
+        if [ "$SERVICE" = "postgres" ]; then
+            "$SCRIPT_DIR/bin/stop-postgres.sh"
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
         ;;
     ps)
         docker-compose ps
