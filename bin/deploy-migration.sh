@@ -16,27 +16,43 @@ else
     exit 1
 fi
 
-# マイグレーションファイルのコピー
-echo "マイグレーションファイルをコピーします..."
-cp "$POSTGRES_DIR/migrations_dev"/*.sql "$POSTGRES_DIR/migrations/"
+# マイグレーションディレクトリの確認
+MIGRATIONS_DIR="$POSTGRES_DIR/migrations"
+ARCHIVE_DIR="$POSTGRES_DIR/init/migrations"
 
-# マイグレーションの適用
-echo "マイグレーションを適用します..."
-docker-compose exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f "/docker-entrypoint-initdb.d/migrations/$(basename "$(ls -t migrations/*.sql | head -n1)")"
-
-# 結果の確認
-if [ $? -eq 0 ]; then
-    echo "マイグレーションが正常に適用されました"
-    
-    # テーブル数の確認
-    echo "テーブル数を確認します..."
-    docker-compose exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
-    SELECT table_name, count(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = 'public' 
-    GROUP BY table_name 
-    ORDER BY table_name;"
-else
-    echo "エラー: マイグレーションの実行に失敗しました"
+if [ ! -d "$MIGRATIONS_DIR" ]; then
+    echo "Error: migrationsディレクトリが見つかりません: $MIGRATIONS_DIR"
     exit 1
-fi 
+fi
+
+if [ ! -d "$ARCHIVE_DIR" ]; then
+    echo "init/migrationsディレクトリを作成します..."
+    mkdir -p "$ARCHIVE_DIR"
+fi
+
+# SQLファイルを順に適用
+SQL_FILES=$(find "$MIGRATIONS_DIR" -name "*.sql" | sort)
+if [ -z "$SQL_FILES" ]; then
+    echo "Error: migrationsディレクトリにSQLファイルが見つかりません: $MIGRATIONS_DIR"
+    exit 1
+fi
+
+for file in $SQL_FILES; do
+    filename=$(basename "$file")
+    echo "適用中: $filename"
+    
+    # SQLファイルを適用（標準入力から）
+    result=$(cat "$file" | docker-compose exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f - 2>&1)
+    
+    if [ $? -eq 0 ]; then
+        echo "適用成功: $filename"
+        mv "$file" "$ARCHIVE_DIR/$filename"
+        echo "移動: $filename -> $ARCHIVE_DIR"
+    else
+        echo "エラー: $filename の適用に失敗しました"
+        echo "psql出力: $result"
+        exit 1
+    fi
+done
+
+echo "全てのマイグレーションが完了しました。" 

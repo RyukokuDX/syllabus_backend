@@ -21,11 +21,13 @@ show_help() {
     echo "  generate             Generate migration files (PostgreSQL only)"
     echo "  init-dirs           Initialize update directories (PostgreSQL only)"
     echo "  clean                Clean update directories (PostgreSQL only)"
+    echo "  records              Display record counts for each table (PostgreSQL only)"
     echo
     echo "Examples:"
     echo "  $0 -p start          # Start PostgreSQL (required before check/deploy)"
     echo "  $0 -p check          # Check PostgreSQL migrations (requires PostgreSQL to be running)"
     echo "  $0 -p deploy         # Deploy migrations (requires PostgreSQL to be running)"
+    echo "  $0 -p records        # Display record counts for each table"
     echo "  $0 -a start          # Start FastAPI"
     echo
     echo "Note: For PostgreSQL operations, make sure to start the service first"
@@ -99,6 +101,28 @@ case "$SERVICE" in
                 ;;
             clean)
                 "$BIN_DIR/init-updates.sh"
+                ;;
+            records)
+                # PostgreSQLが起動しているか確認
+                if ! docker-compose -f "$SCRIPT_DIR/docker/postgresql/docker-compose.yml" ps | grep -q "postgres-db.*Up"; then
+                    echo "Error: PostgreSQL is not running. Please start it first using:"
+                    echo "  $0 -p start"
+                    exit 1
+                fi
+                # 環境変数ファイルからデータベース名を取得
+                if [ -f "$SCRIPT_DIR/.env" ]; then
+                    source "$SCRIPT_DIR/.env"
+                else
+                    echo "Error: .env file not found"
+                    exit 1
+                fi
+                # 各テーブルのレコード数を表示
+                docker-compose -f "$SCRIPT_DIR/docker/postgresql/docker-compose.yml" exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+                SELECT 
+                    schemaname || '.' || relname as table_name,
+                    n_live_tup as record_count
+                FROM pg_stat_user_tables
+                ORDER BY relname;"
                 ;;
             *)
                 echo "Error: Unknown command '$COMMAND' for PostgreSQL service"
