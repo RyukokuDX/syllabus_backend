@@ -191,12 +191,12 @@ CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);
 -- book（書籍）
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
-    url TEXT NOT NULL UNIQUE,
     title TEXT NOT NULL,
     publisher TEXT,
     price INTEGER,
     isbn TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(title, publisher)
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
@@ -321,6 +321,8 @@ CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subject_names.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604112913__insert_instructors.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250604155849__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250604164208__insert_subject_attributes.sql
 
 -- ========== 開発用データベースの初期化 ==========
 

@@ -45,3 +45,5 @@ GRANT USAGE ON SCHEMA public TO app_user;\i /docker-entrypoint-initdb.d/migratio
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subject_names.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604112913__insert_instructors.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250604155849__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250604164208__insert_subject_attributes.sql
