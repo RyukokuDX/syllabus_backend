@@ -61,9 +61,12 @@ def get_db_connection(db_config: Dict[str, str]):
     
     return session
 
-def get_subject_name_id_from_db(session, name: str) -> int:
+def get_subject_name_id_from_db(session, subject_name: str) -> int:
     """科目名IDを取得する"""
     try:
+        # 科目名の正規化（全角スペースを半角に変換）
+        subject_name = subject_name.replace('　', ' ')
+        
         query = text("""
             SELECT subject_name_id 
             FROM subject_name 
@@ -74,14 +77,12 @@ def get_subject_name_id_from_db(session, name: str) -> int:
         
         result = session.execute(
             query,
-            {"name": name}
+            {"name": subject_name}
         ).first()
         
         if result:
             return result[0]
-        else:
-            print(f"エラー: 科目名が見つかりません: {name}")
-            return None
+        return None
             
     except Exception as e:
         print(f"エラー: 科目名IDの取得中にエラーが発生しました: {str(e)}")
@@ -106,127 +107,140 @@ def get_faculty_id_from_db(session, faculty_name: str) -> int:
         
         if result:
             return result[0]
-        else:
-            print(f"エラー: 学部が見つかりません: {faculty_name}")
-            return None
+        return None
             
     except Exception as e:
         print(f"エラー: 学部IDの取得中にエラーが発生しました: {str(e)}")
         session.rollback()
         return None
 
-def get_class_id_from_db(session, class_name: str) -> int:
-    """科目区分IDを取得する"""
+def get_subject_id_from_db(session, subject_name_id: int, faculty_id: int, curriculum_year: int) -> int:
+    """科目IDを取得する"""
     try:
         query = text("""
-            SELECT class_id 
-            FROM class 
-            WHERE class_name = :name
-            ORDER BY class_id
+            SELECT subject_id 
+            FROM subject 
+            WHERE subject_name_id = :subject_name_id
+            AND faculty_id = :faculty_id
+            AND curriculum_year = :curriculum_year
+            ORDER BY subject_id
             LIMIT 1
         """)
         
         result = session.execute(
             query,
-            {"name": class_name}
+            {
+                "subject_name_id": subject_name_id,
+                "faculty_id": faculty_id,
+                "curriculum_year": curriculum_year
+            }
         ).first()
         
         if result:
             return result[0]
-        else:
-            print(f"エラー: 科目区分が見つかりません: {class_name}")
-            return None
+        return None
             
     except Exception as e:
-        print(f"エラー: 科目区分IDの取得中にエラーが発生しました: {str(e)}")
+        print(f"エラー: 科目IDの取得中にエラーが発生しました: {str(e)}")
         session.rollback()
         return None
 
-def get_subclass_id_from_db(session, subclass_name: str) -> int:
-    """科目小区分IDを取得する"""
+def get_attribute_id_from_db(session, attribute_name: str) -> int:
+    """属性IDを取得する"""
     try:
         query = text("""
-            SELECT subclass_id 
-            FROM subclass 
-            WHERE subclass_name = :name
-            ORDER BY subclass_id
+            SELECT attribute_id 
+            FROM subject_attribute 
+            WHERE attribute_name = :name
+            ORDER BY attribute_id
             LIMIT 1
         """)
         
         result = session.execute(
             query,
-            {"name": subclass_name}
+            {"name": attribute_name}
         ).first()
         
         if result:
             return result[0]
         else:
-            print(f"エラー: 科目小区分が見つかりません: {subclass_name}")
+            print(f"エラー: 属性が見つかりません: {attribute_name}")
             return None
             
     except Exception as e:
-        print(f"エラー: 科目小区分IDの取得中にエラーが発生しました: {str(e)}")
+        print(f"エラー: 属性IDの取得中にエラーが発生しました: {str(e)}")
         session.rollback()
         return None
 
-def extract_syllabus_info(csv_file: str, db_config: Dict[str, str]) -> List[Dict]:
-    """CSVからシラバス情報を抽出する"""
-    syllabi = []
+def extract_subject_attribute_values(csv_file: str, db_config: Dict[str, str]) -> List[Dict]:
+    """CSVから科目属性値情報を抽出する"""
+    attribute_values = []
     session = get_db_connection(db_config)
     
     try:
         with open(csv_file, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for row in reader:
-                subject_name_id = get_subject_name_id_from_db(session, row['科目名'])
-                faculty_id = get_faculty_id_from_db(session, row['学部課程'])
-                class_id = get_class_id_from_db(session, row['科目区分'])
-                subclass_id = get_subclass_id_from_db(session, row['科目小区分']) if row['科目小区分'] else None
+                # 17_subject.pyで処理したフィールドを除外
+                processed_fields = {'科目名', '学部課程', '年度', '科目区分', '科目小区分', '必須度'}
+                attribute_fields = set(row.keys()) - processed_fields
                 
-                if subject_name_id is None or faculty_id is None or class_id is None:
-                    print(f"エラー: 必要なIDが見つかりません - 科目名: {row['科目名']}")
+                # 科目名IDを取得
+                subject_name_id = get_subject_name_id_from_db(session, row['科目名'])
+                if subject_name_id is None:
                     continue
+                
+                # 学部IDを取得
+                faculty_id = get_faculty_id_from_db(session, row['学部課程'])
+                if faculty_id is None:
+                    continue
+                
+                # 科目IDを取得
+                subject_id = get_subject_id_from_db(session, subject_name_id, faculty_id, int(row['年度']))
+                if subject_id is None:
+                    continue
+                
+                # 各属性フィールドを処理
+                for field_name in attribute_fields:
+                    value = row[field_name]
+                    if value == "NULL":  # CSVのnull値は文字列"NULL"として保存されている
+                        continue
+                        
+                    attribute_id = get_attribute_id_from_db(session, field_name)
+                    if attribute_id is None:
+                        continue
                     
-                syllabus_info = {
-                    'subject_name_id': subject_name_id,
-                    'faculty_id': faculty_id,
-                    'curriculum_year': int(row['年度']),
-                    'class_id': class_id,
-                    'subclass_id': subclass_id,
-                    'requirement_type': row['必須度'],
-                    'created_at': datetime.now().isoformat()
-                }
-                syllabi.append(syllabus_info)
+                    attribute_value_info = {
+                        'subject_id': subject_id,
+                        'attribute_id': attribute_id,
+                        'value': value,
+                        'created_at': datetime.now().isoformat()
+                    }
+                    attribute_values.append(attribute_value_info)
     finally:
         session.close()
     
-    return syllabi
+    return attribute_values
 
-def create_syllabus_json(syllabi: Set[Dict]) -> str:
-    """シラバス情報のJSONファイルを作成する"""
-    output_dir = os.path.join("updates", "subject", "add")
+def create_subject_attribute_value_json(attribute_values: List[Dict]) -> str:
+    """科目属性値情報のJSONファイルを作成する"""
+    output_dir = os.path.join("updates", "subject_attribute_value", "add")
     os.makedirs(output_dir, exist_ok=True)
     
     # 現在の日時を取得してファイル名を生成
     current_time = datetime.now()
-    filename = f"subject_{current_time.strftime('%Y%m%d_%H%M')}.json"
+    filename = f"subject_attribute_value_{current_time.strftime('%Y%m%d_%H%M')}.json"
     output_file = os.path.join(output_dir, filename)
     
     data = {
-        "subjects": [{
-            "subject_name_id": syllabus["subject_name_id"],
-            "faculty_id": syllabus["faculty_id"],
-            "curriculum_year": syllabus["curriculum_year"],
-            "class_id": syllabus["class_id"],
-            "subclass_id": syllabus["subclass_id"],
-            "requirement_type": syllabus["requirement_type"],
-            "created_at": syllabus["created_at"]
-        } for syllabus in sorted(syllabi, key=lambda x: (
-            x["subject_name_id"],
-            x["faculty_id"],
-            x["curriculum_year"],
-            x["class_id"],
-            x["subclass_id"] if x["subclass_id"] is not None else 0
+        "subject_attribute_values": [{
+            "subject_id": value["subject_id"],
+            "attribute_id": value["attribute_id"],
+            "value": value["value"],
+            "created_at": value["created_at"]
+        } for value in sorted(attribute_values, key=lambda x: (
+            x["subject_id"],
+            x["attribute_id"]
         ))]
     }
     
@@ -246,22 +260,25 @@ def main(db_config: Dict[str, str]):
         csv_files = get_csv_files(year)
         print(f"処理対象ファイル数: {len(csv_files)}")
         
-        # シラバス情報の抽出
-        all_syllabi = set()
+        # 科目属性値情報の抽出
+        all_attribute_values = []
         for csv_file in tqdm(csv_files, desc="CSVファイル処理中"):
-            syllabi = extract_syllabus_info(csv_file, db_config)
-            
-            # 各シラバスの情報をタプルに変換してセットに追加（重複を防ぐため）
-            for syllabus in syllabi:
-                syllabus_tuple = tuple(sorted(syllabus.items()))
-                all_syllabi.add(syllabus_tuple)
+            attribute_values = extract_subject_attribute_values(csv_file, db_config)
+            all_attribute_values.extend(attribute_values)
         
-        # タプルを辞書に戻す
-        syllabus_dicts = [dict(t) for t in all_syllabi]
-        print(f"抽出されたシラバス情報: {len(syllabus_dicts)}件")
+        # 重複を除去
+        unique_attribute_values = []
+        seen_values = set()
+        for value in all_attribute_values:
+            value_key = (value['subject_id'], value['attribute_id'], value['value'])
+            if value_key not in seen_values:
+                seen_values.add(value_key)
+                unique_attribute_values.append(value)
+        
+        print(f"抽出された科目属性値情報: {len(unique_attribute_values)}件")
         
         # JSONファイルの作成
-        output_file = create_syllabus_json(syllabus_dicts)
+        output_file = create_subject_attribute_value_json(unique_attribute_values)
         print(f"JSONファイルを作成しました: {output_file}")
         
     except Exception as e:

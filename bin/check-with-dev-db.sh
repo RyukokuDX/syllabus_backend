@@ -39,15 +39,6 @@ if [ $? -eq 0 ]; then
     # マイグレーションファイルをmigrationsディレクトリに移動
     echo "マイグレーションファイルをmigrationsディレクトリに移動します..."
     mv "$LATEST_MIGRATION" "$POSTGRES_DIR/migrations/"
-    
-    # テーブル数の確認
-    echo "テーブル数を確認します..."
-    docker-compose exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
-    SELECT table_name, count(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = 'public' 
-    GROUP BY table_name 
-    ORDER BY table_name;"
 else
     echo "エラー: マイグレーションの実行に失敗しました"
     exit 1

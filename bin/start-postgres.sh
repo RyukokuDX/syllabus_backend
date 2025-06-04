@@ -24,23 +24,4 @@ docker-compose up -d
 echo -e "\n3. Waiting for container to start..."
 sleep 10
 
-# 4. Display table entry counts
-echo -e "\n4. Displaying table entry counts..."
-
-# Get list of tables first
-tables=$(docker exec postgres-db psql -U postgres -d syllabus_db -t -c "
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
-ORDER BY table_name;")
-
-# For each table, get the record count
-while IFS= read -r table; do
-    table=$(echo "$table" | tr -d '[:space:]')
-    if [ -n "$table" ]; then
-        count=$(docker exec postgres-db psql -U postgres -d syllabus_db -t -c "SELECT COUNT(*) FROM $table;")
-        echo "Table: $table - Records: $(echo "$count" | tr -d '[:space:]')"
-    fi
-done <<< "$tables"
-
 echo -e "\nPostgreSQL is ready!" 

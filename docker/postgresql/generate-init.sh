@@ -11,10 +11,6 @@ OUTPUT_FILE="init/01-init.sql"
 DEV_TEMPLATE_FILE="init/init-dev.sql.template"
 DEV_OUTPUT_FILE="init/02-init-dev.sql"
 MIGRATIONS_DIR="init/migrations"
-DOCKER_MIGRATIONS_DIR="init/docker-entrypoint-initdb.d/migrations"
-
-# マイグレーションディレクトリの作成
-mkdir -p "$DOCKER_MIGRATIONS_DIR"
 
 echo "Generating $OUTPUT_FILE from $TEMPLATE_FILE..."
 echo "Generating $DEV_OUTPUT_FILE from $DEV_TEMPLATE_FILE..."
@@ -36,17 +32,15 @@ done
 echo "$OUTPUT_FILE generated successfully"
 echo "$DEV_OUTPUT_FILE generated successfully"
 
-# マイグレーションファイルの自動挿入とコピー
+# マイグレーションファイルの自動挿入
 if [ -d "$MIGRATIONS_DIR" ]; then
   echo "MIGRATIONS_DIR: $MIGRATIONS_DIR"
   for sqlfile in "$MIGRATIONS_DIR"/*.sql; do
     [ -e "$sqlfile" ] || { echo "No .sql files found in $MIGRATIONS_DIR"; continue; }
     filename=$(basename "$sqlfile")
     echo "Adding migration: $filename"
-    # マイグレーションファイルをコピー
-    cp "$sqlfile" "$DOCKER_MIGRATIONS_DIR/"
-    echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$OUTPUT_FILE"
-    echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$DEV_OUTPUT_FILE"
+    echo "\\i /init/migrations/$filename" >> "$OUTPUT_FILE"
+    echo "\\i /init/migrations/$filename" >> "$DEV_OUTPUT_FILE"
   done
 fi
 
@@ -54,4 +48,4 @@ fi
 echo "
 -- ========== 開発用データベースの初期化 ==========
 
-\\i /docker-entrypoint-initdb.d/02-init-dev.sql" >> "$OUTPUT_FILE"
+\\i /init/02-init-dev.sql" >> "$OUTPUT_FILE"
