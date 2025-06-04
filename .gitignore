@@ -10,7 +10,12 @@
 *pretty.html
 updates/*/registered/json/*.json
 
-# Python
+# Python virtual environment
+syllabus_backend_venv/
+venv/
+env/
+
+# Python bytecode
 __pycache__/
 *.py[cod]
 *.pyc
@@ -56,3 +61,13 @@ Thumbs.db
 
 # binary files
 *.sql
+
+# OS generated files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database
+*.sqlite3
+*.db

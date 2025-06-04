@@ -16,72 +16,74 @@
 ## 使用方法
 
 ```bash
-./syllabus.sh [OPTIONS] COMMAND
+./syllabus.sh [OPTIONS] COMMAND [ARGS]
 ```
 
 ### オプション
 
-- `-p, --postgresql`: PostgreSQLサービスを操作（デフォルト）
-- `-a, --api`: FastAPIサービスを操作
+- `-p, --postgres`: PostgreSQLサービスを操作
 - `-h, --help`: ヘルプメッセージを表示
 
 ### コマンド
 
+#### 基本コマンド
+
+- `help`: ヘルプメッセージを表示
+- `venv-init`: Python仮想環境の初期化
+- `up`: すべてのサービスを起動
+- `down`: すべてのサービスを停止
+- `ps`: サービスの状態を表示
+- `logs`: サービスのログを表示
+
 #### PostgreSQL関連
 
-- `start`: PostgreSQLサービスを起動
-- `stop`: PostgreSQLサービスを停止
-- `check`: 開発用データベースでマイグレーションを確認
-- `deploy`: マイグレーションを本番環境に適用
-- `generate`: マイグレーションファイルを生成
-- `init-dirs`: 更新ディレクトリを初期化
-- `clean`: 更新ディレクトリをクリーンアップ
+- `shell`: PostgreSQLサービスのシェルを開く（-pオプション必須）
+- `records`: すべてのテーブルのレコード数を表示（-pオプション必須）
 
-#### FastAPI関連
+#### パーサー関連
 
-- `start`: FastAPIサービスを起動
-- `stop`: FastAPIサービスを停止
+- `parser`: 指定されたテーブルのパーサースクリプトを実行
+  - 利用可能なパーサー:
+    - `book` または `06`: 書籍パーサー
+    - `syllabus` または `17`: シラバスパーサー
 
 ### 使用例
 
 ```bash
-# PostgreSQLの起動（check/deployの前に必要）
-./syllabus.sh -p start
+# Python仮想環境の初期化
+./syllabus.sh venv-init
 
-# PostgreSQLマイグレーションの確認（PostgreSQLが起動している必要あり）
-./syllabus.sh -p check
+# すべてのサービスの起動
+./syllabus.sh up
 
-# マイグレーションの本番環境への適用（PostgreSQLが起動している必要あり）
-./syllabus.sh -p deploy
+# PostgreSQLシェルの起動
+./syllabus.sh -p shell
 
-# FastAPIの起動
-./syllabus.sh -a start
+# テーブルのレコード数表示
+./syllabus.sh -p records
+
+# パーサーの実行
+./syllabus.sh parser book
+./syllabus.sh parser syllabus
 ```
 
 ## 注意事項
 
-- PostgreSQLの操作（check/deploy）を行う前に、必ず`start`コマンドでサービスを起動してください
+- PostgreSQLの操作（shell/records）を行う場合は、必ず`-p`オプションを指定してください
+- パーサーを実行する前に、`venv-init`コマンドでPython仮想環境を初期化してください
 - 各コマンドは`bin/`ディレクトリ内の対応するスクリプトを実行します
 - エラーが発生した場合は、適切なエラーメッセージとヘルプが表示されます
 
 ## 関連スクリプト
 
-### PostgreSQL関連
-- [start-postgres.sh](./start-postgres.md) - PostgreSQLサービスの起動と初期化
-- [stop-postgres.sh](./stop-postgres.md) - PostgreSQLサービスの停止
-- [check-with-dev-db.sh](./check-with-dev-db.md) - 開発用データベースでのマイグレーション確認
-- [deploy-migration.sh](./deploy-migration.md) - 本番環境へのマイグレーション適用
-- [generate-migration.sh](./generate-migration.md) - マイグレーションファイルの生成
-- [init-directories.sh](./init-directories.md) - 更新ディレクトリの初期化
-- [init-updates.sh](./init-updates.md) - 更新ディレクトリのクリーンアップ
-
-### FastAPI関連
-- FastAPIの起動と停止は`syllabus.sh`内で直接処理されます
+### パーサー関連
+- [parser.sh](./parser.md) - パーサースクリプトの実行
 
 ## 更新履歴
 
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
 | 2024-03-20 | 1.0.0 | 開発者名 | 初版作成 |
+| 2024-03-21 | 1.1.0 | 開発者名 | Python仮想環境のサポートを追加、コマンド構造を整理 |
 
 [🔝 ページトップへ](#syllabussh) 

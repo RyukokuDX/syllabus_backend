@@ -550,9 +550,10 @@ periodは"0"とする.
 | subject_id | INTEGER | NO | ID（主キー） | システム生成 |
 | subject_name_id | INTEGER | NO | 科目名ID（外部キー） | 履修要綱 |
 | faculty_id | INTEGER | NO | 開講学部ID（外部キー） | 履修要綱 |
+| curriculum_year | INTEGER | NO | 要綱年 | 履修要綱 |
 | class_id | INTEGER | NO | クラスID（外部キー） | 履修要綱 |
 | subclass_id | INTEGER | YES | 小区分ID（外部キー） | 履修要綱 |
-| curriculum_year | INTEGER | NO | 要綱年 | 履修要綱 |
+| requirement_type | TEXT | NO | 必修/選択区分 | 履修要綱 |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 

@@ -2,58 +2,84 @@
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BIN_DIR="$SCRIPT_DIR/bin"
+VENV_DIR="$SCRIPT_DIR/syllabus_backend_venv"
+PYTHON="$VENV_DIR/bin/python"
+
+# 仮想環境の初期化
+init_venv() {
+    echo "Initializing virtual environment..."
+    if [ -d "$VENV_DIR" ]; then
+        echo "Virtual environment already exists at $VENV_DIR"
+        echo "Do you want to recreate it? [y/N]"
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            echo "Removing existing virtual environment..."
+            rm -rf "$VENV_DIR"
+        else
+            echo "Keeping existing virtual environment"
+            return
+        fi
+    fi
+    
+    echo "Creating virtual environment..."
+    python3 -m venv "$VENV_DIR"
+    
+    echo "Installing required packages..."
+    "$PYTHON" -m pip install --upgrade pip
+    "$PYTHON" -m pip install -r "$SCRIPT_DIR/requirements.txt"
+    
+    echo "Virtual environment initialized successfully"
+}
 
 # ヘルプメッセージを表示
 show_help() {
-    echo "Usage: $0 [OPTIONS] COMMAND"
+    echo "Usage: $0 [OPTIONS] COMMAND [ARGS]"
     echo
     echo "Options:"
-    echo "  -p, --postgresql      PostgreSQL service (default)"
-    echo "  -a, --api            FastAPI service"
-    echo "  -h, --help           Show this help message"
+    echo "  -h, --help     Show this help message"
+    echo "  -p, --postgres Run command in PostgreSQL service"
     echo
     echo "Commands:"
-    echo "  start                Start the specified service"
-    echo "  stop                 Stop the specified service"
-    echo "  check                Check migrations with development database (PostgreSQL only)"
-    echo "  deploy               Deploy migrations (PostgreSQL only)"
-    echo "  generate             Generate migration files (PostgreSQL only)"
-    echo "  init-dirs           Initialize update directories (PostgreSQL only)"
-    echo "  clean                Clean update directories (PostgreSQL only)"
-    echo "  records              Display record counts for each table (PostgreSQL only)"
+    echo "  help           Show this help message"
+    echo "  venv-init      Initialize Python virtual environment"
+    echo "  up             Start all services"
+    echo "  down           Stop all services"
+    echo "  ps             Show service status"
+    echo "  logs           Show service logs"
+    echo "  shell          Open shell in PostgreSQL service"
+    echo "  records        Show record counts for all tables"
+    echo "  parser         Run parser script for specified table"
     echo
     echo "Examples:"
-    echo "  $0 -p start          # Start PostgreSQL (required before check/deploy)"
-    echo "  $0 -p check          # Check PostgreSQL migrations (requires PostgreSQL to be running)"
-    echo "  $0 -p deploy         # Deploy migrations (requires PostgreSQL to be running)"
-    echo "  $0 -p records        # Display record counts for each table"
-    echo "  $0 -a start          # Start FastAPI"
-    echo
-    echo "Note: For PostgreSQL operations, make sure to start the service first"
-    echo "      using 'start' command before running 'check' or 'deploy'"
+    echo "  $0 venv-init             # Initialize Python virtual environment"
+    echo "  $0 up                    # Start all services"
+    echo "  $0 -p shell              # Open shell in PostgreSQL service"
+    echo "  $0 -p records            # Show record counts"
+    echo "  $0 parser book           # Run book parser"
+    echo "  $0 parser syllabus       # Run syllabus parser"
 }
 
-# デフォルトのサービス
-SERVICE="postgresql"
-
 # コマンドライン引数の解析
+SERVICE=""
+COMMAND=""
+ARGS=()
+
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -p|--postgresql)
-            SERVICE="postgresql"
-            shift
-            ;;
-        -a|--api)
-            SERVICE="api"
-            shift
-            ;;
         -h|--help)
             show_help
             exit 0
             ;;
+        -p|--postgres)
+            SERVICE="postgres"
+            shift
+            ;;
         *)
-            COMMAND="$1"
+            if [ -z "$COMMAND" ]; then
+                COMMAND="$1"
+            else
+                ARGS+=("$1")
+            fi
             shift
             ;;
     esac
@@ -66,91 +92,57 @@ if [ -z "$COMMAND" ]; then
 fi
 
 # コマンドの実行
-case "$SERVICE" in
-    postgresql)
-        case "$COMMAND" in
-            start)
-                "$BIN_DIR/start-postgres.sh"
-                ;;
-            stop)
-                "$BIN_DIR/stop-postgres.sh"
-                ;;
-            check)
-                # PostgreSQLが起動しているか確認
-                if ! docker-compose -f "$SCRIPT_DIR/docker/postgresql/docker-compose.yml" ps | grep -q "postgres-db.*Up"; then
-                    echo "Error: PostgreSQL is not running. Please start it first using:"
-                    echo "  $0 -p start"
-                    exit 1
-                fi
-                "$BIN_DIR/check-with-dev-db.sh"
-                ;;
-            deploy)
-                # PostgreSQLが起動しているか確認
-                if ! docker-compose -f "$SCRIPT_DIR/docker/postgresql/docker-compose.yml" ps | grep -q "postgres-db.*Up"; then
-                    echo "Error: PostgreSQL is not running. Please start it first using:"
-                    echo "  $0 -p start"
-                    exit 1
-                fi
-                "$BIN_DIR/deploy-migration.sh"
-                ;;
-            generate)
-                "$BIN_DIR/generate-migration.sh"
-                ;;
-            init-dirs)
-                "$BIN_DIR/init-directories.sh"
-                ;;
-            clean)
-                "$BIN_DIR/init-updates.sh"
-                ;;
-            records)
-                # PostgreSQLが起動しているか確認
-                if ! docker-compose -f "$SCRIPT_DIR/docker/postgresql/docker-compose.yml" ps | grep -q "postgres-db.*Up"; then
-                    echo "Error: PostgreSQL is not running. Please start it first using:"
-                    echo "  $0 -p start"
-                    exit 1
-                fi
-                # 環境変数ファイルからデータベース名を取得
-                if [ -f "$SCRIPT_DIR/.env" ]; then
-                    source "$SCRIPT_DIR/.env"
-                else
-                    echo "Error: .env file not found"
-                    exit 1
-                fi
-                # 各テーブルのレコード数を表示
-                docker-compose -f "$SCRIPT_DIR/docker/postgresql/docker-compose.yml" exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+case $COMMAND in
+    help)
+        show_help
+        ;;
+    venv-init)
+        init_venv
+        ;;
+    up)
+        docker-compose up -d
+        ;;
+    down)
+        docker-compose down
+        ;;
+    ps)
+        docker-compose ps
+        ;;
+    logs)
+        docker-compose logs -f
+        ;;
+    shell)
+        if [ "$SERVICE" = "postgres" ]; then
+            docker-compose exec postgres psql -U postgres -d syllabus
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
+        ;;
+    records)
+        if [ "$SERVICE" = "postgres" ]; then
+            docker-compose exec postgres psql -U postgres -d syllabus -c "
                 SELECT 
                     schemaname || '.' || relname as table_name,
                     n_live_tup as record_count
                 FROM pg_stat_user_tables
-                ORDER BY relname;"
-                ;;
-            *)
-                echo "Error: Unknown command '$COMMAND' for PostgreSQL service"
-                show_help
-                exit 1
-                ;;
-        esac
+                ORDER BY relname;
+            "
+        else
+            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            exit 1
+        fi
         ;;
-    api)
-        case "$COMMAND" in
-            start)
-                echo "Starting FastAPI service..."
-                cd "$SCRIPT_DIR" || exit
-                uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-                ;;
-            stop)
-                echo "Stopping FastAPI service..."
-                pkill -f "uvicorn src.main:app"
-                ;;
-            *)
-                echo "Error: Unknown command '$COMMAND' for API service"
-                show_help
-                exit 1
-                ;;
-        esac
+    parser)
+        if [ ${#ARGS[@]} -eq 0 ]; then
+            echo "Error: Parser name or number not specified"
+            show_help
+            exit 1
+        fi
+        "$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
         ;;
     *)
-        echo "Error: Unknown service '$SERVICE'"
+        echo "Error: Unknown command '$COMMAND'"
         show_help
         exit 1
         ;;

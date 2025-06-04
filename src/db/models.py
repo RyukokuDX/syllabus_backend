@@ -104,9 +104,10 @@ class Subject(Base):
     subject_id = Column(Integer, primary_key=True)
     subject_name_id = Column(Integer, ForeignKey('subject_name.subject_name_id'), nullable=False)
     faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
+    curriculum_year = Column(Integer, nullable=False)
     class_id = Column(Integer, ForeignKey('class.class_id'), nullable=False)
     subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'), nullable=True)
-    curriculum_year = Column(Integer, nullable=False)
+    requirement_type = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
     updated_at = Column(TIMESTAMP, nullable=True, onupdate=func.now())
 
@@ -402,17 +403,6 @@ class SyllabusData:
     def available_grades(self) -> List[str]:
         """履修可能学年のリストを返す"""
         return self.grades
-
-@dataclass
-class Subject:
-    """科目基本情報モデル"""
-    subject_id: int
-    subject_name_id: int
-    faculty_id: int
-    class_id: int
-    subclass_id: Optional[int]
-    created_at: datetime
-    updated_at: Optional[datetime]
 
 @dataclass
 class Instructor:

@@ -147,9 +147,10 @@ erDiagram
         INTEGER subject_id PK
         INTEGER subject_name_id FK
         INTEGER faculty_id FK
+        INTEGER curriculum_year
         INTEGER class_id FK
         INTEGER subclass_id FK
-        INTEGER curriculum_year
+        TEXT requirement_type
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
