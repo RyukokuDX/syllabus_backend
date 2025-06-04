@@ -124,7 +124,7 @@ case $COMMAND in
         ;;
     shell)
         if [ "$SERVICE" = "postgres" ]; then
-            docker-compose exec postgres psql -U postgres -d syllabus
+            docker-compose exec postgres-db psql -U postgres -d syllabus
         else
             echo "Error: Service not specified. Use -p for PostgreSQL service."
             exit 1
@@ -132,7 +132,9 @@ case $COMMAND in
         ;;
     records)
         if [ "$SERVICE" = "postgres" ]; then
-            docker-compose exec postgres psql -U postgres -d syllabus -c "
+            # .envファイルからデータベース名を取得
+            DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
+            docker exec postgres-db psql -U postgres -d "$DB_NAME" -c "
                 SELECT 
                     schemaname || '.' || relname as table_name,
                     n_live_tup as record_count
