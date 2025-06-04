@@ -187,7 +187,6 @@
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | book_id | INTEGER | NO | 書籍ID（主キー） | システム生成 |
-| url | TEXT | NO | 書籍のURL | Web Syllabus |
 | title | TEXT | NO | 書籍タイトル | Web Syllabus |
 | publisher | TEXT | YES | 出版社名 | Web Syllabus |
 | price | INTEGER | YES | 価格（税抜） | Web Syllabus |
@@ -199,7 +198,7 @@
 |---------------|--------|------|
 | PRIMARY KEY | book_id | 主キー |
 | UNIQUE | isbn | ISBN番号の一意性 |
-| UNIQUE | url | URLの一意性 |
+| UNIQUE | (title, publisher) | タイトルと出版社の組み合わせの一意性 |
 | idx_book_title | title | 書籍タイトルでの検索用 |
 
 #### 外部キー制約

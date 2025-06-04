@@ -187,7 +187,6 @@ class Book(Base):
     __tablename__ = 'book'
 
     book_id = Column(Integer, primary_key=True)
-    url = Column(Text, nullable=False, unique=True)
     title = Column(Text, nullable=False)
     publisher = Column(Text)
     price = Column(Integer)
@@ -197,6 +196,7 @@ class Book(Base):
     __table_args__ = (
         Index('idx_book_title', 'title'),
         Index('idx_book_isbn', 'isbn', unique=True),
+        UniqueConstraint('title', 'publisher', name='uix_book_title_publisher'),
     )
 
 class BookAuthor(Base):
@@ -416,7 +416,6 @@ class Instructor:
 class Book:
     """書籍モデル"""
     book_id: int
-    url: str
     title: str
     publisher: Optional[str]
     price: Optional[int]
