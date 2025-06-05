@@ -54,6 +54,9 @@ def normalize_subject_name(name: str) -> str:
     for full, half in roman_map.items():
         name = name.replace(full, half)
     
+    # 中点の統一（全角→半角）
+    name = name.replace('・', '·')
+    
     return name 
 
 def get_current_year() -> int:

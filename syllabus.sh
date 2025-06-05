@@ -15,6 +15,88 @@ set -a
 . "$ENV_FILE"
 set +a
 
+# CSVファイルの整形
+normalize_csv() {
+    local year="$1"
+    local csv_dir="$SCRIPT_DIR/src/course_guide/$year/csv"
+    
+    if [ ! -d "$csv_dir" ]; then
+        echo "エラー: 指定された年度のCSVディレクトリが存在しません: $csv_dir"
+        exit 1
+    fi
+    
+    echo "$year年度のCSVファイルを整形中..."
+    cd "$SCRIPT_DIR"  # スクリプトのディレクトリに移動
+    
+    # すべてのCSVファイルを処理
+    for csv_file in "$csv_dir"/*.csv; do
+        if [ -f "$csv_file" ]; then
+            echo "処理中: $(basename "$csv_file")"
+            
+            # バックアップファイルが存在しない場合のみバックアップを作成
+            if [ ! -f "${csv_file}.org" ]; then
+                cp "$csv_file" "${csv_file}.org"
+                echo "バックアップ作成: $(basename "${csv_file}.org")"
+            else
+                echo "バックアップは既に存在します: $(basename "${csv_file}.org")"
+            fi
+            
+            PYTHONPATH="$SCRIPT_DIR/src" "$PYTHON" -c "
+import sys
+import csv
+import os
+from db.parser.utils import normalize_subject_name
+
+def normalize_csv(input_file):
+    # 入力ファイルの区切り文字を判定
+    with open(input_file, 'r', encoding='utf-8') as f:
+        sample = f.read(4096)
+        dialect = csv.Sniffer().sniff(sample)
+        delimiter = dialect.delimiter
+    
+    # 入力ファイルを読み込み
+    with open(input_file, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f, delimiter=delimiter)
+        rows = list(reader)
+    
+    # 各フィールドを整形
+    normalized_rows = []
+    for row in rows:
+        # 各フィールドの前後の空白を削除し、空文字列をNULLに変換
+        normalized_row = []
+        for field in row:
+            field = field.strip()
+            # 空文字列、null、NULL、NoneなどをNULLに統一
+            if not field or field.lower() in ['null', 'none', '']:
+                normalized_row.append('NULL')
+            else:
+                normalized_row.append(field)
+        
+        # 科目名フィールド（2番目）を正規化
+        if len(normalized_row) > 1 and normalized_row[1] != 'NULL':
+            normalized_row[1] = normalize_subject_name(normalized_row[1])
+        
+        normalized_rows.append(normalized_row)
+    
+    # 元のファイルに上書き（タブ区切り）
+    with open(input_file, 'w', encoding='utf-8', newline='') as f:
+        writer = csv.writer(f, delimiter='\t')
+        writer.writerows(normalized_rows)
+    
+    print(f'整形完了: {os.path.basename(input_file)}')
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('使用方法: python script.py <input_csv_file>')
+        sys.exit(1)
+    normalize_csv(sys.argv[1])
+" "$csv_file"
+        fi
+    done
+    
+    echo "すべてのCSVファイルの整形が完了しました"
+}
+
 # 仮想環境の初期化
 init_venv() {
     echo "仮想環境を初期化中..."
@@ -63,6 +145,7 @@ show_help() {
     echo "  generate       指定されたテーブルのデータを生成"
     echo "  check          指定されたテーブルのデータをチェック"
     echo "  deploy         指定されたテーブルのデータをデプロイ"
+    echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名を正規化）"
     echo
     echo "使用例:"
     echo "  $0 venv-init             # Python仮想環境を初期化"
@@ -76,6 +159,7 @@ show_help() {
     echo "  $0 -p generate           # 指定されたテーブルのデータを生成"
     echo "  $0 -p check              # 指定されたテーブルのデータをチェック"
     echo "  $0 -p deploy             # 指定されたテーブルのデータをデプロイ"
+    echo "  $0 csv normalize 2024    # 2024年度のCSVファイルを整形"
 }
 
 # コマンドライン引数の解析
@@ -117,6 +201,28 @@ case $COMMAND in
         ;;
     venv-init)
         init_venv
+        ;;
+    csv)
+        if [ ${#ARGS[@]} -eq 0 ]; then
+            echo "エラー: CSVコマンドのサブコマンドが指定されていません"
+            show_help
+            exit 1
+        fi
+        case "${ARGS[0]}" in
+            normalize)
+                if [ ${#ARGS[@]} -lt 2 ]; then
+                    echo "エラー: 年度が指定されていません"
+                    echo "使用方法: $0 csv normalize <year>"
+                    exit 1
+                fi
+                normalize_csv "${ARGS[1]}"
+                ;;
+            *)
+                echo "エラー: 不明なCSVコマンド '${ARGS[0]}'"
+                show_help
+                exit 1
+                ;;
+        esac
         ;;
     start)
         if [ "$SERVICE" = "postgres" ]; then
