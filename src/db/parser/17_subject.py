@@ -161,10 +161,12 @@ def get_faculty_id_from_db(session, faculty_name: str) -> int:
 def get_class_id_from_db(session, class_name: str) -> int:
     """科目区分IDを取得する"""
     try:
+        # 前後の空白を除去
+        class_name = class_name.strip()
         query = text("""
             SELECT class_id 
             FROM class 
-            WHERE class_name = :name
+            WHERE TRIM(class_name) = :name
             ORDER BY class_id
             LIMIT 1
         """)

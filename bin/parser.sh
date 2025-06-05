@@ -89,4 +89,4 @@ fi
 
 # パーサーの実行
 echo "Running parser: $PARSER_NAME"
-cd "$PARSER_DIR" && PYTHONPATH="$PROJECT_ROOT/src" "$PYTHON" "$PARSER_FILE" 
+cd "$PROJECT_ROOT" && PYTHONPATH="$PROJECT_ROOT/src" "$PYTHON" -m src.db.parser.${PARSER_NAME%%.py} 

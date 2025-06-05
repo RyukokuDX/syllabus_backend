@@ -10,9 +10,7 @@ from .models import (
     Book,
     SyllabusBook,
     GradingCriterion,
-    SyllabusFaculty,
-    Requirement,
-    SubjectProgram
+    Requirement
 )
 
 __all__ = [
@@ -27,7 +25,5 @@ __all__ = [
     'Book',
     'SyllabusBook',
     'GradingCriterion',
-    'SyllabusFaculty',
-    'Requirement',
-    'SubjectProgram'
+    'Requirement'
 ] 

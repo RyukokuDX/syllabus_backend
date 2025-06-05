@@ -2,7 +2,7 @@
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-VENV_DIR="$SCRIPT_DIR/syllabus_backend_venv"
+VENV_DIR="$SCRIPT_DIR/venv_syllabus_backend"
 PYTHON="$VENV_DIR/bin/python"
 
 # .envファイルの読み込み
@@ -157,16 +157,24 @@ case $COMMAND in
         ;;
     records)
         if [ "$SERVICE" = "postgres" ]; then
-            # .envファイルからデータベース名とユーザー名を取得
-            DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-            DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
-            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
-                SELECT 
-                    schemaname || '.' || relname as table_name,
-                    n_live_tup as record_count
-                FROM pg_stat_user_tables
-                ORDER BY relname;
-            "
+            if [ ${#ARGS[@]} -eq 0 ]; then
+                # 引数なし: 従来通り全テーブルの件数表示
+                DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
+                DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+                docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+                    SELECT 
+                        schemaname || '.' || relname as table_name,
+                        n_live_tup as record_count
+                    FROM pg_stat_user_tables
+                    ORDER BY relname;
+                "
+            else
+                # 引数あり: 指定テーブルの全件表示
+                TABLE_NAME="${ARGS[0]}"
+                DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
+                DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+                docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM $TABLE_NAME;"
+            fi
         else
             echo "Error: Service not specified. Use -p for PostgreSQL service."
             exit 1

@@ -59,12 +59,5 @@ if [ -d "$MIGRATIONS_DIR" ]; then
     filename=$(basename "$sqlfile")
     echo "Adding migration: $filename"
     echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$OUTPUT_FILE"
-    echo "\\i /docker-entrypoint-initdb.d/migrations/$filename" >> "$DEV_OUTPUT_FILE"
   done
 fi
-
-# 開発用データベースの初期化コマンドを追加
-echo "
--- ========== 開発用データベースの初期化 ==========
-
-\\i /docker-entrypoint-initdb.d/02-init-dev.sql" >> "$OUTPUT_FILE" 

@@ -38,7 +38,7 @@ def extract_class_names(csv_files: List[str]) -> Set[str]:
                 encoding = 'utf-8'  # デフォルトはUTF-8
             
             with open(csv_file, 'r', encoding=encoding, errors='replace') as f:
-                reader = csv.DictReader(f)
+                reader = csv.DictReader(f, delimiter='\t')
                 for row in reader:
                     if '科目区分' in row and row['科目区分']:
                         class_names.add(row['科目区分'].strip())

@@ -1,9 +1,13 @@
 from datetime import datetime
+import unicodedata
 
 def normalize_subject_name(name: str) -> str:
     """科目名を正規化する"""
     # 前後の空白を削除
     name = name.strip()
+    
+    # 全角→半角（英数字・記号）
+    name = unicodedata.normalize('NFKC', name)
     
     # 全角スペースを半角スペースに変換
     name = name.replace('　', ' ')

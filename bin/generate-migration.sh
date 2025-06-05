@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 VENV_DIR="$PROJECT_ROOT/venv_syllabus_backend"
-PYTHON="$VENV_DIR/Scripts/python.exe"
+PYTHON="$VENV_DIR/bin/python"
 
 # Pythonスクリプトのパス
 PYTHON_SCRIPT="$PROJECT_ROOT/src/db/migrations/generate_migration.py"

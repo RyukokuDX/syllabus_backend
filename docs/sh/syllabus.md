@@ -38,7 +38,10 @@
 #### PostgreSQL関連
 
 - `shell`: PostgreSQLサービスのシェルを開く（-pオプション必須）
-- `records`: すべてのテーブルのレコード数を表示（-pオプション必須）
+- `records`: すべてのテーブルのレコード数を表示、または指定テーブルの全件表示（-pオプション必須）
+
+  - 引数なし: 全テーブルのレコード数を表示
+  - `records {テーブル名}`: 指定テーブルの全レコードを表示
 
 #### パーサー関連
 
@@ -61,6 +64,9 @@
 
 # テーブルのレコード数表示
 ./syllabus.sh -p records
+
+# facultyテーブルの全件表示
+./syllabus.sh -p records faculty
 
 # パーサーの実行
 ./syllabus.sh parser book
