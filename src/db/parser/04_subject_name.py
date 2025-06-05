@@ -20,7 +20,7 @@ def get_subject_names(year: int) -> Set[str]:
         cursor = conn.cursor()
         
         # course_titleカラムから科目名を取得
-        cursor.execute("SELECT DISTINCT course_title FROM syllabus_basic WHERE course_title IS NOT NULL")
+        cursor.execute("SELECT DISTINCT subject_name FROM syllabus_basic WHERE subject_name IS NOT NULL")
         rows = cursor.fetchall()
         
         for row in rows:

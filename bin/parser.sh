@@ -38,8 +38,10 @@ for file in "$PARSER_DIR"/*.py; do
         filename=$(basename "$file")
         number=${filename%%_*}  # ファイル名の先頭の数字を取得
         name=${filename%%.py}   # .pyを除いたファイル名
+        short_name=${name#*_}   # 数字と_を除いた名前
         PARSERS["$number"]="$filename"
         PARSERS["$name"]="$filename"
+        PARSERS["$short_name"]="$filename"  # 短い名前でもアクセス可能に
     fi
 done
 

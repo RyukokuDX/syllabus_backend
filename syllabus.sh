@@ -8,7 +8,7 @@ PYTHON="$VENV_DIR/bin/python"
 # .envファイルの読み込み
 ENV_FILE="$SCRIPT_DIR/.env"
 if [ ! -f "$ENV_FILE" ]; then
-    echo "Error: Missing .env file at $ENV_FILE"
+    echo "エラー: .envファイルが見つかりません: $ENV_FILE"
     exit 1
 fi
 set -a
@@ -17,64 +17,65 @@ set +a
 
 # 仮想環境の初期化
 init_venv() {
-    echo "Initializing virtual environment..."
+    echo "仮想環境を初期化中..."
     if [ -d "$VENV_DIR" ]; then
-        echo "Virtual environment already exists at $VENV_DIR"
-        echo "Do you want to recreate it? [y/N]"
+        echo "仮想環境は既に存在します: $VENV_DIR"
+        echo "再作成しますか？ [y/N]"
         read -r response
         if [[ "$response" =~ ^[Yy]$ ]]; then
-            echo "Removing existing virtual environment..."
+            echo "既存の仮想環境を削除中..."
             rm -rf "$VENV_DIR"
         else
-            echo "Keeping existing virtual environment"
+            echo "既存の仮想環境を維持します"
             return
         fi
     fi
     
-    echo "Creating virtual environment..."
+    echo "仮想環境を作成中..."
     python3 -m venv "$VENV_DIR"
     
-    echo "Installing required packages..."
+    echo "必要なパッケージをインストール中..."
     cd "$SCRIPT_DIR"  # スクリプトのディレクトリに移動
     "$PYTHON" -m pip install --upgrade pip
     "$PYTHON" -m pip install -r requirements.txt
     
-    echo "Virtual environment initialized successfully"
+    echo "仮想環境の初期化が完了しました"
 }
 
 # ヘルプメッセージを表示
 show_help() {
-    echo "Usage: $0 [OPTIONS] COMMAND [ARGS]"
+    echo "使用方法: $0 [オプション] コマンド [引数]"
     echo
-    echo "Options:"
-    echo "  -h, --help     Show this help message"
-    echo "  -p, --postgresql Run command in PostgreSQL service"
+    echo "オプション:"
+    echo "  -h, --help     このヘルプメッセージを表示"
+    echo "  -p, --postgresql PostgreSQLサービスでコマンドを実行"
     echo
-    echo "Commands:"
-    echo "  help           Show this help message"
-    echo "  venv-init      Initialize Python virtual environment"
-    echo "  start          Start the specified service"
-    echo "  stop           Stop the specified service"
-    echo "  ps             Show service status"
-    echo "  logs           Show service logs"
-    echo "  shell          Open shell in PostgreSQL service"
-    echo "  records        Show record counts for all tables"
-    echo "  parser         Run parser script for specified table"
-    echo "  generate       Generate data for specified table"
-    echo "  check          Check data for specified table"
-    echo "  deploy         Deploy data to specified table"
+    echo "コマンド:"
+    echo "  help           このヘルプメッセージを表示"
+    echo "  venv-init      Python仮想環境を初期化"
+    echo "  start          指定されたサービスを開始"
+    echo "  stop           指定されたサービスを停止"
+    echo "  ps             サービスの状態を表示"
+    echo "  logs           サービスのログを表示"
+    echo "  shell          PostgreSQLサービスのシェルを開く"
+    echo "  records        全テーブルのレコード数を表示"
+    echo "  parser         指定されたテーブルのパーサースクリプトを実行"
+    echo "  generate       指定されたテーブルのデータを生成"
+    echo "  check          指定されたテーブルのデータをチェック"
+    echo "  deploy         指定されたテーブルのデータをデプロイ"
     echo
-    echo "Examples:"
-    echo "  $0 venv-init             # Initialize Python virtual environment"
-    echo "  $0 -p start              # Start PostgreSQL service"
-    echo "  $0 -p stop               # Stop PostgreSQL service"
-    echo "  $0 -p shell              # Open shell in PostgreSQL service"
-    echo "  $0 -p records            # Show record counts"
-    echo "  $0 parser book           # Run book parser"
-    echo "  $0 parser syllabus       # Run syllabus parser"
-    echo "  $0 -p generate           # Generate data for specified table"
-    echo "  $0 -p check              # Check data for specified table"
-    echo "  $0 -p deploy             # Deploy data to specified table"
+    echo "使用例:"
+    echo "  $0 venv-init             # Python仮想環境を初期化"
+    echo "  $0 -p start              # PostgreSQLサービスを開始"
+    echo "  $0 -p stop               # PostgreSQLサービスを停止"
+    echo "  $0 -p shell              # PostgreSQLサービスのシェルを開く"
+    echo "  $0 -p records            # レコード数を表示"
+    echo "  $0 parser book           # 書籍パーサーを実行"
+    echo "  $0 parser syllabus       # シラバスパーサーを実行"
+    echo "  $0 parser instructor     # 教員パーサーを実行"
+    echo "  $0 -p generate           # 指定されたテーブルのデータを生成"
+    echo "  $0 -p check              # 指定されたテーブルのデータをチェック"
+    echo "  $0 -p deploy             # 指定されたテーブルのデータをデプロイ"
 }
 
 # コマンドライン引数の解析
@@ -121,7 +122,7 @@ case $COMMAND in
         if [ "$SERVICE" = "postgres" ]; then
             "$SCRIPT_DIR/bin/start-postgres.sh"
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
@@ -129,7 +130,7 @@ case $COMMAND in
         if [ "$SERVICE" = "postgres" ]; then
             "$SCRIPT_DIR/bin/stop-postgres.sh"
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
@@ -140,7 +141,7 @@ case $COMMAND in
         if [ "$SERVICE" = "postgres" ]; then
             docker logs -f postgres-db
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
@@ -151,7 +152,7 @@ case $COMMAND in
             DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
             docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME"
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
@@ -176,13 +177,13 @@ case $COMMAND in
                 docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM $TABLE_NAME;"
             fi
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
     parser)
         if [ ${#ARGS[@]} -eq 0 ]; then
-            echo "Error: Parser name or number not specified"
+            echo "エラー: パーサー名または番号が指定されていません"
             show_help
             exit 1
         fi
@@ -191,27 +192,27 @@ case $COMMAND in
     generate)
         if [ "$SERVICE" = "postgres" ]; then
             if [ ${#ARGS[@]} -eq 0 ]; then
-                echo "Error: Generate type not specified"
-                echo "Usage: $0 -p generate [init|migration]"
+                echo "エラー: 生成タイプが指定されていません"
+                echo "使用方法: $0 -p generate [init|migration]"
                 exit 1
             fi
             case "${ARGS[0]}" in
                 init)
-                    echo "Generating initialization data..."
+                    echo "初期化データを生成中..."
                     "$SCRIPT_DIR/bin/generate-init.sh"
                     ;;
                 migration)
-                    echo "Generating migration data..."
+                    echo "マイグレーションデータを生成中..."
                     "$SCRIPT_DIR/bin/generate-migration.sh"
                     ;;
                 *)
-                    echo "Error: Unknown generate type '${ARGS[0]}'"
-                    echo "Usage: $0 -p generate [init|migration]"
+                    echo "エラー: 不明な生成タイプ '${ARGS[0]}'"
+                    echo "使用方法: $0 -p generate [init|migration]"
                     exit 1
                     ;;
             esac
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
@@ -219,7 +220,7 @@ case $COMMAND in
         if [ "$SERVICE" = "postgres" ]; then
             "$SCRIPT_DIR/bin/check-with-dev-db.sh"
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
@@ -227,12 +228,12 @@ case $COMMAND in
         if [ "$SERVICE" = "postgres" ]; then
             "$SCRIPT_DIR/bin/deploy-migration.sh"
         else
-            echo "Error: Service not specified. Use -p for PostgreSQL service."
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
     *)
-        echo "Error: Unknown command '$COMMAND'"
+        echo "エラー: 不明なコマンド '$COMMAND'"
         show_help
         exit 1
         ;;
