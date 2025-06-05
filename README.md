@@ -50,7 +50,8 @@
 ├── docs/                    # ドキュメント
 │   ├── database/           # データベース関連
 │   ├── python/             # Python関連
-│   └── docker/             # Docker関連
+│   ├── docker/             # Docker関連
+│   └── sh/                 # シェルスクリプト関連
 ├── docker/                  # Docker関連
 │   ├── postgresql/         # PostgreSQL設定
 │   │   ├── init/          # 初期化スクリプト
@@ -76,6 +77,7 @@
 ├── log/                     # ログファイル
 ├── updates/                 # 更新用ファイル
 ├── init.sql.template       # データベース初期化テンプレート
+├── syllabus.sh             # メインシェルスクリプト
 └── README.md               # 本ドキュメント
 ```
 
@@ -115,6 +117,9 @@ python src/db/init_db.py
 MIT License
 
 ## ドキュメント
+
+### シェルスクリプト関連
+- [syllabus.sh](docs/sh/syllabus.md) - メインシェルスクリプトの使用方法
 
 ### データベース関連
 - [ER図](docs/database/er.md) - データベースのER図

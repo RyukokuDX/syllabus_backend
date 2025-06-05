@@ -37,22 +37,18 @@ erDiagram
     }
     instructor {
         INTEGER instructor_id PK
-        TEXT instructor_code
-        TEXT last_name
-        TEXT first_name
-        TEXT last_name_kana
-        TEXT first_name_kana
+        TEXT name
+        TEXT name_kana
         TIMESTAMP created_at
-        TIMESTAMP updated_at
     }
     book {
         INTEGER book_id PK
+        TEXT url
         TEXT title
         TEXT publisher
         INTEGER price
         TEXT isbn
         TIMESTAMP created_at
-        TIMESTAMP updated_at
     }
     book_author {
         INTEGER book_author_id PK
@@ -68,47 +64,70 @@ erDiagram
     }
 
     %% トランザクションテーブル
+    syllabus_master {
+        INTEGER syllabus_id PK
+        TEXT syllabus_code
+        INTEGER syllabus_year
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
     syllabus {
-        TEXT syllabus_code PK
+        INTEGER syllabus_id PK,FK
         INTEGER subject_name_id FK
         TEXT subtitle
         TEXT term
         TEXT campus
         INTEGER credits
-        TEXT summary
         TEXT goals
+        TEXT summary
+        TEXT attainment
         TEXT methods
         TEXT outside_study
-        TEXT notes
-        TEXT remarks
+        TEXT textbook_comment
+        TEXT reference_comment
+        TEXT advice
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
     subject_grade {
         INTEGER id PK
-        INTEGER subject_id FK
+        INTEGER syllabus_id FK
         TEXT grade
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
-    lecture_session {
+    lecture_time {
         INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER syllabus_year
+        INTEGER syllabus_id FK
         TEXT day_of_week
         TINYINT period
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
+    lecture_session {
+        INTEGER lecture_session_id PK
+        INTEGER syllabus_id FK
+        INTEGER session_number
+        TEXT contents
+        TEXT other_info
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    lecture_session_instructor {
+        INTEGER id PK
+        INTEGER lecture_session_id FK
+        INTEGER instructor_id FK
+        TIMESTAMP created_at
+    }
     syllabus_instructor {
         INTEGER id PK
-        TEXT syllabus_code FK
+        INTEGER syllabus_id FK
         INTEGER instructor_id FK
         TIMESTAMP created_at
     }
     syllabus_book {
         INTEGER id PK
-        TEXT syllabus_code FK
+        INTEGER syllabus_id FK
         INTEGER book_id FK
         TEXT role
         TEXT note
@@ -116,7 +135,7 @@ erDiagram
     }
     grading_criterion {
         INTEGER id PK
-        TEXT syllabus_code FK
+        INTEGER syllabus_id FK
         TEXT criteria_type
         INTEGER ratio
         TEXT note
@@ -128,8 +147,10 @@ erDiagram
         INTEGER subject_id PK
         INTEGER subject_name_id FK
         INTEGER faculty_id FK
+        INTEGER curriculum_year
         INTEGER class_id FK
         INTEGER subclass_id FK
+        TEXT requirement_type
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -138,8 +159,7 @@ erDiagram
     subject_syllabus {
         INTEGER id PK
         INTEGER subject_id FK
-        TEXT syllabus_code FK
-        INTEGER syllabus_year
+        INTEGER syllabus_id FK
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -148,6 +168,13 @@ erDiagram
         INTEGER subject_id FK
         INTEGER attribute_id FK
         TEXT value
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    syllabus_study_system {
+        INTEGER id PK
+        INTEGER source_syllabus_id FK
+        TEXT target
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -162,21 +189,27 @@ erDiagram
     %% マスターテーブル → トランザクションテーブル
     subject_name ||--o{ syllabus : "subject_name_id"
     instructor ||--o{ syllabus_instructor : "instructor_id"
+    instructor ||--o{ lecture_session_instructor : "instructor_id"
     book ||--o{ syllabus_book : "book_id"
     book ||--o{ book_author : "book_id"
     subject_attribute ||--o{ subject_attribute_value : "attribute_id"
 
     %% 基本テーブル → 関連テーブル
-    subject ||--o{ subject_grade : "subject_id"
     subject ||--o{ subject_syllabus : "subject_id"
     subject ||--o{ subject_attribute_value : "subject_id"
 
     %% トランザクションテーブル → 関連テーブル
-    syllabus ||--o{ lecture_session : "syllabus_code"
-    syllabus ||--o{ syllabus_instructor : "syllabus_code"
-    syllabus ||--o{ syllabus_book : "syllabus_code"
-    syllabus ||--o{ grading_criterion : "syllabus_code"
-    syllabus ||--o{ subject_syllabus : "syllabus_code"
+    syllabus_master ||--|| syllabus : "syllabus_id"
+    syllabus_master ||--o{ subject_grade : "syllabus_id"
+    syllabus_master ||--o{ lecture_time : "syllabus_id"
+    syllabus_master ||--o{ lecture_session : "syllabus_id"
+    syllabus_master ||--o{ syllabus_instructor : "syllabus_id"
+    syllabus_master ||--o{ syllabus_book : "syllabus_id"
+    syllabus_master ||--o{ grading_criterion : "syllabus_id"
+    syllabus_master ||--o{ subject_syllabus : "syllabus_id"
+    syllabus_master ||--o{ syllabus_study_system : "source_syllabus_id"
+
+    lecture_session ||--o{ lecture_session_instructor : "lecture_session_id"
 ```
 
 ## 更新履歴

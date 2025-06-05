@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -104,16 +104,26 @@ class Subject(Base):
     subject_id = Column(Integer, primary_key=True)
     subject_name_id = Column(Integer, ForeignKey('subject_name.subject_name_id'), nullable=False)
     faculty_id = Column(Integer, ForeignKey('faculty.faculty_id'), nullable=False)
+    curriculum_year = Column(Integer, nullable=False)
     class_id = Column(Integer, ForeignKey('class.class_id'), nullable=False)
-    subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'))
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
+    subclass_id = Column(Integer, ForeignKey('subclass.subclass_id'), nullable=True)
+    requirement_type = Column(Text, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    updated_at = Column(TIMESTAMP, nullable=True, onupdate=func.now())
 
     __table_args__ = (
-        Index('idx_subject_subject_name', 'subject_name_id'),
-        Index('idx_subject_class', 'class_id'),
-        Index('idx_subject_faculty', 'faculty_id'),
-        Index('idx_subject_unique', 'subject_name_id', 'faculty_id', 'class_id', 'subclass_id', unique=True),
+        UniqueConstraint(
+            "subject_name_id",
+            "faculty_id",
+            "class_id",
+            "subclass_id",
+            "curriculum_year",
+            name="idx_subject_unique",
+        ),
+        Index("idx_subject_subject_name", "subject_name_id"),
+        Index("idx_subject_class", "class_id"),
+        Index("idx_subject_faculty", "faculty_id"),
+        Index("idx_subject_curriculum_year", "curriculum_year"),
     )
 
 class SubjectSyllabus(Base):
@@ -164,17 +174,13 @@ class Instructor(Base):
     __tablename__ = 'instructor'
 
     instructor_id = Column(Integer, primary_key=True)
-    instructor_code = Column(Text, nullable=False, unique=True)
-    last_name = Column(Text, nullable=False)
-    first_name = Column(Text, nullable=False)
-    last_name_kana = Column(Text)
-    first_name_kana = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
+    name = Column(String, nullable=False)  # 名前 (漢字かカナ)
+    name_kana = Column(String)  # 名前（カナ）
+    created_at = Column(DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
 
     __table_args__ = (
-        Index('idx_instructor_name', 'last_name', 'first_name'),
-        Index('idx_instructor_name_kana', 'last_name_kana', 'first_name_kana'),
+        Index('idx_instructor_name', 'name'),
+        Index('idx_instructor_name_kana', 'name_kana'),
     )
 
 class Book(Base):
@@ -186,11 +192,11 @@ class Book(Base):
     price = Column(Integer)
     isbn = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
         Index('idx_book_title', 'title'),
         Index('idx_book_isbn', 'isbn', unique=True),
+        UniqueConstraint('title', 'publisher', name='uix_book_title_publisher'),
     )
 
 class BookAuthor(Base):
@@ -206,21 +212,56 @@ class BookAuthor(Base):
         Index('idx_book_author_name', 'author_name'),
     )
 
-class LectureSession(Base):
-    __tablename__ = 'lecture_session'
+class LectureTime(Base):
+    __tablename__ = 'lecture_time'
 
-    id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, ForeignKey('syllabus.syllabus_code', ondelete='CASCADE'), nullable=False)
-    syllabus_year = Column(Integer, nullable=False)
-    day_of_week = Column(Text, nullable=False)
-    period = Column(Integer, nullable=False)
+    lecture_time_id = Column(Integer, primary_key=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    day_of_week = Column(SmallInteger, nullable=False)  # 1-7 (Monday-Sunday)
+    period = Column(SmallInteger, nullable=False)  # 1-6 (1st-6th period)
+    room = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        Index('idx_lecture_session_day_period', 'day_of_week', 'period'),
-        Index('idx_lecture_session_syllabus', 'syllabus_code', 'syllabus_year'),
+        Index('idx_lecture_time_syllabus', 'syllabus_id'),
+        Index('idx_lecture_time_day_period', 'day_of_week', 'period'),
     )
+
+    syllabus = relationship("SyllabusMaster", back_populates="lecture_times")
+
+class LectureSession(Base):
+    __tablename__ = 'lecture_session'
+
+    lecture_session_id = Column(Integer, primary_key=True)
+    lecture_time_id = Column(Integer, ForeignKey('lecture_time.lecture_time_id', ondelete='CASCADE'), nullable=False)
+    session_number = Column(SmallInteger, nullable=False)  # 1-15 (1st-15th week)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_lecture_session_time', 'lecture_time_id'),
+        Index('idx_lecture_session_number', 'session_number'),
+    )
+
+    lecture_time = relationship("LectureTime", back_populates="sessions")
+    instructors = relationship("LectureSessionInstructor", back_populates="session", cascade="all, delete-orphan")
+
+class LectureSessionInstructor(Base):
+    __tablename__ = 'lecture_session_instructor'
+
+    id = Column(Integer, primary_key=True)
+    lecture_session_id = Column(Integer, ForeignKey('lecture_session.lecture_session_id', ondelete='CASCADE'), nullable=False)
+    instructor_id = Column(Integer, ForeignKey('instructor.instructor_id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_lecture_session_instructor_session', 'lecture_session_id'),
+        Index('idx_lecture_session_instructor_instructor', 'instructor_id'),
+    )
+
+    session = relationship("LectureSession", back_populates="instructors")
+    instructor = relationship("Instructor")
 
 class SyllabusInstructor(Base):
     __tablename__ = 'syllabus_instructor'
@@ -364,27 +405,12 @@ class SyllabusData:
         return self.grades
 
 @dataclass
-class Subject:
-    """科目基本情報モデル"""
-    subject_id: int
-    subject_name_id: int
-    faculty_id: int
-    class_id: int
-    subclass_id: Optional[int]
-    created_at: datetime
-    updated_at: Optional[datetime]
-
-@dataclass
 class Instructor:
     """教員モデル"""
     instructor_id: int
-    instructor_code: str
-    last_name: str
-    first_name: str
-    last_name_kana: Optional[str]
-    first_name_kana: Optional[str]
+    name: str
+    name_kana: Optional[str]
     created_at: datetime
-    updated_at: Optional[datetime]
 
 @dataclass
 class Book:
@@ -395,7 +421,6 @@ class Book:
     price: Optional[int]
     isbn: Optional[str]
     created_at: datetime
-    updated_at: Optional[datetime]
 
 @dataclass
 class BookAuthor:
@@ -523,4 +548,49 @@ class RequirementModel(Base):
 
     # リレーションシップ
     requirement_header = relationship("RequirementHeaderModel", back_populates="requirements")
-    requirement_attribute = relationship("RequirementAttributeModel", back_populates="requirements") 
+    requirement_attribute = relationship("RequirementAttributeModel", back_populates="requirements")
+
+class SyllabusMaster(Base):
+    __tablename__ = 'syllabus_master'
+
+    syllabus_id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        UniqueConstraint('syllabus_code', 'syllabus_year', name='uix_syllabus_master_code_year'),
+        Index('idx_syllabus_master_code', 'syllabus_code'),
+        Index('idx_syllabus_master_year', 'syllabus_year'),
+    )
+
+    lecture_times = relationship("LectureTime", back_populates="syllabus", cascade="all, delete-orphan")
+    source_study_systems = relationship("SyllabusStudySystem", foreign_keys="SyllabusStudySystem.source_syllabus_id", back_populates="source_syllabus")
+
+class SyllabusStudySystem(Base):
+    __tablename__ = 'syllabus_study_system'
+
+    id = Column(Integer, primary_key=True)
+    source_syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    target = Column(Text, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        UniqueConstraint('source_syllabus_id', 'target', name='uix_syllabus_study_system_source_target'),
+        Index('idx_syllabus_study_system_source', 'source_syllabus_id'),
+        Index('idx_syllabus_study_system_target', 'target'),
+    )
+
+    source_syllabus = relationship("SyllabusMaster", foreign_keys=[source_syllabus_id], back_populates="source_study_systems")
+
+@dataclass
+class SyllabusStudySystemData:
+    """シラバス系統的履修モデル"""
+    id: int
+    source_syllabus_id: int
+    target: str
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    source_syllabus: Optional[SyllabusData] = None  # Web Syllabusの情報 
