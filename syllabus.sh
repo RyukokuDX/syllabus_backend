@@ -35,8 +35,9 @@ init_venv() {
     python3 -m venv "$VENV_DIR"
     
     echo "Installing required packages..."
+    cd "$SCRIPT_DIR"  # スクリプトのディレクトリに移動
     "$PYTHON" -m pip install --upgrade pip
-    "$PYTHON" -m pip install -r "$SCRIPT_DIR/requirements.txt"
+    "$PYTHON" -m pip install -r requirements.txt
     
     echo "Virtual environment initialized successfully"
 }

@@ -11,9 +11,8 @@
 updates/*/registered/json/*.json
 
 # Python virtual environment
+venv_syllabus_backend/
 syllabus_backend_venv/
-venv/
-env/
 
 # Python bytecode
 __pycache__/

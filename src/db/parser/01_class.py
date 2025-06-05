@@ -1,27 +1,11 @@
 import os
 import json
 import csv
-from typing import List, Set
+import sqlite3
+from typing import List, Set, Dict
 from datetime import datetime
 import chardet
-
-def get_current_year() -> int:
-    """現在の年度を取得する"""
-    return datetime.now().year
-
-def get_year_from_user() -> int:
-    """ユーザーから年度を入力してもらう"""
-    while True:
-        try:
-            year = input("年度を入力してください（空の場合は現在の年度）: ").strip()
-            if not year:
-                return get_current_year()
-            year = int(year)
-            if 2000 <= year <= 2100:  # 妥当な年度の範囲をチェック
-                return year
-            print("2000年から2100年の間で入力してください。")
-        except ValueError:
-            print("有効な数値を入力してください。")
+from .utils import get_year_from_user
 
 def get_csv_files(year: int) -> List[str]:
     """指定された年度のCSVファイルのパスを取得する"""

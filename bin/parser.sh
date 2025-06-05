@@ -3,8 +3,33 @@
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PARSER_DIR="$SCRIPT_DIR/../src/db/parser"
-VENV_DIR="$SCRIPT_DIR/../syllabus_backend_venv"
-PYTHON="$VENV_DIR/bin/python"
+VENV_DIR="$SCRIPT_DIR/../venv_syllabus_backend"
+PYTHON="$VENV_DIR/bin/python3"
+PROJECT_ROOT="$SCRIPT_DIR/.."
+
+# 仮想環境の確認と作成
+if [ ! -d "$VENV_DIR" ]; then
+    echo "仮想環境が見つかりません。作成します..."
+    python3 -m venv "$VENV_DIR"
+    if [ $? -ne 0 ]; then
+        echo "エラー: 仮想環境の作成に失敗しました。"
+        exit 1
+    fi
+    echo "仮想環境を作成しました。"
+fi
+
+# 仮想環境のPythonインタプリタの確認
+if [ ! -f "$PYTHON" ]; then
+    echo "エラー: 仮想環境のPythonインタプリタが見つかりません。"
+    echo "仮想環境を再作成します..."
+    rm -rf "$VENV_DIR"
+    python3 -m venv "$VENV_DIR"
+    if [ $? -ne 0 ]; then
+        echo "エラー: 仮想環境の再作成に失敗しました。"
+        exit 1
+    fi
+    echo "仮想環境を再作成しました。"
+fi
 
 # 利用可能なパーサーの一覧を動的に生成
 declare -A PARSERS
@@ -64,4 +89,4 @@ fi
 
 # パーサーの実行
 echo "Running parser: $PARSER_NAME"
-"$PYTHON" "$PARSER_FILE" 
+cd "$PARSER_DIR" && PYTHONPATH="$PROJECT_ROOT/src" "$PYTHON" "$PARSER_FILE" 

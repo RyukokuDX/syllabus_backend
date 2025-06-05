@@ -5,24 +5,7 @@ import sqlite3
 from typing import List, Set, Dict
 from datetime import datetime
 import chardet
-
-def get_current_year() -> int:
-    """現在の年度を取得する"""
-    return datetime.now().year
-
-def get_year_from_user() -> int:
-    """ユーザーから年度を入力してもらう"""
-    while True:
-        try:
-            year = input("年度を入力してください（空の場合は現在の年度）: ").strip()
-            if not year:
-                return get_current_year()
-            year = int(year)
-            if 2000 <= year <= 2100:  # 妥当な年度の範囲をチェック
-                return year
-            print("2000年から2100年の間で入力してください。")
-        except ValueError:
-            print("有効な数値を入力してください。")
+from .utils import normalize_subject_name, get_year_from_user
 
 def get_subject_names(year: int) -> Set[str]:
     """SQLiteデータベースから科目名を抽出する"""
@@ -42,7 +25,9 @@ def get_subject_names(year: int) -> Set[str]:
         
         for row in rows:
             if row[0]:  # NULLでない場合
-                subject_names.add(row[0].strip())
+                normalized_name = normalize_subject_name(row[0])
+                if normalized_name:  # 空文字でない場合
+                    subject_names.add(normalized_name)
         
     except sqlite3.Error as e:
         print(f"データベースエラー: {str(e)}")

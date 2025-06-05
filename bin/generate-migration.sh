@@ -3,8 +3,8 @@
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
-VENV_DIR="$PROJECT_ROOT/syllabus_backend_venv"
-PYTHON="$VENV_DIR/bin/python"
+VENV_DIR="$PROJECT_ROOT/venv_syllabus_backend"
+PYTHON="$VENV_DIR/Scripts/python.exe"
 
 # Pythonスクリプトのパス
 PYTHON_SCRIPT="$PROJECT_ROOT/src/db/migrations/generate_migration.py"

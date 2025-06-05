@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 from dotenv import load_dotenv
+from .utils import normalize_subject_name
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -64,6 +65,10 @@ def get_db_connection(db_config: Dict[str, str]):
 def get_subject_name_id_from_db(session, name: str) -> int:
     """科目名IDを取得する"""
     try:
+        # 科目名を正規化
+        normalized_name = normalize_subject_name(name)
+        
+        # まず完全一致で検索
         query = text("""
             SELECT subject_name_id 
             FROM subject_name 
@@ -74,14 +79,52 @@ def get_subject_name_id_from_db(session, name: str) -> int:
         
         result = session.execute(
             query,
-            {"name": name}
+            {"name": normalized_name}
         ).first()
         
         if result:
             return result[0]
-        else:
-            print(f"エラー: 科目名が見つかりません: {name}")
-            return None
+            
+        # 完全一致で見つからない場合、部分一致で検索
+        query = text("""
+            SELECT subject_name_id 
+            FROM subject_name 
+            WHERE name LIKE :name
+            ORDER BY subject_name_id
+            LIMIT 1
+        """)
+        
+        result = session.execute(
+            query,
+            {"name": f"%{normalized_name}%"}
+        ).first()
+        
+        if result:
+            print(f"警告: 科目名の部分一致が見つかりました: {name} -> {normalized_name}")
+            return result[0]
+            
+        # 部分一致でも見つからない場合、ローマ数字を除去して検索
+        name_without_roman = normalized_name.replace('I', '').replace('II', '').replace('III', '').replace('IV', '').replace('V', '').strip()
+        if name_without_roman != normalized_name:
+            query = text("""
+                SELECT subject_name_id 
+                FROM subject_name 
+                WHERE name LIKE :name
+                ORDER BY subject_name_id
+                LIMIT 1
+            """)
+            
+            result = session.execute(
+                query,
+                {"name": f"%{name_without_roman}%"}
+            ).first()
+            
+            if result:
+                print(f"警告: ローマ数字を除去した科目名の部分一致が見つかりました: {name} -> {name_without_roman}")
+                return result[0]
+        
+        print(f"エラー: 科目名が見つかりません: {name}")
+        return None
             
     except Exception as e:
         print(f"エラー: 科目名IDの取得中にエラーが発生しました: {str(e)}")

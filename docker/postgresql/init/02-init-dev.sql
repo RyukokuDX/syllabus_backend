@@ -42,7 +42,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO app_user;
 GRANT USAGE ON SCHEMA public TO dev_user;
 GRANT USAGE ON SCHEMA public TO app_user;\i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_classs.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subclasss.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_subject_names.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604105720__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604112913__insert_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250604155849__insert_facultys.sql

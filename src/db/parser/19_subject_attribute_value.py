@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 from dotenv import load_dotenv
+from .utils import normalize_subject_name
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -64,8 +65,8 @@ def get_db_connection(db_config: Dict[str, str]):
 def get_subject_name_id_from_db(session, subject_name: str) -> int:
     """科目名IDを取得する"""
     try:
-        # 科目名の正規化（全角スペースを半角に変換）
-        subject_name = subject_name.replace('　', ' ')
+        # 科目名を正規化
+        normalized_name = normalize_subject_name(subject_name)
         
         query = text("""
             SELECT subject_name_id 
@@ -77,7 +78,7 @@ def get_subject_name_id_from_db(session, subject_name: str) -> int:
         
         result = session.execute(
             query,
-            {"name": subject_name}
+            {"name": normalized_name}
         ).first()
         
         if result:
