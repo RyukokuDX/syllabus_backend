@@ -57,6 +57,20 @@ def normalize_csv(input_file):
     # 入力ファイルを読み込み
     with open(input_file, 'r', encoding='utf-8') as f:
         reader = csv.reader(f, delimiter=delimiter)
+        # ヘッダー行を読み取り
+        headers = next(reader)
+        # 科目名フィールドのインデックスを特定
+        subject_name_index = None
+        for i, header in enumerate(headers):
+            if header.strip() == '科目名':
+                subject_name_index = i
+                break
+        
+        if subject_name_index is None:
+            print(f'警告: 科目名フィールドが見つかりません: {os.path.basename(input_file)}')
+            return
+        
+        # 残りの行を読み込み
         rows = list(reader)
     
     # 各フィールドを整形
@@ -72,11 +86,14 @@ def normalize_csv(input_file):
             else:
                 normalized_row.append(field)
         
-        # 科目名フィールド（2番目）を正規化
-        if len(normalized_row) > 1 and normalized_row[1] != 'NULL':
-            normalized_row[1] = normalize_subject_name(normalized_row[1])
+        # 科目名フィールドを正規化
+        if len(normalized_row) > subject_name_index and normalized_row[subject_name_index] != 'NULL':
+            normalized_row[subject_name_index] = normalize_subject_name(normalized_row[subject_name_index])
         
         normalized_rows.append(normalized_row)
+    
+    # ヘッダー行と正規化した行を結合
+    normalized_rows.insert(0, headers)
     
     # 元のファイルに上書き（タブ区切り）
     with open(input_file, 'w', encoding='utf-8', newline='') as f:
