@@ -1,3 +1,9 @@
+<!--
+更新時の注意事項:
+- 準拠とは、類推せずに内容に従うこと
+- 更新は docs/database/structure.md に準拠すること
+-->
+
 # データベースER図
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
