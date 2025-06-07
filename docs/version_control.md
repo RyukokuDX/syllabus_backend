@@ -6,7 +6,7 @@
 - 更新の登録を要求された場合は、/docs/version_control.md に準拠して実行
 -->
 
-# check-with-dev-db.sh
+# check-with-dev-db.sh (v1.0.1)
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md) | [syllabus.shへ](./syllabus.md)
 
@@ -105,5 +105,8 @@ jq --arg level $((max_level + 1)) \
    '.path_level[$level] = {"summary": $summary, "date": $date, "details": $details}' \
    "$json_file" > "${json_file}.tmp" && mv "${json_file}.tmp" "$json_file"
 ```
+
+### fileの更新
+- Json更新後、更新対処の文頭付近のversion番号を更新
 
 [🔝 ページトップへ](#check-with-dev-dbsh) 
