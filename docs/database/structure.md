@@ -1,3 +1,14 @@
+<!--
+更新時の注意事項:
+- 準拠の意味は、類推せずに内容に従うという意味です
+- 更新前に必ず docs/database/policy.md の内容を確認し、structure.mdの更新はpolicy.mdに準拠すること
+- 更新が承認された後、以下のファイルを docs/database/structure.md に準拠して更新すること
+    - docs/database/er.md
+    - src/db/models.py
+    - docker/postgresql/init/init.sql.template
+    - src/db/migratinos/*.py
+-->
+
 # データベース構造定義
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)

@@ -1,4 +1,6 @@
 #!/bin/bash
+# -*- coding: utf-8 -*-
+# - 更新の登録は, /docs/version_control.md に準拠して実行
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -14,6 +16,67 @@ fi
 set -a
 . "$ENV_FILE"
 set +a
+
+# 色の定義
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# ファイルの更新履歴を表示
+show_file_history() {
+    local file_path="$1"
+    
+    # バージョンディレクトリの取得
+    VERSION_DIRS=($(ls -v version/v* 2>/dev/null))
+    if [[ ${#VERSION_DIRS[@]} -eq 0 ]]; then
+        echo -e "${YELLOW}警告: バージョンディレクトリが見つかりません${NC}"
+        exit 0
+    fi
+    
+    # ファイルの更新履歴を表示
+    echo -e "\n${GREEN}ファイル: $file_path の更新履歴${NC}"
+    echo "=================================================="
+    
+    for version_dir in "${VERSION_DIRS[@]}"; do
+        # docs/で始まるパスの場合は、そのまま使用
+        json_file="${version_dir}/${file_path}.json"
+        if [[ -f "$json_file" ]]; then
+            # バージョン情報の取得
+            version=$(jq -r '.meta_data.version' "$json_file")
+            created_at=$(jq -r '.meta_data.created_at' "$json_file")
+            
+            echo -e "\n${YELLOW}バージョン: $version${NC}"
+            echo -e "${YELLOW}作成日時: $created_at${NC}"
+            echo "------------------------------"
+            
+            # 変更履歴の表示
+            jq -r '.path_level | to_entries | sort_by(.key | tonumber) | .[] | 
+                "レベル \(.key):\n  日時: \(.value.date)\n  概要: \(.value.summary)\n  詳細: \(.value.details)\n"' "$json_file"
+        fi
+    done
+}
+
+# スクリプトのバージョンを表示
+show_script_version() {
+    local script_json="$SCRIPT_DIR/version/v1.0/syllabus.sh.json"
+    if [[ -f "$script_json" ]]; then
+        version=$(jq -r '.meta_data.version' "$script_json")
+        created_at=$(jq -r '.meta_data.created_at' "$script_json")
+        
+        echo -e "\n${GREEN}syllabus.sh のバージョン情報${NC}"
+        echo "=================================================="
+        echo -e "${YELLOW}バージョン: $version${NC}"
+        echo -e "${YELLOW}作成日時: $created_at${NC}"
+        echo "------------------------------"
+        
+        # 変更履歴の表示
+        jq -r '.path_level | to_entries | sort_by(.key | tonumber) | .[] | 
+            "レベル \(.key):\n  日時: \(.value.date)\n  概要: \(.value.summary)\n  詳細: \(.value.details)\n"' "$script_json"
+    else
+        echo -e "${YELLOW}警告: バージョン情報が見つかりません${NC}"
+    fi
+}
 
 # CSVファイルの整形
 normalize_csv() {
@@ -57,6 +120,20 @@ def normalize_csv(input_file):
     # 入力ファイルを読み込み
     with open(input_file, 'r', encoding='utf-8') as f:
         reader = csv.reader(f, delimiter=delimiter)
+        # ヘッダー行を読み取り
+        headers = next(reader)
+        # 科目名フィールドのインデックスを特定
+        subject_name_index = None
+        for i, header in enumerate(headers):
+            if header.strip() == '科目名':
+                subject_name_index = i
+                break
+        
+        if subject_name_index is None:
+            print(f'警告: 科目名フィールドが見つかりません: {os.path.basename(input_file)}')
+            return
+        
+        # 残りの行を読み込み
         rows = list(reader)
     
     # 各フィールドを整形
@@ -72,11 +149,14 @@ def normalize_csv(input_file):
             else:
                 normalized_row.append(field)
         
-        # 科目名フィールド（2番目）を正規化
-        if len(normalized_row) > 1 and normalized_row[1] != 'NULL':
-            normalized_row[1] = normalize_subject_name(normalized_row[1])
+        # 科目名フィールドを正規化
+        if len(normalized_row) > subject_name_index and normalized_row[subject_name_index] != 'NULL':
+            normalized_row[subject_name_index] = normalize_subject_name(normalized_row[subject_name_index])
         
         normalized_rows.append(normalized_row)
+    
+    # ヘッダー行と正規化した行を結合
+    normalized_rows.insert(0, headers)
     
     # 元のファイルに上書き（タブ区切り）
     with open(input_file, 'w', encoding='utf-8', newline='') as f:
@@ -134,6 +214,8 @@ show_help() {
     echo
     echo "コマンド:"
     echo "  help           このヘルプメッセージを表示"
+    echo "  version        syllabus.shのバージョンを表示"
+    echo "  version <file> 指定されたファイルの更新履歴を表示"
     echo "  venv-init      Python仮想環境を初期化"
     echo "  start          指定されたサービスを開始"
     echo "  stop           指定されたサービスを停止"
@@ -198,6 +280,13 @@ fi
 case $COMMAND in
     help)
         show_help
+        ;;
+    version)
+        if [ ${#ARGS[@]} -eq 0 ]; then
+            show_script_version
+        else
+            show_file_history "${ARGS[0]}"
+        fi
         ;;
     venv-init)
         init_venv

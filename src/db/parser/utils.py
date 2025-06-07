@@ -6,6 +6,22 @@ def normalize_subject_name(name: str) -> str:
     # 前後の空白を削除
     name = name.strip()
     
+    # 括弧の統一（全角→半角）
+    bracket_map = {
+        '（': '(', '）': ')',
+        '［': '[', '］': ']',
+        '｛': '{', '｝': '}',
+        '【': '[', '】': ']',
+        '〔': '[', '〕': ']',
+        '〈': '<', '〉': '>',
+        '《': '<', '》': '>',
+        '〝': '"', '〟': '"',
+        '″': '"', '″': '"',
+        '′': "'", '′': "'"
+    }
+    for full, half in bracket_map.items():
+        name = name.replace(full, half)
+    
     # 全角→半角（英数字・記号）
     name = unicodedata.normalize('NFKC', name)
     
@@ -30,28 +46,30 @@ def normalize_subject_name(name: str) -> str:
     for full, half in hyphen_map.items():
         name = name.replace(full, half)
     
-    # 括弧の統一（全角→半角）
-    bracket_map = {
-        '（': '(', '）': ')',
-        '［': '[', '］': ']',
-        '｛': '{', '｝': '}',
-        '【': '[', '】': ']',
-        '〔': '[', '〕': ']',
-        '〈': '<', '〉': '>',
-        '《': '<', '》': '>',
-        '〝': '"', '〟': '"',
-        '″': '"', '″': '"',
-        '′': "'", '′': "'"
-    }
-    for full, half in bracket_map.items():
-        name = name.replace(full, half)
-    
     # ローマ数字の統一（全角→半角）
     roman_map = {
         'Ⅰ': 'I', 'Ⅱ': 'II', 'Ⅲ': 'III', 'Ⅳ': 'IV', 'Ⅴ': 'V',
         'Ⅵ': 'VI', 'Ⅶ': 'VII', 'Ⅷ': 'VIII', 'Ⅸ': 'IX', 'Ⅹ': 'X'
     }
     for full, half in roman_map.items():
+        name = name.replace(full, half)
+    
+    # 全角アルファベットの統一（全角→半角）
+    alpha_map = {
+        'Ａ': 'A', 'Ｂ': 'B', 'Ｃ': 'C', 'Ｄ': 'D', 'Ｅ': 'E',
+        'Ｆ': 'F', 'Ｇ': 'G', 'Ｈ': 'H', 'Ｉ': 'I', 'Ｊ': 'J',
+        'Ｋ': 'K', 'Ｌ': 'L', 'Ｍ': 'M', 'Ｎ': 'N', 'Ｏ': 'O',
+        'Ｐ': 'P', 'Ｑ': 'Q', 'Ｒ': 'R', 'Ｓ': 'S', 'Ｔ': 'T',
+        'Ｕ': 'U', 'Ｖ': 'V', 'Ｗ': 'W', 'Ｘ': 'X', 'Ｙ': 'Y',
+        'Ｚ': 'Z',
+        'ａ': 'a', 'ｂ': 'b', 'ｃ': 'c', 'ｄ': 'd', 'ｅ': 'e',
+        'ｆ': 'f', 'ｇ': 'g', 'ｈ': 'h', 'ｉ': 'i', 'ｊ': 'j',
+        'ｋ': 'k', 'ｌ': 'l', 'ｍ': 'm', 'ｎ': 'n', 'ｏ': 'o',
+        'ｐ': 'p', 'ｑ': 'q', 'ｒ': 'r', 'ｓ': 's', 'ｔ': 't',
+        'ｕ': 'u', 'ｖ': 'v', 'ｗ': 'w', 'ｘ': 'x', 'ｙ': 'y',
+        'ｚ': 'z'
+    }
+    for full, half in alpha_map.items():
         name = name.replace(full, half)
     
     # 中点の統一（全角→半角）

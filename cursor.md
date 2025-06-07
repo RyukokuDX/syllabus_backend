@@ -1,12 +1,11 @@
-+ 指示していない新規ファイルの生成/削除は禁止
-+ 指示していない箇所の類推による変更は承認を必ず得る
-+ 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
++ file作成時や更新時、次の内容を文頭にコメントアウトで実際
+  - 更新時の注意事項:
+    - 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
+    - file作成や削除は、必ず事前に承認を受けること
+    - 更新の登録を要求された場合は、/docs/version_control.md に準拠して実行
+    - 指示していない箇所の類推による変更は承認を必ず得る
+
++ .mdの場合は更に
+  - 更新は, /docs/doc.mdに準拠
+
 + ps1ファイルにはutf8withbom, shではutf8(bom無)
-+ 更新は既存のファイルの更新であり、新規ファイルの生成要求ではない
-+ docs/database/structure.mdの更新の際は
-    - docs/database/policy.mdに準拠
-    - 承認後, docs/database/structure.mdに準拠して、以下を更新
-        - docs/database/er.md
-        - src/db/models.py
-        - docker/postgresql/init/init.sql.template
-        - src/db/migratinos/*.py

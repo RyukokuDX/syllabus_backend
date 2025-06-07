@@ -1,3 +1,9 @@
+<!--
+更新時の注意事項:
+- 準拠とは、類推せずに内容に従うこと
+- 更新は docs/doc.md に準拠すること
+-->
+
 # データモデル定義 (`models.py`)
 
 [readmeへ](../../README.md) | [DB構成仕様へ](../database/structure.md)
