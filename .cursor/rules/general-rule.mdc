@@ -3,6 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
+ - 編集時
+    インデントはタブでtabstopは3
+
  - コマンド実行時
     - 使用している環境がpsの場合は、wslとしてコマンドを実行してください。
 
