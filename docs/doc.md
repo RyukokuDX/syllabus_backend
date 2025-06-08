@@ -7,6 +7,7 @@
     - 更新では docs/doc.mdに準拠
     - 更新時には、docs/giet_commit_poilcy.mdに準拠して更新
 -->
+
 # ドキュメント作成ガイドライン
 
 Version: 1.0.1
