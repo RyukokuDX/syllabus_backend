@@ -1,8 +1,15 @@
+---
+title: Gitコミットポリシー
+file_version: v1.0.2
+project_version: v1.0.2
+last_updated: 2025-06-10
+---
+
 # Gitコミットポリシー
 
-- File Version: v1.0.1
-- Project Version: v1.0.1
-- Last Updated: 2025-06-08
+- File Version: v1.0.2
+- Project Version: v1.0.2
+- Last Updated: 2025-06-10
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](./doc.md)
 
@@ -196,16 +203,93 @@
 - 複数のファイルを変更する場合は、ファイルごとの変更内容を明確に記載
 
 ### ファイル更新時のバージョン管理
-- ファイルを更新する際は、ファイル自体のバージョン（file version）とプロジェクトバージョン（project version）の両方を記載・更新します。
-- 例：ファイルの先頭やコメントに以下のように記載します。
+- ファイルを更新する際は、ファイル形式に応じて以下の形式でバージョン情報を記載します：
+
+  **Markdownファイルの場合：**
   ```markdown
-  # ファイル名: example.md
-  # File Version: v1.0.5
-  # Project Version: v1.2.1
-  # Last Updated: 2023-10-01
+  ---
+  title: タイトル
+  file_version: v1.0.2
+  project_version: v1.0.2
+  last_updated: YYYY-MM-DD
+  ---
+
+  # タイトル
+
+  - File Version: v1.0.2
+  - Project Version: v1.0.2
+  - Last Updated: YYYY-MM-DD
   ```
-- 更新時は、ファイルバージョンとプロジェクトバージョンを適切にインクリメントし、更新日も記録します。
-- この方法により、ファイルごとの修正履歴とプロジェクト全体のリリース履歴を明確に管理できます。
+
+  **Pythonファイルの場合：**
+  ```python
+  # File Version: v1.0.2
+  # Project Version: v1.0.2
+  # Last Updated: YYYY-MM-DD
+  ```
+
+  **Shellスクリプトの場合：**
+  ```bash
+  # File Version: v1.0.2
+  # Project Version: v1.0.2
+  # Last Updated: YYYY-MM-DD
+  ```
+
+  **JSONファイルの場合：**
+  ```json
+  // File Version: v1.0.2
+  // Project Version: v1.0.2
+  // Last Updated: YYYY-MM-DD
+  ```
+
+- バージョン情報の更新は`git_bump.sh`によって自動的に行われます
+- 更新時は`git_bump.sh`を実行し、生成されたコミットメッセージの「(ここに変更内容を記入)」の部分を、ファイル内容の変更から適切な内容に更新します
+- 変更内容は箇条書きで詳細を記載します
+
+### Cursorの挿入問題対策
+1. **テンプレートファイルの作成**
+   - 各ファイル形式用のテンプレートファイルを作成し、バージョン情報を含める
+   - 例：`templates/python_template.py`, `templates/shell_template.sh`など
+
+2. **VSCodeスニペットの活用**
+   - 各ファイル形式用のスニペットを作成
+   - 例：
+     ```json
+     {
+       "Markdown File Header": {
+         "prefix": "mdheader",
+         "body": [
+           "# $1",
+           "",
+           "- File Version: v1.0.2",
+           "- Project Version: v1.0.2",
+           "- Last Updated: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"
+         ]
+       }
+     }
+     ```
+
+3. **git_bump.shの拡張**
+   - ファイル形式を検出し、適切なコメントアウト方法を適用する機能を追加
+   - 例：
+     ```bash
+     # ファイル拡張子に基づいてコメントアウト方法を決定
+     case "$file" in
+       *.py) comment_prefix="#" ;;
+       *.sh) comment_prefix="#" ;;
+       *.json) comment_prefix="//" ;;
+       *.md) comment_prefix="-" ;;
+       *) comment_prefix="#" ;;
+     esac
+     ```
+
+4. **CI/CDでの検証**
+   - バージョン情報の形式が正しいことを確認するチェックを追加
+   - 不正な形式の場合はエラーを報告
+
+5. **ドキュメントの整備**
+   - 各ファイル形式での正しいバージョン情報の記載方法を明確に文書化
+   - チーム内で共有し、統一された形式を維持
 
 ### タグ運用方法
 
