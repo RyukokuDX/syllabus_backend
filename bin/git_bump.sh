@@ -80,3 +80,5 @@ git add "${!file_versions[@]}"
     echo
   done
 } > commit_msg
+
+git add .

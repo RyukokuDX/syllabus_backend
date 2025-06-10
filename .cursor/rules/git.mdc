@@ -1,38 +1,8 @@
 ---
-title: Gitコミットポリシー
-file_version: v1.0.4
-project_version: v1.0.4
-last_updated: 2025-06-10
+description: git
+globs: 
+alwaysApply: false
 ---
-
-# Gitコミットポリシー
-
-- File Version: v1.0.4
-- Project Version: v1.0.4
-- Last Updated: 2025-06-10
-
-[readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](./doc.md)
-
-## 目次
-1. [基本方針](#基本方針)
-2. [コミットメッセージ](#コミットメッセージ)
-3. [ブランチ管理](#ブランチ管理)
-4. [バージョン管理](#バージョン管理)
-5. [アップデートのコミット方法](#アップデートのコミット方法)
-6. [マージ戦略](#マージ戦略)
-
-## 基本方針
-
-### 文書の目的
-- 開発者が一貫した方法でGitを運用できること
-- 変更履歴が明確に追跡できること
-- チーム内でのコミュニケーションが円滑であること
-
-### 対象読者
-- プロジェクトの開発者
-- コードレビュアー
-- プロジェクト管理者
-
 ## コミットメッセージ
 
 ### 基本形式
@@ -90,12 +60,12 @@ last_updated: 2025-06-10
 
 ### セマンティックバージョニング
 - メジャー.マイナー.パッチ形式を採用
-- 例：1.0.1, 1.1.0, 1.1.1
+- 例：1.0.0, 1.1.0, 1.1.1
 
 ### タグ管理
-- リリース時はタグを付与（例：v1.0.1）
+- リリース時はタグを付与（例：v1.0.0）
 - ファイルごとのバージョン管理もタグで実施
-  - 例：docs/version_control.md@v1.0.1
+  - 例：docs/version_control.md@v1.0.0
   - コミットメッセージにファイルのバージョン情報を含める
 
 ### ブランチ運用
@@ -202,128 +172,3 @@ last_updated: 2025-06-10
 - ファイルごとに変更内容をまとめて記載
 - 複数のファイルを変更する場合は、ファイルごとの変更内容を明確に記載
 
-### ファイル更新時のバージョン管理
-- ファイルを更新する際は、ファイル形式に応じて以下の形式でバージョン情報を記載します：
-
-  **Markdownファイルの場合：**
-  ```markdown
-  ---
-  title: タイトル
-  file_version: v1.0.4
-  project_version: v1.0.4
-  last_updated: YYYY-MM-DD
-  ---
-
-  # タイトル
-
-  - File Version: v1.0.4
-  - Project Version: v1.0.4
-  - Last Updated: YYYY-MM-DD
-  ```
-
-  **Pythonファイルの場合：**
-  ```python
-  # File Version: v1.0.4
-  # Project Version: v1.0.4
-  # Last Updated: YYYY-MM-DD
-  ```
-
-  **Shellスクリプトの場合：**
-  ```bash
-  # File Version: v1.0.4
-  # Project Version: v1.0.4
-  # Last Updated: YYYY-MM-DD
-  ```
-
-  **JSONファイルの場合：**
-  ```json
-  // File Version: v1.0.4
-  // Project Version: v1.0.4
-  // Last Updated: YYYY-MM-DD
-  ```
-
-- バージョン情報の更新は`git_bump.sh`によって自動的に行われます
-- 更新時は`git_bump.sh`を実行し、生成されたコミットメッセージの「(ここに変更内容を記入)」の部分を、ファイル内容の変更から適切な内容に更新します
-- 変更内容は箇条書きで詳細を記載します
-
-### Cursorの挿入問題対策
-1. **テンプレートファイルの作成**
-   - 各ファイル形式用のテンプレートファイルを作成し、バージョン情報を含める
-   - 例：`templates/python_template.py`, `templates/shell_template.sh`など
-
-2. **VSCodeスニペットの活用**
-   - 各ファイル形式用のスニペットを作成
-   - 例：
-     ```json
-     {
-       "Markdown File Header": {
-         "prefix": "mdheader",
-         "body": [
-           "# $1",
-           "",
-           "- File Version: v1.0.4",
-           "- Project Version: v1.0.4",
-           "- Last Updated: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"
-         ]
-       }
-     }
-     ```
-
-3. **git_bump.shの拡張**
-   - ファイル形式を検出し、適切なコメントアウト方法を適用する機能を追加
-   - 例：
-     ```bash
-     # ファイル拡張子に基づいてコメントアウト方法を決定
-     case "$file" in
-       *.py) comment_prefix="#" ;;
-       *.sh) comment_prefix="#" ;;
-       *.json) comment_prefix="//" ;;
-       *.md) comment_prefix="-" ;;
-       *) comment_prefix="#" ;;
-     esac
-     ```
-
-4. **CI/CDでの検証**
-   - バージョン情報の形式が正しいことを確認するチェックを追加
-   - 不正な形式の場合はエラーを報告
-
-5. **ドキュメントの整備**
-   - 各ファイル形式での正しいバージョン情報の記載方法を明確に文書化
-   - チーム内で共有し、統一された形式を維持
-
-### タグ運用方法
-
-- バージョン管理にはgitのタグ機能を活用します。
-- リリース時や重要な変更時には、下記のコマンドでタグを付与します。
-
-#### タグの付与方法
-```bash
-# 例：v1.0.1というタグを付与
-git tag v1.0.1
-
-# 署名付きタグの場合
-git tag -s v1.0.1 -m "リリースv1.0.1"
-```
-
-#### タグの確認・削除・push
-```bash
-# タグ一覧表示
-git tag
-
-# タグの詳細表示
-git show v1.0.1
-
-# タグの削除
-git tag -d v1.0.1
-
-# リモートにタグをpush
-git push origin v1.0.1
-
-# すべてのタグをリモートにpush
-git push origin --tags
-```
-
-- タグにはセマンティックバージョニング（例：v1.0.1）を使用します。
-- ファイル単位のバージョン管理が必要な場合は、`ファイル名@バージョン` の形式でタグを付与しても良いです（例：docs/version_control.md@v1.0.1）。
-
-[🔝 ページトップへ](#gitコミットポリシー) 

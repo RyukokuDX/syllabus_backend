@@ -1,16 +1,15 @@
-<!--
-  - 更新時の注意
-    - 指示していない新規ファイルの生成/削除は禁止
-    - 指示していない箇所の類推による変更は承認を必ず得る
-    - 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
-    - 更新は既存のファイルの更新であり、新規ファイルの生成要求ではない
-    - 更新では docs/doc.mdに準拠
-    - 更新時には、docs/giet_commit_poilcy.mdに準拠して更新
--->
+---
+title: ドキュメント作成ガイドライン
+file_version: v1.0.4
+project_version: v1.0.4
+last_updated: 2025-06-10
+---
 
 # ドキュメント作成ガイドライン
 
-Version: 1.0.1
+- File Version: v1.0.4
+- Project Version: v1.0.4
+- Last Updated: 2025-06-10
 
 [readmeへ](../README.md)
 
