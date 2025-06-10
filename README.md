@@ -1,4 +1,15 @@
+---
+title: Syllabus Backend
+file_version: v1.0.4
+project_version: v1.0.4
+last_updated: 2025-06-10
+---
+
 # Syllabus Backend
+
+- File Version: v1.0.4
+- Project Version: v1.0.4
+- Last Updated: 2025-06-10
 
 ## 概要
 シラバス情報を管理するバックエンドシステム。Web Syllabusから取得したシラバス情報をデータベースに格納し、APIを通じて提供します。
@@ -155,34 +166,18 @@ MIT License
   - 開発者はこれらのルールに従って作業を行う必要があります
 
 ### Git更新手順
-1. 変更の確認
+1. バージョン更新
    ```bash
-   git status
-   git diff
+   git bump
    ```
 
-2. 変更のステージング
-   ```bash
-   git add .
-   # または特定のファイルのみ
-   git add <ファイル名>
-   ```
+2. Cursorへの commit_msg 変更依頼
+   - Cursor IDEで commit_msg を開き、変更内容を確認・編集
 
-3. コミット
+3. 変更のコミット
    ```bash
-   git commit -m "プレフィックス: 変更内容の説明"
-   # 例: git commit -m "docs: READMEにGit更新手順を追加"
+   git fcom
    ```
-
-4. プッシュ
-   ```bash
-   git push origin <ブランチ名>
-   ```
-
-5. プルリクエストの作成（必要な場合）
-   - GitHubのウェブインターフェースでプルリクエストを作成
-   - レビュアーの指定
-   - 変更内容の説明を記載
 
 ### コミットメッセージのプレフィックス
 - `feat:` - 新機能
