@@ -1,98 +1,129 @@
 #!/bin/bash
-# File Version: v1.0.1
-# Project Version: v1.0.1
-# Last Updated: 2024-03-19
+# File Version: v1.0.7
+# Project Version: v1.0.7
+# Last Updated: 2025-06-10
 
-# 現在のプロジェクトバージョン
-project_version=$(cat project_version.txt)
-IFS='.' read -r p_major p_minor p_patch <<< "$project_version"
-next_project="$p_major.$p_minor.$((p_patch + 1))"
+# バージョン更新の種類を確認
+if [ "$1" != "major" ] && [ "$1" != "minor" ] && [ "$1" != "patch" ]; then
+  echo "Usage: git bump [major|minor|patch]"
+  echo "  major: メジャーバージョンを更新（例：1.0.0 -> 2.0.0）"
+  echo "  minor: マイナーバージョンを更新（例：1.0.0 -> 1.1.0）"
+  echo "  patch: パッチバージョンを更新（例：1.0.0 -> 1.0.1）"
+  exit 1
+fi
 
-today=$(date +"%Y-%m-%d")
+# バージョン更新の種類を設定
+BUMP_TYPE=$1
 
-exts="\.md$|\.sh$|\.json$|\.py$"
-target_files=$(git ls-files | grep -E "$exts")
+# 現在のプロジェクトバージョンを読み取り
+CURRENT_VERSION=$(cat project_version.txt)
+IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
 
-declare -A file_versions  # key=ファイル名, value=旧バージョン
+# 次のバージョンを計算
+case $BUMP_TYPE in
+  "major")
+    NEXT_MAJOR=$((MAJOR + 1))
+    NEXT_MINOR=0
+    NEXT_PATCH=0
+    ;;
+  "minor")
+    NEXT_MAJOR=$MAJOR
+    NEXT_MINOR=$((MINOR + 1))
+    NEXT_PATCH=0
+    ;;
+  "patch")
+    NEXT_MAJOR=$MAJOR
+    NEXT_MINOR=$MINOR
+    NEXT_PATCH=$((PATCH + 1))
+    ;;
+esac
 
-# バージョン文字列を置換し記録
-for file in $target_files; do
-  # ファイル拡張子に基づいてコメントアウト方法を決定
-  case "$file" in
-    *.md) 
-      # Markdownファイルの場合、YAML Front Matterと箇条書き形式で更新
-      if grep -q "file_version: v$project_version" "$file"; then
-        # ファイルバージョンの取得（メジャー・マイナーはプロジェクトバージョンに連動）
-        file_version=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' "$file" | head -1)
-        IFS='.' read -r f_major f_minor f_patch <<< "$file_version"
-        next_file="$p_major.$p_minor.$((f_patch + 1))"
-        
-        # YAML Front Matterの更新
-        sed -i "s/file_version: v$file_version/file_version: v$next_file/g" "$file"
-        sed -i "s/project_version: v$project_version/project_version: v$next_project/g" "$file"
-        sed -i "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $today/g" "$file"
-        
-        # 箇条書き形式の更新
-        sed -i "s/File Version: v$file_version/File Version: v$next_file/g" "$file"
-        sed -i "s/Project Version: v$project_version/Project Version: v$next_project/g" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $today/g" "$file"
-        
-        file_versions["$file"]="$file_version"
-      fi
-      ;;
-    *.py|*.sh)
-      # Python/Shellファイルの場合、#コメントで更新
-      if grep -q "# File Version: v$project_version" "$file"; then
-        file_version=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' "$file" | head -1)
-        IFS='.' read -r f_major f_minor f_patch <<< "$file_version"
-        next_file="$p_major.$p_minor.$((f_patch + 1))"
-        
-        sed -i "s/# File Version: v$file_version/# File Version: v$next_file/g" "$file"
-        sed -i "s/# Project Version: v$project_version/# Project Version: v$next_project/g" "$file"
-        sed -i "s/# Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/# Last Updated: $today/g" "$file"
-        file_versions["$file"]="$file_version"
-      fi
-      ;;
-    *.json)
-      # JSONファイルの場合、//コメントで更新
-      if grep -q "// File Version: v$project_version" "$file"; then
-        file_version=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' "$file" | head -1)
-        IFS='.' read -r f_major f_minor f_patch <<< "$file_version"
-        next_file="$p_major.$p_minor.$((f_patch + 1))"
-        
-        sed -i "s/\/\/ File Version: v$file_version/\/\/ File Version: v$next_file/g" "$file"
-        sed -i "s/\/\/ Project Version: v$project_version/\/\/ Project Version: v$next_project/g" "$file"
-        sed -i "s/\/\/ Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/\/\/ Last Updated: $today/g" "$file"
-        file_versions["$file"]="$file_version"
-      fi
-      ;;
-  esac
+NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
+TODAY=$(date +%Y-%m-%d)
+
+# 変更されたファイルを検出
+CHANGED_FILES=$(git status --porcelain | grep -E '\.(md|py|sh|json)$' | awk '{print $2}')
+
+# バージョン情報を持つファイルを特定
+VERSION_FILES=()
+for file in $CHANGED_FILES; do
+  if grep -q "file_version:" "$file" || grep -q "File Version:" "$file"; then
+    VERSION_FILES+=("$file")
+  fi
 done
 
-# project_version.txtも更新
-echo "$next_project" > project_version.txt
-file_versions["project_version.txt"]="$project_version"
+# project_version.txtも追加
+VERSION_FILES+=("project_version.txt")
 
-# ステージ
-git add "${!file_versions[@]}"
+# コミットメッセージのヘッダーを生成
+echo "# bump time: $TODAY" > commit_msg
+echo "" >> commit_msg
+echo "# bump list" >> commit_msg
 
-# コミットテンプレート作成（Markdown形式）
-{
-  echo "# bump time: $today"
-  echo
-  echo "# bump list"
-  for f in "${!file_versions[@]}"; do
-    echo "- $f: ${file_versions[$f]}"
-  done
-  echo
-  echo "# bump summary"
-  for f in "${!file_versions[@]}"; do
-    echo "## $f"
-    echo "- version: ${file_versions[$f]}"
-    echo "- type: bump"
-    echo "- summary: （ここに変更内容を記入）"
-    echo
-  done
-} > commit_msg
+# 各ファイルのバージョンを更新し、コミットメッセージに追加
+for file in "${VERSION_FILES[@]}"; do
+  if [ -f "$file" ]; then
+    # 現在のバージョンを取得
+    CURRENT_FILE_VERSION=$(grep -E "file_version:|File Version:" "$file" | head -n 1 | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+    if [ -z "$CURRENT_FILE_VERSION" ]; then
+      CURRENT_FILE_VERSION=$CURRENT_VERSION
+    fi
 
-git add .
+    # コミットメッセージに追加
+    echo "- $file: $CURRENT_FILE_VERSION" >> commit_msg
+
+    # ファイルの種類に応じてバージョン情報を更新
+    case "$file" in
+      *.md)
+        # Markdownファイルの更新
+        sed -i "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_VERSION/" "$file"
+        sed -i "s/project_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/project_version: v$NEXT_VERSION/" "$file"
+        sed -i "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $TODAY/" "$file"
+        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        ;;
+      *.py|*.sh)
+        # Python/Shellファイルの更新
+        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        ;;
+      *.json)
+        # JSONファイルの更新
+        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        ;;
+      project_version.txt)
+        # project_version.txtの更新
+        echo "$NEXT_VERSION" > "$file"
+        ;;
+    esac
+  fi
+done
+
+# コミットメッセージのサマリー部分を生成
+echo "" >> commit_msg
+echo "# bump summary" >> commit_msg
+
+for file in "${VERSION_FILES[@]}"; do
+  if [ -f "$file" ]; then
+    CURRENT_FILE_VERSION=$(grep -E "file_version:|File Version:" "$file" | head -n 1 | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+    if [ -z "$CURRENT_FILE_VERSION" ]; then
+      CURRENT_FILE_VERSION=$CURRENT_VERSION
+    fi
+
+    echo "## $file" >> commit_msg
+    echo "- version: $CURRENT_FILE_VERSION" >> commit_msg
+    echo "- type: $BUMP_TYPE bump" >> commit_msg
+    echo "- summary: （ここに変更内容を記入）" >> commit_msg
+    echo "" >> commit_msg
+  fi
+done
+
+# 変更をステージング
+git add "${VERSION_FILES[@]}"
+
+echo "バージョンを $CURRENT_VERSION から $NEXT_VERSION に更新しました。"
+echo "commit_msgを編集してからコミットしてください。"

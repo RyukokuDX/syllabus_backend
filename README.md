@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v1.0.4
-project_version: v1.0.4
+file_version: v1.0.7
+project_version: v1.0.7
 last_updated: 2025-06-10
 ---
 
 # Syllabus Backend
 
-- File Version: v1.0.4
-- Project Version: v1.0.4
+- File Version: v1.0.7
+- Project Version: v1.0.7
 - Last Updated: 2025-06-10
 
 ## 概要
@@ -131,6 +131,7 @@ MIT License
 
 ### シェルスクリプト関連
 - [syllabus.sh](docs/sh/syllabus.md) - メインシェルスクリプトの使用方法
+- [git_bump.sh](docs/sh/git_bump.md) - バージョン管理スクリプトの使用方法
 
 ### データベース関連
 - [ER図](docs/database/er.md) - データベースのER図
