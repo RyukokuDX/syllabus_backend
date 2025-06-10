@@ -1,14 +1,14 @@
 ---
 title: git_bump.sh
-file_version: v1.0.7
-project_version: v1.0.7
+file_version: v1.3.0
+project_version: v1.3.0
 last_updated: 2025-06-10
 ---
 
 # git_bump.sh
 
-- File Version: v1.0.7
-- Project Version: v1.0.7
+- File Version: v1.3.0
+- Project Version: v1.3.0
 - Last Updated: 2025-06-10
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md) | [Gitコミットポリシーへ](../git_commit_policy.md)
@@ -123,29 +123,29 @@ git bump major
 ```markdown
 ---
 title: タイトル
-file_version: v1.0.7
-project_version: v1.0.7
+file_version: v1.3.0
+project_version: v1.3.0
 last_updated: 2025-06-10
 ---
 
 # タイトル
 
-- File Version: v1.0.7
-- Project Version: v1.0.7
+- File Version: v1.3.0
+- Project Version: v1.3.0
 - Last Updated: 2025-06-10
 ```
 
 ### Python/Shellファイル
 ```python
-# File Version: v1.0.7
-# Project Version: v1.0.7
+# File Version: v1.3.0
+# Project Version: v1.3.0
 # Last Updated: 2025-06-10
 ```
 
 ### JSONファイル
 ```json
-// File Version: v1.0.7
-// Project Version: v1.0.7
+// File Version: v1.3.0
+// Project Version: v1.3.0
 // Last Updated: 2025-06-10
 ```
 

@@ -1,6 +1,6 @@
 #!/bin/bash
-# File Version: v1.0.7
-# Project Version: v1.0.7
+# File Version: v1.3.0
+# Project Version: v1.3.0
 # Last Updated: 2025-06-10
 
 # バージョン更新の種類を確認
@@ -41,16 +41,19 @@ esac
 NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
 TODAY=$(date +%Y-%m-%d)
 
-# 変更されたファイルを検出
-CHANGED_FILES=$(git status --porcelain | grep -E '\.(md|py|sh|json)$' | awk '{print $2}')
+# デバッグ情報の出力
+echo "Current version: $CURRENT_VERSION"
+echo "Bump type: $BUMP_TYPE"
+echo "Next version: $NEXT_VERSION"
 
-# バージョン情報を持つファイルを特定
-VERSION_FILES=()
-for file in $CHANGED_FILES; do
-  if grep -q "file_version:" "$file" || grep -q "File Version:" "$file"; then
-    VERSION_FILES+=("$file")
-  fi
-done
+# バージョン情報を持つファイルを検出
+if [ "$BUMP_TYPE" = "minor" ] || [ "$BUMP_TYPE" = "major" ]; then
+  # マイナー/メジャー更新時は全ファイルを対象
+  VERSION_FILES=($(git ls-files | grep -E '\.(md|py|sh|json)$'))
+else
+  # パッチ更新時は変更されたファイルのみを対象
+  VERSION_FILES=($(git status --porcelain | grep -E '\.(md|py|sh|json)$' | awk '{print $2}'))
+fi
 
 # project_version.txtも追加
 VERSION_FILES+=("project_version.txt")
@@ -115,7 +118,7 @@ for file in "${VERSION_FILES[@]}"; do
     fi
 
     echo "## $file" >> commit_msg
-    echo "- version: $CURRENT_FILE_VERSION" >> commit_msg
+    echo "- version: $NEXT_VERSION" >> commit_msg
     echo "- type: $BUMP_TYPE bump" >> commit_msg
     echo "- summary: （ここに変更内容を記入）" >> commit_msg
     echo "" >> commit_msg
