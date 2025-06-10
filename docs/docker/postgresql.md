@@ -1,4 +1,15 @@
-# PostgreSQL環境構築・データ管理設計書
+---
+title: PostgreSQL環境構築ガイド
+file_version: v1.3.0
+project_version: v1.3.0
+last_updated: 2025-06-10
+---
+
+# PostgreSQL環境構築ガイド
+
+- File Version: v1.3.0
+- Project Version: v1.3.0
+- Last Updated: 2025-06-10
 
 [readmeへ](../../README.md) | [doc.mdへ](../doc.md)
 
@@ -284,7 +295,7 @@ docker logs postgresql-db
 
 | 日付 | バージョン | 更新内容 | 更新者 |
 |------|------------|----------|--------|
-| 2024-03-22 | 1.0.0 | 初版作成 | - |
+| 2024-03-22 | 1.0.1 | 初版作成 | - |
 | 2024-03-22 | 1.1.0 | 初期化プロセスの詳細化 | - |
 | 2024-03-22 | 1.2.0 | PowerShellスクリプトの仕様追加 | - |
 | 2024-03-22 | 1.3.0 | 目次更新と更新履歴追加 | - |

@@ -1,12 +1,11 @@
-+ 指示していない新規ファイルの生成/削除は禁止
-+ 指示していない箇所の類推による変更は承認を必ず得る
-+ 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
-+ ps1ファイルにはutf8withbom, shではutf8(bom無)
-+ 更新は既存のファイルの更新であり、新規ファイルの生成要求ではない
-+ docs/database/structure.mdの更新の際は
-    - docs/database/policy.mdに準拠
-    - 承認後, docs/database/structure.mdに準拠して、以下を更新
-        - docs/database/er.md
-        - src/db/models.py
-        - docker/postgresql/init/init.sql.template
-        - src/db/migratinos/*.py
++ ファイルの新規作成時に以下の内容をコメントアウトに追加または更新時に以下の内容がない場合は加筆
+  - 更新時の注意
+    - 指示していない新規ファイルの生成/削除は禁止
+    - 指示していない箇所の類推による変更は承認を必ず得る
+    - 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
+    - 更新は既存のファイルの更新であり、新規ファイルの生成要求ではない
+    - 更新時には、docs/giet_commit_poilcy.mdに準拠して更新
+
++ .mdの場合は更に以下を追加
+    - 更新では docs/doc.mdに準拠
+    - Gitの更新ポリシーは docs/git_commit_policy.md に準拠

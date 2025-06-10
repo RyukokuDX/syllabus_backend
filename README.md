@@ -1,4 +1,15 @@
+---
+title: Syllabus Backend
+file_version: v1.3.0
+project_version: v1.3.0
+last_updated: 2025-06-10
+---
+
 # Syllabus Backend
+
+- File Version: v1.3.0
+- Project Version: v1.3.0
+- Last Updated: 2025-06-10
 
 ## 概要
 シラバス情報を管理するバックエンドシステム。Web Syllabusから取得したシラバス情報をデータベースに格納し、APIを通じて提供します。
@@ -120,6 +131,7 @@ MIT License
 
 ### シェルスクリプト関連
 - [syllabus.sh](docs/sh/syllabus.md) - メインシェルスクリプトの使用方法
+- [git_bump.sh](docs/sh/git_bump.md) - バージョン管理スクリプトの使用方法
 
 ### データベース関連
 - [ER図](docs/database/er.md) - データベースのER図
@@ -138,3 +150,41 @@ MIT License
 
 ### その他
 - [ドキュメント作成ガイド](docs/doc.md) - ドキュメント作成のガイドライン
+
+### Cursor関連
+- `.cursor/rules/` - Cursor IDEの設定ファイル
+  - `git.mdc` - Git操作に関するルール設定
+    - コミットメッセージの形式とプレフィックス
+    - ブランチ管理と命名規則
+    - バージョン管理とタグ運用
+    - マージ戦略とパッチ管理
+  - `general-rule.mdc` - 一般的な開発ルール設定
+    - ファイル更新時の規約
+    - 新規ファイル生成の制限
+    - 変更承認プロセス
+  - これらのファイルは、Cursor IDEでの開発効率を向上させるための設定を含みます
+  - チーム開発時の一貫性を保つために使用されます
+  - 開発者はこれらのルールに従って作業を行う必要があります
+
+### Git更新手順
+1. バージョン更新
+   ```bash
+   git bump
+   ```
+
+2. Cursorへの commit_msg 変更依頼
+   - Cursor IDEで commit_msg を開き、変更内容を確認・編集
+
+3. 変更のコミット
+   ```bash
+   git fcom
+   ```
+
+### コミットメッセージのプレフィックス
+- `feat:` - 新機能
+- `fix:` - バグ修正
+- `docs:` - ドキュメントの変更
+- `style:` - コードの意味に影響を与えない変更
+- `refactor:` - バグ修正や機能追加を含まないコードの変更
+- `test:` - テストの追加・修正
+- `chore:` - ビルドプロセスやツールの変更
