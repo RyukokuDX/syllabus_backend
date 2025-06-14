@@ -1,12 +1,9 @@
-# File Version: v1.0.1
-# Project Version: v1.0.1
-# Last Updated: 2024-03-19
-
 import os
 import json
 import glob
 from typing import List, Set
 from datetime import datetime
+from tqdm import tqdm
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -39,7 +36,10 @@ def get_faculty_names(year: int) -> Set[str]:
     if not json_files:
         raise FileNotFoundError(f"JSONファイルが見つかりません: {json_pattern}")
     
-    for json_file in json_files:
+    total_files = len(json_files)
+    print(f"処理対象ファイル数: {total_files}件")
+    
+    for json_file in tqdm(json_files, desc="JSONファイル処理", unit="file"):
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -57,10 +57,10 @@ def get_faculty_names(year: int) -> Set[str]:
                                 faculty_names.add(dept)
         
         except json.JSONDecodeError as e:
-            print(f"JSONファイルの解析エラー ({json_file}): {str(e)}")
+            print(f"\nJSONファイルの解析エラー ({json_file}): {str(e)}")
             continue
         except Exception as e:
-            print(f"ファイル処理エラー ({json_file}): {str(e)}")
+            print(f"\nファイル処理エラー ({json_file}): {str(e)}")
             continue
     
     return faculty_names
