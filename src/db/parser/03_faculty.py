@@ -1,6 +1,10 @@
+# File Version: v1.0.1
+# Project Version: v1.0.1
+# Last Updated: 2024-03-19
+
 import os
 import json
-import sqlite3
+import glob
 from typing import List, Set
 from datetime import datetime
 
@@ -23,41 +27,41 @@ def get_year_from_user() -> int:
             print("有効な数値を入力してください。")
 
 def get_faculty_names(year: int) -> Set[str]:
-    """SQLiteデータベースから学部名を抽出する"""
+    """JSONファイルから学部名を抽出する"""
     faculty_names = set()
     # スクリプトのディレクトリを基準にパスを生成
     script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    db_path = os.path.join(script_dir, "syllabus", str(year), "data", f"syllabus_{year}.db")
+    json_pattern = os.path.join(script_dir, "syllabus", str(year), "json", "*.json")
     
-    print(f"データベースパス: {db_path}")
+    print(f"JSONファイルパターン: {json_pattern}")
     
-    if not os.path.exists(db_path):
-        raise FileNotFoundError(f"データベースファイルが見つかりません: {db_path}")
+    json_files = glob.glob(json_pattern)
+    if not json_files:
+        raise FileNotFoundError(f"JSONファイルが見つかりません: {json_pattern}")
     
-    conn = None
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+    for json_file in json_files:
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+                # 基本情報.対象学部.内容から学部名を取得
+                if '基本情報' in data and '対象学部' in data['基本情報'] and '内容' in data['基本情報']['対象学部']:
+                    departments = data['基本情報']['対象学部']['内容']
+                    if departments:
+                        # カンマで区切られた学部名を分割して追加
+                        for dept in departments.split(','):
+                            dept = dept.strip()
+                            # ・を半角に変換
+                            dept = dept.replace('・', '･')
+                            if dept:  # 空文字でない場合のみ追加
+                                faculty_names.add(dept)
         
-        # departmentsカラムから学部名を取得
-        cursor.execute("SELECT DISTINCT departments FROM syllabus_basic WHERE departments IS NOT NULL")
-        rows = cursor.fetchall()
-        
-        for row in rows:
-            if row[0]:  # NULLでない場合
-                # カンマで区切られた学部名を分割して追加
-                departments = row[0].split(',')
-                for dept in departments:
-                    dept = dept.strip()
-                    if dept:  # 空文字でない場合のみ追加
-                        faculty_names.add(dept)
-        
-    except sqlite3.Error as e:
-        print(f"データベースエラー: {str(e)}")
-        raise
-    finally:
-        if conn:
-            conn.close()
+        except json.JSONDecodeError as e:
+            print(f"JSONファイルの解析エラー ({json_file}): {str(e)}")
+            continue
+        except Exception as e:
+            print(f"ファイル処理エラー ({json_file}): {str(e)}")
+            continue
     
     return faculty_names
 
