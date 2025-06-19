@@ -1,0 +1,7 @@
+"{projectルートからのシラバスjsonのpath}", "error message", "time"
+"src/syllabus/2025/json/Y740000131.json", "不正ISBN: 桁数違反", "2025-06-19 15:22:00"
+"src/syllabus/2025/json/Y740000132.json", "不正ISBN: 桁数違反", "2025-06-19 15:22:00"
+"src/syllabus/2025/json/Y740000132.json", "問題レコード: 書籍名類似度低 - シラバス書籍名「大学院講義有機化学Ⅰ」、CiNii書籍名「分子構造と反応・有機金属化学」", "2025-06-19 15:22:00"
+"src/syllabus/2025/json/Y740000133.json", "問題ISBN: ciniiデータ不在", "2025-06-19 15:22:00"
+"src/syllabus/2025/json/Y740000134.json", "不正ISBN: 桁数違反", "2025-06-19 15:22:01"
+"src/syllabus/2025/json/Y740000134.json", "不正ISBN: 桁数違反", "2025-06-19 15:22:01"

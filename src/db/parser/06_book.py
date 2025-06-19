@@ -12,7 +12,6 @@ import glob
 import csv
 import re
 import requests
-import xml.etree.ElementTree as ET
 import time
 from typing import List, Dict, Set, Tuple, Any, Optional
 from datetime import datetime
@@ -46,10 +45,6 @@ except ImportError:
         def distance(s1, s2):
             return levenshtein_distance(s1, s2)
 
-def get_current_year() -> int:
-    """現在の年度を取得する"""
-    return datetime.now().year
-
 def validate_isbn(isbn: str) -> bool:
     """ISBNのチェックディジットを検証する"""
     if not isbn:
@@ -78,30 +73,6 @@ def validate_isbn(isbn: str) -> bool:
         return str(check_digit) == isbn[12]
     
     return False
-
-def normalize_isbn(isbn: str) -> str:
-    """ISBNを正規化する（ISBN-10をISBN-13に変換）"""
-    if not isbn:
-        return isbn
-    
-    # ハイフンを除去
-    isbn = isbn.replace('-', '')
-    
-    # ISBN-10の場合、ISBN-13に変換
-    if len(isbn) == 10:
-        # 978を先頭に追加
-        isbn = '978' + isbn[:-1]
-        
-        # チェックディジットを計算
-        total = 0
-        for i, digit in enumerate(isbn):
-            weight = 1 if i % 2 == 0 else 3
-            total += int(digit) * weight
-        
-        check_digit = (10 - (total % 10)) % 10
-        isbn = isbn + str(check_digit)
-    
-    return isbn
 
 def calculate_similarity(str1: str, str2: str) -> float:
     """
@@ -158,34 +129,7 @@ def calculate_similarity(str1: str, str2: str) -> float:
     # 重み付けは0.7:0.3（仕様書に準拠）
     return 0.7 * string_similarity + 0.3 * word_similarity
 
-def check_isbn_database(isbn: str, book_info: Dict, year: int) -> Tuple[bool, str]:
-    """ISBNデータベースで書籍情報を検証"""
-    try:
-        # ISBNデータベースのパスを設定
-        isbn_db_path = Path(f"src/db/isbn/{year}/isbn.json")
-        if not isbn_db_path.exists():
-            return True, ""  # データベースが存在しない場合は検証をスキップ
-        
-        # ISBNデータベースを読み込む
-        with open(isbn_db_path, 'r', encoding='utf-8') as f:
-            isbn_db = json.load(f)
-        
-        # ISBNで検索
-        if isbn in isbn_db:
-            db_book = isbn_db[isbn]
-            # 書籍名の類似度を計算（閾値を0.2に変更）
-            similarity = calculate_similarity(book_info['name'], db_book['title'])
-            if similarity < 0.2:
-                return False, f"ISBNデータ不一致: シラバス書籍名「{book_info['name']}」、ISBNデータ書籍名「{db_book['title']}」"
-            return True, ""
-        
-        return True, ""  # ISBNが存在しない場合は検証をスキップ
-    
-    except Exception as e:
-        print(f"ISBNデータベースの検証中にエラーが発生しました: {str(e)}")
-        return True, ""  # エラーの場合は検証をスキップ
-
-def log_warning(message: str, json_file: str, year: int):
+def log_warning(message: str, json_file: str, year: int, isbn: str = ""):
     """警告をCSVファイルに記録"""
     # 現在の日時を取得してファイル名を生成
     current_time = datetime.now()
@@ -196,83 +140,16 @@ def log_warning(message: str, json_file: str, year: int):
     # ファイルが存在しない場合はヘッダーを書き込む
     if not os.path.exists(warning_file):
         with open(warning_file, 'w', encoding='utf-8') as f:
-            f.write('"{projectルートからのシラバスjsonのpath}", "error message", "time"\n')
+            f.write('"{projectルートからのシラバスjsonのpath}", "ISBN", "error message", "time"\n')
     
     # 警告を追記（ファイル名をプロジェクトルートからの相対パスに変換）
     relative_path = str(Path(json_file).relative_to(Path.cwd())) if json_file else ""
     with open(warning_file, 'a', encoding='utf-8') as f:
-        f.write(f'"{relative_path}", "{message}", "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"\n')
-
-def collect_valid_isbns(year: int) -> Set[str]:
-    """シラバスから正規のISBNを収集する"""
-    valid_isbns = set()
-    script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    json_pattern = os.path.join(script_dir, 'syllabus', str(year), 'json', '*.json')
-    
-    # JSONファイルの検索
-    json_files = glob.glob(json_pattern)
-    if not json_files:
-        error_msg = f"JSONファイルが見つかりません: {json_pattern}"
-        log_warning(error_msg, "", year)
-        raise FileNotFoundError(error_msg)
-    
-    print(f"処理対象ファイル数: {len(json_files)}")
-    
-    # 各JSONファイルを処理
-    for json_file in tqdm(json_files, desc="ISBN収集中"):
-        try:
-            with open(json_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # 詳細情報の取得
-            if '詳細情報' not in data:
-                continue
-                
-            detail = data['詳細情報']
-            
-            # テキスト情報の処理
-            if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
-                text_content = detail['テキスト']['内容']
-                if isinstance(text_content, dict) and '書籍' in text_content:
-                    books_list = text_content['書籍']
-                    if isinstance(books_list, list):
-                        print(f"テキスト書籍数: {len(books_list)}")  # デバッグ情報
-                        for book in books_list:
-                            isbn = book.get('ISBN', '').strip()
-                            print(f"ISBN: {isbn}, 書籍名: {book.get('書籍名', '')}")  # デバッグ情報
-                            if not isbn or not validate_isbn(isbn):
-                                print(f"無効なISBNまたは空のISBN: {isbn}")  # デバッグ情報
-                                if not isbn:
-                                    log_warning("不正ISBN: 桁数違反", json_file, year)
-                                else:
-                                    log_warning("不正ISBN: cd違反", json_file, year)
-                                continue
-                            if isbn and validate_isbn(isbn):
-                                valid_isbns.add(isbn)
-            
-            # 参考文献情報の処理
-            if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
-                ref_content = detail['参考文献']['内容']
-                if isinstance(ref_content, dict) and '書籍' in ref_content:
-                    books_list = ref_content['書籍']
-                    if isinstance(books_list, list):
-                        for book in books_list:
-                            isbn = book.get('ISBN', '')
-                            if isbn and validate_isbn(isbn):
-                                valid_isbns.add(isbn)
-                            
-        except Exception as e:
-            log_warning(f"ファイル処理エラー: {str(e)}", json_file, year)
-            continue
-    
-    return valid_isbns
+        f.write(f'"{relative_path}", "{isbn}", "{message}", "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"\n')
 
 def get_book_info(year: int) -> List[Dict[str, Any]]:
     """書籍情報を取得する"""
     books = []
-    
-    # 既存の書籍JSONファイルのパスを設定
-    books_json_dir = Path("src/books/json")
     
     # シラバスから書籍情報を取得
     script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -288,38 +165,61 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                 
             detail = data['詳細情報']
             
-            # テキスト情報の処理
+            # テキスト情報の処理（仕様書準拠）
             if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
                 text_content = detail['テキスト']['内容']
                 if isinstance(text_content, dict) and '書籍' in text_content:
                     books_list = text_content['書籍']
                     if isinstance(books_list, list):
-                        print(f"テキスト書籍数: {len(books_list)}")  # デバッグ情報
                         for book in books_list:
                             isbn = book.get('ISBN', '').strip()
-                            print(f"ISBN: {isbn}, 書籍名: {book.get('書籍名', '')}")  # デバッグ情報
-                            if not isbn or not validate_isbn(isbn):
-                                print(f"無効なISBNまたは空のISBN: {isbn}")  # デバッグ情報
-                                if not isbn:
-                                    log_warning("不正ISBN: 桁数違反", json_file, year)
-                                else:
-                                    log_warning("不正ISBN: cd違反", json_file, year)
+                            if not isbn:
+                                # ISBNがnullの場合：シラバスJSONのデータから出力JSONに追記
+                                book_info = {
+                                    'title': book.get('書籍名', '').strip(),
+                                    'isbn': None,
+                                    'author': book.get('著者', '').strip(),
+                                    'publisher': book.get('出版社', '').strip(),
+                                    'price': None,
+                                    'created_at': datetime.now().isoformat()
+                                }
+                                books.append(book_info)
                                 continue
-                                
+                            
+                            # ISBNが存在する場合の処理
+                            if not validate_isbn(isbn):
+                                # 桁数確認またはチェックディジット確認で異常あり
+                                if len(isbn) != 10 and len(isbn) != 13:
+                                    log_warning("不正ISBN: 桁数違反", json_file, year, isbn)
+                                else:
+                                    log_warning("不正ISBN: cd違反", json_file, year, isbn)
+                                # シラバスJSONの対象レコードから出力JSONに追記
+                                book_info = {
+                                    'title': book.get('書籍名', '').strip(),
+                                    'isbn': isbn,
+                                    'author': book.get('著者', '').strip(),
+                                    'publisher': book.get('出版社', '').strip(),
+                                    'price': None,
+                                    'created_at': datetime.now().isoformat()
+                                }
+                                books.append(book_info)
+                                continue
+                            
+                            # ISBNが正常な場合
                             # シラバスから価格情報を取得
                             price = None
                             price_str = book.get('価格', '')
-                            if price_str:
+                            if price_str and price_str.strip():  # 空文字列でない場合のみ処理
                                 try:
-                                    price = int(price_str.replace(',', ''))
+                                    price = int(price_str.replace(',', '').replace('円', ''))
                                 except ValueError:
                                     pass
                             
                             # シラバスから書籍名を取得（類似度比較用）
                             syllabus_title = book.get('書籍名', '').strip()
                             
-                            # 既存のJSONファイルの存在確認
-                            book_json_path = books_json_dir / f"{isbn}.json"
+                            # src/books/{ISBN}.jsonの存在確認（仕様書準拠）
+                            book_json_path = Path(f"src/books/{isbn}.json")
                             if book_json_path.exists():
                                 print(f"既存JSONファイル発見: {book_json_path}")  # デバッグ情報
                                 try:
@@ -338,8 +238,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             if syllabus_title and existing_title:
                                                 similarity = calculate_similarity(syllabus_title, existing_title)
                                                 print(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")  # デバッグ情報
-                                                if similarity < 0.2:
-                                                    log_warning("問題レコード: 書籍名類似度低", json_file, year)
+                                                if similarity < 0.05:  # 閾値を0.05に変更
+                                                    log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、CiNii書籍名「{existing_title}」", json_file, year, isbn)
                                                     continue
                                             
                                             # 書籍情報を作成（既存JSONから取得、priceのみシラバスから）
@@ -360,11 +260,31 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             books.append(book_info)
                                         else:
                                             print(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
+                                            # itemsが見つからない場合はシラバスデータのみで作成
+                                            book_info = {
+                                                'title': syllabus_title,
+                                                'isbn': isbn,
+                                                'author': book.get('著者', '').strip(),
+                                                'publisher': book.get('出版社', '').strip(),
+                                                'price': price,
+                                                'created_at': datetime.now().isoformat()
+                                            }
+                                            books.append(book_info)
                                     else:
                                         print(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
+                                        # @graphが見つからない場合はシラバスデータのみで作成
+                                        book_info = {
+                                            'title': syllabus_title,
+                                            'isbn': isbn,
+                                            'author': book.get('著者', '').strip(),
+                                            'publisher': book.get('出版社', '').strip(),
+                                            'price': price,
+                                            'created_at': datetime.now().isoformat()
+                                        }
+                                        books.append(book_info)
                                         
                                 except Exception as e:
-                                    print(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")
+                                    print(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -381,6 +301,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                 try:
                                     cinii_data = get_cinii_data(isbn)
                                     if cinii_data:
+                                        print(f"CiNiiから取得成功: {isbn}")  # デバッグ情報
                                         # 書籍情報を作成
                                         book_info = {
                                             'title': cinii_data.get('title', syllabus_title),
@@ -392,7 +313,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                     else:
-                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year)
+                                        print(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
+                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn)
                                         # CiNiiデータがない場合はシラバスデータのみで作成
                                         book_info = {
                                             'title': syllabus_title,
@@ -404,7 +326,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                 except Exception as e:
-                                    print(f"警告: ISBN {isbn} の情報取得中にエラーが発生しました: {str(e)}")
+                                    print(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -416,38 +338,61 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                     }
                                     books.append(book_info)
             
-            # 参考文献情報の処理（テキスト情報と同じ処理）
+            # 参考文献情報の処理（仕様書準拠）
             if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
                 ref_content = detail['参考文献']['内容']
                 if isinstance(ref_content, dict) and '書籍' in ref_content:
                     books_list = ref_content['書籍']
                     if isinstance(books_list, list):
-                        print(f"参考文献数: {len(books_list)}")  # デバッグ情報
                         for book in books_list:
                             isbn = book.get('ISBN', '').strip()
-                            print(f"参考文献 ISBN: {isbn}, 書籍名: {book.get('書籍名', '')}")  # デバッグ情報
-                            if not isbn or not validate_isbn(isbn):
-                                print(f"無効なISBNまたは空のISBN: {isbn}")  # デバッグ情報
-                                if not isbn:
-                                    log_warning("不正ISBN: 桁数違反", json_file, year)
-                                else:
-                                    log_warning("不正ISBN: cd違反", json_file, year)
+                            if not isbn:
+                                # ISBNがnullの場合：シラバスJSONのデータから出力JSONに追記
+                                book_info = {
+                                    'title': book.get('書籍名', '').strip(),
+                                    'isbn': None,
+                                    'author': book.get('著者', '').strip(),
+                                    'publisher': book.get('出版社', '').strip(),
+                                    'price': None,
+                                    'created_at': datetime.now().isoformat()
+                                }
+                                books.append(book_info)
                                 continue
-                                
+                            
+                            # ISBNが存在する場合の処理
+                            if not validate_isbn(isbn):
+                                # 桁数確認またはチェックディジット確認で異常あり
+                                if len(isbn) != 10 and len(isbn) != 13:
+                                    log_warning("不正ISBN: 桁数違反", json_file, year, isbn)
+                                else:
+                                    log_warning("不正ISBN: cd違反", json_file, year, isbn)
+                                # シラバスJSONの対象レコードから出力JSONに追記
+                                book_info = {
+                                    'title': book.get('書籍名', '').strip(),
+                                    'isbn': isbn,
+                                    'author': book.get('著者', '').strip(),
+                                    'publisher': book.get('出版社', '').strip(),
+                                    'price': None,
+                                    'created_at': datetime.now().isoformat()
+                                }
+                                books.append(book_info)
+                                continue
+                            
+                            # ISBNが正常な場合
                             # シラバスから価格情報を取得
                             price = None
                             price_str = book.get('価格', '')
-                            if price_str:
+                            if price_str and price_str.strip():  # 空文字列でない場合のみ処理
                                 try:
-                                    price = int(price_str.replace(',', ''))
+                                    price = int(price_str.replace(',', '').replace('円', ''))
                                 except ValueError:
                                     pass
                             
                             # シラバスから書籍名を取得（類似度比較用）
                             syllabus_title = book.get('書籍名', '').strip()
                             
-                            # 既存のJSONファイルの存在確認
-                            book_json_path = books_json_dir / f"{isbn}.json"
+                            # src/books/{ISBN}.jsonの存在確認（仕様書準拠）
+                            book_json_path = Path(f"src/books/{isbn}.json")
                             if book_json_path.exists():
                                 print(f"既存JSONファイル発見: {book_json_path}")  # デバッグ情報
                                 try:
@@ -459,13 +404,15 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         channel = existing_data['@graph'][0]
                                         if 'items' in channel and len(channel['items']) > 0:
                                             item = channel['items'][0]
+                                            print(f"CiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
                                             
                                             # 書籍名の類似度比較
                                             existing_title = item.get('title', '')
                                             if syllabus_title and existing_title:
                                                 similarity = calculate_similarity(syllabus_title, existing_title)
-                                                if similarity < 0.2:
-                                                    log_warning("問題レコード: 書籍名類似度低", json_file, year)
+                                                print(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")  # デバッグ情報
+                                                if similarity < 0.05:  # 閾値を0.05に変更
+                                                    log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、CiNii書籍名「{existing_title}」", json_file, year, isbn)
                                                     continue
                                             
                                             # 書籍情報を作成（既存JSONから取得、priceのみシラバスから）
@@ -484,9 +431,33 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             
                                             print(f"作成された書籍情報: {book_info}")  # デバッグ情報
                                             books.append(book_info)
+                                        else:
+                                            print(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
+                                            # itemsが見つからない場合はシラバスデータのみで作成
+                                            book_info = {
+                                                'title': syllabus_title,
+                                                'isbn': isbn,
+                                                'author': book.get('著者', '').strip(),
+                                                'publisher': book.get('出版社', '').strip(),
+                                                'price': price,
+                                                'created_at': datetime.now().isoformat()
+                                            }
+                                            books.append(book_info)
+                                    else:
+                                        print(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
+                                        # @graphが見つからない場合はシラバスデータのみで作成
+                                        book_info = {
+                                            'title': syllabus_title,
+                                            'isbn': isbn,
+                                            'author': book.get('著者', '').strip(),
+                                            'publisher': book.get('出版社', '').strip(),
+                                            'price': price,
+                                            'created_at': datetime.now().isoformat()
+                                        }
+                                        books.append(book_info)
                                         
                                 except Exception as e:
-                                    print(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")
+                                    print(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -502,6 +473,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                 try:
                                     cinii_data = get_cinii_data(isbn)
                                     if cinii_data:
+                                        print(f"CiNiiから取得成功: {isbn}")  # デバッグ情報
                                         # 書籍情報を作成
                                         book_info = {
                                             'title': cinii_data.get('title', syllabus_title),
@@ -513,7 +485,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                     else:
-                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year)
+                                        print(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
+                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn)
                                         # CiNiiデータがない場合はシラバスデータのみで作成
                                         book_info = {
                                             'title': syllabus_title,
@@ -525,7 +498,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                 except Exception as e:
-                                    print(f"警告: ISBN {isbn} の情報取得中にエラーが発生しました: {str(e)}")
+                                    print(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -536,7 +509,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         'created_at': datetime.now().isoformat()
                                     }
                                     books.append(book_info)
-                            
+            
         except Exception as e:
             log_warning(f"ファイル処理エラー: {str(e)}", json_file, year)
             continue
@@ -567,6 +540,15 @@ def get_cinii_data(isbn: str) -> Optional[Dict[str, str]]:
         # 書籍情報が存在する場合
         if data.get('@graph') and len(data['@graph']) > 0:
             book_data = data['@graph'][0]
+            
+            # src/books/{ISBN}.jsonに保存（仕様書準拠）
+            books_dir = Path("src/books")
+            books_dir.mkdir(exist_ok=True)
+            book_json_path = books_dir / f"{isbn}.json"
+            
+            with open(book_json_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            
             return {
                 'title': book_data.get('dc:title', ''),
                 'author': book_data.get('dc:creator', ''),
@@ -611,143 +593,20 @@ def create_book_json(books: List[Dict[str, Any]]) -> str:
     
     return output_file
 
-def process_book_info(book: dict, json_file: str, year: int) -> Optional[dict]:
-    """書籍情報を処理"""
-    if not book or not isinstance(book, dict):
-        return None
+def test_similarity():
+    """類似度計算のテスト"""
+    test_cases = [
+        ("振動学", "振動学 = Mechanical vibration"),
+        ("材料の科学と工学〈1〉材料の微細構造", "機械材料入門")
+    ]
     
-    # 書籍名の取得
-    book_name = book.get('書籍名', '').strip()
-    if not book_name:
-        return None
-    
-    # ISBNの取得と検証
-    isbn = book.get('ISBN', '').strip()
-    if isbn:
-        if not validate_isbn(isbn):
-            log_warning(f"無効なISBN: {isbn}", json_file, year)
-        else:
-            # ISBNデータベースとの整合性チェック
-            is_valid, error_msg = check_isbn_database(isbn, {'name': book_name}, year)
-            if not is_valid:
-                log_warning(error_msg, json_file, year)
-    
-    # 著者名の取得
-    author = book.get('著者名', '').strip()
-    
-    # 出版社の取得
-    publisher = book.get('出版社', '').strip()
-    
-    # 出版年の取得と検証
-    year_str = book.get('出版年', '').strip()
-    if year_str and not year_str.isdigit():
-        log_warning(f"無効な出版年: {year_str}", json_file, year)
-        year_str = None
-    
-    # 書籍情報の作成
-    book_info = {
-        "name": book_name,
-        "isbn": isbn if isbn else None,
-        "author": author if author else None,
-        "publisher": publisher if publisher else None,
-        "year": int(year_str) if year_str else None
-    }
-    
-    return book_info
-
-def process_json_file(json_file: Path, year: int) -> List[dict]:
-    """JSONファイルを処理して書籍情報を抽出"""
-    try:
-        with open(json_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        if not isinstance(data, dict):
-            log_warning("JSONデータが辞書形式ではありません", str(json_file), year)
-            return []
-        
-        # 詳細情報の取得
-        detail_info = data.get('詳細情報', {})
-        if not detail_info:
-            return []
-        
-        books = []
-        processed_names = set()  # 書籍名の重複チェック用
-        processed_isbns = set()  # ISBNの重複チェック用
-        
-        # テキスト情報の処理
-        text_content = detail_info.get('テキスト情報', {})
-        if text_content and isinstance(text_content, dict):
-            book_list = text_content.get('書籍', [])
-            if isinstance(book_list, list):
-                for book in book_list:
-                    if book is None or not isinstance(book, dict):
-                        continue
-                    
-                    book_info = process_book_info(book, str(json_file), year)
-                    if not book_info:
-                        continue
-                    
-                    # ISBNの重複チェック
-                    if book_info['isbn'] and book_info['isbn'] in processed_isbns:
-                        log_warning(f"重複するISBN: {book_info['isbn']} ({book_info['name']})", str(json_file), year)
-                        continue
-                    
-                    # 書籍名の重複チェック
-                    if book_info['name'] not in processed_names:
-                        # 類似度チェック（閾値0.2に変更）
-                        is_duplicate = False
-                        for existing_book in books:
-                            if calculate_similarity(book_info['name'], existing_book['name']) > 0.2:
-                                is_duplicate = True
-                                break
-                        
-                        if not is_duplicate:
-                            books.append(book_info)
-                            processed_names.add(book_info['name'])
-                            if book_info['isbn']:
-                                processed_isbns.add(book_info['isbn'])
-        
-        # 参考文献情報の処理
-        ref_content = detail_info.get('参考文献情報', {})
-        if ref_content and isinstance(ref_content, dict):
-            book_list = ref_content.get('書籍', [])
-            if isinstance(book_list, list):
-                for book in book_list:
-                    if book is None or not isinstance(book, dict):
-                        continue
-                    
-                    book_info = process_book_info(book, str(json_file), year)
-                    if not book_info:
-                        continue
-                    
-                    # ISBNの重複チェック
-                    if book_info['isbn'] and book_info['isbn'] in processed_isbns:
-                        log_warning(f"重複するISBN: {book_info['isbn']} ({book_info['name']})", str(json_file), year)
-                        continue
-                    
-                    # 書籍名の重複チェック
-                    if book_info['name'] not in processed_names:
-                        # 類似度チェック（閾値0.2に変更）
-                        is_duplicate = False
-                        for existing_book in books:
-                            if calculate_similarity(book_info['name'], existing_book['name']) > 0.2:
-                                is_duplicate = True
-                                break
-                        
-                        if not is_duplicate:
-                            books.append(book_info)
-                            processed_names.add(book_info['name'])
-                            if book_info['isbn']:
-                                processed_isbns.add(book_info['isbn'])
-        
-        return books
-    
-    except json.JSONDecodeError as e:
-        log_warning(f"JSONの解析に失敗: {str(e)}", str(json_file), year)
-        return []
-    except Exception as e:
-        log_warning(f"ファイル処理エラー: {str(e)}", str(json_file), year)
-        return []
+    for title1, title2 in test_cases:
+        similarity = calculate_similarity(title1, title2)
+        print(f"類似度: {similarity:.3f}")
+        print(f"  シラバス: {title1}")
+        print(f"  CiNii: {title2}")
+        print(f"  判定: {'類似度低い' if similarity < 0.05 else '類似度高い'}")
+        print()
 
 def main():
     """メイン処理"""
@@ -773,4 +632,8 @@ def main():
         raise
 
 if __name__ == "__main__":
+    # 類似度テスト
+    test_similarity()
+    
+    # メイン処理
     main() 

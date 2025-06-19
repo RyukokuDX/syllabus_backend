@@ -1,0 +1,5 @@
+"{projectルートからのシラバスjsonのpath}", "error message", "time"
+"src/syllabus/2025/json/Y001049010.json", "問題レコード: 書籍名類似度低 - シラバス書籍名「みんなのPython 第4版」、CiNii書籍名「みんなのPython : lightweight language Python definitive guide」", "2025-06-19 15:33:52"
+"src/syllabus/2025/json/Y001050010.json", "問題レコード: 書籍名類似度低 - シラバス書籍名「計算理論の基礎（原書第２版）」、CiNii書籍名「オートマトンと言語」", "2025-06-19 15:33:52"
+"src/syllabus/2025/json/Y001055010.json", "問題レコード: 書籍名類似度低 - シラバス書籍名「計算理論の基礎 (原書第二版)」、CiNii書籍名「オートマトンと言語」", "2025-06-19 15:33:52"
+"src/syllabus/2025/json/Y001055010.json", "不正ISBN: 桁数違反", "2025-06-19 15:33:52"
