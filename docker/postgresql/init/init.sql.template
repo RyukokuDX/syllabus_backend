@@ -192,26 +192,17 @@ CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
+    author TEXT,
     publisher TEXT,
     price INTEGER,
     isbn TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(isbn),
     UNIQUE(title, publisher)
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
 CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
-
--- book_author（書籍著者）
-CREATE TABLE IF NOT EXISTS book_author (
-    book_author_id SERIAL PRIMARY KEY,
-    book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
-    author_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
-CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);
 
 -- lecture_time（講義時間）
 CREATE TABLE IF NOT EXISTS lecture_time (

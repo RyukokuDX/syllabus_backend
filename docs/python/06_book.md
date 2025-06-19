@@ -1,14 +1,14 @@
 ---
 title: 06_book.pyの仕様書
-file_version: v1.3.4
-project_version: v1.3.4
+file_version: v1.3.5
+project_version: v1.3.5
 last_updated: 2025-06-19
 ---
 
 # `06_book.py`の仕様書　
 
-- File Version: v1.3.4
-- Project Version: v1.3.4
+- File Version: v1.3.5
+- Project Version: v1.3.5
 - Last Updated: 2025-06-19
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](./doc.md)
