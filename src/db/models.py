@@ -188,6 +188,7 @@ class Book(Base):
 
     book_id = Column(Integer, primary_key=True)
     title = Column(Text, nullable=False)
+    author = Column(Text)  # カンマ区切りの著者名
     publisher = Column(Text)
     price = Column(Integer)
     isbn = Column(Text)
@@ -197,19 +198,6 @@ class Book(Base):
         Index('idx_book_title', 'title'),
         Index('idx_book_isbn', 'isbn', unique=True),
         UniqueConstraint('title', 'publisher', name='uix_book_title_publisher'),
-    )
-
-class BookAuthor(Base):
-    __tablename__ = 'book_author'
-
-    book_author_id = Column(Integer, primary_key=True)
-    book_id = Column(Integer, ForeignKey('book.book_id', ondelete='CASCADE'), nullable=False)
-    author_name = Column(Text, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_book_author_book', 'book_id'),
-        Index('idx_book_author_name', 'author_name'),
     )
 
 class LectureTime(Base):
@@ -417,17 +405,10 @@ class Book:
     """書籍モデル"""
     book_id: int
     title: str
+    author: Optional[str]  # カンマ区切りの著者名
     publisher: Optional[str]
     price: Optional[int]
     isbn: Optional[str]
-    created_at: datetime
-
-@dataclass
-class BookAuthor:
-    """書籍著者モデル"""
-    book_author_id: int
-    book_id: int
-    author_name: str
     created_at: datetime
 
 @dataclass

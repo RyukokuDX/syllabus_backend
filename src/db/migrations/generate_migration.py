@@ -17,6 +17,30 @@ DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localho
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# テーブル名の複数形マッピング
+TABLE_NAME_PLURAL = {
+    'class': 'classes',
+    'subclass': 'subclasses',
+    'faculty': 'faculties',
+    'subject_name': 'subject_names',
+    'instructor': 'instructors',
+    'book': 'books',
+    'syllabus_master': 'syllabus_masters',
+    'syllabus': 'syllabuses',
+    'subject_grade': 'subject_grades',
+    'lecture_time': 'lecture_times',
+    'lecture_session': 'lecture_sessions',
+    'syllabus_instructor': 'syllabus_instructors',
+    'lecture_session_instructor': 'lecture_session_instructors',
+    'syllabus_book': 'syllabus_books',
+    'grading_criterion': 'grading_criteria',
+    'subject_attribute': 'subject_attributes',
+    'subject': 'subjects',
+    'subject_syllabus': 'subject_syllabuses',
+    'subject_attribute_value': 'subject_attribute_values',
+    'syllabus_study_system': 'syllabus_study_systems'
+}
+
 def read_json_files(directory, table_name):
     """指定されたディレクトリ内のすべてのJSONファイルを読み込む"""
     data = []
@@ -37,32 +61,7 @@ def read_json_files(directory, table_name):
             with open(file, 'r', encoding='utf-8') as f:
                 json_data = json.load(f)
                 # テーブル名に応じた配列名を取得
-                array_name = {
-                    'class': 'classes',
-                    'subclass': 'subclasses',
-                    'faculty': 'faculties',
-                    'subject_name': 'subject_names',
-                    'subject': 'subjects',
-                    'instructor': 'instructors',
-                    'book': 'books',
-                    'syllabus': 'syllabuses',
-                    'lecture_session': 'lecture_sessions',
-                    'syllabus_instructor': 'syllabus_instructors',
-                    'syllabus_book': 'syllabus_books',
-                    'grading_criterion': 'grading_criteria',
-                    'subject_grade': 'subject_grades',
-                    'subject_attribute': 'subject_attributes',
-                    'subject_attribute_value': 'subject_attribute_values',
-                    'subject_syllabus': 'subject_syllabuses',
-                    'syllabus_study_system': 'syllabus_study_systems',
-                    'lecture_session_instructor': 'lecture_session_instructors',
-                    'lecture_time': 'lecture_times',
-                    'book_author': 'book_authors',
-                    'syllabus_master': 'syllabus_masters',
-                    'requirement_header': 'requirement_headers',
-                    'requirement_attribute': 'requirement_attributes',
-                    'requirement': 'requirements'
-                }.get(table_name, f"{table_name}s")
+                array_name = TABLE_NAME_PLURAL.get(table_name, f"{table_name}s")
                 
                 if array_name in json_data:
                     records = json_data[array_name]
@@ -222,10 +221,13 @@ CREATE TABLE IF NOT EXISTS instructor (
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
+    author TEXT,
     publisher TEXT,
     price INTEGER,
     isbn TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(isbn),
+    UNIQUE(title, publisher)
 );""",
         'book_author': """
 CREATE TABLE IF NOT EXISTS book_author (
@@ -392,7 +394,8 @@ CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attr
 CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(name);
 CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);""",
         'book': """
-CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);""",
+CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
+CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);""",
         'book_author': """
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
 CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);""",

@@ -158,13 +158,14 @@
 ### book 書籍
 
 #### テーブル概要
-教科書・参考文献として使用される書籍の情報を管理するテーブル。
+教科書・参考文献として使用される書籍の情報を管理するテーブル。著者情報はカンマ区切りの単一フィールドで管理。
 
 #### カラム定義
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | book_id | INTEGER | NO | 書籍ID（主キー） | システム生成 |
 | title | TEXT | NO | 書籍タイトル | Web Syllabus |
+| author | TEXT | YES | 著者名（カンマ区切り） | Web Syllabus |
 | publisher | TEXT | YES | 出版社名 | Web Syllabus |
 | price | INTEGER | YES | 価格（税抜） | Web Syllabus |
 | isbn | TEXT | YES | ISBN番号 | Web Syllabus |
@@ -182,33 +183,6 @@
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | - | - | - |
-
-[目次へ戻る](#目次)
-
-### book_author 書籍著者
-
-#### テーブル概要
-書籍の著者情報を管理するテーブル。1つの書籍に複数の著者が存在する場合に対応。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| book_author_id | INTEGER | NO | 著者ID（主キー） | システム生成 |
-| book_id | INTEGER | NO | 書籍ID（外部キー） | Web Syllabus |
-| author_name | TEXT | NO | 著者名 | Web Syllabus |
-| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | book_author_id | 主キー |
-| idx_book_author_book | book_id | 書籍IDでの検索用 |
-| idx_book_author_name | author_name | 著者名での検索用 |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| book_id | book(book_id) | CASCADE |
 
 [目次へ戻る](#目次)
 

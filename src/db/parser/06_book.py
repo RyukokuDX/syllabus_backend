@@ -1,132 +1,364 @@
+# File Version: v1.3.4
+# Project Version: v1.3.4
+# Last Updated: 2025-06-19
+
 import os
 import json
-from typing import List, Dict, Set
-from datetime import datetime
-from bs4 import BeautifulSoup
-from tqdm import tqdm
+import glob
+import csv
 import re
+import requests
+import xml.etree.ElementTree as ET
+import time
+from typing import List, Dict, Set, Tuple, Any, Optional
+from datetime import datetime
+from tqdm import tqdm
+from .utils import get_year_from_user
+from pathlib import Path
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
     return datetime.now().year
 
-def get_year_from_user() -> int:
-    """ユーザーから年度を入力してもらう"""
-    while True:
-        try:
-            year = input("年度を入力してください（空の場合は現在の年度）: ").strip()
-            if not year:
-                return get_current_year()
-            year = int(year)
-            if 2000 <= year <= 2100:  # 妥当な年度の範囲をチェック
-                return year
-            print("2000年から2100年の間で入力してください。")
-        except ValueError:
-            print("有効な数値を入力してください。")
+def validate_isbn(isbn: str) -> bool:
+    """ISBNのチェックディジットを検証する"""
+    if not isbn:
+        return False
+    
+    # 数字以外の文字を除去（Xは除く）
+    isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
+    
+    # ISBN-10の場合
+    if len(isbn) == 10:
+        total = 0
+        for i in range(9):
+            total += int(isbn[i]) * (10 - i)
+        check_digit = (11 - (total % 11)) % 11
+        # チェックデジットが10の場合は'X'
+        expected_check = 'X' if check_digit == 10 else str(check_digit)
+        return expected_check.upper() == isbn[9].upper()
+    
+    # ISBN-13の場合
+    elif len(isbn) == 13:
+        total = 0
+        for i in range(12):
+            weight = 1 if i % 2 == 0 else 3
+            total += int(isbn[i]) * weight
+        check_digit = (10 - (total % 10)) % 10
+        return str(check_digit) == isbn[12]
+    
+    return False
 
-def get_html_files(year: int) -> List[str]:
-    """指定された年度のHTMLファイルのパスを取得する"""
-    base_dir = os.path.join("src", "syllabus", str(year), "raw_html")
-    if not os.path.exists(base_dir):
-        raise FileNotFoundError(f"ディレクトリが見つかりません: {base_dir}")
+def normalize_isbn(isbn: str) -> str:
+    """ISBNを正規化する（ISBN-10をISBN-13に変換）"""
+    if not isbn:
+        return isbn
     
-    html_files = [f for f in os.listdir(base_dir) if f.endswith('.html')]
-    if not html_files:
-        raise FileNotFoundError(f"HTMLファイルが見つかりません: {base_dir}")
+    # ハイフンを除去
+    isbn = isbn.replace('-', '')
     
-    return [os.path.join(base_dir, f) for f in html_files]
+    # ISBN-10の場合、ISBN-13に変換
+    if len(isbn) == 10:
+        # 978を先頭に追加
+        isbn = '978' + isbn[:-1]
+        
+        # チェックディジットを計算
+        total = 0
+        for i, digit in enumerate(isbn):
+            weight = 1 if i % 2 == 0 else 3
+            total += int(digit) * weight
+        
+        check_digit = (10 - (total % 10)) % 10
+        isbn = isbn + str(check_digit)
+    
+    return isbn
 
-def create_pretty_html(html_content: str, output_path: str) -> None:
-    """HTMLを整形して保存する"""
-    soup = BeautifulSoup(html_content, 'html.parser')
-    pretty_html = soup.prettify()
+def calculate_similarity(str1: str, str2: str) -> float:
+    """2つの文字列の類似度を計算（0.0-1.0）"""
+    if not str1 or not str2:
+        return 0.0
     
-    # 出力ディレクトリの作成
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # 文字列を正規化
+    str1 = str1.lower().strip()
+    str2 = str2.lower().strip()
     
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(pretty_html)
+    # 完全一致
+    if str1 == str2:
+        return 1.0
+    
+    # 部分一致（一方が他方に含まれる）
+    if str1 in str2 or str2 in str1:
+        return 0.8
+    
+    # 文字列の長さが大きく異なる場合は類似度を下げる
+    len_ratio = min(len(str1), len(str2)) / max(len(str1), len(str2))
+    if len_ratio < 0.5:
+        return 0.0
+    
+    # 文字の一致率を計算
+    set1 = set(str1)
+    set2 = set(str2)
+    intersection = set1.intersection(set2)
+    union = set1.union(set2)
+    
+    return len(intersection) / len(union)
 
-def find_th_with_text(soup: BeautifulSoup, text: str) -> BeautifulSoup:
-    """指定されたテキストを含むthタグを探す"""
-    for th in soup.find_all('th'):
-        if text in th.text:
-            return th
-    return None
+def check_isbn_database(isbn: str, book_info: Dict) -> Tuple[bool, str]:
+    """ISBNデータベースで書籍情報を検証"""
+    try:
+        # ISBNデータベースのパスを設定
+        isbn_db_path = Path(f"src/db/isbn/{YEAR}/isbn.json")
+        if not isbn_db_path.exists():
+            return True, ""  # データベースが存在しない場合は検証をスキップ
+        
+        # ISBNデータベースを読み込む
+        with open(isbn_db_path, 'r', encoding='utf-8') as f:
+            isbn_db = json.load(f)
+        
+        # ISBNで検索
+        if isbn in isbn_db:
+            db_book = isbn_db[isbn]
+            # 書籍名の類似度を計算
+            similarity = calculate_similarity(book_info['name'], db_book['title'])
+            if similarity < 0.15:
+                return False, f"ISBNデータ不一致: シラバス書籍名「{book_info['name']}」、ISBNデータ書籍名「{db_book['title']}」"
+            return True, ""
+        
+        return True, ""  # ISBNが存在しない場合は検証をスキップ
+    
+    except Exception as e:
+        print(f"ISBNデータベースの検証中にエラーが発生しました: {str(e)}")
+        return True, ""  # エラーの場合は検証をスキップ
 
-def get_next_td_content(element: BeautifulSoup) -> str:
-    """指定された要素の次のtdタグの内容を取得する"""
-    next_td = element.find_next('td')
-    if not next_td:
-        return ""
-    return next_td.text.strip()
+def log_warning(message: str, json_file: str, year: int):
+    """警告をCSVファイルに記録"""
+    warning_file = f"warning/{year}/book.csv"
+    os.makedirs(os.path.dirname(warning_file), exist_ok=True)
+    
+    # ファイルが存在しない場合はヘッダーを書き込む
+    if not os.path.exists(warning_file):
+        with open(warning_file, 'w', encoding='utf-8') as f:
+            f.write('JSONファイル,エラー内容,日時\n')
+    
+    # 警告を追記（ファイル名をプロジェクトルートからの相対パスに変換）
+    relative_path = str(Path(json_file).relative_to(Path.cwd())) if json_file else ""
+    with open(warning_file, 'a', encoding='utf-8') as f:
+        f.write(f'{relative_path},{message},{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
 
-def extract_book_info(html_content: str, file_path: str) -> List[Dict]:
-    """HTMLから書籍情報を抽出する"""
-    soup = BeautifulSoup(html_content, 'html.parser')
-    books = []
+def collect_valid_isbns(year: int) -> Set[str]:
+    """シラバスから正規のISBNを収集する"""
+    valid_isbns = set()
+    script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    json_pattern = os.path.join(script_dir, 'syllabus', str(year), 'json', '*.json')
     
-    # 教科書情報を抽出
-    textbook_th = find_th_with_text(soup, '教科書')
-    if textbook_th:
-        textbook_content = get_next_td_content(textbook_th)
-        if textbook_content:
-            books.append({
-                'title': textbook_content,
-                'role': '教科書',
-                'note': None
-            })
-    
-    # 参考書情報を抽出
-    reference_th = find_th_with_text(soup, '参考書')
-    if reference_th:
-        reference_content = get_next_td_content(reference_th)
-        if reference_content:
-            books.append({
-                'title': reference_content,
-                'role': '参考書',
-                'note': None
-            })
-    
-    # その他の書籍情報を抽出（必要に応じて追加）
-    
-    return books
-
-def get_latest_json(year: int) -> str:
-    """指定された年度の最新のJSONファイルを取得する"""
-    data_dir = os.path.join("src", "syllabus", str(year), "data")
-    if not os.path.exists(data_dir):
-        raise FileNotFoundError(f"ディレクトリが見つかりません: {data_dir}")
-    
-    json_files = [f for f in os.listdir(data_dir) if f.startswith('syllabus_') and f.endswith('.json')]
+    # JSONファイルの検索
+    json_files = glob.glob(json_pattern)
     if not json_files:
-        raise FileNotFoundError(f"JSONファイルが見つかりません: {data_dir}")
+        error_msg = f"JSONファイルが見つかりません: {json_pattern}"
+        log_warning(error_msg, "", year)
+        raise FileNotFoundError(error_msg)
     
-    # ファイル名のタイムスタンプでソートして最新のものを取得
-    latest_json = sorted(json_files)[-1]
-    return os.path.join(data_dir, latest_json)
+    print(f"処理対象ファイル数: {len(json_files)}")
+    
+    # 各JSONファイルを処理
+    for json_file in tqdm(json_files, desc="ISBN収集中"):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # 詳細情報の取得
+            if '詳細情報' not in data:
+                continue
+                
+            detail = data['詳細情報']
+            
+            # テキスト情報の処理
+            if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
+                text_content = detail['テキスト']['内容']
+                if isinstance(text_content, dict) and '書籍' in text_content:
+                    books_list = text_content['書籍']
+                    if isinstance(books_list, list):
+                        for book in books_list:
+                            isbn = book.get('ISBN', '')
+                            if isbn and validate_isbn(isbn):
+                                valid_isbns.add(isbn)
+            
+            # 参考文献情報の処理
+            if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
+                ref_content = detail['参考文献']['内容']
+                if isinstance(ref_content, dict) and '書籍' in ref_content:
+                    books_list = ref_content['書籍']
+                    if isinstance(books_list, list):
+                        for book in books_list:
+                            isbn = book.get('ISBN', '')
+                            if isbn and validate_isbn(isbn):
+                                valid_isbns.add(isbn)
+                            
+        except Exception as e:
+            log_warning(f"ファイル処理エラー: {str(e)}", json_file, year)
+            continue
+    
+    return valid_isbns
 
-def extract_book_info_from_json(json_data: Dict) -> List[Dict]:
-    """JSONデータから書籍情報を抽出する"""
+def get_book_info(year: int) -> List[Dict[str, Any]]:
+    """書籍情報を取得する"""
     books = []
+    missing_info_isbns = set()  # 情報が不足しているISBNのセット
     
-    for syllabus in json_data.get("content", []):
-        for book in syllabus.get("books", []):
-            book_info = {
-                'title': book.get('title', ''),
-                'author': book.get('author', ''),
-                'publisher': book.get('publisher', ''),
-                'price': book.get('price', 0),
-                'isbn': book.get('isbn', ''),
-                'role': book.get('role', '')
-            }
-            # タイトルが空の書籍情報は除外
-            if book_info['title']:
-                books.append(book_info)
+    # シラバスから書籍情報を取得
+    script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    json_pattern = os.path.join(script_dir, 'syllabus', str(year), 'json', '*.json')
+    
+    for json_file in tqdm(glob.glob(json_pattern), desc="シラバスから書籍情報取得中"):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            if '詳細情報' not in data:
+                continue
+                
+            detail = data['詳細情報']
+            
+            # テキスト情報の処理
+            if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
+                text_content = detail['テキスト']['内容']
+                if isinstance(text_content, dict) and '書籍' in text_content:
+                    books_list = text_content['書籍']
+                    if isinstance(books_list, list):
+                        for book in books_list:
+                            isbn = book.get('ISBN', '').strip()
+                            if not isbn or not validate_isbn(isbn):
+                                continue
+                                
+                            # 書籍情報の作成
+                            book_info = {
+                                'title': book.get('書籍名', '').strip(),
+                                'isbn': isbn,
+                                'author': book.get('著者名', '').strip(),
+                                'publisher': book.get('出版社', '').strip(),
+                                'price': None,
+                                'created_at': datetime.now().isoformat()
+                            }
+                            
+                            # 価格情報の取得
+                            price = book.get('価格', '')
+                            if price:
+                                try:
+                                    book_info['price'] = int(price.replace(',', ''))
+                                except ValueError:
+                                    pass
+                            
+                            # 情報が不足している場合はCiNiiから取得するために記録
+                            if not book_info['title'] or not book_info['author'] or not book_info['publisher']:
+                                missing_info_isbns.add(isbn)
+                            
+                            books.append(book_info)
+            
+            # 参考文献情報の処理
+            if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
+                ref_content = detail['参考文献']['内容']
+                if isinstance(ref_content, dict) and '書籍' in ref_content:
+                    books_list = ref_content['書籍']
+                    if isinstance(books_list, list):
+                        for book in books_list:
+                            isbn = book.get('ISBN', '').strip()
+                            if not isbn or not validate_isbn(isbn):
+                                continue
+                                
+                            # 書籍情報の作成
+                            book_info = {
+                                'title': book.get('書籍名', '').strip(),
+                                'isbn': isbn,
+                                'author': book.get('著者名', '').strip(),
+                                'publisher': book.get('出版社', '').strip(),
+                                'price': None,
+                                'created_at': datetime.now().isoformat()
+                            }
+                            
+                            # 価格情報の取得
+                            price = book.get('価格', '')
+                            if price:
+                                try:
+                                    book_info['price'] = int(price.replace(',', ''))
+                                except ValueError:
+                                    pass
+                            
+                            # 情報が不足している場合はCiNiiから取得するために記録
+                            if not book_info['title'] or not book_info['author'] or not book_info['publisher']:
+                                missing_info_isbns.add(isbn)
+                            
+                            books.append(book_info)
+                            
+        except Exception as e:
+            log_warning(f"ファイル処理エラー: {str(e)}", json_file, year)
+            continue
+    
+    # 情報が不足している書籍の情報をCiNiiから取得
+    if missing_info_isbns:
+        print(f"情報が不足している書籍数: {len(missing_info_isbns)}")
+        for isbn in tqdm(missing_info_isbns, desc="CiNiiから不足情報取得中"):
+            try:
+                cinii_data = get_cinii_data(isbn)
+                if cinii_data:
+                    # 対応する書籍情報を更新
+                    for book_info in books:
+                        if book_info['isbn'] == isbn:
+                            if not book_info['title']:
+                                book_info['title'] = cinii_data.get('title', '')
+                            if not book_info['author']:
+                                book_info['author'] = cinii_data.get('author', '')
+                            if not book_info['publisher']:
+                                book_info['publisher'] = cinii_data.get('publisher', '')
+                            break
+            except Exception as e:
+                print(f"警告: ISBN {isbn} の情報取得中にエラーが発生しました: {str(e)}")
+                continue
     
     return books
 
-def create_book_json(books: Set[Dict]) -> str:
+def get_cinii_data(isbn: str) -> Optional[Dict[str, str]]:
+    """ciniiから書籍データを取得する"""
+    try:
+        # ciniiのAPIエンドポイント
+        url = f"https://ci.nii.ac.jp/books/opensearch/search?isbn={isbn}&format=json"
+        
+        # ヘッダーの設定
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        # APIリクエスト
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        # リクエスト間隔を設定（1秒）
+        time.sleep(1)
+        
+        # JSONデータを解析
+        data = response.json()
+        
+        # 書籍情報が存在する場合
+        if data.get('@graph') and len(data['@graph']) > 0:
+            book_data = data['@graph'][0]
+            return {
+                'title': book_data.get('dc:title', ''),
+                'author': book_data.get('dc:creator', ''),
+                'publisher': book_data.get('dc:publisher', '')
+            }
+        
+        return None
+    
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            print(f"警告: CiNii BooksのAPIアクセスが制限されています。ISBN {isbn} の書籍情報を取得できませんでした。")
+        else:
+            print(f"警告: CiNii BooksのAPIでエラーが発生しました。ISBN {isbn} の書籍情報を取得できませんでした。")
+        return None
+    except Exception as e:
+        print(f"警告: ISBN {isbn} の書籍情報を取得中にエラーが発生しました: {str(e)}")
+        return None
+
+def create_book_json(books: List[Dict[str, Any]]) -> str:
     """書籍情報のJSONファイルを作成する"""
     output_dir = os.path.join("updates", "book", "add")
     os.makedirs(output_dir, exist_ok=True)
@@ -143,9 +375,8 @@ def create_book_json(books: Set[Dict]) -> str:
             "publisher": book["publisher"],
             "price": book["price"],
             "isbn": book["isbn"],
-            "role": book["role"],
             "created_at": current_time.isoformat()
-        } for book in sorted(books, key=lambda x: (x["title"], x["author"]))]
+        } for book in sorted(books, key=lambda x: (x["title"], x["publisher"]))]
     }
     
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -153,31 +384,143 @@ def create_book_json(books: Set[Dict]) -> str:
     
     return output_file
 
-def get_pretty_html_path(raw_html_path: str) -> str:
-    """raw_htmlのパスからpretty_htmlのパスを生成する"""
-    return raw_html_path.replace('raw_html', 'pretty_html')
+def process_book_info(book: dict, json_file: str, year: int) -> Optional[dict]:
+    """書籍情報を処理"""
+    if not book or not isinstance(book, dict):
+        return None
+    
+    # 書籍名の取得
+    book_name = book.get('書籍名', '').strip()
+    if not book_name:
+        return None
+    
+    # ISBNの取得と検証
+    isbn = book.get('ISBN', '').strip()
+    if isbn:
+        if not validate_isbn(isbn):
+            log_warning(f"無効なISBN: {isbn}", json_file, year)
+        else:
+            # ISBNデータベースとの整合性チェック
+            is_valid, error_msg = check_isbn_database(isbn, {'name': book_name})
+            if not is_valid:
+                log_warning(error_msg, json_file, year)
+    
+    # 著者名の取得
+    author = book.get('著者名', '').strip()
+    
+    # 出版社の取得
+    publisher = book.get('出版社', '').strip()
+    
+    # 出版年の取得と検証
+    year_str = book.get('出版年', '').strip()
+    if year_str and not year_str.isdigit():
+        log_warning(f"無効な出版年: {year_str}", json_file, year)
+        year_str = None
+    
+    # 書籍情報の作成
+    book_info = {
+        "name": book_name,
+        "isbn": isbn if isbn else None,
+        "author": author if author else None,
+        "publisher": publisher if publisher else None,
+        "year": int(year_str) if year_str else None
+    }
+    
+    return book_info
 
-def process_html_file(html_file: str) -> List[Dict]:
-    """HTMLファイルを処理して書籍情報を抽出する"""
-    # 元のHTMLファイルを読み込む
-    with open(html_file, 'r', encoding='utf-8') as f:
-        html_content = f.read()
+def process_json_file(json_file: Path, year: int) -> List[dict]:
+    """JSONファイルを処理して書籍情報を抽出"""
+    try:
+        with open(json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        if not isinstance(data, dict):
+            log_warning("JSONデータが辞書形式ではありません", str(json_file), year)
+            return []
+        
+        # 詳細情報の取得
+        detail_info = data.get('詳細情報', {})
+        if not detail_info:
+            return []
+        
+        books = []
+        processed_names = set()  # 書籍名の重複チェック用
+        processed_isbns = set()  # ISBNの重複チェック用
+        
+        # テキスト情報の処理
+        text_content = detail_info.get('テキスト情報', {})
+        if text_content and isinstance(text_content, dict):
+            book_list = text_content.get('書籍', [])
+            if isinstance(book_list, list):
+                for book in book_list:
+                    if book is None or not isinstance(book, dict):
+                        continue
+                    
+                    book_info = process_book_info(book, str(json_file), year)
+                    if not book_info:
+                        continue
+                    
+                    # ISBNの重複チェック
+                    if book_info['isbn'] and book_info['isbn'] in processed_isbns:
+                        log_warning(f"重複するISBN: {book_info['isbn']} ({book_info['name']})", str(json_file), year)
+                        continue
+                    
+                    # 書籍名の重複チェック
+                    if book_info['name'] not in processed_names:
+                        # 類似度チェック
+                        is_duplicate = False
+                        for existing_book in books:
+                            if calculate_similarity(book_info['name'], existing_book['name']) > 0.8:
+                                is_duplicate = True
+                                break
+                        
+                        if not is_duplicate:
+                            books.append(book_info)
+                            processed_names.add(book_info['name'])
+                            if book_info['isbn']:
+                                processed_isbns.add(book_info['isbn'])
+        
+        # 参考文献情報の処理
+        ref_content = detail_info.get('参考文献情報', {})
+        if ref_content and isinstance(ref_content, dict):
+            book_list = ref_content.get('書籍', [])
+            if isinstance(book_list, list):
+                for book in book_list:
+                    if book is None or not isinstance(book, dict):
+                        continue
+                    
+                    book_info = process_book_info(book, str(json_file), year)
+                    if not book_info:
+                        continue
+                    
+                    # ISBNの重複チェック
+                    if book_info['isbn'] and book_info['isbn'] in processed_isbns:
+                        log_warning(f"重複するISBN: {book_info['isbn']} ({book_info['name']})", str(json_file), year)
+                        continue
+                    
+                    # 書籍名の重複チェック
+                    if book_info['name'] not in processed_names:
+                        # 類似度チェック
+                        is_duplicate = False
+                        for existing_book in books:
+                            if calculate_similarity(book_info['name'], existing_book['name']) > 0.8:
+                                is_duplicate = True
+                                break
+                        
+                        if not is_duplicate:
+                            books.append(book_info)
+                            processed_names.add(book_info['name'])
+                            if book_info['isbn']:
+                                processed_isbns.add(book_info['isbn'])
+        
+        return books
     
-    # pretty_htmlのパスを生成
-    pretty_html_path = get_pretty_html_path(html_file)
-    
-    # pretty_htmlが存在しない場合、または元のHTMLファイルより新しい場合は作成
-    if not os.path.exists(pretty_html_path) or \
-       os.path.getmtime(html_file) > os.path.getmtime(pretty_html_path):
-        create_pretty_html(html_content, pretty_html_path)
-        html_content = BeautifulSoup(html_content, 'html.parser').prettify()
-    else:
-        # 既存のpretty_htmlを読み込む
-        with open(pretty_html_path, 'r', encoding='utf-8') as f:
-            html_content = f.read()
-    
-    # 書籍情報を抽出
-    return extract_book_info(html_content, html_file)
+    except json.JSONDecodeError as e:
+        log_warning(f"JSONの解析に失敗: {str(e)}", str(json_file), year)
+        return []
+    except Exception as e:
+        log_warning(f"ファイル処理エラー: {str(e)}", str(json_file), year)
+        return []
 
 def main():
     """メイン処理"""
@@ -186,33 +529,20 @@ def main():
         year = get_year_from_user()
         print(f"処理対象年度: {year}")
         
-        # 最新のJSONファイルを取得
-        json_file = get_latest_json(year)
-        print(f"処理対象ファイル: {json_file}")
-        
-        # JSONファイルを読み込む
-        with open(json_file, 'r', encoding='utf-8') as f:
-            json_data = json.load(f)
-        
-        # 書籍情報の抽出
-        all_books = set()
-        books = extract_book_info_from_json(json_data)
-        
-        # 各書籍の情報をタプルに変換してセットに追加（重複を防ぐため）
-        for book in books:
-            book_tuple = tuple(sorted(book.items()))
-            all_books.add(book_tuple)
-        
-        # タプルを辞書に戻す
-        book_dicts = [dict(t) for t in all_books]
-        print(f"抽出された書籍情報: {len(book_dicts)}件")
+        # 書籍情報の取得
+        print("書籍情報の取得を開始します...")
+        books = get_book_info(year)
+        print(f"抽出された書籍情報: {len(books)}件")
         
         # JSONファイルの作成
-        output_file = create_book_json(book_dicts)
+        print("JSONファイルの作成を開始します...")
+        output_file = create_book_json(books)
         print(f"JSONファイルを作成しました: {output_file}")
         
     except Exception as e:
         print(f"エラーが発生しました: {str(e)}")
+        import traceback
+        print(f"エラーの詳細: {traceback.format_exc()}")
         raise
 
 if __name__ == "__main__":
