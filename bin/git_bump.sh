@@ -1,7 +1,7 @@
 #!/bin/bash
-# File Version: v1.3.0
-# Project Version: v1.3.0
-# Last Updated: 2025-06-10
+# File Version: v1.3.1
+# Project Version: v1.3.7
+# Last Updated: 2025-06-19
 
 # バージョン更新の種類を確認
 if [ "$1" != "major" ] && [ "$1" != "minor" ] && [ "$1" != "patch" ]; then
@@ -52,7 +52,7 @@ if [ "$BUMP_TYPE" = "minor" ] || [ "$BUMP_TYPE" = "major" ]; then
   VERSION_FILES=($(git ls-files | grep -E '\.(md|py|sh|json)$'))
 else
   # パッチ更新時は変更されたファイルのみを対象
-  VERSION_FILES=($(git status --porcelain | grep -E '\.(md|py|sh|json)$' | awk '{print $2}'))
+  VERSION_FILES=($(git diff --name-only HEAD | grep -E '\.(md|py|sh|json)$'))
 fi
 
 # project_version.txtも追加
@@ -79,22 +79,43 @@ for file in "${VERSION_FILES[@]}"; do
     case "$file" in
       *.md)
         # Markdownファイルの更新
-        sed -i "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_VERSION/" "$file"
+        if [ "$BUMP_TYPE" = "patch" ]; then
+          # パッチ更新時はファイルごとのバージョンを更新
+          IFS='.' read -r F_MAJOR F_MINOR F_PATCH <<< "$CURRENT_FILE_VERSION"
+          NEXT_FILE_VERSION="$F_MAJOR.$F_MINOR.$((F_PATCH + 1))"
+        else
+          NEXT_FILE_VERSION=$NEXT_VERSION
+        fi
+        sed -i "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_FILE_VERSION/" "$file"
         sed -i "s/project_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/project_version: v$NEXT_VERSION/" "$file"
         sed -i "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $TODAY/" "$file"
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_VERSION/" "$file"
+        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
         sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
         sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
         ;;
       *.py|*.sh)
         # Python/Shellファイルの更新
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_VERSION/" "$file"
+        if [ "$BUMP_TYPE" = "patch" ]; then
+          # パッチ更新時はファイルごとのバージョンを更新
+          IFS='.' read -r F_MAJOR F_MINOR F_PATCH <<< "$CURRENT_FILE_VERSION"
+          NEXT_FILE_VERSION="$F_MAJOR.$F_MINOR.$((F_PATCH + 1))"
+        else
+          NEXT_FILE_VERSION=$NEXT_VERSION
+        fi
+        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
         sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
         sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
         ;;
       *.json)
         # JSONファイルの更新
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_VERSION/" "$file"
+        if [ "$BUMP_TYPE" = "patch" ]; then
+          # パッチ更新時はファイルごとのバージョンを更新
+          IFS='.' read -r F_MAJOR F_MINOR F_PATCH <<< "$CURRENT_FILE_VERSION"
+          NEXT_FILE_VERSION="$F_MAJOR.$F_MINOR.$((F_PATCH + 1))"
+        else
+          NEXT_FILE_VERSION=$NEXT_VERSION
+        fi
+        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
         sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
         sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
         ;;
@@ -118,8 +139,16 @@ for file in "${VERSION_FILES[@]}"; do
     fi
 
     echo "## $file" >> commit_msg
-    echo "- version: $NEXT_VERSION" >> commit_msg
-    echo "- type: $BUMP_TYPE bump" >> commit_msg
+    if [ "$BUMP_TYPE" = "patch" ]; then
+      # パッチ更新時はファイルごとのバージョンを更新
+      IFS='.' read -r F_MAJOR F_MINOR F_PATCH <<< "$CURRENT_FILE_VERSION"
+      NEXT_FILE_VERSION="$F_MAJOR.$F_MINOR.$((F_PATCH + 1))"
+      echo "- version: $NEXT_FILE_VERSION" >> commit_msg
+      echo "- type: $BUMP_TYPE bump" >> commit_msg
+    else
+      echo "- version: $NEXT_VERSION" >> commit_msg
+      echo "- type: $BUMP_TYPE bump" >> commit_msg
+    fi
     echo "- summary: （ここに変更内容を記入）" >> commit_msg
     echo "" >> commit_msg
   fi
