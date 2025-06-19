@@ -1,6 +1,6 @@
 import os
 import json
-import sqlite3
+import glob
 from typing import List, Dict, Set
 from datetime import datetime
 from tqdm import tqdm
@@ -24,40 +24,61 @@ def get_year_from_user() -> int:
             print("有効な数値を入力してください。")
 
 def get_syllabus_masters(year: int) -> List[Dict]:
-    """SQLiteデータベースからシラバスマスター情報を取得する"""
-    db_path = os.path.join("src", "syllabus", str(year), "data", f"syllabus_{year}.db")
-    conn = None
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        
-        # syllabus_basicテーブルからシラバスコードを取得
-        cursor.execute("""
-            SELECT DISTINCT syllabus_id
-            FROM syllabus_basic
-            WHERE syllabus_id IS NOT NULL
-        """)
-        
-        syllabus_masters = []
-        for row in cursor.fetchall():
-            syllabus_code = row[0]
-            if syllabus_code:
-                syllabus_masters.append({
-                    'syllabus_code': syllabus_code,
-                    'syllabus_year': year  # ユーザー入力の年度を使用
-                })
-        
-        return syllabus_masters
-        
-    except sqlite3.Error as e:
-        print(f"データベースエラー: {str(e)}")
+    """JSONファイルからシラバスマスター情報を取得する"""
+    json_dir = os.path.join("src", "syllabus", str(year), "json")
+    
+    if not os.path.exists(json_dir):
+        print(f"ディレクトリが存在しません: {json_dir}")
         return []
-    except Exception as e:
-        print(f"エラーが発生しました: {str(e)}")
+    
+    # JSONファイルのパターンを取得
+    json_pattern = os.path.join(json_dir, "*.json")
+    json_files = glob.glob(json_pattern)
+    
+    if not json_files:
+        print(f"JSONファイルが見つかりません: {json_pattern}")
         return []
-    finally:
-        if conn:
-            conn.close()
+    
+    syllabus_masters = []
+    syllabus_codes = set()  # 重複チェック用
+    
+    for json_file in tqdm(json_files, desc="JSONファイルを処理中"):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # JSONファイルからシラバスコードを抽出
+            # ファイル名から抽出する場合
+            filename = os.path.basename(json_file)
+            if filename.endswith('.json'):
+                syllabus_code = filename[:-5]  # .jsonを除去
+                
+                # 重複チェック
+                if syllabus_code not in syllabus_codes:
+                    syllabus_codes.add(syllabus_code)
+                    syllabus_masters.append({
+                        'syllabus_code': syllabus_code,
+                        'syllabus_year': year
+                    })
+            
+            # または、JSONデータ内から抽出する場合（データ構造に応じて調整）
+            # if isinstance(data, dict) and 'syllabus_code' in data:
+            #     syllabus_code = data['syllabus_code']
+            #     if syllabus_code not in syllabus_codes:
+            #         syllabus_codes.add(syllabus_code)
+            #         syllabus_masters.append({
+            #             'syllabus_code': syllabus_code,
+            #             'syllabus_year': year
+            #         })
+            
+        except json.JSONDecodeError as e:
+            print(f"JSONファイルの解析エラー {json_file}: {str(e)}")
+            continue
+        except Exception as e:
+            print(f"ファイル処理エラー {json_file}: {str(e)}")
+            continue
+    
+    return syllabus_masters
 
 def create_syllabus_master_json(syllabus_masters: List[Dict]) -> str:
     """シラバスマスター情報のJSONファイルを作成する"""
@@ -89,9 +110,13 @@ def main():
         year = get_year_from_user()
         print(f"処理対象年度: {year}")
         
-        # データベースからシラバスマスター情報を取得
+        # JSONファイルからシラバスマスター情報を取得
         syllabus_masters = get_syllabus_masters(year)
         print(f"抽出されたシラバスマスター情報: {len(syllabus_masters)}件")
+        
+        if not syllabus_masters:
+            print("シラバスマスター情報が見つかりませんでした。")
+            return
         
         # JSONファイルの作成
         output_file = create_syllabus_master_json(syllabus_masters)

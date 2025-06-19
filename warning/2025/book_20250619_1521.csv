@@ -1,7 +1,0 @@
-"{projectルートからのシラバスjsonのpath}", "error message", "time"
-"src/syllabus/2025/json/Y730000127.json", "不正ISBN: cd違反", "2025-06-19 15:21:24"
-"src/syllabus/2025/json/Y730000130.json", "不正ISBN: 桁数違反", "2025-06-19 15:21:24"
-"src/syllabus/2025/json/Y730000131.json", "不正ISBN: 桁数違反", "2025-06-19 15:21:24"
-"src/syllabus/2025/json/Y730000142.json", "不正ISBN: 桁数違反", "2025-06-19 15:21:41"
-"src/syllabus/2025/json/Y740000111.json", "不正ISBN: 桁数違反", "2025-06-19 15:21:50"
-"src/syllabus/2025/json/Y740000111.json", "不正ISBN: 桁数違反", "2025-06-19 15:21:50"

@@ -1,14 +1,14 @@
 ---
 title: 06_book.pyの仕様書
-file_version: v1.3.5
-project_version: v1.3.5
+file_version: v1.3.6
+project_version: v1.3.8
 last_updated: 2025-06-19
 ---
 
 # `06_book.py`の仕様書　
 
-- File Version: v1.3.5
-- Project Version: v1.3.5
+- File Version: v1.3.6
+- Project Version: v1.3.8
 - Last Updated: 2025-06-19
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](./doc.md)
@@ -38,9 +38,32 @@ last_updated: 2025-06-19
 
 ## 出力形式
 ### 基本形式
-- `docs/database/structure.md`のbookテーブルのカラムに対応したJSON形式
+- `docs/database/structure.md`のbookテーブルとbook_authorテーブルのカラムに対応したJSON形式
 - 出力は単一ファイルにまとめる
 - 出力ファイルは「出力JSON」と呼ぶ
+
+### 出力構造
+```json
+{
+  "books": [
+    {
+      "title": "書籍タイトル",
+      "author": "著者名（カンマ区切り）",
+      "publisher": "出版社名",
+      "price": 価格,
+      "isbn": "ISBN番号",
+      "created_at": "作成日時"
+    }
+  ],
+  "book_authors": [
+    {
+      "book_id": "対応するbookのID",
+      "author_name": "個別著者名",
+      "created_at": "作成日時"
+    }
+  ]
+}
+```
 
 ## 警告ファイル
 ### 基本情報
@@ -49,7 +72,7 @@ last_updated: 2025-06-19
 
 ### CSVヘッダー
 ```
-"{projectルートからのシラバスjsonのpath}", "error message", "time"
+"{projectルートからのシラバスjsonのpath}", "ISBN", "error message", "time"
 ```
 
 ## 処理フロー
@@ -64,6 +87,7 @@ tqdmで進捗を表示しながら、シラバスJSONを以下のように処理
 
 #### ISBNがnullの場合
 - シラバスJSONのデータから出力JSONに追記
+- 著者名がカンマ区切りの場合は、book_authorsセクションにも個別に追加
 
 #### ISBNが存在する場合
 - 桁数確認
@@ -92,6 +116,11 @@ tqdmで進捗を表示しながら、シラバスJSONを以下のように処理
                 - priceフィールド：該当レコードから取得
                 - その他：`src/books/{ISBN}.json`から取得
                 - 出力JSONに追記
+
+### 著者情報の処理
+- 書籍情報の`author`フィールドはカンマ区切りの文字列として保存
+- 同時に`book_authors`セクションで個別の著者名を管理
+- 著者名の正規化（前後の空白除去、重複除去）を実施
 
 ## 類似度計算
 ### 概要

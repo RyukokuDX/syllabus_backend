@@ -43,17 +43,11 @@ erDiagram
     }
     book {
         INTEGER book_id PK
-        TEXT url
         TEXT title
+        TEXT author
         TEXT publisher
         INTEGER price
         TEXT isbn
-        TIMESTAMP created_at
-    }
-    book_author {
-        INTEGER book_author_id PK
-        INTEGER book_id FK
-        TEXT author_name
         TIMESTAMP created_at
     }
     subject_attribute {
@@ -72,44 +66,34 @@ erDiagram
         TIMESTAMP updated_at
     }
     syllabus {
-        INTEGER syllabus_id PK,FK
+        TEXT syllabus_code PK
         INTEGER subject_name_id FK
         TEXT subtitle
         TEXT term
         TEXT campus
         INTEGER credits
-        TEXT goals
         TEXT summary
-        TEXT attainment
+        TEXT goals
         TEXT methods
         TEXT outside_study
-        TEXT textbook_comment
-        TEXT reference_comment
-        TEXT advice
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    subject_grade {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        TEXT grade
+        TEXT notes
+        TEXT remarks
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
     lecture_time {
-        INTEGER id PK
+        INTEGER lecture_time_id PK
         INTEGER syllabus_id FK
-        TEXT day_of_week
-        TINYINT period
+        SMALLINT day_of_week
+        SMALLINT period
+        TEXT room
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
     lecture_session {
         INTEGER lecture_session_id PK
-        INTEGER syllabus_id FK
-        INTEGER session_number
-        TEXT contents
-        TEXT other_info
+        INTEGER lecture_time_id FK
+        SMALLINT session_number
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -121,13 +105,13 @@ erDiagram
     }
     syllabus_instructor {
         INTEGER id PK
-        INTEGER syllabus_id FK
+        TEXT syllabus_code FK
         INTEGER instructor_id FK
         TIMESTAMP created_at
     }
     syllabus_book {
         INTEGER id PK
-        INTEGER syllabus_id FK
+        TEXT syllabus_code FK
         INTEGER book_id FK
         TEXT role
         TEXT note
@@ -135,10 +119,26 @@ erDiagram
     }
     grading_criterion {
         INTEGER id PK
-        INTEGER syllabus_id FK
+        TEXT syllabus_code FK
         TEXT criteria_type
         INTEGER ratio
         TEXT note
+        TIMESTAMP created_at
+    }
+    syllabus_enrollment_year {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        INTEGER enrollment_year
+        INTEGER syllabus_year
+        INTEGER faculty_id FK
+        TIMESTAMP created_at
+    }
+    syllabus_faculty_enrollment {
+        INTEGER id PK
+        TEXT syllabus_code FK
+        INTEGER enrollment_year
+        INTEGER syllabus_year
+        INTEGER faculty_id FK
         TIMESTAMP created_at
     }
 
@@ -159,7 +159,8 @@ erDiagram
     subject_syllabus {
         INTEGER id PK
         INTEGER subject_id FK
-        INTEGER syllabus_id FK
+        TEXT syllabus_code FK
+        INTEGER syllabus_year
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -178,6 +179,27 @@ erDiagram
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
+    requirement_header {
+        INTEGER requirement_header_id PK
+        INTEGER requirement_year
+        INTEGER faculty_id FK
+        INTEGER subject_name_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    requirement_attribute {
+        INTEGER requirement_attribute_id PK
+        TEXT name
+        TIMESTAMP created_at
+    }
+    requirement {
+        INTEGER requirement_id PK
+        INTEGER requirement_header_id FK
+        INTEGER requirement_attribute_id FK
+        TEXT text
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
 
     %% 関連の定義
     %% マスターテーブル → 基本テーブル
@@ -191,25 +213,30 @@ erDiagram
     instructor ||--o{ syllabus_instructor : "instructor_id"
     instructor ||--o{ lecture_session_instructor : "instructor_id"
     book ||--o{ syllabus_book : "book_id"
-    book ||--o{ book_author : "book_id"
     subject_attribute ||--o{ subject_attribute_value : "attribute_id"
+    faculty ||--o{ syllabus_enrollment_year : "faculty_id"
+    faculty ||--o{ syllabus_faculty_enrollment : "faculty_id"
+    faculty ||--o{ requirement_header : "faculty_id"
+    subject_name ||--o{ requirement_header : "subject_name_id"
+    requirement_attribute ||--o{ requirement : "requirement_attribute_id"
 
     %% 基本テーブル → 関連テーブル
     subject ||--o{ subject_syllabus : "subject_id"
     subject ||--o{ subject_attribute_value : "subject_id"
 
     %% トランザクションテーブル → 関連テーブル
-    syllabus_master ||--|| syllabus : "syllabus_id"
-    syllabus_master ||--o{ subject_grade : "syllabus_id"
     syllabus_master ||--o{ lecture_time : "syllabus_id"
-    syllabus_master ||--o{ lecture_session : "syllabus_id"
-    syllabus_master ||--o{ syllabus_instructor : "syllabus_id"
-    syllabus_master ||--o{ syllabus_book : "syllabus_id"
-    syllabus_master ||--o{ grading_criterion : "syllabus_id"
-    syllabus_master ||--o{ subject_syllabus : "syllabus_id"
     syllabus_master ||--o{ syllabus_study_system : "source_syllabus_id"
+    syllabus ||--o{ syllabus_instructor : "syllabus_code"
+    syllabus ||--o{ syllabus_book : "syllabus_code"
+    syllabus ||--o{ grading_criterion : "syllabus_code"
+    syllabus ||--o{ syllabus_enrollment_year : "syllabus_code"
+    syllabus ||--o{ syllabus_faculty_enrollment : "syllabus_code"
+    syllabus ||--o{ subject_syllabus : "syllabus_code"
 
+    lecture_time ||--o{ lecture_session : "lecture_time_id"
     lecture_session ||--o{ lecture_session_instructor : "lecture_session_id"
+    requirement_header ||--o{ requirement : "requirement_header_id"
 ```
 
 ## 更新履歴
@@ -233,5 +260,6 @@ erDiagram
 | 2024-05-21 | 1.1.13 | 藤原 | requirementテーブルをEAVパターンに変更、programテーブルとsubject_programテーブルを削除 |
 | 2024-05-29 | 1.1.14 | 藤原 | マスターテーブルのタイムスタンプカラムを整理、instructorテーブルの主キーをinstructor_idに変更 |
 | 2024-05-29 | 1.1.15 | 藤原 | syllabus_bookテーブルのroleカラムをTEXT型に変更、subject_syllabusテーブルからlecture_codeを削除 |
+| 2025-06-19 | 1.1.16 | 藤原 | structure.mdとmodels.pyに準拠してER図を更新 |
 
 [目次へ戻る](#目次) 

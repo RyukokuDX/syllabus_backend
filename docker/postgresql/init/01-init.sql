@@ -84,99 +84,6 @@ CREATE TABLE IF NOT EXISTS subject_name (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- syllabus_master（シラバスマスタ）
-CREATE TABLE IF NOT EXISTS syllabus_master (
-    syllabus_id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    syllabus_year INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(syllabus_code, syllabus_year)
-);
-
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
-
--- syllabus（シラバス情報）
-CREATE TABLE IF NOT EXISTS syllabus (
-    syllabus_id INTEGER PRIMARY KEY REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
-    subtitle TEXT,
-    term TEXT NOT NULL,
-    campus TEXT NOT NULL,
-    credits INTEGER NOT NULL,
-    summary TEXT,
-    goals TEXT,
-    attainment TEXT,
-    methods TEXT,
-    outside_study TEXT,
-    notes TEXT,
-    remarks TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_syllabus_term ON syllabus(term);
-CREATE INDEX IF NOT EXISTS idx_syllabus_campus ON syllabus(campus);
-CREATE INDEX IF NOT EXISTS idx_syllabus_subject_name ON syllabus(subject_name_id);
-
--- subject（科目基本情報）
-CREATE TABLE IF NOT EXISTS subject (
-    subject_id SERIAL PRIMARY KEY,
-    subject_name_id INTEGER NOT NULL,
-    faculty_id INTEGER NOT NULL,
-    curriculum_year INTEGER NOT NULL,
-    class_id INTEGER NOT NULL,
-    subclass_id INTEGER,
-    requirement_type TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (subject_name_id) REFERENCES subject_name(subject_name_id),
-    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id),
-    FOREIGN KEY (class_id) REFERENCES class(class_id),
-    FOREIGN KEY (subclass_id) REFERENCES subclass(subclass_id),
-    UNIQUE (subject_name_id, faculty_id, class_id, subclass_id, curriculum_year)
-);
-
-CREATE INDEX idx_subject_subject_name ON subject(subject_name_id);
-CREATE INDEX idx_subject_class ON subject(class_id);
-CREATE INDEX idx_subject_faculty ON subject(faculty_id);
-CREATE INDEX idx_subject_curriculum_year ON subject(curriculum_year);
-
--- subject_syllabus（科目シラバス関連）
-CREATE TABLE IF NOT EXISTS subject_syllabus (
-    id SERIAL PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, syllabus_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_id);
-
--- subject_attribute（科目属性）
-CREATE TABLE IF NOT EXISTS subject_attribute (
-    attribute_id SERIAL PRIMARY KEY,
-    attribute_name TEXT NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- subject_attribute_value（科目属性値）
-CREATE TABLE IF NOT EXISTS subject_attribute_value (
-    id SERIAL PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    attribute_id INTEGER NOT NULL REFERENCES subject_attribute(attribute_id) ON DELETE RESTRICT,
-    value TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);
-
 -- instructor（教員）
 CREATE TABLE IF NOT EXISTS instructor (
     instructor_id SERIAL PRIMARY KEY,
@@ -192,15 +99,16 @@ CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
+    author TEXT,
     publisher TEXT,
     price INTEGER,
     isbn TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(isbn),
     UNIQUE(title, publisher)
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
-CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
 
 -- book_author（書籍著者）
 CREATE TABLE IF NOT EXISTS book_author (
@@ -211,55 +119,110 @@ CREATE TABLE IF NOT EXISTS book_author (
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
-CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);
+
+-- syllabus_master（シラバスマスタ）
+CREATE TABLE IF NOT EXISTS syllabus_master (
+    syllabus_id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_code, syllabus_year)
+);
+
+CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
+
+-- syllabus（シラバス情報）
+CREATE TABLE IF NOT EXISTS syllabus (
+    syllabus_id INTEGER PRIMARY KEY REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE CASCADE,
+    subtitle TEXT,
+    term TEXT NOT NULL,
+    campus TEXT NOT NULL,
+    credits INTEGER NOT NULL,
+    goals TEXT,
+    summary TEXT,
+    attainment TEXT,
+    methods TEXT,
+    outside_study TEXT,
+    textbook_comment TEXT,
+    reference_comment TEXT,
+    advice TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_syllabus_term ON syllabus(term);
+CREATE INDEX IF NOT EXISTS idx_syllabus_campus ON syllabus(campus);
+CREATE INDEX IF NOT EXISTS idx_syllabus_subject_name ON syllabus(subject_name_id);
+
+-- subject_grade（科目履修可能学年）
+CREATE TABLE IF NOT EXISTS subject_grade (
+    id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    grade TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_subject_grade_grade ON subject_grade(grade);
+CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_id);
 
 -- lecture_time（講義時間）
 CREATE TABLE IF NOT EXISTS lecture_time (
-    lecture_time_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    day_of_week SMALLINT NOT NULL,  -- 1-7 (Monday-Sunday)
-    period SMALLINT NOT NULL,  -- 1-6 (1st-6th period)
-    room TEXT,
+    day_of_week TEXT NOT NULL,
+    period SMALLINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_lecture_time_syllabus ON lecture_time(syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
+CREATE INDEX IF NOT EXISTS idx_lecture_time_syllabus ON lecture_time(syllabus_id);
 
--- lecture_session（講義セッション）
+-- lecture_session（講義回数）
 CREATE TABLE IF NOT EXISTS lecture_session (
     lecture_session_id SERIAL PRIMARY KEY,
-    lecture_time_id INTEGER NOT NULL REFERENCES lecture_time(lecture_time_id) ON DELETE CASCADE,
-    session_number SMALLINT NOT NULL,  -- 1-15 (1st-15th week)
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    session_number INTEGER NOT NULL,
+    contents TEXT,
+    other_info TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_lecture_session_time ON lecture_session(lecture_time_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session_number);
-
--- lecture_session_instructor（講義セッション教員）
-CREATE TABLE IF NOT EXISTS lecture_session_instructor (
-    id SERIAL PRIMARY KEY,
-    lecture_session_id INTEGER NOT NULL REFERENCES lecture_session(lecture_session_id) ON DELETE CASCADE,
-    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_session ON lecture_session_instructor(lecture_session_id);
-CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_instructor ON lecture_session_instructor(instructor_id);
 
 -- syllabus_instructor（シラバス教員関連）
 CREATE TABLE IF NOT EXISTS syllabus_instructor (
     id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    role TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, instructor_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_syllabus ON syllabus_instructor(syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_syllabus_instructor_instructor ON syllabus_instructor(instructor_id);
+
+-- lecture_session_instructor（講義回数担当者）
+CREATE TABLE IF NOT EXISTS lecture_session_instructor (
+    id SERIAL PRIMARY KEY,
+    lecture_session_id INTEGER NOT NULL REFERENCES lecture_session(lecture_session_id) ON DELETE CASCADE,
+    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
+    role TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(lecture_session_id, instructor_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_session ON lecture_session_instructor(lecture_session_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_instructor ON lecture_session_instructor(instructor_id);
 
 -- syllabus_book（シラバス教科書関連）
 CREATE TABLE IF NOT EXISTS syllabus_book (
@@ -287,7 +250,61 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_type ON grading_criterion(criteria_type);
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(syllabus_id);
 
--- syllabus_study_system（シラバス学習システム）
+-- subject_attribute（科目属性）
+CREATE TABLE IF NOT EXISTS subject_attribute (
+    attribute_id SERIAL PRIMARY KEY,
+    attribute_name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- subject（科目基本情報）
+CREATE TABLE IF NOT EXISTS subject (
+    subject_id SERIAL PRIMARY KEY,
+    subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE RESTRICT,
+    curriculum_year INTEGER NOT NULL,
+    class_id INTEGER NOT NULL REFERENCES class(class_id) ON DELETE RESTRICT,
+    subclass_id INTEGER REFERENCES subclass(subclass_id) ON DELETE RESTRICT,
+    requirement_type TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(subject_name_id, faculty_id, class_id, subclass_id, curriculum_year)
+);
+
+CREATE INDEX IF NOT EXISTS idx_subject_subject_name ON subject(subject_name_id);
+CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
+CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);
+CREATE INDEX IF NOT EXISTS idx_subject_curriculum_year ON subject(curriculum_year);
+
+-- subject_syllabus（科目シラバス関連）
+CREATE TABLE IF NOT EXISTS subject_syllabus (
+    id SERIAL PRIMARY KEY,
+    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(subject_id, syllabus_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
+CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_id);
+
+-- subject_attribute_value（科目属性値）
+CREATE TABLE IF NOT EXISTS subject_attribute_value (
+    id SERIAL PRIMARY KEY,
+    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
+    attribute_id INTEGER NOT NULL REFERENCES subject_attribute(attribute_id) ON DELETE RESTRICT,
+    value TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(subject_id, attribute_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
+CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);
+
+-- syllabus_study_system（シラバス系統的履修）
 CREATE TABLE IF NOT EXISTS syllabus_study_system (
     id SERIAL PRIMARY KEY,
     source_syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
@@ -300,22 +317,6 @@ CREATE TABLE IF NOT EXISTS syllabus_study_system (
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_source ON syllabus_study_system(source_syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_system(target);
 
--- subject_grade（科目履修可能学年）
-CREATE TABLE IF NOT EXISTS subject_grade (
-    id SERIAL PRIMARY KEY,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    grade TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(syllabus_id, grade)
-);
-
-CREATE INDEX IF NOT EXISTS idx_subject_grade_grade ON subject_grade(grade);
-CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_id);
-
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）
-\i /docker-entrypoint-initdb.d/migrations/V20250605103132__insert_facultys.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250605103132__insert_subject_attributes.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250605103132__insert_syllabus_masters.sql
