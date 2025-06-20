@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- commit_msgの"（ここに変更内容を記入）"を現状に併せて変更
+
+- version番号については変更しない

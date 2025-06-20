@@ -58,9 +58,6 @@ Thumbs.db
 *.html
 */*.html
 
-# binary files
-*.sql
-
 # OS generated files
 .env.local
 .env.development.local
