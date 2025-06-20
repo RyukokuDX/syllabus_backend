@@ -1,0 +1,8324 @@
+{
+  "books": [
+    {
+      "title": "",
+      "author": "",
+      "publisher": "American Institute of Aeronautics and Astronautics",
+      "price": 11501,
+      "isbn": "9781563477805",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "American Institute of Aeronautics and Astronautics",
+      "price": 11501,
+      "isbn": "9781563477805",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "American Institute of Aeronautics and Astronautics",
+      "price": 11501,
+      "isbn": "9781563477805",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Artech House",
+      "price": null,
+      "isbn": "0890063974",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Artech House",
+      "price": null,
+      "isbn": "0890063974",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Brooks/Cole,東京化学同人 (発売)",
+      "price": 4515,
+      "isbn": "9784807908066",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "CQ出版",
+      "price": 1890,
+      "isbn": "4789836274",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "CQ出版社",
+      "price": 1890,
+      "isbn": "9784789849012",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "CRC Press",
+      "price": null,
+      "isbn": "9781138605107",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "CRC Press",
+      "price": null,
+      "isbn": "9781138605107",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Cambridge University Press",
+      "price": 9000,
+      "isbn": "9780521054225",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Cambridge University Press",
+      "price": 9681,
+      "isbn": "9780521794831",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "MIT Press",
+      "price": 20000,
+      "isbn": "9780262162098",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "MIT Press",
+      "price": 7423,
+      "isbn": "9780262039246",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "MIT Press",
+      "price": 7755,
+      "isbn": "9780262193986",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "MIT Press",
+      "price": 7755,
+      "isbn": "9780262193986",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "MIT Press",
+      "price": 7423,
+      "isbn": "9780262039246",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "McGraw-Hill",
+      "price": null,
+      "isbn": "9780071125697",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "McGraw-Hill",
+      "price": null,
+      "isbn": "9780071125697",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "NHK出版",
+      "price": 583,
+      "isbn": "9784140884409",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "NetLibrary",
+      "price": 2500,
+      "isbn": "9784501907907",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "NetLibrary",
+      "price": 2500,
+      "isbn": "9784501907907",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Oxford University Press",
+      "price": null,
+      "isbn": "9784807906970",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Pearson Education International",
+      "price": null,
+      "isbn": "9780135052679",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Prentice Hall",
+      "price": null,
+      "isbn": "0138147574",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2530,
+      "isbn": "9784815609795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2530,
+      "isbn": "9784815609795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2530,
+      "isbn": "9784815609795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2700,
+      "isbn": "9784797389463",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 1892,
+      "isbn": "9784797386677",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2530,
+      "isbn": "9784815609795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2530,
+      "isbn": "9784815609795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2750,
+      "isbn": "9784815609788",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "SBクリエイティブ",
+      "price": 2970,
+      "isbn": "9784815606015",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Seibido",
+      "price": null,
+      "isbn": "9784791972340",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Seibido",
+      "price": null,
+      "isbn": "9784791972340",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Seibido",
+      "price": null,
+      "isbn": "9784791972340",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Seibido",
+      "price": null,
+      "isbn": "9784791972340",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9781071621967",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9783319296579",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9784431542902",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9780387310732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9780387310732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9781071621967",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9783319296579",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9781071621967",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer",
+      "price": null,
+      "isbn": "9783319296579",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer-Verlag",
+      "price": 29630,
+      "isbn": "3540904727",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Springer-Verlag",
+      "price": 17387,
+      "isbn": "3540971246",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": "0471049956",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": "9780470631553",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": "9780470631553",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": "9780471056690",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": "9780471056690",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley",
+      "price": 91855,
+      "isbn": "0471941131",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley-VCH",
+      "price": null,
+      "isbn": "9783527313655",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "Wiley-VCH",
+      "price": null,
+      "isbn": "9783527346400",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "[実教出版]",
+      "price": 2052,
+      "isbn": "9784407332506",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "[実教出版]",
+      "price": 2052,
+      "isbn": "9784407332506",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "[裳華房]",
+      "price": 2640,
+      "isbn": "9784785315795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "[裳華房]",
+      "price": 2640,
+      "isbn": "9784785315795",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ぎょうせい",
+      "price": null,
+      "isbn": "9784324112212",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "すばる舎",
+      "price": 1870,
+      "isbn": "9784799106945",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "アイテック",
+      "price": 4400,
+      "isbn": "9784865752380",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "アグネ技術センター",
+      "price": 2200,
+      "isbn": "9784901496780",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "アグネ技術センター,アグネ (発売)",
+      "price": 4500,
+      "isbn": "9784900041011",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "アグネ技術センター,アグネ (発売)",
+      "price": 4500,
+      "isbn": "9784900041011",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "アグネ技術センター,アグネ (発売)",
+      "price": 4500,
+      "isbn": "9784900041011",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "アスキー",
+      "price": null,
+      "isbn": "9784756101587",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "インデックス出版,山海堂 (発売)",
+      "price": 3600,
+      "isbn": "9784381022578",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "インプレス",
+      "price": null,
+      "isbn": "9784295007326",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "エヌ・ティー・エス",
+      "price": 3800,
+      "isbn": "9784860435974",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "エヌ・ティー・エス",
+      "price": 3800,
+      "isbn": "9784860435974",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社",
+      "price": 5830,
+      "isbn": "4814400934",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873114286",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873119663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873119663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": 2200,
+      "isbn": "9784814400232",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873119458",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873119458",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873119663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オライリー・ジャパン,オーム社 (発売)",
+      "price": null,
+      "isbn": "9784873119663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2200,
+      "isbn": "9784274065705",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2420,
+      "isbn": "9784274066146",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 3080,
+      "isbn": "9784274221569",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2750,
+      "isbn": "9784274201622",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2750,
+      "isbn": "9784274201622",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2600,
+      "isbn": "9784274067075",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2420,
+      "isbn": "4274224473",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 3900,
+      "isbn": "9784274228193",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274210976",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2700,
+      "isbn": "9784274216107",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2500,
+      "isbn": "9784274213113",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2730,
+      "isbn": "9784274212550",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274502484",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2970,
+      "isbn": "9784274227585",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2730,
+      "isbn": "9784274212550",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2800,
+      "isbn": "9784274502743",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274216077",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2970,
+      "isbn": "9784274227585",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2340,
+      "isbn": "4274069850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2340,
+      "isbn": "4274069850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2310,
+      "isbn": "9784274231612",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 4400,
+      "isbn": "9784274227875",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2340,
+      "isbn": "4274069850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274219719",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274069642",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274130588",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2100,
+      "isbn": "9784274222825",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2100,
+      "isbn": "9784274222825",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2340,
+      "isbn": "4274069850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274130588",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274069642",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274219719",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 3800,
+      "isbn": "4274201562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2900,
+      "isbn": "4274202542",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2500,
+      "isbn": "9784274222825",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2400,
+      "isbn": "9784274226892",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2400,
+      "isbn": "9784274223211",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 3800,
+      "isbn": "4274201562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2900,
+      "isbn": "4274202542",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274069857",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2100,
+      "isbn": "9784274069376",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2500,
+      "isbn": "9784274215810",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2100,
+      "isbn": "9784274069376",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2600,
+      "isbn": "9784274222504",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 4410,
+      "isbn": "4274128776",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 4410,
+      "isbn": "4274128776",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274502484",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274502484",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 3150,
+      "isbn": "9784274208287",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274224300",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "9784274224300",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2600,
+      "isbn": "9784274215124",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "オーム社",
+      "price": 2600,
+      "isbn": "9784274215124",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2700,
+      "isbn": "9784339018431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3600,
+      "isbn": "9784339007565",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3080,
+      "isbn": "9784339028911",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2400,
+      "isbn": "9784339024562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2530,
+      "isbn": "9784339023633",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2600,
+      "isbn": "9784339008302",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3200,
+      "isbn": "9784339013016",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 4950,
+      "isbn": "9784339029284",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 4950,
+      "isbn": "9784339029284",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339028911",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2700,
+      "isbn": "9784339005820",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2970,
+      "isbn": "9784339007268",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2750,
+      "isbn": "9784339009101",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2600,
+      "isbn": "9784339012163",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3000,
+      "isbn": "9784339008029",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2700,
+      "isbn": "4339007269",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 1900,
+      "isbn": "9784339012040",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2300,
+      "isbn": "4339044601",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2300,
+      "isbn": "4339044601",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3300,
+      "isbn": "4339044083",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339040692",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3300,
+      "isbn": "4339044083",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339040692",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2970,
+      "isbn": "9784339044850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339031997",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339032116",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2808,
+      "isbn": "9784339008623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2700,
+      "isbn": "9784339044850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339031997",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339032116",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2808,
+      "isbn": "9784339008623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339044607",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2592,
+      "isbn": "9784339072334",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3020,
+      "isbn": "9784339040395",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3020,
+      "isbn": "9784339040395",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "4339052019",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2000,
+      "isbn": "4339065986",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3000,
+      "isbn": "4339006114",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3000,
+      "isbn": "4339006114",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "4339043974",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "4339043974",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2530,
+      "isbn": "9784339045802",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 2530,
+      "isbn": "9784339045802",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 4400,
+      "isbn": "9784339012286",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339012675",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784339012675",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 4950,
+      "isbn": "9784339029284",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 4950,
+      "isbn": "9784339029284",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3520,
+      "isbn": "9784339029093",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "コロナ社",
+      "price": 3520,
+      "isbn": "9784339029093",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1650,
+      "isbn": "9784781914091",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1760,
+      "isbn": "9784781908601",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 2200,
+      "isbn": "9784781912738",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1733,
+      "isbn": "4781910343",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1733,
+      "isbn": "4781910343",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1733,
+      "isbn": "4781910343",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 3080,
+      "isbn": "9784781910260",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 3080,
+      "isbn": "9784781910260",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": null,
+      "isbn": "9784781913698",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 2600,
+      "isbn": "9784781910246",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1900,
+      "isbn": "4781909817",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 1750,
+      "isbn": "4781910211",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": null,
+      "isbn": "4781907903",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": null,
+      "isbn": "9784781903620",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": null,
+      "isbn": "9784781903620",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "サイエンス社",
+      "price": 2079,
+      "isbn": "9784781909752",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "シュプリンガー・ジャパン",
+      "price": null,
+      "isbn": "9784431100652",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ジャパンタイムズ",
+      "price": 3000,
+      "isbn": "9784789013864",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ソフトバンククリエイティブ",
+      "price": null,
+      "isbn": "9784797360691",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ソフトバンククリエイティブ",
+      "price": null,
+      "isbn": "9784797304954",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ソフトバンククリエイティブ",
+      "price": null,
+      "isbn": "9784797363289",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ソフトバンククリエイティブ",
+      "price": 1000,
+      "isbn": "9784797342000",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ソフトバンクパブリッシング",
+      "price": 4104,
+      "isbn": "9784797327038",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ソフトバンクパブリッシング",
+      "price": 4104,
+      "isbn": "9784797327038",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "テクノタイムズ社,電子ジャーナル(発売)",
+      "price": 8000,
+      "isbn": "9784990579142",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1300,
+      "isbn": "4816339175",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1400,
+      "isbn": "9784816343926",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1400,
+      "isbn": "9784816343926",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1890,
+      "isbn": "9784816353000",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1890,
+      "isbn": "9784816353000",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1350,
+      "isbn": "4816335838",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 1350,
+      "isbn": "4816335838",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ナツメ社",
+      "price": 3500,
+      "isbn": "9784816358555",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "パーソナルメディア",
+      "price": 3500,
+      "isbn": "4893620940",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ピアソン・エデュケーション",
+      "price": 7980,
+      "isbn": "9784894715370",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ピアソン・エデュケーション",
+      "price": 5263,
+      "isbn": "9784894717169",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ピアソン・エデュケーション",
+      "price": 5263,
+      "isbn": "9784894717169",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ベレ出版",
+      "price": 1600,
+      "isbn": "9784860645137",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ベレ出版",
+      "price": 1600,
+      "isbn": "9784860645137",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ベレ出版",
+      "price": 1620,
+      "isbn": "9784860643430",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "マイナビ出版",
+      "price": 4378,
+      "isbn": "9784839967888",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "マイナビ出版",
+      "price": 4378,
+      "isbn": "9784839967888",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "マイナビ出版",
+      "price": 4378,
+      "isbn": "4839977739",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "マイナビ出版",
+      "price": null,
+      "isbn": "4839965366",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ミネルヴァ書房",
+      "price": 2750,
+      "isbn": "9784623095247",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ミネルヴァ書房",
+      "price": 2420,
+      "isbn": "4623084353",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ムイスリ出版",
+      "price": 2250,
+      "isbn": "9784896411942",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "ラトルズ",
+      "price": 2200,
+      "isbn": "9784899774631",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 3000,
+      "isbn": "9784782707388",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 2300,
+      "isbn": "4782704054",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 2718,
+      "isbn": "4782702604",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 2700,
+      "isbn": "9784782706077",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 3000,
+      "isbn": "9784782707388",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 3000,
+      "isbn": "9784782707388",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 3000,
+      "isbn": "9784782707388",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 2600,
+      "isbn": "9784782706671",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 2600,
+      "isbn": "9784782706671",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 3675,
+      "isbn": "9784782705575",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "三共出版",
+      "price": 3675,
+      "isbn": "9784782705575",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "中央法規出版",
+      "price": 2500,
+      "isbn": "9784805847220",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 2500,
+      "isbn": "4621074636",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 2800,
+      "isbn": "9784621081587",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 3740,
+      "isbn": "9784621076538",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": "4621039962",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 3600,
+      "isbn": "9784621082607",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 20000,
+      "isbn": "4621049569",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 20000,
+      "isbn": "4621049569",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 3500,
+      "isbn": "4621073389",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": "4621027271",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": "4621027271",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 3080,
+      "isbn": "9784621076613",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 3080,
+      "isbn": "9784621076613",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 4620,
+      "isbn": "9784621042557",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善",
+      "price": 3200,
+      "isbn": "9784621046562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 3500,
+      "isbn": "9784621087541",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 2900,
+      "isbn": "9784621089934",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 2900,
+      "isbn": "9784621089934",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 3500,
+      "isbn": "9784621087541",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 2200,
+      "isbn": "9784621303801",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 3800,
+      "isbn": "9784621088104",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 2200,
+      "isbn": "9784621303801",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 10000,
+      "isbn": "9784621086858",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 5720,
+      "isbn": "9784621301562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 8856,
+      "isbn": "9784621065488",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": null,
+      "isbn": "9784621084144",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": null,
+      "isbn": "9784621084144",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 3045,
+      "isbn": "9784621303801",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "丸善出版",
+      "price": 3045,
+      "isbn": "9784621303801",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "京都大学学術出版会",
+      "price": 12000,
+      "isbn": "4876986061",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3080,
+      "isbn": "9784320026926",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3740,
+      "isbn": "9784320017139",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3740,
+      "isbn": "9784320017146",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3400,
+      "isbn": "9784320017146",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3400,
+      "isbn": "9784320017139",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3080,
+      "isbn": "9784320026926",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2000,
+      "isbn": "9784320110366",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2860,
+      "isbn": "9784320115651",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3080,
+      "isbn": "9784320026926",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2200,
+      "isbn": "9784320113350",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2530,
+      "isbn": "9784320017009",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2530,
+      "isbn": "9784320114982",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3520,
+      "isbn": "9784320114647",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3300,
+      "isbn": "9784320124233",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3520,
+      "isbn": "9784320114647",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2750,
+      "isbn": "9784320111851",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2750,
+      "isbn": "9784320113756",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 1870,
+      "isbn": "9784320110663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3300,
+      "isbn": "9784320124233",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2750,
+      "isbn": "9784320111813",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3520,
+      "isbn": "9784320122079",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3520,
+      "isbn": "9784320122079",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2640,
+      "isbn": "9784320123175",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 17600,
+      "isbn": "9784320123281",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320122963",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320112735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320112735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3080,
+      "isbn": "9784320026926",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2205,
+      "isbn": "4320002075",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2205,
+      "isbn": "4320002075",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3080,
+      "isbn": "9784320080867",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3300,
+      "isbn": "9784320085862",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2090,
+      "isbn": "9784320071292",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 1540,
+      "isbn": "4320041569",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3520,
+      "isbn": "9784320036215",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 1540,
+      "isbn": "4320041569",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3150,
+      "isbn": "9784320088702",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "4320044088",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320043800",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320043800",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2700,
+      "isbn": "9784320071711",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320043800",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320043800",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3150,
+      "isbn": "9784320088702",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3400,
+      "isbn": "9784320057418",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3600,
+      "isbn": "9784320058439",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3800,
+      "isbn": "9784320056312",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3400,
+      "isbn": "9784320057364",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2200,
+      "isbn": "4320055268",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3600,
+      "isbn": "9784320058439",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2500,
+      "isbn": "9784320056190",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3300,
+      "isbn": "9784320057395",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3960,
+      "isbn": "9784320122512",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320019539",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320019539",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3800,
+      "isbn": "4320086023",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2970,
+      "isbn": "9784320071735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2970,
+      "isbn": "9784320071735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "4320080580",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "4320080580",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2900,
+      "isbn": "9784320044036",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 2900,
+      "isbn": "9784320044036",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320112735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320122963",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320122963",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "9784320112735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3600,
+      "isbn": "9784320058439",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "共立出版",
+      "price": 3600,
+      "isbn": "9784320058439",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "内田老鶴圃",
+      "price": null,
+      "isbn": "4753651894",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "内田老鶴圃",
+      "price": null,
+      "isbn": "4753651894",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "内田老鶴圃",
+      "price": null,
+      "isbn": "9784753650316",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "内田老鶴圃",
+      "price": null,
+      "isbn": "9784753650316",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": "4759808949",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3000,
+      "isbn": "4759818294",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": "4759801979",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": "4759801774",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2800,
+      "isbn": "9784759810707",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2500,
+      "isbn": "9784759809039",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 1800,
+      "isbn": "4759802460",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 4326,
+      "isbn": "4759807713",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2500,
+      "isbn": "9784759815405",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2400,
+      "isbn": "9784759814934",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2000,
+      "isbn": "4759809511",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3500,
+      "isbn": "9784759819328",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2300,
+      "isbn": "4759808280",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 4326,
+      "isbn": "4759807713",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 4326,
+      "isbn": "4759807713",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2000,
+      "isbn": "4759808167",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2000,
+      "isbn": "4759809511",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2000,
+      "isbn": "4759808167",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2000,
+      "isbn": "4759809511",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2500,
+      "isbn": "9784759815405",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3800,
+      "isbn": "9784759814798",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 8000,
+      "isbn": "9784759811919",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3000,
+      "isbn": "4759808345",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2800,
+      "isbn": "9784759810806",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3500,
+      "isbn": "9784759819328",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 6800,
+      "isbn": "9784759811742",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3500,
+      "isbn": "9784759819328",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2800,
+      "isbn": "4759810803",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 3500,
+      "isbn": "9784759819328",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2800,
+      "isbn": "4759810803",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 8800,
+      "isbn": "9784759832440",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 9680,
+      "isbn": "9784759832440",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2800,
+      "isbn": "9784759808612",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "化学同人",
+      "price": 2800,
+      "isbn": "9784759808612",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "古今書院",
+      "price": 3080,
+      "isbn": "9784772253246",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "古今書院",
+      "price": 3080,
+      "isbn": "9784772253444",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "古今書院",
+      "price": 2900,
+      "isbn": "4772213732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "古今書院",
+      "price": 2900,
+      "isbn": "4772213732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "吉岡書店",
+      "price": null,
+      "isbn": "9784842703367",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "同文舘出版",
+      "price": null,
+      "isbn": "9784495366940",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "名古屋大学出版会",
+      "price": 2700,
+      "isbn": "9784815809119",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "名古屋大学出版会",
+      "price": 2800,
+      "isbn": "9784815805999",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "国立民族学博物館",
+      "price": null,
+      "isbn": "9784910055053",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 4725,
+      "isbn": "4563014532",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 3080,
+      "isbn": "9784563035211",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 3960,
+      "isbn": "9784563033347",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1848,
+      "isbn": "9784563002220",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1800,
+      "isbn": "9784563002763",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2310,
+      "isbn": "9784563004729",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1680,
+      "isbn": "4563002224",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2400,
+      "isbn": "4563001619",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1680,
+      "isbn": "4563002224",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2400,
+      "isbn": "4563001619",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2090,
+      "isbn": "4563002224",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "4563001619",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2750,
+      "isbn": "9784563067120",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 3300,
+      "isbn": "4563015466",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2700,
+      "isbn": "4563067431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2500,
+      "isbn": "9784563067137",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2700,
+      "isbn": "4563067431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2500,
+      "isbn": "9784563067120",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 3024,
+      "isbn": "9784563069322",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1848,
+      "isbn": "9784563002220",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2310,
+      "isbn": "9784563004729",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1800,
+      "isbn": "9784563002763",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "4563041858",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2910,
+      "isbn": "4563045454",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "4563045624",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "4563045624",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2910,
+      "isbn": "4563045454",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "4563041858",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2900,
+      "isbn": "4563045187",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 1600,
+      "isbn": "4563042730",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2500,
+      "isbn": "4563067121",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 2500,
+      "isbn": "4563067121",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "培風館",
+      "price": 3730,
+      "isbn": "4563035467",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "大日本図書",
+      "price": null,
+      "isbn": "9784477026411",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学文社",
+      "price": null,
+      "isbn": "9784762022845",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学文社",
+      "price": null,
+      "isbn": "9784762022876",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学文社",
+      "price": 2530,
+      "isbn": "9784762022852",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学芸出版社",
+      "price": 2800,
+      "isbn": "9784761524449",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学芸出版社",
+      "price": 3080,
+      "isbn": "9784761524449",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学術図書出版社",
+      "price": 1600,
+      "isbn": "9784780604054",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学術図書出版社",
+      "price": 2000,
+      "isbn": "9784873610009",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学術図書出版社",
+      "price": null,
+      "isbn": "9784780605259",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学術図書出版社",
+      "price": null,
+      "isbn": "9784780605259",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学術図書出版社",
+      "price": null,
+      "isbn": "9784780605259",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "学術図書出版社",
+      "price": 2400,
+      "isbn": "9784780609509",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "実教出版",
+      "price": 2310,
+      "isbn": "9784407320893",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "実教出版",
+      "price": 3150,
+      "isbn": "4407347716",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "山川出版社",
+      "price": 1800,
+      "isbn": "9784634151246",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "山海堂",
+      "price": 4600,
+      "isbn": "4381017862",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000103431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000103431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "9784000076418",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000103431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000103431",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "9784000298681",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "9784000298681",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2400,
+      "isbn": "9784000078665",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2200,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000109618",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "9784000077712",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "9784000077729",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2400,
+      "isbn": "9784000078634",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2400,
+      "isbn": "9784000298636",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2600,
+      "isbn": "9784000298858",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 1800,
+      "isbn": "9784000298643",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 3360,
+      "isbn": "9784000077132",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2400,
+      "isbn": "9784000078634",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2600,
+      "isbn": "9784000298858",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2400,
+      "isbn": "9784000298636",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 1800,
+      "isbn": "9784000298643",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2600,
+      "isbn": "4000077767",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 3360,
+      "isbn": "9784000077132",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2600,
+      "isbn": "4000077767",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 900,
+      "isbn": "9784004313311",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 900,
+      "isbn": "9784004313311",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000054244",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2300,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2300,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2530,
+      "isbn": "9784000298629",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 3200,
+      "isbn": "9784000052092",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2200,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2200,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2200,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2200,
+      "isbn": "4000078623",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2800,
+      "isbn": "9784000058407",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": 2800,
+      "isbn": "9784000058407",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000079271",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "岩波書店",
+      "price": null,
+      "isbn": "4000079271",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "工業調査会",
+      "price": null,
+      "isbn": "9784769351382",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "工業調査会",
+      "price": 3000,
+      "isbn": "4769312563",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 4326,
+      "isbn": "4765501299",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 4326,
+      "isbn": "4765501299",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 4326,
+      "isbn": "4765501299",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 2200,
+      "isbn": "9784765534178",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 2200,
+      "isbn": "9784765534178",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": null,
+      "isbn": "4765531236",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 2940,
+      "isbn": "4765531899",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技報堂出版",
+      "price": 2940,
+      "isbn": "4765531899",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": 1680,
+      "isbn": "9784774138800",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": 2970,
+      "isbn": "9784774191805",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": 2970,
+      "isbn": "9784774191805",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": 2462,
+      "isbn": "9784774140810",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": 1880,
+      "isbn": "9784774139807",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": 2948,
+      "isbn": "9784297118617",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "放送大学教育振興会",
+      "price": null,
+      "isbn": "4595324162",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "放送大学教育振興会",
+      "price": null,
+      "isbn": "9784595323942",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "数理工学社,サイエンス社 (発売)",
+      "price": 2400,
+      "isbn": "9784901683845",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "数理工学社,サイエンス社 (発売)",
+      "price": 1900,
+      "isbn": "9784864810067",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "数研出版",
+      "price": 2500,
+      "isbn": "9784410154621",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 4000,
+      "isbn": "9784829965344",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 3800,
+      "isbn": "9784829921760",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 4104,
+      "isbn": "9784829965207",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 3200,
+      "isbn": "4829921706",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 7200,
+      "isbn": "9784829910672",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 7200,
+      "isbn": "9784829910672",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文一総合出版",
+      "price": 3200,
+      "isbn": "4829921706",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "文永堂出版",
+      "price": 4000,
+      "isbn": "4830040866",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "新曜社",
+      "price": null,
+      "isbn": "9784788514348",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "新曜社",
+      "price": null,
+      "isbn": "9784788514348",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": null,
+      "isbn": "4526022233",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 1400,
+      "isbn": "9784526058967",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 1400,
+      "isbn": "9784526058967",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 3456,
+      "isbn": "9784526071263",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 2600,
+      "isbn": "9784526073748",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 3456,
+      "isbn": "9784526071263",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 2600,
+      "isbn": "9784526073748",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 2546,
+      "isbn": "9784526075278",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 3080,
+      "isbn": "9784526055966",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日刊工業新聞社",
+      "price": 4180,
+      "isbn": "9784526066351",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日新出版",
+      "price": 2447,
+      "isbn": "9784817301499",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本実業出版社",
+      "price": 2200,
+      "isbn": "4534034903",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本材料学会",
+      "price": 3000,
+      "isbn": "9784901381260",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本材料学会",
+      "price": 3000,
+      "isbn": "9784901381260",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善 (発売)",
+      "price": 1886,
+      "isbn": "9784888981194",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善 (発売)",
+      "price": 1886,
+      "isbn": "9784888981194",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善 (発売)",
+      "price": 2075,
+      "isbn": "9784888981194",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善 (発売)",
+      "price": 1886,
+      "isbn": "4888981043",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善 (発売)",
+      "price": 2075,
+      "isbn": "9784888981194",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善 (発売)",
+      "price": 1886,
+      "isbn": "4888981043",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善出版 (発売)",
+      "price": 2750,
+      "isbn": "9784888983341",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善出版 (発売)",
+      "price": 2750,
+      "isbn": "9784888983341",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善出版 (発売)",
+      "price": null,
+      "isbn": "9784888982085",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本機械学会,丸善出版 (発売)",
+      "price": null,
+      "isbn": "9784888982085",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本能率協会マネジメントセンター",
+      "price": 2310,
+      "isbn": "9784820747529",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 2530,
+      "isbn": "9784535806313",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 2530,
+      "isbn": "9784535806351",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 2530,
+      "isbn": "9784535806313",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 2530,
+      "isbn": "9784535806351",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 3024,
+      "isbn": "9784535787568",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 3024,
+      "isbn": "9784535787568",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 2900,
+      "isbn": "4535783748",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日本評論社",
+      "price": 2900,
+      "isbn": "4535783748",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日科技連出版社",
+      "price": 8208,
+      "isbn": "9784817161482",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日経BP社,日経BPマーケティング (発売)",
+      "price": null,
+      "isbn": "9784822284930",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日経BP社,日経BPマーケティング (発売)",
+      "price": 1124,
+      "isbn": "9784822234836",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "日経BP社,日経BPマーケティング (発売)",
+      "price": null,
+      "isbn": "9784822298425",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "早川書房",
+      "price": null,
+      "isbn": "9784152098931",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭和堂",
+      "price": 2420,
+      "isbn": "9784812209165",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭和堂",
+      "price": 2179,
+      "isbn": "9784812207383",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": null,
+      "isbn": "4785630787",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": null,
+      "isbn": "4785630787",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": null,
+      "isbn": "9784785631604",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": null,
+      "isbn": "4785660341",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": 2900,
+      "isbn": "4785660341",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": 3200,
+      "isbn": "4785660368",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": 3200,
+      "isbn": "4785660368",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "昭晃堂",
+      "price": 2900,
+      "isbn": "4785660341",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "晃洋書房",
+      "price": 2750,
+      "isbn": "9784771026339",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "晃洋書房",
+      "price": 3850,
+      "isbn": "9784771030565",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 4180,
+      "isbn": "9784254115871",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 2640,
+      "isbn": "9784254111460",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 4180,
+      "isbn": "9784254115871",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3200,
+      "isbn": "9784254128956",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3200,
+      "isbn": "9784254128956",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 2800,
+      "isbn": "4254116233",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 2800,
+      "isbn": "4254116233",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": null,
+      "isbn": "9784254231106",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3800,
+      "isbn": "9784254236828",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": null,
+      "isbn": "9784254231106",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3800,
+      "isbn": "9784254236828",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3300,
+      "isbn": "9784254131130",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3500,
+      "isbn": "4254146027",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3500,
+      "isbn": "4254146027",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": null,
+      "isbn": "4254145934",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 5800,
+      "isbn": "9784254140828",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3500,
+      "isbn": "4254146027",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3600,
+      "isbn": "9784254180442",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3400,
+      "isbn": "9784254470512",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 2970,
+      "isbn": "9784254185454",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": null,
+      "isbn": "9784254103069",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": null,
+      "isbn": "9784254102758",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": null,
+      "isbn": "9784254103069",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 4730,
+      "isbn": "9784254122671",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 3600,
+      "isbn": "9784254231212",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 2500,
+      "isbn": "9784254231489",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 4620,
+      "isbn": "4254209452",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "朝倉書店",
+      "price": 4620,
+      "isbn": "4254209452",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 5900,
+      "isbn": "9784807909773",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4600,
+      "isbn": "9784807909124",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 3200,
+      "isbn": "4807905244",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 5900,
+      "isbn": "9784807908912",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 5900,
+      "isbn": "9784807907816",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "9784807908110",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "9784807908110",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "9784807908103",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6500,
+      "isbn": "9784807908981",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "9784807908912",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "9784807906963",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "9784807906956",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6372,
+      "isbn": "9784807908912",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6372,
+      "isbn": "9784807908912",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4620,
+      "isbn": "9784807906130",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4300,
+      "isbn": "9784807906352",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4620,
+      "isbn": "9784807906130",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4300,
+      "isbn": "9784807906352",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6490,
+      "isbn": "9784807909773",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 2800,
+      "isbn": "9784807909735",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4600,
+      "isbn": "9784807909124",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6490,
+      "isbn": "9784807909773",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "4807905511",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 3000,
+      "isbn": "9784807907830",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 2800,
+      "isbn": "9784807907830",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 2800,
+      "isbn": "9784807905980",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 2800,
+      "isbn": "9784807907830",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 3300,
+      "isbn": "9784807907199",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4600,
+      "isbn": "9784807905263",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 4600,
+      "isbn": "9784807905263",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 3300,
+      "isbn": "9784807907199",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 3200,
+      "isbn": "9784807920549",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6400,
+      "isbn": "9784807904846",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 3200,
+      "isbn": "9784807920549",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京化学同人",
+      "price": 6400,
+      "isbn": "9784807904846",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": 2200,
+      "isbn": "9784489024122",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": 2200,
+      "isbn": "9784489022227",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": 2420,
+      "isbn": "9784489024122",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": 3080,
+      "isbn": "4489021178",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": null,
+      "isbn": "4489021178",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": null,
+      "isbn": "4489021178",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": null,
+      "isbn": "9784489022272",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京図書",
+      "price": null,
+      "isbn": "9784489022272",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 2940,
+      "isbn": "9784130420655",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": null,
+      "isbn": "9784130420655",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": null,
+      "isbn": "9784130420655",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 2800,
+      "isbn": "9784130629119",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 5060,
+      "isbn": "9784130628051",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 2730,
+      "isbn": "9784130628099",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 2730,
+      "isbn": "9784130628099",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 3000,
+      "isbn": "9784130623117",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 3080,
+      "isbn": "4130627252",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 15400,
+      "isbn": "9784130602181",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 6000,
+      "isbn": "9784130611565",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 3600,
+      "isbn": "4130628259",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 6000,
+      "isbn": "9784130611565",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 6000,
+      "isbn": "9784130611565",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 5060,
+      "isbn": "9784130628051",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": 5060,
+      "isbn": "9784130628051",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": null,
+      "isbn": "4130605003",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京大学出版会",
+      "price": null,
+      "isbn": "4130605003",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京教学社",
+      "price": 1836,
+      "isbn": "4808220229",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京教学社",
+      "price": 1836,
+      "isbn": "4808220229",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京電機大学出版局",
+      "price": 2600,
+      "isbn": "9784501419103",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京電機大学出版局",
+      "price": 3200,
+      "isbn": "9784501418502",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京電機大学出版局",
+      "price": null,
+      "isbn": "4501414103",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東京電機大学出版局",
+      "price": null,
+      "isbn": "4501414103",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東海大学出版会",
+      "price": 1200,
+      "isbn": "9784486019220",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東海大学出版会",
+      "price": 2200,
+      "isbn": "4486014197",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東海大学出版部",
+      "price": 3300,
+      "isbn": "9784486020981",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "東海教育研究所",
+      "price": null,
+      "isbn": "9784924523371",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3080,
+      "isbn": "9784627805521",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627852129",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2100,
+      "isbn": "9784627705135",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2100,
+      "isbn": "9784627705135",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3000,
+      "isbn": "9784627782822",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2200,
+      "isbn": "9784627773714",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3500,
+      "isbn": "4627710305",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2520,
+      "isbn": "4627706413",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2200,
+      "isbn": "9784627773714",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2400,
+      "isbn": "9784627770416",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2520,
+      "isbn": "4627706413",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627776616",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3500,
+      "isbn": "9784627072909",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2700,
+      "isbn": "9784627162112",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2700,
+      "isbn": "9784627162112",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2700,
+      "isbn": "9784627162112",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2750,
+      "isbn": "9784627162112",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2420,
+      "isbn": "9784627650411",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627661936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2420,
+      "isbn": "9784627650411",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627661936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627661936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627918429",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2400,
+      "isbn": "9784627914902",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2400,
+      "isbn": "9784627668928",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627610101",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627661936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627918429",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2400,
+      "isbn": "9784627668928",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627610101",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3240,
+      "isbn": "9784627666412",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627661936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2940,
+      "isbn": "4627672616",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2940,
+      "isbn": "9784627673410",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627914902",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3300,
+      "isbn": "9784627920613",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2860,
+      "isbn": "9784627605732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627675223",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 1900,
+      "isbn": "9784627669017",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627661936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3240,
+      "isbn": "9784627666412",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2940,
+      "isbn": "4627672616",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2940,
+      "isbn": "9784627673410",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627914902",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3300,
+      "isbn": "9784627920613",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2860,
+      "isbn": "9784627605732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627675223",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 1900,
+      "isbn": "9784627669017",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2520,
+      "isbn": "9784627661929",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2420,
+      "isbn": "9784627650411",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2700,
+      "isbn": "9784627667112",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2800,
+      "isbn": "9784627663039",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627914902",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 1680,
+      "isbn": "4627605420",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2100,
+      "isbn": "9784627625211",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2500,
+      "isbn": "9784627913820",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2750,
+      "isbn": "9784627162112",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 1680,
+      "isbn": "4627605420",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2500,
+      "isbn": "9784627913820",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2100,
+      "isbn": "9784627625211",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2600,
+      "isbn": "9784627605732",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3500,
+      "isbn": "9784627072909",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3080,
+      "isbn": "9784627245426",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3080,
+      "isbn": "9784627245426",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627245419",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3200,
+      "isbn": "9784627666634",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3080,
+      "isbn": "9784627810716",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3500,
+      "isbn": "4627710305",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3500,
+      "isbn": "4627710305",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2835,
+      "isbn": "4627912404",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627913837",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627913837",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3200,
+      "isbn": "9784627920415",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3200,
+      "isbn": "9784627920415",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2860,
+      "isbn": "4627917821",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2640,
+      "isbn": "4627918429",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2860,
+      "isbn": "4627917821",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 2640,
+      "isbn": "4627918429",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3600,
+      "isbn": "9784627773912",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3600,
+      "isbn": "9784627773912",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3400,
+      "isbn": "9784627828117",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3400,
+      "isbn": "9784627828117",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3740,
+      "isbn": "9784627670235",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "森北出版",
+      "price": 3740,
+      "isbn": "9784627670235",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "浜島書店",
+      "price": 900,
+      "isbn": "9784834340129",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "理工学社",
+      "price": 4400,
+      "isbn": "4844520237",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "理工学社",
+      "price": 4400,
+      "isbn": "4844520237",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "理工学社",
+      "price": 2000,
+      "isbn": "9784844527503",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "産業図書",
+      "price": 3960,
+      "isbn": "9784782841044",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "産業図書",
+      "price": 2860,
+      "isbn": "4782826117",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "産業環境管理協会,丸善出版 (発売)",
+      "price": 2376,
+      "isbn": "9784862401274",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "画像情報教育振興協会",
+      "price": 4290,
+      "isbn": "9784903474649",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "画像情報教育振興協会(CG-ARTS協会)",
+      "price": null,
+      "isbn": "9784903474496",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "秀和システム",
+      "price": 2420,
+      "isbn": "9784798030142",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "秀和システム",
+      "price": 2420,
+      "isbn": "9784798030142",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "秀和システム",
+      "price": 1575,
+      "isbn": "9784798041063",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "秀和システム",
+      "price": 1600,
+      "isbn": "9784798042138",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "秀和システム",
+      "price": 1600,
+      "isbn": "9784798023755",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "筑摩書房",
+      "price": 1100,
+      "isbn": "9784480511287",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "筑摩書房",
+      "price": 1600,
+      "isbn": "9784480093936",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "築地書館",
+      "price": 2060,
+      "isbn": "4806710865",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "築地書館",
+      "price": 3914,
+      "isbn": "4806722235",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "羊土社",
+      "price": 3520,
+      "isbn": "9784758121217",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "翔泳社",
+      "price": null,
+      "isbn": "4798104523",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "翔泳社",
+      "price": 3300,
+      "isbn": "9784798163642",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "翔泳社",
+      "price": 2380,
+      "isbn": "9784798149776",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "翔泳社",
+      "price": 2420,
+      "isbn": "9784798163239",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "翔泳社",
+      "price": 2592,
+      "isbn": "9784798107950",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "翔泳社",
+      "price": 2592,
+      "isbn": "9784798107950",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "英治出版",
+      "price": 2400,
+      "isbn": "9784862763099",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "9784785312084",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2600,
+      "isbn": "4785314125",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785321000",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785320997",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2600,
+      "isbn": "4785314125",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3740,
+      "isbn": "9784785316037",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3520,
+      "isbn": "9784785315986",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2600,
+      "isbn": "4785314125",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3520,
+      "isbn": "9784785315986",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785320881",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785314118",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785315740",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785320881",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785314118",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785315740",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2835,
+      "isbn": "4785315369",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2750,
+      "isbn": "9784785315740",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3200,
+      "isbn": "9784785313166",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2200,
+      "isbn": "9784785320744",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2940,
+      "isbn": "4785321385",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2940,
+      "isbn": "4785321385",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2200,
+      "isbn": "4785315210",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 1800,
+      "isbn": "9784785320591",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 1800,
+      "isbn": "9784785320591",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "9784785315740",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "9784785315740",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2420,
+      "isbn": "9784785315597",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2200,
+      "isbn": "4785315210",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2970,
+      "isbn": "4785315369",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2420,
+      "isbn": "9784785320744",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "4785315369",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "4785315369",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "4785315369",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3410,
+      "isbn": "4785330996",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2700,
+      "isbn": "4785315369",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "4785320850",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3410,
+      "isbn": "4785330996",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3540,
+      "isbn": "4785320559",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2205,
+      "isbn": "4785334169",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2205,
+      "isbn": "4785334169",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3540,
+      "isbn": "4785320559",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2100,
+      "isbn": "9784785320744",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2420,
+      "isbn": "9784785320744",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3000,
+      "isbn": "9784785314071",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 3000,
+      "isbn": "9784785314071",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2940,
+      "isbn": "4785321385",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 2940,
+      "isbn": "4785321385",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 1890,
+      "isbn": "9784785328283",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 5280,
+      "isbn": "9784785380120",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": 4840,
+      "isbn": "9784785380328",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785326074",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": "9784785326074",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "言語交流研究所ヒッポファミリークラブ",
+      "price": 3500,
+      "isbn": "9784906519002",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "言語交流研究所ヒッポファミリークラブ",
+      "price": 3500,
+      "isbn": "9784906519002",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2800,
+      "isbn": "9784061565449",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2800,
+      "isbn": "9784061565104",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 1430,
+      "isbn": "9784062570848",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 3520,
+      "isbn": "9784061538306",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2700,
+      "isbn": "9784065184363",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2800,
+      "isbn": "9784065215180",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2800,
+      "isbn": "9784065215180",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2200,
+      "isbn": "9784061565371",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2200,
+      "isbn": "9784061565371",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "9784065137475",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "9784065137475",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "9784061565562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "9784061565500",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "9784061565562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "9784061565500",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 4660,
+      "isbn": "4061533711",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2700,
+      "isbn": "9784061545205",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2500,
+      "isbn": "4061546562",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2700,
+      "isbn": "4061545493",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 6050,
+      "isbn": "4061543903",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2700,
+      "isbn": "4061545493",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 3200,
+      "isbn": "9784061543577",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 6050,
+      "isbn": "4061543903",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 4660,
+      "isbn": "4061533711",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 3200,
+      "isbn": "9784065133415",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 4660,
+      "isbn": "4061533711",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 3520,
+      "isbn": "9784061568020",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 4900,
+      "isbn": "4061543121",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 4900,
+      "isbn": "4061543121",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 4200,
+      "isbn": "9784061543232",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2640,
+      "isbn": "9784061565425",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 3080,
+      "isbn": "9784065337639",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2020,
+      "isbn": "9784065191835",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2020,
+      "isbn": "9784065191835",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 3080,
+      "isbn": "9784065337639",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2800,
+      "isbn": "9784065215180",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2800,
+      "isbn": "9784065215180",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "4061539663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "4061539663",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2600,
+      "isbn": "9784061565081",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 2600,
+      "isbn": "9784061565081",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 9800,
+      "isbn": "9784061533745",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "講談社",
+      "price": 9800,
+      "isbn": "9784061533745",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "近代科学社",
+      "price": 2400,
+      "isbn": "9784764904408",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "近代科学社",
+      "price": null,
+      "isbn": "9784764901650",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "長松昭男,コロナ社 (発売)",
+      "price": 5500,
+      "isbn": "4339082252",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "長松昭男,コロナ社 (発売)",
+      "price": 5500,
+      "isbn": "4339082252",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "開隆堂出版",
+      "price": 221,
+      "isbn": "9784304041655",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "電子情報通信学会,コロナ社 (発売)",
+      "price": 4000,
+      "isbn": "4885521289",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "電子情報通信学会,コロナ社 (発売)",
+      "price": 4000,
+      "isbn": "4885521289",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "電気書院",
+      "price": 2800,
+      "isbn": "9784485301159",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "電気書院",
+      "price": 2200,
+      "isbn": "9784485300992",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "青山社",
+      "price": 2178,
+      "isbn": "4883591190",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "養賢堂",
+      "price": 2860,
+      "isbn": "9784842505015",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "養賢堂",
+      "price": 3600,
+      "isbn": "9784842501123",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "養賢堂",
+      "price": 4400,
+      "isbn": "4842505907",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "",
+      "author": "",
+      "publisher": "養賢堂",
+      "price": 4400,
+      "isbn": "4842505907",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Advanced Digital Signal Processing and Noise Reduction",
+      "author": "Saeed V. Vaseghi",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Advanced Engineering Electromagnetics",
+      "author": "C.A.Balanis",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Antenna Theory",
+      "author": "C.B.Balanis",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Biomechanics -Mechanical Properties of Living Tissue-",
+      "author": "Y.C.Fung",
+      "publisher": "Springer-Verlag",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Biomechanics -Motion, Flow, Stress, and Growth-",
+      "author": "Y.C.Fung",
+      "publisher": "Springer-Verlag",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Biomechanics in Orthopedic Trauma",
+      "author": "A.F.Tencer, K.D.Johnson",
+      "publisher": "Martin Dunitz",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Chem. Rev. 2000, 100, 1685-1716.",
+      "author": "M. Irieら",
+      "publisher": "アメリカ化学会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Chem. Rev.2014,114,12174-12277.",
+      "author": "M. Irieら",
+      "publisher": "アメリカ化学会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Chemistry Made Simple",
+      "author": "John T. Moore",
+      "publisher": "Broadway Books",
+      "price": null,
+      "isbn": "9780767917025",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Computer Methods in Biomechanics and Biomedical Engineering",
+      "author": "",
+      "publisher": "Taylor & Francis",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Diarylethene Molecular Photoswitches",
+      "author": "M. Irie",
+      "publisher": "Wiley-VCH",
+      "price": null,
+      "isbn": "97835273464",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Digital Image Processing",
+      "author": "R.C.Gonzalez",
+      "publisher": "Prentice Hall",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "EXCELによる数値計算法",
+      "author": "趙華安",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Fatigue of metallic materials",
+      "author": "Mirko Klensnil and Petr Lukas",
+      "publisher": "Elsevier",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Foundations for Microwave Engineering",
+      "author": "R.E. Collin",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Fundamentals of Linear Algebra",
+      "author": "Katsumi Nomizu",
+      "publisher": "McGraw-Hill Inc.,US",
+      "price": null,
+      "isbn": "9780070468801",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Journal of Biomechanics",
+      "author": "",
+      "publisher": "Elsevier",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Journal of the Mechanical Behavior of Biomedical Materials",
+      "author": "",
+      "publisher": "Elsevier",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Microwave Engineering",
+      "author": "D.M. Pozar",
+      "publisher": "Wiley",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Microwave Engineering",
+      "author": "D.M.Pozar",
+      "publisher": "Wiley",
+      "price": 20000,
+      "isbn": "9781118213636",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "Wireless Transceiver Architecture: Bridging RF and Digital Communications",
+      "author": "Pierre Baudin",
+      "publisher": "Wiley",
+      "price": 20000,
+      "isbn": "9781118874820",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "『Introduction to Materials Science for Engineers 6th Ed.",
+      "author": "J. F. Shackelford",
+      "publisher": "Pearson Prentice Hall",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "『Introduction to Materials Science for Engineers 6th Ed.",
+      "author": "J. F. Shackelford",
+      "publisher": "Pearson Prentice Hall",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "『Introduction to Materials Science for Engineers 6th Ed.",
+      "author": "J. F. Shackelford",
+      "publisher": "Pearson Prentice Hall",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "『マイクロ波技術講座第1巻、第2巻",
+      "author": "小西良弘",
+      "publisher": "日刊工業新聞社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "『マイクロ波技術講座第1巻、第2巻",
+      "author": "小西良弘",
+      "publisher": "日刊工業新聞社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "はじめての半導体デバイス",
+      "author": "執行 直之",
+      "publisher": "近代科学社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "はじめての半導体デバイス",
+      "author": "執行 直之",
+      "publisher": "近代科学社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "はじめて学ぶ移動現象論",
+      "author": "杉山均、佐野正利、永橋優純、加藤直人",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "わかりやすい機能性色素材料",
+      "author": "詫摩啓輔ら",
+      "publisher": "工業調査会",
+      "price": null,
+      "isbn": "476934130",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "アナログ電子回路の基礎",
+      "author": "藤井信生",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": "427421608",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "エコシステムマネジメント",
+      "author": "森章",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "784320057760",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "エンジニアのための人間工学 改訂第6版",
+      "author": "小松原明哲",
+      "publisher": "日本出版サービス",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "オートマトン・言語理論 (第二版)",
+      "author": "富田 悦次, 横森 貴",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "978462780552",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "クリティカルシンキング・ロジカルライティング",
+      "author": "ベネッセi－キャリア",
+      "publisher": "ベネッセi－キャリア",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "クリティカルシンキング・ロジカルライティング",
+      "author": "ベネッセi－キャリア",
+      "publisher": "ベネッセi－キャリア",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "クリティカルシンキング・ロジカルライティング",
+      "author": "ベネッセi－キャリア",
+      "publisher": "ベネッセi－キャリア",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "クリティカルシンキング・ロジカルライティング",
+      "author": "ベネッセi－キャリア",
+      "publisher": "ベネッセi－キャリア",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "クリティカルシンキング・ロジカルライティング",
+      "author": "ベネッセi－キャリア",
+      "publisher": "ベネッセi－キャリア",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "クリティカルシンキング・ロジカルライティング",
+      "author": "ベネッセi－キャリア",
+      "publisher": "ベネッセi－キャリア",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "スッキリ！がってん！ 有機EL の本",
+      "author": "木村睦",
+      "publisher": "電気書院",
+      "price": null,
+      "isbn": "0",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装",
+      "author": "斎藤 康毅",
+      "publisher": "オライリージャパン",
+      "price": null,
+      "isbn": "0",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ディジタル回路",
+      "author": "田所 嘉昭",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ディジタル回路",
+      "author": "斉藤 忠夫",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ナノエレクトロニクス",
+      "author": "榊裕之・横山直樹",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ナノエレクトロニクス",
+      "author": "榊裕之・横山直樹",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ナノエレクトロニクスの基礎",
+      "author": "三好旦六他",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "ナノエレクトロニクスの基礎",
+      "author": "三好旦六他",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "バイオマテリアル",
+      "author": "岩田、加藤、木村、田畑",
+      "publisher": "丸善出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "バイオマテリアル",
+      "author": "岩田、加藤、木村、田畑",
+      "publisher": "丸善出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "バイオマテリアルサイエンスー基礎から臨床までー（第2版）",
+      "author": "山岡、大矢、中野、石原",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "バイオマテリアルサイエンスー基礎から臨床までー（第2版）",
+      "author": "山岡、大矢、中野、石原",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "マイクロ波工学　基礎と原理",
+      "author": "中島将光",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "マイクロ波工学　基礎と原理",
+      "author": "中島将光",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "モバイルコミュニケーション",
+      "author": "中川正雄、大槻知明",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": "9784399018653",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "リードα物理基礎・物理　改訂版",
+      "author": "数研出版編集部編",
+      "publisher": "数研出版社",
+      "price": 990,
+      "isbn": "9784410262791",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "リードα物理基礎・物理　改訂版",
+      "author": "数研出版編集部編",
+      "publisher": "数研出版社",
+      "price": 990,
+      "isbn": "9784410262791",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "下水道施設計画・設計指針と解説",
+      "author": "社法　日本下水道協会",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "下水道施設計画・設計指針と解説",
+      "author": "社法　日本下水道協会",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "下水道施設計画・設計指針と解説",
+      "author": "日本下水道協会",
+      "publisher": "日本下水道協会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "下水道施設計画・設計指針と解説 前編・後編 2009年版",
+      "author": "(社) 日本下水道協会",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "人間工学の基礎",
+      "author": "石光俊介，佐藤秀紀",
+      "publisher": "養賢堂",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "侵入と伝播の拡散現象",
+      "author": "二宮広和",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "侵入と伝播の拡散現象",
+      "author": "二宮広和",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "再生医療のためのバイオマテリアル",
+      "author": "田畑",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "再生医療のためのバイオマテリアル",
+      "author": "田畑",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "制御工学の基礎",
+      "author": "田中正吾，山口静馬，和田憲造，清水光",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "力学",
+      "author": "原島 鮮",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "化学実験書",
+      "author": "龍谷大学理工学部編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "化学工学入門",
+      "author": "化学工学編集委員会編",
+      "publisher": "実教出版",
+      "price": null,
+      "isbn": "9784407323948",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "化学工学入門",
+      "author": "化学工学編集委員会編",
+      "publisher": "実教出版",
+      "price": null,
+      "isbn": "9784407323948",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "博物館情報・メディア論",
+      "author": "西岡貞一・篠田謙一",
+      "publisher": "放送大学教育振興会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "博物館情報・メディア論",
+      "author": "稲村哲也・近藤智嗣",
+      "publisher": "放送大学教育振興会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "危険物の保安管理",
+      "author": "",
+      "publisher": "全国危険物安全協会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "図解SolidWorks実習(第３版)",
+      "author": "栗山晃治・新間寬之・高橋史生",
+      "publisher": "森北出版株式会社",
+      "price": null,
+      "isbn": "978462766634",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "図解・情報技術者合格教本",
+      "author": "角谷一成",
+      "publisher": "技術評論社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "固体物理学入門　第8版上巻、下巻",
+      "author": "C. キッテル",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "固体物理学入門　第8版上巻、下巻",
+      "author": "C. キッテル",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "固体表面分析",
+      "author": "大西孝治他著",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "固体表面分析",
+      "author": "大西孝治他著",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "地域から考える環境と経済",
+      "author": "八木信一　他",
+      "publisher": "有斐閣",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "地域環境管理工学",
+      "author": "三野徹　他",
+      "publisher": "農業土木学会",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "基本情報技術者合格教本",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "大学院講義有機化学1",
+      "author": "野依良治他",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "480790484",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "大学院講義有機化学2",
+      "author": "野依良治他",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "480790485",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "大学院講義有機化学Ⅱ",
+      "author": "野依良治ら編",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "480790485",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "大学院講義有機化学Ⅱ",
+      "author": "野依良治ら編",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": "480790485",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "学生のための化学実験安全ガイド",
+      "author": "",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "安全のてびき",
+      "author": "",
+      "publisher": "龍谷大学先端理工学部制作",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "実験を安全に行うために",
+      "author": "",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "実験を安全に行うために",
+      "author": "化学同人編集部編",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "実験データを正しく扱うために",
+      "author": "化学同人編集部編",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "実験指導書",
+      "author": "環境生態工学課程編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "実験物理学講座　全12巻",
+      "author": "安岡、本河編",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "実験物理学講座　全12巻",
+      "author": "安岡、本河編",
+      "publisher": "丸善",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "微分方程式と数理モデル",
+      "author": "遠藤雅守・北林照幸",
+      "publisher": "裳華房",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "微分積分学の基礎",
+      "author": "水本久夫",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "応用情報技術者合格教本",
+      "author": "",
+      "publisher": "技術評論社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "情報セキュリティの技術と対策がしっかりわかる教科書",
+      "author": "中村行宏",
+      "publisher": "技術評論社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "情報セキュリティ読本",
+      "author": "情報処理推進機構",
+      "publisher": "実教出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "技術者のための化学工学の基礎と実践",
+      "author": "化学工学会",
+      "publisher": "アグネ承風社",
+      "price": null,
+      "isbn": "490050856",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "技術者のための化学工学の基礎と実践",
+      "author": "化学工学会",
+      "publisher": "アグネ承風社",
+      "price": null,
+      "isbn": "490050856",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "搭載!! 人工知能",
+      "author": "木村睦",
+      "publisher": "電気書院",
+      "price": null,
+      "isbn": "0",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "改訂　演習・微分積分学",
+      "author": "青木利夫　他",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "456300197",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "改訂　演習・微分積分学",
+      "author": "青木利夫　他",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "456300197",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "改訂　演習・微分積分学",
+      "author": "青木利夫　他",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "456300197",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "改訂化学のレポートと論文の書き方",
+      "author": "化学同人編集部編",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "教養の化学",
+      "author": "E.F.Neuzil 著, 和田悟朗 訳",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "数値計算入門",
+      "author": "川村哲也",
+      "publisher": "サイエンス社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "新博物館学教科書 博物館学Ⅲ 博物館情報・メディア 論＊博物館経営論",
+      "author": "大堀哲・水嶋英治 編著",
+      "publisher": "学文社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "有機化学　下",
+      "author": "マクマリー",
+      "publisher": "東京化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "有機機能材料",
+      "author": "松浦和則ら",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "8978406156020",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "有機機能材料",
+      "author": "松浦和則ら",
+      "publisher": "講談社",
+      "price": null,
+      "isbn": "784061568020",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "有限要素法入門 改訂版",
+      "author": "三好俊郎",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "563034908",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "材料の科学と工学 ２",
+      "author": "Callister, William D., 入戸野　修",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "456306713",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "材料の科学と工学 ２",
+      "author": "Callister, William D., 入戸野　修",
+      "publisher": "培風館",
+      "price": null,
+      "isbn": "456306713",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "機器分析化学実験指導書",
+      "author": "本学理工学部物質化学科編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "機械製図の基礎と演習",
+      "author": "熊谷信男ほか",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": "320080266",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "機械設計製図便覧",
+      "author": "津村利光ほか",
+      "publisher": "理工学社",
+      "price": null,
+      "isbn": "844520075",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "水環境施設実験指導書",
+      "author": "環境生態工学課程編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "水質工学　応用編",
+      "author": "合田健",
+      "publisher": "丸善株式会社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "水質工学　応用編",
+      "author": "合田健",
+      "publisher": "丸善株式会社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "水道施設設計指針 2012",
+      "author": "(社) 日本水道協会",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "滋賀の環境",
+      "author": "滋賀県琵琶湖環境部",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "燃焼学",
+      "author": "石塚　悟",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": "9784627675573",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "物理化学実験指針DVD",
+      "author": "龍谷大学理工学部物質化学科",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "物理化学実験指針（改定版）",
+      "author": "龍谷大学理工学部物質化学科",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "物理実験",
+      "author": "龍谷大学理工学部編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "物理実験",
+      "author": "龍谷大学理工学部編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "物理実験",
+      "author": "龍谷大学理工学部編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "現代人間工学 : 知的システム設計の基礎と実践",
+      "author": "呉景龍，塚本一義",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "琵琶湖のまわりの昆虫-地域の人びとと探る-",
+      "author": "八尋克郎",
+      "publisher": "サンライズ出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "琵琶湖の生物はいつ、どこからきたのか？",
+      "author": "西野麻知子編",
+      "publisher": "サンライズ出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "琵琶湖ハンドブック",
+      "author": "滋賀県琵琶湖環境部",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "環境分析化学実験指導書",
+      "author": "環境生態工学課程編",
+      "publisher": "manabaで配布",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "生態学入門（第２版）",
+      "author": "日本生態学会",
+      "publisher": "東京科学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "絵ときディジタル回路の教室",
+      "author": "堀　桂太郎",
+      "publisher": "オーム社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "続実験を安全に行うために",
+      "author": "化学同人編集部編",
+      "publisher": "化学同人",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "計測工学",
+      "author": "谷口 修, 堀込 泰雄",
+      "publisher": "森北出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "計測工学",
+      "author": "谷口修・掘込泰雄",
+      "publisher": "森北出版株式会社",
+      "price": null,
+      "isbn": "6276116117",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "詳解 電気回路演習 上",
+      "author": "大下真二郎著",
+      "publisher": "共立出版株式会社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "詳解 電気回路演習 下",
+      "author": "大下真二郎著",
+      "publisher": "共立出版株式会社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "詳解電気回路演習上",
+      "author": "大下真二郎著",
+      "publisher": "共立出版株式会社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "詳解電気回路演習下",
+      "author": "大下真二郎著",
+      "publisher": "共立出版株式会社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "課題論文を配布する。",
+      "author": "",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "課題論文を配布する。",
+      "author": "",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "進化生態学入門‐数式で見る生物進化-",
+      "author": "山内淳",
+      "publisher": "共立出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "進化生物学",
+      "author": "フツイマ 著、岸由二 訳",
+      "publisher": "蒼樹書房",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "都市環境施設実験Ｂテキスト",
+      "author": "市川陽一ほか",
+      "publisher": "龍谷大学理工学部",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "都市環境施設実験Ｂテキスト",
+      "author": "市川陽一ほか",
+      "publisher": "龍谷大学理工学部",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電子工学基礎",
+      "author": "中澤達夫・藤原勝幸",
+      "publisher": "コロナ社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電子情報通信実験 テキスト",
+      "author": "龍谷大学先端理工学部電子情報通信課程編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電子情報通信実験 テキスト",
+      "author": "龍谷大学先端理工学部電子情報通信課程編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電子情報通信実験 テキスト",
+      "author": "龍谷大学先端理工学部電子情報通信課程編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電子情報通信実験 テキスト",
+      "author": "龍谷大学先端理工学部電子情報通信課程編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電気電子回路基礎",
+      "author": "山本伸一",
+      "publisher": "電気書院",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電気電子回路基礎",
+      "author": "山本伸一",
+      "publisher": "電気書院",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電気電子回路基礎",
+      "author": "山本伸一",
+      "publisher": "電気書院",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電波・アンテナ工学入門",
+      "author": "築地　武彦",
+      "publisher": "総合電子出版",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "電磁波工学の基礎",
+      "author": "中野　義昭",
+      "publisher": "数理工学社",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "鳥越皓之 帯谷博明",
+      "author": "よくわかる環境社会学",
+      "publisher": "ミネルヴァ書房",
+      "price": null,
+      "isbn": "978053247",
+      "created_at": "2025-06-20T11:57:32.672727"
+    },
+    {
+      "title": "龍谷大学情報システムガイドブック",
+      "author": "龍谷大学情報メディアセンター編",
+      "publisher": "",
+      "price": null,
+      "isbn": null,
+      "created_at": "2025-06-20T11:57:32.672727"
+    }
+  ]
+}

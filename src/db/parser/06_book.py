@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 書籍情報抽出スクリプト
-File Version: v1.3.5
-Project Version: v1.3.5
+File Version: v1.3.6
+Project Version: v1.3.10
 """
 
 import os
@@ -51,26 +51,35 @@ def validate_isbn(isbn: str) -> bool:
         return False
     
     # 数字以外の文字を除去（Xは除く）
-    isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
+    cleaned_isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
     
     # ISBN-10の場合
-    if len(isbn) == 10:
+    if len(cleaned_isbn) == 10:
         total = 0
         for i in range(9):
-            total += int(isbn[i]) * (10 - i)
+            total += int(cleaned_isbn[i]) * (10 - i)
         check_digit = (11 - (total % 11)) % 11
         # チェックデジットが10の場合は'X'
         expected_check = 'X' if check_digit == 10 else str(check_digit)
-        return expected_check.upper() == isbn[9].upper()
+        actual_check = cleaned_isbn[9].upper()
+        is_valid = expected_check.upper() == actual_check
+        if not is_valid:
+            tqdm.write(f"ISBN-10 チェックディジット違反: {isbn} -> 期待値: {expected_check}, 実際: {actual_check}")
+        return is_valid
     
     # ISBN-13の場合
-    elif len(isbn) == 13:
+    elif len(cleaned_isbn) == 13:
         total = 0
         for i in range(12):
             weight = 1 if i % 2 == 0 else 3
-            total += int(isbn[i]) * weight
+            total += int(cleaned_isbn[i]) * weight
         check_digit = (10 - (total % 10)) % 10
-        return str(check_digit) == isbn[12]
+        expected_check = str(check_digit)
+        actual_check = cleaned_isbn[12]
+        is_valid = expected_check == actual_check
+        if not is_valid:
+            tqdm.write(f"ISBN-13 チェックディジット違反: {isbn} -> 期待値: {expected_check}, 実際: {actual_check}")
+        return is_valid
     
     return False
 
@@ -129,8 +138,15 @@ def calculate_similarity(str1: str, str2: str) -> float:
     # 重み付けは0.7:0.3（仕様書に準拠）
     return 0.7 * string_similarity + 0.3 * word_similarity
 
-def log_warning(message: str, json_file: str, year: int, isbn: str = ""):
+def log_warning(message: str, json_file: str, year: int, isbn: str = "", recorded_warnings: set = None):
     """警告をCSVファイルに記録"""
+    # 重複警告を防ぐ
+    if recorded_warnings is not None and isbn:
+        warning_key = f"{isbn}:{message}"
+        if warning_key in recorded_warnings:
+            return  # 既に記録済みの場合はスキップ
+        recorded_warnings.add(warning_key)
+    
     # 現在の日時を取得してファイル名を生成
     current_time = datetime.now()
     filename = f"book_{current_time.strftime('%Y%m%d_%H%M')}.csv"
@@ -150,6 +166,8 @@ def log_warning(message: str, json_file: str, year: int, isbn: str = ""):
 def get_book_info(year: int) -> List[Dict[str, Any]]:
     """書籍情報を取得する"""
     books = []
+    # 重複警告を防ぐためのセット
+    recorded_warnings = set()
     
     # シラバスから書籍情報を取得
     script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -173,6 +191,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                     if isinstance(books_list, list):
                         for book in books_list:
                             isbn = book.get('ISBN', '').strip()
+                            tqdm.write(f"処理中の書籍: ISBN={isbn}, 書籍名={book.get('書籍名', '')}, 著者={book.get('著者', '')}")  # デバッグ情報
                             if not isbn:
                                 # ISBNがnullの場合：シラバスJSONのデータから出力JSONに追記
                                 book_info = {
@@ -188,11 +207,15 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                             
                             # ISBNが存在する場合の処理
                             if not validate_isbn(isbn):
-                                # 桁数確認またはチェックディジット確認で異常あり
-                                if len(isbn) != 10 and len(isbn) != 13:
-                                    log_warning("不正ISBN: 桁数違反", json_file, year, isbn)
+                                # 数字以外の文字を除去した後の長さでチェック
+                                cleaned_isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
+                                tqdm.write(f"不正ISBN検出: {isbn} -> クリーンアップ後: {cleaned_isbn} (長さ: {len(cleaned_isbn)})")
+                                if len(cleaned_isbn) != 10 and len(cleaned_isbn) != 13:
+                                    log_warning("不正ISBN: 桁数違反", json_file, year, isbn, recorded_warnings)
+                                    tqdm.write(f"桁数違反: {len(cleaned_isbn)}桁 (期待: 10または13桁)")
                                 else:
-                                    log_warning("不正ISBN: cd違反", json_file, year, isbn)
+                                    log_warning("不正ISBN: cd違反", json_file, year, isbn, recorded_warnings)
+                                    tqdm.write(f"チェックディジット違反: {cleaned_isbn}")
                                 # シラバスJSONの対象レコードから出力JSONに追記
                                 book_info = {
                                     'title': book.get('書籍名', '').strip(),
@@ -218,10 +241,10 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                             # シラバスから書籍名を取得（類似度比較用）
                             syllabus_title = book.get('書籍名', '').strip()
                             
-                            # src/books/{ISBN}.jsonの存在確認（仕様書準拠）
-                            book_json_path = Path(f"src/books/{isbn}.json")
+                            # src/books/json/{ISBN}.jsonの存在確認（仕様書準拠）
+                            book_json_path = Path(f"src/books/json/{isbn}.json")
                             if book_json_path.exists():
-                                print(f"既存JSONファイル発見: {book_json_path}")  # デバッグ情報
+                                tqdm.write(f"既存JSONファイル発見: {book_json_path}")  # デバッグ情報
                                 try:
                                     with open(book_json_path, 'r', encoding='utf-8') as f:
                                         existing_data = json.load(f)
@@ -231,35 +254,96 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         channel = existing_data['@graph'][0]
                                         if 'items' in channel and len(channel['items']) > 0:
                                             item = channel['items'][0]
-                                            print(f"CiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
+                                            tqdm.write(f"CiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
                                             
-                                            # 書籍名の類似度比較
-                                            existing_title = item.get('title', '')
-                                            if syllabus_title and existing_title:
-                                                similarity = calculate_similarity(syllabus_title, existing_title)
-                                                print(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")  # デバッグ情報
-                                                if similarity < 0.05:  # 閾値を0.05に変更
-                                                    log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、CiNii書籍名「{existing_title}」", json_file, year, isbn)
-                                                    continue
-                                            
-                                            # 書籍情報を作成（既存JSONから取得、priceのみシラバスから）
-                                            book_info = {
-                                                'title': item.get('title', ''),
-                                                'isbn': isbn,
-                                                'author': item.get('dc:creator', ''),
-                                                'publisher': item.get('dc:publisher', ''),
-                                                'price': price,  # シラバスから取得
-                                                'created_at': datetime.now().isoformat()
-                                            }
-                                            
-                                            # publisherが配列の場合は最初の要素を使用
-                                            if isinstance(book_info['publisher'], list):
-                                                book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
-                                            
-                                            print(f"作成された書籍情報: {book_info}")  # デバッグ情報
-                                            books.append(book_info)
+                                            # BibTeX経由で書籍情報を取得
+                                            bibtex_book_info = get_book_info_from_bibtex(isbn)
+                                            if bibtex_book_info:
+                                                tqdm.write(f"BibTeXから取得した書籍情報: {bibtex_book_info}")  # デバッグ情報
+                                                tqdm.write(f"BibTeXデータ詳細: title='{bibtex_book_info.get('title', '')}', author='{bibtex_book_info.get('author', '')}', publisher='{bibtex_book_info.get('publisher', '')}'")  # デバッグ情報
+                                                
+                                                # 書籍名の類似度比較
+                                                existing_title = bibtex_book_info.get('title', '')
+                                                if syllabus_title and existing_title:
+                                                    similarity = calculate_similarity(syllabus_title, existing_title)
+                                                    tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, BibTeX: {existing_title})")  # デバッグ情報
+                                                    if similarity < 0.05:  # 閾値を0.05に変更
+                                                        log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、BibTeX書籍名「{existing_title}」", json_file, year, isbn, recorded_warnings)
+                                                        continue
+                                                
+                                                # BibTeXデータで空の項目がある場合はwarningに記載
+                                                empty_fields = []
+                                                if not bibtex_book_info.get('title', ''):
+                                                    empty_fields.append('タイトル')
+                                                if not bibtex_book_info.get('author', ''):
+                                                    empty_fields.append('著者')
+                                                if not bibtex_book_info.get('publisher', ''):
+                                                    empty_fields.append('出版社')
+                                                if empty_fields:
+                                                    log_warning(f"不正BibTeX データ: Null検知 - {', '.join(empty_fields)}が空", json_file, year, isbn, recorded_warnings)
+                                                
+                                                # 書籍情報を作成（BibTeXから取得、priceのみシラバスから）
+                                                book_info = {
+                                                    'title': bibtex_book_info.get('title', '') if bibtex_book_info.get('title', '') else syllabus_title,
+                                                    'isbn': isbn,
+                                                    'author': bibtex_book_info.get('author', '') if bibtex_book_info.get('author', '') else book.get('著者', '').strip(),
+                                                    'publisher': bibtex_book_info.get('publisher', '') if bibtex_book_info.get('publisher', '') else book.get('出版社', '').strip(),
+                                                    'price': price,  # シラバスから取得
+                                                    'created_at': datetime.now().isoformat()
+                                                }
+                                                
+                                                tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
+                                                books.append(book_info)
+                                            else:
+                                                # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
+                                                tqdm.write(f"BibTeX取得に失敗、既存CiNiiデータを使用: {isbn}")  # デバッグ情報
+                                                
+                                                # 書籍名の類似度比較
+                                                existing_title = item.get('title', '')
+                                                if syllabus_title and existing_title:
+                                                    similarity = calculate_similarity(syllabus_title, existing_title)
+                                                    tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")  # デバッグ情報
+                                                    if similarity < 0.05:  # 閾値を0.05に変更
+                                                        log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、CiNii書籍名「{existing_title}」", json_file, year, isbn, recorded_warnings)
+                                                        continue
+                                                
+                                                # CiNiiデータで空の項目がある場合はwarningに記載
+                                                empty_fields = []
+                                                if not item.get('title', ''):
+                                                    empty_fields.append('タイトル')
+                                                if not item.get('dc:creator', ''):
+                                                    empty_fields.append('著者')
+                                                if not item.get('dc:publisher', ''):
+                                                    empty_fields.append('出版社')
+                                                if empty_fields:
+                                                    log_warning(f"不正CiNii データ: Null検知 - {', '.join(empty_fields)}が空", json_file, year, isbn, recorded_warnings)
+                                                
+                                                # 書籍情報を作成（既存JSONから取得、priceのみシラバスから）
+                                                # CiNiiデータが空の場合はシラバスデータを優先
+                                                cinii_title = item.get('title', '')
+                                                cinii_author = item.get('dc:creator', '')
+                                                cinii_publisher = item.get('dc:publisher', '')
+                                                
+                                                tqdm.write(f"CiNiiデータ確認: title='{cinii_title}', author='{cinii_author}', publisher='{cinii_publisher}'")  # デバッグ情報
+                                                
+                                                book_info = {
+                                                    'title': cinii_title if cinii_title else syllabus_title,
+                                                    'isbn': isbn,
+                                                    'author': cinii_author if cinii_author else book.get('著者', '').strip(),
+                                                    'publisher': cinii_publisher if cinii_publisher else book.get('出版社', '').strip(),
+                                                    'price': price,  # シラバスから取得
+                                                    'created_at': datetime.now().isoformat()
+                                                }
+                                                
+                                                # publisherが配列の場合は最初の要素を使用
+                                                if isinstance(book_info['publisher'], list):
+                                                    book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
+                                                
+                                                tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
+                                                tqdm.write(f"元のCiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
+                                                books.append(book_info)
                                         else:
-                                            print(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
+                                            tqdm.write(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
                                             # itemsが見つからない場合はシラバスデータのみで作成
                                             book_info = {
                                                 'title': syllabus_title,
@@ -271,7 +355,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             }
                                             books.append(book_info)
                                     else:
-                                        print(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
+                                        tqdm.write(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
                                         # @graphが見つからない場合はシラバスデータのみで作成
                                         book_info = {
                                             'title': syllabus_title,
@@ -284,7 +368,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         books.append(book_info)
                                         
                                 except Exception as e:
-                                    print(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
+                                    tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -296,12 +380,12 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                     }
                                     books.append(book_info)
                             else:
-                                print(f"既存JSONファイルが存在しません: {book_json_path}")  # デバッグ情報
+                                tqdm.write(f"既存JSONファイルが存在しません: {book_json_path}")  # デバッグ情報
                                 # 既存JSONファイルが存在しない場合はCiNiiから取得
                                 try:
                                     cinii_data = get_cinii_data(isbn)
                                     if cinii_data:
-                                        print(f"CiNiiから取得成功: {isbn}")  # デバッグ情報
+                                        tqdm.write(f"CiNiiから取得成功: {isbn}")  # デバッグ情報
                                         # 書籍情報を作成
                                         book_info = {
                                             'title': cinii_data.get('title', syllabus_title),
@@ -313,8 +397,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                     else:
-                                        print(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
-                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn)
+                                        tqdm.write(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
+                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn, recorded_warnings)
                                         # CiNiiデータがない場合はシラバスデータのみで作成
                                         book_info = {
                                             'title': syllabus_title,
@@ -326,7 +410,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                 except Exception as e:
-                                    print(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
+                                    tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -346,6 +430,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                     if isinstance(books_list, list):
                         for book in books_list:
                             isbn = book.get('ISBN', '').strip()
+                            tqdm.write(f"処理中の書籍: ISBN={isbn}, 書籍名={book.get('書籍名', '')}, 著者={book.get('著者', '')}")  # デバッグ情報
                             if not isbn:
                                 # ISBNがnullの場合：シラバスJSONのデータから出力JSONに追記
                                 book_info = {
@@ -361,11 +446,15 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                             
                             # ISBNが存在する場合の処理
                             if not validate_isbn(isbn):
-                                # 桁数確認またはチェックディジット確認で異常あり
-                                if len(isbn) != 10 and len(isbn) != 13:
-                                    log_warning("不正ISBN: 桁数違反", json_file, year, isbn)
+                                # 数字以外の文字を除去した後の長さでチェック
+                                cleaned_isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
+                                tqdm.write(f"不正ISBN検出: {isbn} -> クリーンアップ後: {cleaned_isbn} (長さ: {len(cleaned_isbn)})")
+                                if len(cleaned_isbn) != 10 and len(cleaned_isbn) != 13:
+                                    log_warning("不正ISBN: 桁数違反", json_file, year, isbn, recorded_warnings)
+                                    tqdm.write(f"桁数違反: {len(cleaned_isbn)}桁 (期待: 10または13桁)")
                                 else:
-                                    log_warning("不正ISBN: cd違反", json_file, year, isbn)
+                                    log_warning("不正ISBN: cd違反", json_file, year, isbn, recorded_warnings)
+                                    tqdm.write(f"チェックディジット違反: {cleaned_isbn}")
                                 # シラバスJSONの対象レコードから出力JSONに追記
                                 book_info = {
                                     'title': book.get('書籍名', '').strip(),
@@ -391,10 +480,10 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                             # シラバスから書籍名を取得（類似度比較用）
                             syllabus_title = book.get('書籍名', '').strip()
                             
-                            # src/books/{ISBN}.jsonの存在確認（仕様書準拠）
-                            book_json_path = Path(f"src/books/{isbn}.json")
+                            # src/books/json/{ISBN}.jsonの存在確認（仕様書準拠）
+                            book_json_path = Path(f"src/books/json/{isbn}.json")
                             if book_json_path.exists():
-                                print(f"既存JSONファイル発見: {book_json_path}")  # デバッグ情報
+                                tqdm.write(f"既存JSONファイル発見: {book_json_path}")  # デバッグ情報
                                 try:
                                     with open(book_json_path, 'r', encoding='utf-8') as f:
                                         existing_data = json.load(f)
@@ -404,35 +493,96 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         channel = existing_data['@graph'][0]
                                         if 'items' in channel and len(channel['items']) > 0:
                                             item = channel['items'][0]
-                                            print(f"CiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
+                                            tqdm.write(f"CiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
                                             
-                                            # 書籍名の類似度比較
-                                            existing_title = item.get('title', '')
-                                            if syllabus_title and existing_title:
-                                                similarity = calculate_similarity(syllabus_title, existing_title)
-                                                print(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")  # デバッグ情報
-                                                if similarity < 0.05:  # 閾値を0.05に変更
-                                                    log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、CiNii書籍名「{existing_title}」", json_file, year, isbn)
-                                                    continue
-                                            
-                                            # 書籍情報を作成（既存JSONから取得、priceのみシラバスから）
-                                            book_info = {
-                                                'title': item.get('title', ''),
-                                                'isbn': isbn,
-                                                'author': item.get('dc:creator', ''),
-                                                'publisher': item.get('dc:publisher', ''),
-                                                'price': price,  # シラバスから取得
-                                                'created_at': datetime.now().isoformat()
-                                            }
-                                            
-                                            # publisherが配列の場合は最初の要素を使用
-                                            if isinstance(book_info['publisher'], list):
-                                                book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
-                                            
-                                            print(f"作成された書籍情報: {book_info}")  # デバッグ情報
-                                            books.append(book_info)
+                                            # BibTeX経由で書籍情報を取得
+                                            bibtex_book_info = get_book_info_from_bibtex(isbn)
+                                            if bibtex_book_info:
+                                                tqdm.write(f"BibTeXから取得した書籍情報: {bibtex_book_info}")  # デバッグ情報
+                                                tqdm.write(f"BibTeXデータ詳細: title='{bibtex_book_info.get('title', '')}', author='{bibtex_book_info.get('author', '')}', publisher='{bibtex_book_info.get('publisher', '')}'")  # デバッグ情報
+                                                
+                                                # 書籍名の類似度比較
+                                                existing_title = bibtex_book_info.get('title', '')
+                                                if syllabus_title and existing_title:
+                                                    similarity = calculate_similarity(syllabus_title, existing_title)
+                                                    tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, BibTeX: {existing_title})")  # デバッグ情報
+                                                    if similarity < 0.05:  # 閾値を0.05に変更
+                                                        log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、BibTeX書籍名「{existing_title}」", json_file, year, isbn, recorded_warnings)
+                                                        continue
+                                                
+                                                # BibTeXデータで空の項目がある場合はwarningに記載
+                                                empty_fields = []
+                                                if not bibtex_book_info.get('title', ''):
+                                                    empty_fields.append('タイトル')
+                                                if not bibtex_book_info.get('author', ''):
+                                                    empty_fields.append('著者')
+                                                if not bibtex_book_info.get('publisher', ''):
+                                                    empty_fields.append('出版社')
+                                                if empty_fields:
+                                                    log_warning(f"不正BibTeX データ: Null検知 - {', '.join(empty_fields)}が空", json_file, year, isbn, recorded_warnings)
+                                                
+                                                # 書籍情報を作成（BibTeXから取得、priceのみシラバスから）
+                                                book_info = {
+                                                    'title': bibtex_book_info.get('title', '') if bibtex_book_info.get('title', '') else syllabus_title,
+                                                    'isbn': isbn,
+                                                    'author': bibtex_book_info.get('author', '') if bibtex_book_info.get('author', '') else book.get('著者', '').strip(),
+                                                    'publisher': bibtex_book_info.get('publisher', '') if bibtex_book_info.get('publisher', '') else book.get('出版社', '').strip(),
+                                                    'price': price,  # シラバスから取得
+                                                    'created_at': datetime.now().isoformat()
+                                                }
+                                                
+                                                tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
+                                                books.append(book_info)
+                                            else:
+                                                # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
+                                                tqdm.write(f"BibTeX取得に失敗、既存CiNiiデータを使用: {isbn}")  # デバッグ情報
+                                                
+                                                # 書籍名の類似度比較
+                                                existing_title = item.get('title', '')
+                                                if syllabus_title and existing_title:
+                                                    similarity = calculate_similarity(syllabus_title, existing_title)
+                                                    tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")  # デバッグ情報
+                                                    if similarity < 0.05:  # 閾値を0.05に変更
+                                                        log_warning(f"問題レコード: 書籍名類似度低 - シラバス書籍名「{syllabus_title}」、CiNii書籍名「{existing_title}」", json_file, year, isbn, recorded_warnings)
+                                                        continue
+                                                
+                                                # CiNiiデータで空の項目がある場合はwarningに記載
+                                                empty_fields = []
+                                                if not item.get('title', ''):
+                                                    empty_fields.append('タイトル')
+                                                if not item.get('dc:creator', ''):
+                                                    empty_fields.append('著者')
+                                                if not item.get('dc:publisher', ''):
+                                                    empty_fields.append('出版社')
+                                                if empty_fields:
+                                                    log_warning(f"不正CiNii データ: Null検知 - {', '.join(empty_fields)}が空", json_file, year, isbn, recorded_warnings)
+                                                
+                                                # 書籍情報を作成（既存JSONから取得、priceのみシラバスから）
+                                                # CiNiiデータが空の場合はシラバスデータを優先
+                                                cinii_title = item.get('title', '')
+                                                cinii_author = item.get('dc:creator', '')
+                                                cinii_publisher = item.get('dc:publisher', '')
+                                                
+                                                tqdm.write(f"CiNiiデータ確認: title='{cinii_title}', author='{cinii_author}', publisher='{cinii_publisher}'")  # デバッグ情報
+                                                
+                                                book_info = {
+                                                    'title': cinii_title if cinii_title else syllabus_title,
+                                                    'isbn': isbn,
+                                                    'author': cinii_author if cinii_author else book.get('著者', '').strip(),
+                                                    'publisher': cinii_publisher if cinii_publisher else book.get('出版社', '').strip(),
+                                                    'price': price,  # シラバスから取得
+                                                    'created_at': datetime.now().isoformat()
+                                                }
+                                                
+                                                # publisherが配列の場合は最初の要素を使用
+                                                if isinstance(book_info['publisher'], list):
+                                                    book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
+                                                
+                                                tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
+                                                tqdm.write(f"元のCiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
+                                                books.append(book_info)
                                         else:
-                                            print(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
+                                            tqdm.write(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
                                             # itemsが見つからない場合はシラバスデータのみで作成
                                             book_info = {
                                                 'title': syllabus_title,
@@ -444,7 +594,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             }
                                             books.append(book_info)
                                     else:
-                                        print(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
+                                        tqdm.write(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
                                         # @graphが見つからない場合はシラバスデータのみで作成
                                         book_info = {
                                             'title': syllabus_title,
@@ -457,7 +607,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         books.append(book_info)
                                         
                                 except Exception as e:
-                                    print(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
+                                    tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -473,7 +623,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                 try:
                                     cinii_data = get_cinii_data(isbn)
                                     if cinii_data:
-                                        print(f"CiNiiから取得成功: {isbn}")  # デバッグ情報
+                                        tqdm.write(f"CiNiiから取得成功: {isbn}")  # デバッグ情報
                                         # 書籍情報を作成
                                         book_info = {
                                             'title': cinii_data.get('title', syllabus_title),
@@ -485,8 +635,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                     else:
-                                        print(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
-                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn)
+                                        tqdm.write(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
+                                        log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn, recorded_warnings)
                                         # CiNiiデータがない場合はシラバスデータのみで作成
                                         book_info = {
                                             'title': syllabus_title,
@@ -498,7 +648,7 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         }
                                         books.append(book_info)
                                 except Exception as e:
-                                    print(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
+                                    tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
                                     book_info = {
                                         'title': syllabus_title,
@@ -541,8 +691,8 @@ def get_cinii_data(isbn: str) -> Optional[Dict[str, str]]:
         if data.get('@graph') and len(data['@graph']) > 0:
             book_data = data['@graph'][0]
             
-            # src/books/{ISBN}.jsonに保存（仕様書準拠）
-            books_dir = Path("src/books")
+            # src/books/json/{ISBN}.jsonに保存（仕様書準拠）
+            books_dir = Path("src/books/json")
             books_dir.mkdir(exist_ok=True)
             book_json_path = books_dir / f"{isbn}.json"
             
@@ -559,12 +709,12 @@ def get_cinii_data(isbn: str) -> Optional[Dict[str, str]]:
     
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 403:
-            print(f"警告: CiNii BooksのAPIアクセスが制限されています。ISBN {isbn} の書籍情報を取得できませんでした。")
+            tqdm.write(f"警告: CiNii BooksのAPIアクセスが制限されています。ISBN {isbn} の書籍情報を取得できませんでした。")
         else:
-            print(f"警告: CiNii BooksのAPIでエラーが発生しました。ISBN {isbn} の書籍情報を取得できませんでした。")
+            tqdm.write(f"警告: CiNii BooksのAPIでエラーが発生しました。ISBN {isbn} の書籍情報を取得できませんでした。")
         return None
     except Exception as e:
-        print(f"警告: ISBN {isbn} の書籍情報を取得中にエラーが発生しました: {str(e)}")
+        tqdm.write(f"警告: ISBN {isbn} の書籍情報を取得中にエラーが発生しました: {str(e)}")
         return None
 
 def create_book_json(books: List[Dict[str, Any]]) -> str:
@@ -602,33 +752,152 @@ def test_similarity():
     
     for title1, title2 in test_cases:
         similarity = calculate_similarity(title1, title2)
-        print(f"類似度: {similarity:.3f}")
-        print(f"  シラバス: {title1}")
-        print(f"  CiNii: {title2}")
-        print(f"  判定: {'類似度低い' if similarity < 0.05 else '類似度高い'}")
-        print()
+        tqdm.write(f"類似度: {similarity:.3f}")
+        tqdm.write(f"  シラバス: {title1}")
+        tqdm.write(f"  CiNii: {title2}")
+        tqdm.write(f"  判定: {'類似度低い' if similarity < 0.05 else '類似度高い'}")
+        tqdm.write("")
+
+def save_bibtex_file(bn: str, bibtex_content: str):
+    """BibTeXファイルを保存"""
+    bibtex_dir = Path("src/books/bib")
+    bibtex_dir.mkdir(exist_ok=True)
+    bibtex_file = bibtex_dir / f"{bn}.bib"
+    
+    with open(bibtex_file, 'w', encoding='utf-8') as f:
+        f.write(bibtex_content)
+    
+    tqdm.write(f"BibTeXファイルを保存しました: {bibtex_file}")
+
+def extract_bn_from_cinii_json(data: dict) -> Optional[str]:
+    """CiNii JSONからBNを抽出"""
+    try:
+        if '@graph' in data and len(data['@graph']) > 0:
+            channel = data['@graph'][0]
+            if 'items' in channel and len(channel['items']) > 0:
+                item = channel['items'][0]
+                # @idからBNを抽出 (例: https://ci.nii.ac.jp/ncid/BB29265110 -> BB29265110)
+                item_id = item.get('@id', '')
+                if '/ncid/' in item_id:
+                    bn = item_id.split('/ncid/')[-1]
+                    return bn
+        return None
+    except Exception as e:
+        tqdm.write(f"BN抽出に失敗: {str(e)}")
+        return None
+
+def get_bibtex_from_bn(bn: str) -> Optional[str]:
+    """BNからBibTeXファイルを取得"""
+    try:
+        url = f"https://ci.nii.ac.jp/ncid/{bn}.bib"
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        tqdm.write(f"BibTeX取得に失敗: {bn} - {str(e)}")
+        return None
+
+def parse_bibtex(bibtex_text: str) -> Optional[Dict[str, str]]:
+    """BibTeXテキストをパースして書籍情報を抽出"""
+    try:
+        # 正しいBibTeXパーサー
+        lines = bibtex_text.split('\n')
+        book_info = {}
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('author'):
+                # author = "Turro, Nicholas J. and Ramamurthy, V. and Scaiano, J. C. and 井上, 晴夫  and 伊藤, 攻",
+                if '=' in line:
+                    value_part = line.split('=', 1)[1].strip()
+                    # 最初と最後のダブルクォートを除去し、末尾のカンマも除去
+                    if value_part.startswith('"') and value_part.endswith('",'):
+                        book_info['author'] = value_part[1:-2]
+                    elif value_part.startswith('"') and value_part.endswith('"'):
+                        book_info['author'] = value_part[1:-1]
+            elif line.startswith('title'):
+                if '=' in line:
+                    value_part = line.split('=', 1)[1].strip()
+                    if value_part.startswith('"') and value_part.endswith('",'):
+                        book_info['title'] = value_part[1:-2]
+                    elif value_part.startswith('"') and value_part.endswith('"'):
+                        book_info['title'] = value_part[1:-1]
+            elif line.startswith('publisher'):
+                if '=' in line:
+                    value_part = line.split('=', 1)[1].strip()
+                    if value_part.startswith('"') and value_part.endswith('",'):
+                        book_info['publisher'] = value_part[1:-2]
+                    elif value_part.startswith('"') and value_part.endswith('"'):
+                        book_info['publisher'] = value_part[1:-1]
+        
+        tqdm.write(f"BibTeXパース結果: {book_info}")  # デバッグ情報
+        return book_info if book_info else None
+    except Exception as e:
+        tqdm.write(f"BibTeXパースに失敗: {str(e)}")
+        return None
+
+def get_book_info_from_bibtex(isbn: str) -> Optional[Dict[str, str]]:
+    """既存JSONからBNを抽出し、BibTeXから書籍情報を取得"""
+    try:
+        # 1. 既存JSONファイルからBNを抽出
+        json_file = f"src/books/json/{isbn}.json"
+        if not os.path.exists(json_file):
+            return None
+            
+        with open(json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        bn = extract_bn_from_cinii_json(data)
+        if not bn:
+            return None
+        
+        # 2. 既存のBibTeXファイルをチェック
+        bibtex_file = f"src/books/bib/{bn}.bib"
+        bibtex_content = None
+        
+        if os.path.exists(bibtex_file):
+            # 既存のBibTeXファイルを読み込み
+            tqdm.write(f"既存のBibTeXファイルを使用: {bibtex_file}")
+            with open(bibtex_file, 'r', encoding='utf-8') as f:
+                bibtex_content = f.read()
+        else:
+            # 2. BNからBibTeXファイルを取得
+            bibtex_content = get_bibtex_from_bn(bn)
+            if bibtex_content:
+                # 3. BibTeXファイルを保存
+                save_bibtex_file(bn, bibtex_content)
+        
+        if not bibtex_content:
+            return None
+        
+        # 4. BibTeXから書籍情報を抽出
+        return parse_bibtex(bibtex_content)
+        
+    except Exception as e:
+        tqdm.write(f"BibTeX経由の書籍情報取得に失敗: {isbn} - {str(e)}")
+        return None
 
 def main():
     """メイン処理"""
     try:
         # 年度の取得
         year = get_year_from_user()
-        print(f"処理対象年度: {year}")
+        tqdm.write(f"処理対象年度: {year}")
         
         # 書籍情報の取得
-        print("書籍情報の取得を開始します...")
+        tqdm.write("書籍情報の取得を開始します...")
         books = get_book_info(year)
-        print(f"抽出された書籍情報: {len(books)}件")
+        tqdm.write(f"抽出された書籍情報: {len(books)}件")
         
         # JSONファイルの作成
-        print("JSONファイルの作成を開始します...")
+        tqdm.write("JSONファイルの作成を開始します...")
         output_file = create_book_json(books)
-        print(f"JSONファイルを作成しました: {output_file}")
+        tqdm.write(f"JSONファイルを作成しました: {output_file}")
         
     except Exception as e:
-        print(f"エラーが発生しました: {str(e)}")
+        tqdm.write(f"エラーが発生しました: {str(e)}")
         import traceback
-        print(f"エラーの詳細: {traceback.format_exc()}")
+        tqdm.write(f"エラーの詳細: {traceback.format_exc()}")
         raise
 
 if __name__ == "__main__":
