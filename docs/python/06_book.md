@@ -1,15 +1,15 @@
 ---
 title: 06_book.pyの仕様書
-file_version: v1.3.6
-project_version: v1.3.8
-last_updated: 2025-06-19
+file_version: v1.3.7
+project_version: v1.3.12
+last_updated: 2025-06-20
 ---
 
 # `06_book.py`の仕様書　
 
-- File Version: v1.3.6
-- Project Version: v1.3.8
-- Last Updated: 2025-06-19
+- File Version: v1.3.7
+- Project Version: v1.3.12
+- Last Updated: 2025-06-20
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](./doc.md)
 
@@ -20,9 +20,11 @@ last_updated: 2025-06-19
 4. [警告ファイル](#警告ファイル)
 5. [処理フロー](#処理フロー)
 6. [類似度計算](#類似度計算)
+7. [BibTeX処理](#bibtex処理)
+8. [警告メッセージ](#警告メッセージ)
 
 ## 概要
-`06_book.py`は、シラバスから書籍情報を抽出し、データベース用のJSONファイルを生成するスクリプトです。
+`06_book.py`は、シラバスから書籍情報を抽出し、データベース用のJSONファイルを生成するスクリプトです。CiNii APIとBibTeXデータを活用して書籍情報の精度を向上させます。
 
 ## 解析対象
 ### 対象ディレクトリ
@@ -38,7 +40,7 @@ last_updated: 2025-06-19
 
 ## 出力形式
 ### 基本形式
-- `docs/database/structure.md`のbookテーブルとbook_authorテーブルのカラムに対応したJSON形式
+- `docs/database/structure.md`のbookテーブルのカラムに対応したJSON形式
 - 出力は単一ファイルにまとめる
 - 出力ファイルは「出力JSON」と呼ぶ
 
@@ -52,13 +54,6 @@ last_updated: 2025-06-19
       "publisher": "出版社名",
       "price": 価格,
       "isbn": "ISBN番号",
-      "created_at": "作成日時"
-    }
-  ],
-  "book_authors": [
-    {
-      "book_id": "対応するbookのID",
-      "author_name": "個別著者名",
       "created_at": "作成日時"
     }
   ]
@@ -75,6 +70,10 @@ last_updated: 2025-06-19
 "{projectルートからのシラバスjsonのpath}", "ISBN", "error message", "time"
 ```
 
+### 重複警告防止
+- 同じISBNとメッセージの組み合わせは1回だけ記録
+- 警告の重複記録を防ぐ機能を実装
+
 ## 処理フロー
 ### 年度取得
 1. 起動時の引数で`{year}`を取得
@@ -87,10 +86,9 @@ tqdmで進捗を表示しながら、シラバスJSONを以下のように処理
 
 #### ISBNがnullの場合
 - シラバスJSONのデータから出力JSONに追記
-- 著者名がカンマ区切りの場合は、book_authorsセクションにも個別に追加
 
 #### ISBNが存在する場合
-- 桁数確認
+- 桁数確認（数字以外の文字を除去した後の長さで判定）
   - 異常あり：
     - 警告ファイルに記載（error message: "不正ISBN: 桁数違反"）
     - シラバスJSONの対象レコードから出力JSONに追記
@@ -100,26 +98,31 @@ tqdmで進捗を表示しながら、シラバスJSONを以下のように処理
         - 警告ファイルに記載（error message: "不正ISBN: cd違反"）
         - シラバスJSONの対象レコードから出力JSONに追記
       - 異常なし：
-        - `src/books/{ISBN}.json`の存在確認
+        - `src/books/json/{ISBN}.json`の存在確認
           - 存在しない：
             - CiNii APIで検索
               - ヒットなし：
                 - 警告ファイルに記載（error message: "問題ISBN: ciniiデータ不在"）
               - ヒットあり：
-                - `src/books/{ISBN}.json`に保存
+                - `src/books/json/{ISBN}.json`に保存
                 - 存在する場合の処理に進む
           - 存在する：
-            - 書籍名の類似度比較
-              - 類似度0.2以下：
-                - 警告ファイルに記載（error message: "問題レコード: 書籍名類似度低"）
-              - 類似度0.2以上：
-                - priceフィールド：該当レコードから取得
-                - その他：`src/books/{ISBN}.json`から取得
-                - 出力JSONに追記
+            - BibTeX経由で書籍情報を取得
+              - 取得成功：
+                - 書籍名の類似度比較
+                  - 類似度0.05以下：
+                    - 警告ファイルに記載（error message: "問題レコード: 書籍名類似度低"）
+                  - 類似度0.05以上：
+                    - priceフィールド：該当レコードから取得
+                    - その他：BibTeXから取得
+                    - 出力JSONに追記
+              - 取得失敗：
+                - 既存のCiNiiデータを使用
+                - 書籍名の類似度比較（閾値0.05）
+                - 類似度が低い場合は警告記録
 
 ### 著者情報の処理
 - 書籍情報の`author`フィールドはカンマ区切りの文字列として保存
-- 同時に`book_authors`セクションで個別の著者名を管理
 - 著者名の正規化（前後の空白除去、重複除去）を実施
 
 ## 類似度計算
@@ -141,8 +144,49 @@ tqdmで進捗を表示しながら、シラバスJSONを以下のように処理
      - シリーズ名の違いによる影響を軽減
 
 3. 閾値
-   - 0.2未満：明らかに異なる書籍
-   - 0.2以上0.5未満：要確認の範囲
-   - 0.5以上：同じ書籍の可能性が高い
+   - 0.05未満：明らかに異なる書籍（警告記録）
+   - 0.05以上：同じ書籍の可能性が高い
+
+## BibTeX処理
+### 処理フロー
+1. 既存JSONファイルからBN（CiNii ID）を抽出
+2. `src/books/bib/{BN}.bib`の存在確認
+3. 存在しない場合：
+   - CiNiiからBibTeXファイルを取得
+   - `src/books/bib/{BN}.bib`に保存
+4. BibTeXファイルをパースして書籍情報を抽出
+
+### BibTeXパーサー
+- 正しいBibTeX形式に対応
+- author、title、publisherフィールドを抽出
+- ダブルクォートとカンマの適切な処理
+
+### データ保存先
+- JSONファイル: `src/books/json/{ISBN}.json`
+- BibTeXファイル: `src/books/bib/{BN}.bib`
+
+## 警告メッセージ
+### 警告の種類
+1. **不正ISBN: 桁数違反**
+   - ISBNの桁数が10または13でない場合
+
+2. **不正ISBN: cd違反**
+   - ISBNのチェックディジットが正しくない場合
+
+3. **問題ISBN: ciniiデータ不在**
+   - CiNii APIで書籍情報が見つからない場合
+
+4. **問題レコード: 書籍名類似度低**
+   - シラバスとCiNii/BibTeXの書籍名の類似度が0.05未満の場合
+
+5. **不正BibTeX データ: Null検知**
+   - BibTeXデータでタイトル、著者、出版社が空の場合
+
+6. **不正CiNii データ: Null検知**
+   - CiNiiデータでタイトル、著者、出版社が空の場合
+
+### デバッグ情報
+- tqdm.writeを使用して詳細なデバッグ情報を出力
+- 処理中の書籍情報、類似度計算結果、データ取得状況を記録
 
 [🔝 ページトップへ](#06_bookpyの仕様書)
