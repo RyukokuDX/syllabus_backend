@@ -80,7 +80,7 @@ class Book(Base):
     __table_args__ = (
         Index('idx_book_title', 'title'),
         Index('idx_book_isbn', 'isbn'),
-        UniqueConstraint('title', 'publisher', name='uix_book_title_publisher'),
+        UniqueConstraint('isbn', name='uix_book_isbn'),
     )
 
 class BookUncategorized(Base):

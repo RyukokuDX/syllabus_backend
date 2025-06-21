@@ -1,14 +1,14 @@
 ---
 title: データベース構造定義
-file_version: v1.3.3
-project_version: v1.3.13
+file_version: v1.3.4
+project_version: v1.3.14
 last_updated: 2025-06-21
 ---
 
 # データベース構造定義
 
-- File Version: v1.3.3
-- Project Version: v1.3.13
+- File Version: v1.3.4
+- Project Version: v1.3.14
 - Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -190,7 +190,7 @@ last_updated: 2025-06-21
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | book_id | 主キー |
-| UNIQUE | (title, publisher) | タイトルと出版社の組み合わせの一意性 |
+| UNIQUE | isbn | ISBN番号の一意性 |
 | idx_book_title | title | 書籍タイトルでの検索用 |
 | idx_book_isbn | isbn | ISBN番号での検索用 |
 

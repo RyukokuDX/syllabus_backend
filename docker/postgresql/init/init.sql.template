@@ -102,9 +102,8 @@ CREATE TABLE IF NOT EXISTS book (
     author TEXT,
     publisher TEXT,
     price INTEGER,
-    isbn TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(title, publisher)
+    isbn TEXT UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
