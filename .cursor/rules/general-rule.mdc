@@ -17,7 +17,8 @@ alwaysApply: true
     - 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
     - 更新は既存のファイルの更新であり、新規ファイルの生成要求ではない
     - 更新に際して、cursorはversion情報を更新しない
-    - 更新に際して、文頭にファイル毎に定めたversion情報が記載されているかを確認し、無い場合はpatchレベル0で追加
+    - 更新に際して、文頭にファイル毎に定めたversion情報が記載されているかを確認
+        - 無い場合は [project_version.txt](mdc:project_version.txt) を参考に、 patchレベル0で追加
     - 更新承認後にgitへのpushの確認をする.
     - version情報を更新してからpushする
         - mdの場合は更新時にタイトル下のversion情報を更新、なければ加筆
@@ -27,7 +28,6 @@ alwaysApply: true
 - git bumpによって更新処理を行います
 - cursorはcommit_msg更新の指示で、 git bumpによって生成されたcommit_msgの「(ここに変更内容を記入)」の部分を、ファイル内容の変更から適当なものに変更します。
 - 変更は箇条書きで詳細を書きます
-
 ### version情報凡例
 - python
 ``` python
