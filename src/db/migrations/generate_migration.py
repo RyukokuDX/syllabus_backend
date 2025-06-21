@@ -124,6 +124,7 @@ def generate_sql_insert(table_name, records):
         "faculty": ["faculty_name"],
         "subject_name": ["name"],
         "syllabus_master": ["syllabus_code", "syllabus_year"],
+        "syllabus": ["syllabus_id"],  # syllabus_idは主キーなので一意
         "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name"],
@@ -149,6 +150,7 @@ def generate_sql_insert(table_name, records):
         "faculty": ["faculty_name"],
         "subject_name": ["name"],
         "syllabus_master": ["syllabus_code", "syllabus_year"],
+        "syllabus": ["subject_name_id", "subtitle", "term", "campus", "credits", "goals", "summary", "attainment", "methods", "outside_study", "textbook_comment", "reference_comment", "advice"],  # syllabus_id以外のカラムを更新対象に
         "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name", "description"],
@@ -280,8 +282,9 @@ CREATE TABLE IF NOT EXISTS syllabus (
     attainment TEXT,
     methods TEXT,
     outside_study TEXT,
-    notes TEXT,
-    remarks TEXT,
+    textbook_comment TEXT,
+    reference_comment TEXT,
+    advice TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );""",
