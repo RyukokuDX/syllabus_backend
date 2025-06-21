@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 書籍情報抽出スクリプト
-File Version: v1.3.6
-Project Version: v1.3.10
+File Version: v1.3.7
+Project Version: v1.3.13
 """
 
 import os
@@ -168,6 +168,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
     books = []
     # 重複警告を防ぐためのセット
     recorded_warnings = set()
+    # ISBN重複回避のためのセット
+    processed_isbns = set()
     
     # シラバスから書籍情報を取得
     script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -205,6 +207,11 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                 books.append(book_info)
                                 continue
                             
+                            # ISBN重複チェック（正規のISBNのみ）
+                            if validate_isbn(isbn) and isbn in processed_isbns:
+                                tqdm.write(f"重複ISBNをスキップ: {isbn}")
+                                continue
+                            
                             # ISBNが存在する場合の処理
                             if not validate_isbn(isbn):
                                 # 数字以外の文字を除去した後の長さでチェック
@@ -294,6 +301,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                                 
                                                 tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
                                                 books.append(book_info)
+                                                # 正規のISBNを処理済みとして記録
+                                                processed_isbns.add(isbn)
                                             else:
                                                 # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
                                                 tqdm.write(f"BibTeX取得に失敗、既存CiNiiデータを使用: {isbn}")  # デバッグ情報
@@ -342,6 +351,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                                 tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
                                                 tqdm.write(f"元のCiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
                                                 books.append(book_info)
+                                                # 正規のISBNを処理済みとして記録
+                                                processed_isbns.add(isbn)
                                         else:
                                             tqdm.write(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
                                             # itemsが見つからない場合はシラバスデータのみで作成
@@ -354,6 +365,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                                 'created_at': datetime.now().isoformat()
                                             }
                                             books.append(book_info)
+                                            # 正規のISBNを処理済みとして記録
+                                            processed_isbns.add(isbn)
                                     else:
                                         tqdm.write(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
                                         # @graphが見つからない場合はシラバスデータのみで作成
@@ -366,6 +379,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             'created_at': datetime.now().isoformat()
                                         }
                                         books.append(book_info)
+                                        # 正規のISBNを処理済みとして記録
+                                        processed_isbns.add(isbn)
                                         
                                 except Exception as e:
                                     tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
@@ -379,6 +394,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         'created_at': datetime.now().isoformat()
                                     }
                                     books.append(book_info)
+                                    # 正規のISBNを処理済みとして記録
+                                    processed_isbns.add(isbn)
                             else:
                                 tqdm.write(f"既存JSONファイルが存在しません: {book_json_path}")  # デバッグ情報
                                 # 既存JSONファイルが存在しない場合はCiNiiから取得
@@ -396,6 +413,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             'created_at': datetime.now().isoformat()
                                         }
                                         books.append(book_info)
+                                        # 正規のISBNを処理済みとして記録
+                                        processed_isbns.add(isbn)
                                     else:
                                         tqdm.write(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
                                         log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn, recorded_warnings)
@@ -409,6 +428,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             'created_at': datetime.now().isoformat()
                                         }
                                         books.append(book_info)
+                                        # 正規のISBNを処理済みとして記録
+                                        processed_isbns.add(isbn)
                                 except Exception as e:
                                     tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
@@ -421,6 +442,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         'created_at': datetime.now().isoformat()
                                     }
                                     books.append(book_info)
+                                    # 正規のISBNを処理済みとして記録
+                                    processed_isbns.add(isbn)
             
             # 参考文献情報の処理（仕様書準拠）
             if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
@@ -444,6 +467,11 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                 books.append(book_info)
                                 continue
                             
+                            # ISBN重複チェック（正規のISBNのみ）
+                            if validate_isbn(isbn) and isbn in processed_isbns:
+                                tqdm.write(f"重複ISBNをスキップ: {isbn}")
+                                continue
+                            
                             # ISBNが存在する場合の処理
                             if not validate_isbn(isbn):
                                 # 数字以外の文字を除去した後の長さでチェック
@@ -533,6 +561,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                                 
                                                 tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
                                                 books.append(book_info)
+                                                # 正規のISBNを処理済みとして記録
+                                                processed_isbns.add(isbn)
                                             else:
                                                 # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
                                                 tqdm.write(f"BibTeX取得に失敗、既存CiNiiデータを使用: {isbn}")  # デバッグ情報
@@ -581,6 +611,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                                 tqdm.write(f"作成された書籍情報: {book_info}")  # デバッグ情報
                                                 tqdm.write(f"元のCiNiiデータ: title={item.get('title', '')}, author={item.get('dc:creator', '')}, publisher={item.get('dc:publisher', '')}")  # デバッグ情報
                                                 books.append(book_info)
+                                                # 正規のISBNを処理済みとして記録
+                                                processed_isbns.add(isbn)
                                         else:
                                             tqdm.write(f"CiNii JSONにitemsが見つかりません: {book_json_path}")  # デバッグ情報
                                             # itemsが見つからない場合はシラバスデータのみで作成
@@ -593,6 +625,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                                 'created_at': datetime.now().isoformat()
                                             }
                                             books.append(book_info)
+                                            # 正規のISBNを処理済みとして記録
+                                            processed_isbns.add(isbn)
                                     else:
                                         tqdm.write(f"CiNii JSONに@graphが見つかりません: {book_json_path}")  # デバッグ情報
                                         # @graphが見つからない場合はシラバスデータのみで作成
@@ -605,6 +639,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             'created_at': datetime.now().isoformat()
                                         }
                                         books.append(book_info)
+                                        # 正規のISBNを処理済みとして記録
+                                        processed_isbns.add(isbn)
                                         
                                 except Exception as e:
                                     tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")  # デバッグ情報
@@ -618,6 +654,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         'created_at': datetime.now().isoformat()
                                     }
                                     books.append(book_info)
+                                    # 正規のISBNを処理済みとして記録
+                                    processed_isbns.add(isbn)
                             else:
                                 # 既存JSONファイルが存在しない場合はCiNiiから取得
                                 try:
@@ -634,6 +672,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             'created_at': datetime.now().isoformat()
                                         }
                                         books.append(book_info)
+                                        # 正規のISBNを処理済みとして記録
+                                        processed_isbns.add(isbn)
                                     else:
                                         tqdm.write(f"CiNiiから取得失敗: {isbn}")  # デバッグ情報
                                         log_warning("問題ISBN: ciniiデータ不在", json_file, year, isbn, recorded_warnings)
@@ -647,6 +687,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                             'created_at': datetime.now().isoformat()
                                         }
                                         books.append(book_info)
+                                        # 正規のISBNを処理済みとして記録
+                                        processed_isbns.add(isbn)
                                 except Exception as e:
                                     tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")  # デバッグ情報
                                     # エラーの場合はシラバスデータのみで作成
@@ -659,6 +701,8 @@ def get_book_info(year: int) -> List[Dict[str, Any]]:
                                         'created_at': datetime.now().isoformat()
                                     }
                                     books.append(book_info)
+                                    # 正規のISBNを処理済みとして記録
+                                    processed_isbns.add(isbn)
             
         except Exception as e:
             log_warning(f"ファイル処理エラー: {str(e)}", json_file, year)

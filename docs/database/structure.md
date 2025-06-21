@@ -1,15 +1,15 @@
 ---
 title: データベース構造定義
-file_version: v1.3.2
-project_version: v1.3.11
-last_updated: 2025-06-20
+file_version: v1.3.3
+project_version: v1.3.13
+last_updated: 2025-06-21
 ---
 
 # データベース構造定義
 
-- File Version: v1.3.2
-- Project Version: v1.3.11
-- Last Updated: 2025-06-20
+- File Version: v1.3.3
+- Project Version: v1.3.13
+- Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -22,20 +22,21 @@ last_updated: 2025-06-20
 4. [subject_name 科目名マスタ](#subject_name-科目名マスタ)
 5. [instructor 教員](#instructor-教員)
 6. [book 書籍](#book-書籍)
-7. [syllabus_master シラバスマスタ](#syllabus_master-シラバスマスタ)
-8. [syllabus シラバス情報](#syllabus-シラバス情報)
-9. [subject_grade 科目履修可能学年](#subject_grade-科目履修可能学年)
-10. [lecture_time 講義時間](#lecture_time-講義時間)
-11. [lecture_session 講義回数](#lecture_session-講義回数)
-12. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
-13. [lecture_session_instructor 講義回数担当者](#lecture_session_instructor-講義回数担当者)
-14. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
-15. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-16. [subject_attribute 科目属性](#subject_attribute-科目属性)
-17. [subject 科目基本情報](#subject-科目基本情報)
-18. [subject_syllabus 科目シラバス関連](#subject_syllabus-科目シラバス関連)
-19. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
-20. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
+7. [book_uncategorized 未分類書籍](#book_uncategorized-未分類書籍)
+8. [syllabus_master シラバスマスタ](#syllabus_master-シラバスマスタ)
+9. [syllabus シラバス情報](#syllabus-シラバス情報)
+10. [subject_grade 科目履修可能学年](#subject_grade-科目履修可能学年)
+11. [lecture_time 講義時間](#lecture_time-講義時間)
+12. [lecture_session 講義回数](#lecture_session-講義回数)
+13. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
+14. [lecture_session_instructor 講義回数担当者](#lecture_session_instructor-講義回数担当者)
+15. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
+16. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+17. [subject_attribute 科目属性](#subject_attribute-科目属性)
+18. [subject 科目基本情報](#subject-科目基本情報)
+19. [subject_syllabus 科目シラバス関連](#subject_syllabus-科目シラバス関連)
+20. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
+21. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
 
 
 ## テーブル構成
@@ -56,6 +57,7 @@ last_updated: 2025-06-20
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | class_id | 主キー |
+| UNIQUE | class_name | クラス名の一意性 |
 | idx_class_name | class_name | クラス名での検索用 |
 
 #### 外部キー制約
@@ -81,6 +83,7 @@ last_updated: 2025-06-20
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | subclass_id | 主キー |
+| UNIQUE | subclass_name | 小区分名の一意性 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -105,6 +108,8 @@ last_updated: 2025-06-20
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | faculty_id | 主キー |
+| UNIQUE | faculty_name | 学部・課程名の一意性 |
+| idx_faculty_name | faculty_name | 学部・課程名での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
@@ -185,14 +190,59 @@ last_updated: 2025-06-20
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | book_id | 主キー |
-| UNIQUE | isbn | ISBN番号の一意性 |
 | UNIQUE | (title, publisher) | タイトルと出版社の組み合わせの一意性 |
 | idx_book_title | title | 書籍タイトルでの検索用 |
+| idx_book_isbn | isbn | ISBN番号での検索用 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | - | - | - |
+
+#### 補足
+- ISBN番号には不正な値が混入する可能性があるため、UNIQUE制約は設定していない
+- ISBN番号での検索は可能だが、重複を許容する
+
+[🔝 ページトップへ](#データベース構造定義)
+
+### book_uncategorized 未分類書籍
+
+#### テーブル概要
+正規のbookテーブルに分類できない書籍情報（ISBNなし、不正ISBN、タイトル不一致、データ不足など）を管理するテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | 主キー | システム生成 |
+| syllabus_code | TEXT | NO | シラバスコード | Web Syllabus |
+| title | TEXT | NO | 書籍タイトル | Web Syllabus |
+| author | TEXT | YES | 著者名 | Web Syllabus |
+| publisher | TEXT | YES | 出版社名 | Web Syllabus |
+| price | INTEGER | YES | 価格（税抜） | Web Syllabus |
+| role | TEXT | NO | 利用方法（教科書、参考書など） | Web Syllabus |
+| isbn | TEXT | YES | ISBN番号（不正・未入力含む） | Web Syllabus |
+| categorization_status | TEXT | YES | 未分類理由（ISBNなし、不正ISBN、タイトル不一致、データ不足など） | システム判定 |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_book_uncategorized_syllabus | syllabus_code | シラバスコードでの検索用 |
+| idx_book_uncategorized_title | title | 書籍タイトルでの検索用 |
+| idx_book_uncategorized_isbn | isbn | ISBN番号での検索用 |
+| idx_book_uncategorized_status | categorization_status | 未分類理由での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| - | - | - |
+
+#### 補足
+- 正規のbookテーブルに分類できない全ての書籍情報を管理
+- categorization_statusで未分類理由を明示
+- シラバスコードとの関連を保持し、どのシラバスで参照されているかを追跡可能
 
 [🔝 ページトップへ](#データベース構造定義)
 

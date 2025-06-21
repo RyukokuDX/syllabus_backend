@@ -17,17 +17,17 @@ erDiagram
     %% マスターテーブル
     class {
         INTEGER class_id PK
-        TEXT class_name
+        TEXT class_name UNIQUE
         TIMESTAMP created_at
     }
     subclass {
         INTEGER subclass_id PK
-        TEXT subclass_name
+        TEXT subclass_name UNIQUE
         TIMESTAMP created_at
     }
     faculty {
         INTEGER faculty_id PK
-        TEXT faculty_name
+        TEXT faculty_name UNIQUE
         TIMESTAMP created_at
     }
     subject_name {
@@ -50,6 +50,25 @@ erDiagram
         TEXT isbn
         TIMESTAMP created_at
     }
+    book_uncategorized {
+        INTEGER id PK
+        TEXT syllabus_code
+        TEXT title
+        TEXT author
+        TEXT publisher
+        INTEGER price
+        TEXT role
+        TEXT isbn
+        TEXT categorization_status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    book_author {
+        INTEGER book_author_id PK
+        INTEGER book_id FK
+        TEXT author_name
+        TIMESTAMP created_at
+    }
     subject_attribute {
         INTEGER attribute_id PK
         TEXT attribute_name
@@ -66,34 +85,52 @@ erDiagram
         TIMESTAMP updated_at
     }
     syllabus {
-        TEXT syllabus_code PK
+        INTEGER syllabus_id PK,FK
         INTEGER subject_name_id FK
         TEXT subtitle
         TEXT term
         TEXT campus
         INTEGER credits
-        TEXT summary
         TEXT goals
+        TEXT summary
+        TEXT attainment
         TEXT methods
         TEXT outside_study
-        TEXT notes
-        TEXT remarks
+        TEXT textbook_comment
+        TEXT reference_comment
+        TEXT advice
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    subject_grade {
+        INTEGER id PK
+        INTEGER syllabus_id FK
+        TEXT grade
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
     lecture_time {
-        INTEGER lecture_time_id PK
+        INTEGER id PK
         INTEGER syllabus_id FK
-        SMALLINT day_of_week
+        TEXT day_of_week
         SMALLINT period
-        TEXT room
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
     lecture_session {
         INTEGER lecture_session_id PK
-        INTEGER lecture_time_id FK
-        SMALLINT session_number
+        INTEGER syllabus_id FK
+        INTEGER session_number
+        TEXT contents
+        TEXT other_info
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    syllabus_instructor {
+        INTEGER id PK
+        INTEGER syllabus_id FK
+        INTEGER instructor_id FK
+        TEXT role
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -101,17 +138,13 @@ erDiagram
         INTEGER id PK
         INTEGER lecture_session_id FK
         INTEGER instructor_id FK
+        TEXT role
         TIMESTAMP created_at
-    }
-    syllabus_instructor {
-        INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER instructor_id FK
-        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
     syllabus_book {
         INTEGER id PK
-        TEXT syllabus_code FK
+        INTEGER syllabus_id FK
         INTEGER book_id FK
         TEXT role
         TEXT note
@@ -119,26 +152,10 @@ erDiagram
     }
     grading_criterion {
         INTEGER id PK
-        TEXT syllabus_code FK
+        INTEGER syllabus_id FK
         TEXT criteria_type
         INTEGER ratio
         TEXT note
-        TIMESTAMP created_at
-    }
-    syllabus_enrollment_year {
-        INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER enrollment_year
-        INTEGER syllabus_year
-        INTEGER faculty_id FK
-        TIMESTAMP created_at
-    }
-    syllabus_faculty_enrollment {
-        INTEGER id PK
-        TEXT syllabus_code FK
-        INTEGER enrollment_year
-        INTEGER syllabus_year
-        INTEGER faculty_id FK
         TIMESTAMP created_at
     }
 
@@ -159,8 +176,7 @@ erDiagram
     subject_syllabus {
         INTEGER id PK
         INTEGER subject_id FK
-        TEXT syllabus_code FK
-        INTEGER syllabus_year
+        INTEGER syllabus_id FK
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -179,27 +195,6 @@ erDiagram
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
-    requirement_header {
-        INTEGER requirement_header_id PK
-        INTEGER requirement_year
-        INTEGER faculty_id FK
-        INTEGER subject_name_id FK
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    requirement_attribute {
-        INTEGER requirement_attribute_id PK
-        TEXT name
-        TIMESTAMP created_at
-    }
-    requirement {
-        INTEGER requirement_id PK
-        INTEGER requirement_header_id FK
-        INTEGER requirement_attribute_id FK
-        TEXT text
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
 
     %% 関連の定義
     %% マスターテーブル → 基本テーブル
@@ -213,30 +208,25 @@ erDiagram
     instructor ||--o{ syllabus_instructor : "instructor_id"
     instructor ||--o{ lecture_session_instructor : "instructor_id"
     book ||--o{ syllabus_book : "book_id"
+    book ||--o{ book_author : "book_id"
     subject_attribute ||--o{ subject_attribute_value : "attribute_id"
-    faculty ||--o{ syllabus_enrollment_year : "faculty_id"
-    faculty ||--o{ syllabus_faculty_enrollment : "faculty_id"
-    faculty ||--o{ requirement_header : "faculty_id"
-    subject_name ||--o{ requirement_header : "subject_name_id"
-    requirement_attribute ||--o{ requirement : "requirement_attribute_id"
 
     %% 基本テーブル → 関連テーブル
     subject ||--o{ subject_syllabus : "subject_id"
     subject ||--o{ subject_attribute_value : "subject_id"
 
     %% トランザクションテーブル → 関連テーブル
+    syllabus_master ||--|| syllabus : "syllabus_id"
+    syllabus_master ||--o{ subject_grade : "syllabus_id"
     syllabus_master ||--o{ lecture_time : "syllabus_id"
+    syllabus_master ||--o{ lecture_session : "syllabus_id"
+    syllabus_master ||--o{ syllabus_instructor : "syllabus_id"
+    syllabus_master ||--o{ syllabus_book : "syllabus_id"
+    syllabus_master ||--o{ grading_criterion : "syllabus_id"
     syllabus_master ||--o{ syllabus_study_system : "source_syllabus_id"
-    syllabus ||--o{ syllabus_instructor : "syllabus_code"
-    syllabus ||--o{ syllabus_book : "syllabus_code"
-    syllabus ||--o{ grading_criterion : "syllabus_code"
-    syllabus ||--o{ syllabus_enrollment_year : "syllabus_code"
-    syllabus ||--o{ syllabus_faculty_enrollment : "syllabus_code"
-    syllabus ||--o{ subject_syllabus : "syllabus_code"
+    syllabus_master ||--o{ subject_syllabus : "syllabus_id"
 
-    lecture_time ||--o{ lecture_session : "lecture_time_id"
     lecture_session ||--o{ lecture_session_instructor : "lecture_session_id"
-    requirement_header ||--o{ requirement : "requirement_header_id"
 ```
 
 ## 更新履歴
@@ -261,5 +251,6 @@ erDiagram
 | 2024-05-29 | 1.1.14 | 藤原 | マスターテーブルのタイムスタンプカラムを整理、instructorテーブルの主キーをinstructor_idに変更 |
 | 2024-05-29 | 1.1.15 | 藤原 | syllabus_bookテーブルのroleカラムをTEXT型に変更、subject_syllabusテーブルからlecture_codeを削除 |
 | 2025-06-19 | 1.1.16 | 藤原 | structure.mdとmodels.pyに準拠してER図を更新 |
+| 2025-06-20 | 1.1.17 | 藤原 | structure.mdに準拠してER図を更新、bookテーブルのISBN制約を削除し、不要なテーブルを削除 |
 
 [目次へ戻る](#目次) 

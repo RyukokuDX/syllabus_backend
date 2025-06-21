@@ -17,6 +17,7 @@ class Class(Base):
 
     __table_args__ = (
         Index('idx_class_name', 'class_name'),
+        UniqueConstraint('class_name', name='uix_class_name'),
     )
 
 class Subclass(Base):
@@ -25,6 +26,11 @@ class Subclass(Base):
     subclass_id = Column(Integer, primary_key=True)
     subclass_name = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_subclass_name', 'subclass_name'),
+        UniqueConstraint('subclass_name', name='uix_subclass_name'),
+    )
 
 class ClassNote(Base):
     __tablename__ = 'class_note'
@@ -41,6 +47,7 @@ class Faculty(Base):
 
     __table_args__ = (
         Index('idx_faculty_name', 'faculty_name'),
+        UniqueConstraint('faculty_name', name='uix_faculty_name'),
     )
 
     syllabus_enrollment_years = relationship("SyllabusEnrollmentYear", back_populates="faculty", cascade="all, delete-orphan")
@@ -72,8 +79,30 @@ class Book(Base):
 
     __table_args__ = (
         Index('idx_book_title', 'title'),
-        UniqueConstraint('isbn', name='uix_book_isbn'),
+        Index('idx_book_isbn', 'isbn'),
         UniqueConstraint('title', 'publisher', name='uix_book_title_publisher'),
+    )
+
+class BookUncategorized(Base):
+    __tablename__ = 'book_uncategorized'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, nullable=False)
+    title = Column(Text, nullable=False)
+    author = Column(Text)
+    publisher = Column(Text)
+    price = Column(Integer)
+    role = Column(Text, nullable=False)
+    isbn = Column(Text)
+    categorization_status = Column(Text)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_book_uncategorized_syllabus_code', 'syllabus_code'),
+        Index('idx_book_uncategorized_title', 'title'),
+        Index('idx_book_uncategorized_isbn', 'isbn'),
+        Index('idx_book_uncategorized_status', 'categorization_status'),
     )
 
 class BookAuthor(Base):
@@ -357,6 +386,33 @@ class Faculty:
     """開講学部・課程モデル"""
     faculty_id: int
     faculty_name: str
+    created_at: datetime
+
+@dataclass
+class Instructor:
+    """教員モデル"""
+    instructor_id: int
+    name: str
+    name_kana: Optional[str]
+    created_at: datetime
+
+@dataclass
+class Book:
+    """書籍モデル"""
+    book_id: int
+    title: str
+    author: Optional[str]
+    publisher: Optional[str]
+    price: Optional[int]
+    isbn: Optional[str]
+    created_at: datetime
+
+@dataclass
+class BookAuthor:
+    """書籍著者モデル"""
+    book_author_id: int
+    book_id: int
+    author_name: str
     created_at: datetime
 
 @dataclass

@@ -104,11 +104,11 @@ CREATE TABLE IF NOT EXISTS book (
     price INTEGER,
     isbn TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(isbn),
     UNIQUE(title, publisher)
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
+CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
 
 -- book_author（書籍著者）
 CREATE TABLE IF NOT EXISTS book_author (
@@ -320,3 +320,7 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 -- ========== マイグレーションファイルの実行 ==========
 
 -- （この部分はgenerate-init.shで自動挿入されます）
+\i /docker-entrypoint-initdb.d/migrations/V20250619213023__insert_classs.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250619213231__insert_subclasss.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250619213358__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250619213519__insert_subject_names.sql

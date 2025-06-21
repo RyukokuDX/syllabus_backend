@@ -26,11 +26,17 @@ fi
 MIGRATION_NAME=$(basename "$LATEST_MIGRATION")
 echo "最新のマイグレーションファイル: $MIGRATION_NAME を適用します..."
 
-# マイグレーションファイルをコンテナにコピー
-docker cp "$LATEST_MIGRATION" postgres-db:/tmp/
+# ファイルの存在確認
+if [ ! -f "$LATEST_MIGRATION" ]; then
+    echo "エラー: マイグレーションファイルが見つかりません: $LATEST_MIGRATION"
+    exit 1
+fi
 
-# マイグレーションの適用
-docker-compose exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f "/tmp/$MIGRATION_NAME"
+echo "ファイルパス: $LATEST_MIGRATION"
+
+# ファイルの内容を直接コンテナ内で実行
+echo "マイグレーションを適用中..."
+docker-compose exec -T postgres-db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" < "$LATEST_MIGRATION"
 
 # 結果の確認
 if [ $? -eq 0 ]; then
