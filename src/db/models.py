@@ -87,7 +87,7 @@ class BookUncategorized(Base):
     __tablename__ = 'book_uncategorized'
 
     id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, nullable=False)
+    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
     title = Column(Text, nullable=False)
     author = Column(Text)
     publisher = Column(Text)
@@ -99,7 +99,7 @@ class BookUncategorized(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        Index('idx_book_uncategorized_syllabus_code', 'syllabus_code'),
+        Index('idx_book_uncategorized_syllabus', 'syllabus_id'),
         Index('idx_book_uncategorized_title', 'title'),
         Index('idx_book_uncategorized_isbn', 'isbn'),
         Index('idx_book_uncategorized_status', 'categorization_status'),
@@ -219,6 +219,22 @@ class LectureSession(Base):
         Index('idx_lecture_session_number', 'session_number'),
     )
 
+class LectureSessionIrregular(Base):
+    __tablename__ = 'lecture_session_irregular'
+
+    lecture_session_irregular_id = Column(Integer, primary_key=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    session_pattern = Column(Text, nullable=False)
+    contents = Column(Text)
+    other_info = Column(Text)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_lecture_session_irregular_syllabus', 'syllabus_id'),
+        Index('idx_lecture_session_irregular_pattern', 'session_pattern'),
+    )
+
 class SyllabusInstructor(Base):
     __tablename__ = 'syllabus_instructor'
 
@@ -249,6 +265,22 @@ class LectureSessionInstructor(Base):
         Index('idx_lecture_session_instructor_session', 'lecture_session_id'),
         Index('idx_lecture_session_instructor_instructor', 'instructor_id'),
         UniqueConstraint('lecture_session_id', 'instructor_id', name='uix_lecture_session_instructor_unique'),
+    )
+
+class LectureSessionIrregularInstructor(Base):
+    __tablename__ = 'lecture_session_irregular_instructor'
+
+    id = Column(Integer, primary_key=True)
+    lecture_session_irregular_id = Column(Integer, ForeignKey('lecture_session_irregular.lecture_session_irregular_id', ondelete='CASCADE'), nullable=False)
+    instructor_id = Column(Integer, ForeignKey('instructor.instructor_id', ondelete='CASCADE'), nullable=False)
+    role = Column(Text)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_lecture_session_irregular_instructor_session', 'lecture_session_irregular_id'),
+        Index('idx_lecture_session_irregular_instructor_instructor', 'instructor_id'),
+        UniqueConstraint('lecture_session_irregular_id', 'instructor_id', name='uix_lecture_session_irregular_instructor_unique'),
     )
 
 class SyllabusBook(Base):
@@ -496,6 +528,27 @@ class LectureSessionInstructor:
     """講義回数担当者モデル"""
     id: int
     lecture_session_id: int
+    instructor_id: int
+    role: Optional[str]
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+@dataclass
+class LectureSessionIrregular:
+    """不定形講義回数モデル"""
+    lecture_session_irregular_id: int
+    syllabus_id: int
+    session_pattern: str
+    contents: Optional[str]
+    other_info: Optional[str]
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+@dataclass
+class LectureSessionIrregularInstructor:
+    """不定形講義回数担当者モデル"""
+    id: int
+    lecture_session_irregular_id: int
     instructor_id: int
     role: Optional[str]
     created_at: datetime

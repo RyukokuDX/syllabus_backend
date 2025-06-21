@@ -1,14 +1,14 @@
 ---
 title: データベース構造定義
-file_version: v1.3.5
-project_version: v1.3.15
+file_version: v1.3.6
+project_version: v1.3.20
 last_updated: 2025-06-21
 ---
 
 # データベース構造定義
 
-- File Version: v1.3.5
-- Project Version: v1.3.15
+- File Version: v1.3.6
+- Project Version: v1.3.20
 - Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -28,15 +28,17 @@ last_updated: 2025-06-21
 10. [subject_grade 科目履修可能学年](#subject_grade-科目履修可能学年)
 11. [lecture_time 講義時間](#lecture_time-講義時間)
 12. [lecture_session 講義回数](#lecture_session-講義回数)
-13. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
-14. [lecture_session_instructor 講義回数担当者](#lecture_session_instructor-講義回数担当者)
-15. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
-16. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
-17. [subject_attribute 科目属性](#subject_attribute-科目属性)
-18. [subject 科目基本情報](#subject-科目基本情報)
-19. [subject_syllabus 科目シラバス関連](#subject_syllabus-科目シラバス関連)
-20. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
-21. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
+13. [lecture_session_irregular 不定形講義回数](#lecture_session_irregular-不定形講義回数)
+14. [syllabus_instructor シラバス教員関連](#syllabus_instructor-シラバス教員関連)
+15. [lecture_session_instructor 講義回数担当者](#lecture_session_instructor-講義回数担当者)
+16. [lecture_session_irregular_instructor 不定形講義回数担当者](#lecture_session_irregular_instructor-不定形講義回数担当者)
+17. [syllabus_book シラバス教科書関連](#syllabus_book-シラバス教科書関連)
+18. [grading_criterion 成績評価基準](#grading_criterion-成績評価基準)
+19. [subject_attribute 科目属性](#subject_attribute-科目属性)
+20. [subject 科目基本情報](#subject-科目基本情報)
+21. [subject_syllabus 科目シラバス関連](#subject_syllabus-科目シラバス関連)
+22. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
+23. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
 
 
 ## テーブル構成
@@ -214,7 +216,7 @@ last_updated: 2025-06-21
 | カラム名 | データ型 | NULL | 説明 | 情報源 |
 |----------|----------|------|------|--------|
 | id | INTEGER | NO | 主キー | システム生成 |
-| syllabus_code | TEXT | NO | シラバスコード | Web Syllabus |
+| syllabus_id | INTEGER | NO | シラバスID（外部キー） | システム生成 |
 | title | TEXT | NO | 書籍タイトル | Web Syllabus |
 | author | TEXT | YES | 著者名 | Web Syllabus |
 | publisher | TEXT | YES | 出版社名 | Web Syllabus |
@@ -229,7 +231,7 @@ last_updated: 2025-06-21
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_book_uncategorized_syllabus | syllabus_code | シラバスコードでの検索用 |
+| idx_book_uncategorized_syllabus | syllabus_id | シラバスIDでの検索用 |
 | idx_book_uncategorized_title | title | 書籍タイトルでの検索用 |
 | idx_book_uncategorized_isbn | isbn | ISBN番号での検索用 |
 | idx_book_uncategorized_status | categorization_status | 未分類理由での検索用 |
@@ -237,12 +239,12 @@ last_updated: 2025-06-21
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
-| - | - | - |
+| syllabus_id | syllabus_master(syllabus_id) | CASCADE |
 
 #### 補足
 - 正規のbookテーブルに分類できない全ての書籍情報を管理
 - categorization_statusで未分類理由を明示
-- シラバスコードとの関連を保持し、どのシラバスで参照されているかを追跡可能
+- シラバスIDとの関連を保持し、どのシラバスで参照されているかを追跡可能
 
 [🔝 ページトップへ](#データベース構造定義)
 
@@ -413,6 +415,41 @@ periodは"0"とする.
 
 [🔝 ページトップへ](#データベース構造定義)
 
+### lecture_session_irregular 不定形講義回数
+
+#### テーブル概要
+不定形の講義回数情報を管理するテーブル。通常の講義回数とは異なる形式（I-1、I-2、飛び番など）の講義回数を格納。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| lecture_session_irregular_id | INTEGER | NO | 不定形講義回数ID（主キー） | システム生成 |
+| syllabus_id | INTEGER | NO | シラバスID（外部キー） | システム生成 |
+| session_pattern | TEXT | NO | 回数パターン | Web Syllabus |
+| contents | TEXT | YES | 学修内容 | Web Syllabus |
+| other_info | TEXT | YES | その他情報 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | lecture_session_irregular_id | 主キー |
+| idx_lecture_session_irregular_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_lecture_session_irregular_pattern | session_pattern | 回数パターンでの検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| syllabus_id | syllabus_master(syllabus_id) | CASCADE |
+
+#### 補足
+- session_patternの例：「I-1」「I-2」「12,15,34,56,78」「1-8」など
+- 通常の講義回数（1-15回）とは異なる形式の回数を管理
+- 授業回数とは関係ない番号（I-1、I-2など）も含む
+
+[🔝 ページトップへ](#データベース構造定義)
+
 ### syllabus_instructor シラバス教員関連
 
 #### テーブル概要
@@ -481,6 +518,42 @@ periodは"0"とする.
 #### 補足
 - 一つの講義回数に対して複数の担当者が存在する可能性がある
 - 年度ごとに担当者情報が異なる場合に対応
+
+[🔝 ページトップへ](#データベース構造定義)
+
+### lecture_session_irregular_instructor 不定形講義回数担当者
+
+#### テーブル概要
+不定形講義回数ごとの担当者情報を管理するテーブル。Web Syllabusから取得される不定形講義回数ごとの担当者情報を格納。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | ID（主キー） | システム生成 |
+| lecture_session_irregular_id | INTEGER | NO | 不定形講義回数ID（外部キー） | システム生成 |
+| instructor_id | INTEGER | NO | 担当者ID（外部キー） | Web Syllabus |
+| role | TEXT | YES | 役割 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_lecture_session_irregular_instructor_session | lecture_session_irregular_id | 不定形講義回数IDでの検索用 |
+| idx_lecture_session_irregular_instructor_instructor | instructor_id | 担当者IDでの検索用 |
+| UNIQUE | (lecture_session_irregular_id, instructor_id) | 不定形講義回数と担当者の一意性 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| lecture_session_irregular_id | lecture_session_irregular(lecture_session_irregular_id) | CASCADE |
+| instructor_id | instructor(instructor_id) | CASCADE |
+
+#### 補足
+- 一つの不定形講義回数に対して複数の担当者が存在する可能性がある
+- 年度ごとに担当者情報が異なる場合に対応
+- 通常の講義回数とは異なる形式の回数に対する担当者情報を管理
 
 [🔝 ページトップへ](#データベース構造定義)
 

@@ -1,4 +1,15 @@
+---
+title: データベースER図
+file_version: v1.3.1
+project_version: v1.3.20
+last_updated: 2025-06-21
+---
+
 # データベースER図
+
+- File Version: v1.3.1
+- Project Version: v1.3.20
+- Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
 
@@ -52,7 +63,7 @@ erDiagram
     }
     book_uncategorized {
         INTEGER id PK
-        TEXT syllabus_code
+        INTEGER syllabus_id FK
         TEXT title
         TEXT author
         TEXT publisher
@@ -207,9 +218,11 @@ erDiagram
     subject_name ||--o{ syllabus : "subject_name_id"
     instructor ||--o{ syllabus_instructor : "instructor_id"
     instructor ||--o{ lecture_session_instructor : "instructor_id"
+    instructor ||--o{ lecture_session_irregular_instructor : "instructor_id"
     book ||--o{ syllabus_book : "book_id"
     book ||--o{ book_author : "book_id"
     subject_attribute ||--o{ subject_attribute_value : "attribute_id"
+    syllabus_master ||--o{ book_uncategorized : "syllabus_id"
 
     %% 基本テーブル → 関連テーブル
     subject ||--o{ subject_syllabus : "subject_id"
@@ -220,6 +233,7 @@ erDiagram
     syllabus_master ||--o{ subject_grade : "syllabus_id"
     syllabus_master ||--o{ lecture_time : "syllabus_id"
     syllabus_master ||--o{ lecture_session : "syllabus_id"
+    syllabus_master ||--o{ lecture_session_irregular : "syllabus_id"
     syllabus_master ||--o{ syllabus_instructor : "syllabus_id"
     syllabus_master ||--o{ syllabus_book : "syllabus_id"
     syllabus_master ||--o{ grading_criterion : "syllabus_id"
@@ -227,30 +241,7 @@ erDiagram
     syllabus_master ||--o{ subject_syllabus : "syllabus_id"
 
     lecture_session ||--o{ lecture_session_instructor : "lecture_session_id"
+    lecture_session_irregular ||--o{ lecture_session_irregular_instructor : "lecture_session_irregular_id"
 ```
-
-## 更新履歴
-
-| 日付 | バージョン | 更新者 | 内容 |
-|------|------------|--------|------|
-| 2024-05-19 | 1.0.1 | 藤原 | 初版作成 |
-| 2024-05-20 | 1.1.0 | 藤原 | テーブル名・カラム名の統一（subject_code → syllabus_code） |
-| 2024-05-20 | 1.1.1 | 藤原 | requirementテーブルの主キーをrequirement_codeに修正 |
-| 2024-05-20 | 1.1.2 | 藤原 | インデックス名の統一、外部キー制約の整理 |
-| 2024-05-21 | 1.1.3 | 藤原 | 正規化を強化。facultyテーブルをsubjectテーブルの直後に移動、目次・本文順序修正 |
-| 2024-05-21 | 1.1.4 | 藤原 | requirementテーブルの主キーをrequirement_idに変更、関連テーブルの外部キー制約を修正 |
-| 2024-05-21 | 1.1.5 | 藤原 | subject_requirementテーブルを削除、requirementテーブルにsyllabus_codeを追加 |
-| 2024-05-21 | 1.1.6 | 藤原 | 外部キー制約の整合性を修正、インデックスを最適化 |
-| 2024-05-21 | 1.1.7 | 藤原 | 不要な関連を削除、テーブル間の参照整合性を強化 |
-| 2024-05-21 | 1.1.8 | 藤原 | programテーブルを追加、subject_programテーブルの外部キー制約を修正 |
-| 2024-05-21 | 1.1.9 | 藤原 | subjectテーブルにサロゲートキーを追加、syllabusテーブルとの関連を整理 |
-| 2024-05-21 | 1.1.10 | 藤原 | subjectテーブルの主キー名をidに変更、syllabusテーブルからyearカラムを移動 |
-| 2024-05-21 | 1.1.11 | 藤原 | テーブル構成をデータソースの依存度に基づいて再構成 |
-| 2024-05-21 | 1.1.12 | 藤原 | syllabusテーブルの履修可能学年フィールドをビットマスク方式に変更、パフォーマンスと拡張性を改善 |
-| 2024-05-21 | 1.1.13 | 藤原 | requirementテーブルをEAVパターンに変更、programテーブルとsubject_programテーブルを削除 |
-| 2024-05-29 | 1.1.14 | 藤原 | マスターテーブルのタイムスタンプカラムを整理、instructorテーブルの主キーをinstructor_idに変更 |
-| 2024-05-29 | 1.1.15 | 藤原 | syllabus_bookテーブルのroleカラムをTEXT型に変更、subject_syllabusテーブルからlecture_codeを削除 |
-| 2025-06-19 | 1.1.16 | 藤原 | structure.mdとmodels.pyに準拠してER図を更新 |
-| 2025-06-20 | 1.1.17 | 藤原 | structure.mdに準拠してER図を更新、bookテーブルのISBN制約を削除し、不要なテーブルを削除 |
 
 [目次へ戻る](#目次) 
