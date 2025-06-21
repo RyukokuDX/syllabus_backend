@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-書籍情報抽出スクリプト
-File Version: v1.3.8
-Project Version: v1.3.15
+# File Version: v1.3.9
+# Project Version: v1.3.21
+# Last Updated: 2025-06-21
 """
 
 import os
@@ -16,33 +16,34 @@ import time
 from typing import List, Dict, Set, Tuple, Any, Optional
 from datetime import datetime
 from tqdm import tqdm
-from .utils import get_year_from_user
+from .utils import get_year_from_user, get_db_connection, get_syllabus_master_id_from_db
 from pathlib import Path
+from sqlalchemy import text
 
 # レーベンシュタイン距離の計算用ライブラリ
 try:
-    import Levenshtein
+	import Levenshtein
 except ImportError:
-    # Levenshteinライブラリが利用できない場合の代替実装
-    def levenshtein_distance(s1, s2):
-        if len(s1) < len(s2):
-            return levenshtein_distance(s2, s1)
-        if len(s2) == 0:
-            return len(s1)
-        previous_row = list(range(len(s2) + 1))
-        for i, c1 in enumerate(s1):
-            current_row = [i + 1]
-            for j, c2 in enumerate(s2):
-                insertions = previous_row[j + 1] + 1
-                deletions = current_row[j] + 1
-                substitutions = previous_row[j] + (c1 != c2)
-                current_row.append(min(insertions, deletions, substitutions))
-            previous_row = current_row
-        return previous_row[-1]
-    class Levenshtein:
-	    @staticmethod
-	    def distance(s1, s2):
-	        return levenshtein_distance(s1, s2)
+	# Levenshteinライブラリが利用できない場合の代替実装
+	def levenshtein_distance(s1, s2):
+		if len(s1) < len(s2):
+			return levenshtein_distance(s2, s1)
+		if len(s2) == 0:
+			return len(s1)
+		previous_row = list(range(len(s2) + 1))
+		for i, c1 in enumerate(s1):
+			current_row = [i + 1]
+			for j, c2 in enumerate(s2):
+				insertions = previous_row[j + 1] + 1
+				deletions = current_row[j] + 1
+				substitutions = previous_row[j] + (c1 != c2)
+				current_row.append(min(insertions, deletions, substitutions))
+			previous_row = current_row
+		return previous_row[-1]
+	class Levenshtein:
+		@staticmethod
+		def distance(s1, s2):
+			return levenshtein_distance(s1, s2)
 
 def validate_isbn(isbn: str) -> bool:
     """ISBNのチェックディジットを検証する"""
@@ -140,286 +141,162 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
     # ISBN重複回避のためのセット
     processed_isbns = set()
     
-    # シラバスから書籍情報を取得
-    script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    json_pattern = os.path.join(script_dir, 'syllabus', str(year), 'json', '*.json')
+    # 統計情報
+    stats = {
+        'total_files': 0,
+        'processed_files': 0,
+        'total_books': 0,
+        'valid_books': 0,
+        'uncategorized_books': 0,
+        'duplicate_isbns': 0,
+        'invalid_isbns': 0,
+        'cinii_failures': 0
+    }
     
-    for json_file in tqdm(glob.glob(json_pattern), desc="シラバスから書籍情報取得中"):
-        try:
-            with open(json_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            if '詳細情報' not in data:
-                continue
+    # データベース接続
+    session = get_db_connection()
+    
+    try:
+        # シラバスから書籍情報を取得
+        script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        json_pattern = os.path.join(script_dir, 'syllabus', str(year), 'json', '*.json')
+        
+        json_files = glob.glob(json_pattern)
+        stats['total_files'] = len(json_files)
+        
+        tqdm.write(f"処理開始: {stats['total_files']}個のJSONファイルを処理します")
+        
+        for json_file in tqdm(json_files, desc="シラバスファイル処理中", unit="file"):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
                 
-            detail = data['詳細情報']
-            syllabus_code = data.get('科目コード', '')
-            
-            # テキスト情報の処理（仕様書準拠）
-            if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
-                text_content = detail['テキスト']['内容']
-                if isinstance(text_content, dict) and '書籍' in text_content:
-                    books_list = text_content['書籍']
-                    if isinstance(books_list, list) and books_list:  # nullでない場合のみ処理
-                        for book in books_list:
-                            isbn = book.get('ISBN', '').strip()
-                            title = book.get('書籍名', '').strip()
-                            author = book.get('著者', '').strip()
-                            publisher = book.get('出版社', '').strip()
-                            price = None
-                            price_str = book.get('価格', '')
-                            if price_str and price_str.strip():
-                                try:
-                                    price = int(price_str.replace(',', '').replace('円', ''))
-                                except ValueError:
-                                    pass
-                            role = '教科書'
-                            now = datetime.now().isoformat()
+                if '詳細情報' not in data:
+                    continue
+                    
+                detail = data['詳細情報']
+                syllabus_code = data.get('科目コード', '')
+                
+                # 基本情報から年度を取得（09_syllabus.pyを参考）
+                basic_info = data.get("基本情報", {})
+                syllabus_year = int(basic_info.get("開講年度", {}).get("内容", str(year)))
+                
+                # syllabus_masterからsyllabus_idを取得
+                try:
+                    syllabus_id = get_syllabus_master_id_from_db(session, syllabus_code, syllabus_year)
+                    if not syllabus_id:
+                        tqdm.write(f"syllabus_masterに対応するレコードがありません（科目コード: {syllabus_code}, 年度: {syllabus_year}）")
+                        continue
+                except Exception as e:
+                    tqdm.write(f"致命的なDB接続エラー: {e}")
+                    raise
+                
+                stats['processed_files'] += 1
+                
+                # テキスト情報の処理（仕様書準拠）
+                if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
+                    text_content = detail['テキスト']['内容']
+                    if isinstance(text_content, dict) and '書籍' in text_content:
+                        books_list = text_content['書籍']
+                        if isinstance(books_list, list) and books_list:  # nullでない場合のみ処理
+                            stats['total_books'] += len(books_list)
                             
-                            # ISBNがnullの場合
-                            if not isbn:
-                                books_uncategorized.append({
-                                    'syllabus_code': syllabus_code,
-                                    'title': title,
-                                    'author': author,
-                                    'publisher': publisher,
-                                    'price': price,
-                                    'role': role,
-                                    'isbn': None,
-                                    'categorization_status': 'ISBNなし',
-                                    'created_at': now,
-                                    'updated_at': now
-                                })
-                                continue
-                            
-                            # ISBN重複チェック（正規のISBNのみ）
-                            if validate_isbn(isbn) and isbn in processed_isbns:
-                                tqdm.write(f"重複ISBNをスキップ: {isbn}")
-                                continue
-                            
-                            # ISBNが存在する場合の処理
-                            if not validate_isbn(isbn):
-                                # 数字以外の文字を除去した後の長さでチェック
-                                cleaned_isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
-                                tqdm.write(f"不正ISBN検出: {isbn} -> クリーンアップ後: {cleaned_isbn} (長さ: {len(cleaned_isbn)})")
-                                if len(cleaned_isbn) != 10 and len(cleaned_isbn) != 13:
-                                    tqdm.write(f"桁数違反: {len(cleaned_isbn)}桁 (期待: 10または13桁)")
-                                    books_uncategorized.append({
-                                        'syllabus_code': syllabus_code,
-                                        'title': title,
-                                        'author': author,
-                                        'publisher': publisher,
-                                        'price': price,
-                                        'role': role,
-                                        'isbn': isbn,
-                                        'categorization_status': '不正ISBN: 桁数違反',
-                                        'created_at': now,
-                                        'updated_at': now
-                                    })
-                                else:
-                                    tqdm.write(f"チェックディジット違反: {cleaned_isbn}")
-                                    books_uncategorized.append({
-                                        'syllabus_code': syllabus_code,
-                                        'title': title,
-                                        'author': author,
-                                        'publisher': publisher,
-                                        'price': price,
-                                        'role': role,
-                                        'isbn': isbn,
-                                        'categorization_status': '不正ISBN: cd違反',
-                                        'created_at': now,
-                                        'updated_at': now
-                                    })
-                                continue
-                            
-                            # ISBNが正常な場合の処理（テキストと同様）
-                            # シラバスから価格情報を取得（既に取得済みの場合は再取得しない）
-                            if price is None:
+                            # 書籍処理の進捗を表示
+                            for book in tqdm(books_list, desc=f"書籍処理中 ({syllabus_code})", leave=False):
+                                isbn = book.get('ISBN', '').strip()
+                                title = book.get('書籍名', '').strip()
+                                author = book.get('著者', '').strip()
+                                publisher = book.get('出版社', '').strip()
+                                price = None
                                 price_str = book.get('価格', '')
                                 if price_str and price_str.strip():
                                     try:
                                         price = int(price_str.replace(',', '').replace('円', ''))
                                     except ValueError:
                                         pass
-                            
-                            # シラバスから書籍名を取得（類似度比較用）
-                            syllabus_title = book.get('書籍名', '').strip()
-                            
-                            # src/books/json/{ISBN}.jsonの存在確認
-                            book_json_path = Path(f"src/books/json/{isbn}.json")
-                            if not book_json_path.exists():
-                                # 既存JSONファイルが存在しない場合はCiNiiから取得
-                                try:
-                                    cinii_data = get_cinii_data(isbn)
-                                    if not cinii_data:
-                                        tqdm.write(f"CiNiiから取得失敗: {isbn}")
+                                role = '教科書'
+                                now = datetime.now().isoformat()
+                                
+                                # ISBNがnullの場合
+                                if not isbn:
+                                    books_uncategorized.append({
+                                        'syllabus_id': syllabus_id,
+                                        'title': title,
+                                        'author': author,
+                                        'publisher': publisher,
+                                        'price': price,
+                                        'role': role,
+                                        'isbn': None,
+                                        'categorization_status': 'ISBNなし',
+                                        'created_at': now,
+                                        'updated_at': now
+                                    })
+                                    stats['uncategorized_books'] += 1
+                                    continue
+                                
+                                # ISBN重複チェック（正規のISBNのみ）
+                                if validate_isbn(isbn) and isbn in processed_isbns:
+                                    # tqdm.write(f"重複ISBNをスキップ: {isbn}")
+                                    stats['duplicate_isbns'] += 1
+                                    continue
+                                
+                                # ISBNが存在する場合の処理
+                                if not validate_isbn(isbn):
+                                    # 数字以外の文字を除去した後の長さでチェック
+                                    cleaned_isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
+                                    if len(cleaned_isbn) != 10 and len(cleaned_isbn) != 13:
                                         books_uncategorized.append({
-                                            'syllabus_code': syllabus_code,
+                                            'syllabus_id': syllabus_id,
                                             'title': title,
                                             'author': author,
                                             'publisher': publisher,
                                             'price': price,
                                             'role': role,
                                             'isbn': isbn,
-                                            'categorization_status': '問題ISBN: ciniiデータ不在',
+                                            'categorization_status': '不正ISBN: 桁数違反',
                                             'created_at': now,
                                             'updated_at': now
                                         })
-                                        continue
-                                except Exception as e:
-                                    tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")
-                                    books_uncategorized.append({
-                                        'syllabus_code': syllabus_code,
-                                        'title': title,
-                                        'author': author,
-                                        'publisher': publisher,
-                                        'price': price,
-                                        'role': role,
-                                        'isbn': isbn,
-                                        'categorization_status': '問題ISBN: ciniiデータ不在',
-                                        'created_at': now,
-                                        'updated_at': now
-                                    })
-                                    continue
-                            
-                            # BibTeX経由で書籍情報を取得
-                            bibtex_book_info = get_book_info_from_bibtex(isbn)
-                            if bibtex_book_info:
-                                tqdm.write(f"BibTeXから取得した書籍情報: {bibtex_book_info}")
-                                
-                                # 書籍名の類似度比較
-                                existing_title = bibtex_book_info.get('title', '')
-                                if syllabus_title and existing_title:
-                                    similarity = calculate_similarity(syllabus_title, existing_title)
-                                    tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, BibTeX: {existing_title})")
-                                    if similarity < 0.05:
+                                    else:
                                         books_uncategorized.append({
-                                            'syllabus_code': syllabus_code,
+                                            'syllabus_id': syllabus_id,
                                             'title': title,
                                             'author': author,
                                             'publisher': publisher,
                                             'price': price,
                                             'role': role,
                                             'isbn': isbn,
-                                            'categorization_status': '問題レコード: 書籍名類似度低',
+                                            'categorization_status': '不正ISBN: cd違反',
                                             'created_at': now,
                                             'updated_at': now
                                         })
-                                        continue
-                                
-                                # BibTeXデータで空の項目がある場合は未分類に
-                                empty_fields = []
-                                if not bibtex_book_info.get('title', ''):
-                                    empty_fields.append('タイトル')
-                                if not bibtex_book_info.get('author', ''):
-                                    empty_fields.append('著者')
-                                if not bibtex_book_info.get('publisher', ''):
-                                    empty_fields.append('出版社')
-                                if empty_fields:
-                                    books_uncategorized.append({
-                                        'syllabus_code': syllabus_code,
-                                        'title': title,
-                                        'author': author,
-                                        'publisher': publisher,
-                                        'price': price,
-                                        'role': role,
-                                        'isbn': isbn,
-                                        'categorization_status': f'不正BibTeX データ: Null検知 - {", ".join(empty_fields)}が空',
-                                        'created_at': now,
-                                        'updated_at': now
-                                    })
+                                    stats['invalid_isbns'] += 1
+                                    stats['uncategorized_books'] += 1
                                     continue
                                 
-                                # 正常な書籍として登録
-                                book_info = {
-                                    'title': bibtex_book_info.get('title', '') if bibtex_book_info.get('title', '') else syllabus_title,
-                                    'isbn': isbn,
-                                    'author': bibtex_book_info.get('author', '') if bibtex_book_info.get('author', '') else author,
-                                    'publisher': bibtex_book_info.get('publisher', '') if bibtex_book_info.get('publisher', '') else publisher,
-                                    'price': price,
-                                    'created_at': now
-                                }
-                                books.append(book_info)
-                                processed_isbns.add(isbn)
-                            else:
-                                # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
-                                tqdm.write(f"BibTeX取得に失敗、既存CiNiiデータを使用: {isbn}")
-                                try:
-                                    with open(book_json_path, 'r', encoding='utf-8') as f:
-                                        existing_data = json.load(f)
-                                    
-                                    if '@graph' in existing_data and len(existing_data['@graph']) > 0:
-                                        channel = existing_data['@graph'][0]
-                                        if 'items' in channel and len(channel['items']) > 0:
-                                            item = channel['items'][0]
-                                            
-                                            # 書籍名の類似度比較
-                                            existing_title = item.get('title', '')
-                                            if syllabus_title and existing_title:
-                                                similarity = calculate_similarity(syllabus_title, existing_title)
-                                                tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")
-                                                if similarity < 0.05:
-                                                    books_uncategorized.append({
-                                                        'syllabus_code': syllabus_code,
-                                                        'title': title,
-                                                        'author': author,
-                                                        'publisher': publisher,
-                                                        'price': price,
-                                                        'role': role,
-                                                        'isbn': isbn,
-                                                        'categorization_status': '問題レコード: 書籍名類似度低',
-                                                        'created_at': now,
-                                                        'updated_at': now
-                                                    })
-                                                    continue
-                                            
-                                            # CiNiiデータで空の項目がある場合は未分類に
-                                            empty_fields = []
-                                            if not item.get('title', ''):
-                                                empty_fields.append('タイトル')
-                                            if not item.get('dc:creator', ''):
-                                                empty_fields.append('著者')
-                                            if not item.get('dc:publisher', ''):
-                                                empty_fields.append('出版社')
-                                            if empty_fields:
-                                                books_uncategorized.append({
-                                                    'syllabus_code': syllabus_code,
-                                                    'title': title,
-                                                    'author': author,
-                                                    'publisher': publisher,
-                                                    'price': price,
-                                                    'role': role,
-                                                    'isbn': isbn,
-                                                    'categorization_status': f'不正CiNii データ: Null検知 - {", ".join(empty_fields)}が空',
-                                                    'created_at': now,
-                                                    'updated_at': now
-                                                })
-                                                continue
-                                            
-                                            # 正常な書籍として登録
-                                            cinii_title = item.get('title', '')
-                                            cinii_author = item.get('dc:creator', '')
-                                            cinii_publisher = item.get('dc:publisher', '')
-                                            
-                                            book_info = {
-                                                'title': cinii_title if cinii_title else syllabus_title,
-                                                'isbn': isbn,
-                                                'author': cinii_author if cinii_author else author,
-                                                'publisher': cinii_publisher if cinii_publisher else publisher,
-                                                'price': price,
-                                                'created_at': now
-                                            }
-                                            
-                                            # publisherが配列の場合は最初の要素を使用
-                                            if isinstance(book_info['publisher'], list):
-                                                book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
-                                            
-                                            books.append(book_info)
-                                            processed_isbns.add(isbn)
-                                        else:
-                                            # itemsが見つからない場合は未分類に
+                                # ISBNが正常な場合の処理（テキストと同様）
+                                # シラバスから価格情報を取得（既に取得済みの場合は再取得しない）
+                                if price is None:
+                                    price_str = book.get('価格', '')
+                                    if price_str and price_str.strip():
+                                        try:
+                                            price = int(price_str.replace(',', '').replace('円', ''))
+                                        except ValueError:
+                                            pass
+                                
+                                # シラバスから書籍名を取得（類似度比較用）
+                                syllabus_title = book.get('書籍名', '').strip()
+                                
+                                # src/books/json/{ISBN}.jsonの存在確認
+                                book_json_path = Path(f"src/books/json/{isbn}.json")
+                                if not book_json_path.exists():
+                                    # 既存JSONファイルが存在しない場合はCiNiiから取得
+                                    try:
+                                        cinii_data = get_cinii_data(isbn)
+                                        if not cinii_data:
+                                            # tqdm.write(f"CiNiiから取得失敗: {isbn}")
                                             books_uncategorized.append({
-                                                'syllabus_code': syllabus_code,
+                                                'syllabus_id': syllabus_id,
                                                 'title': title,
                                                 'author': author,
                                                 'publisher': publisher,
@@ -430,10 +307,11 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                                 'created_at': now,
                                                 'updated_at': now
                                             })
-                                    else:
-                                        # @graphが見つからない場合は未分類に
+                                            continue
+                                    except Exception as e:
+                                        # tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")
                                         books_uncategorized.append({
-                                            'syllabus_code': syllabus_code,
+                                            'syllabus_id': syllabus_id,
                                             'title': title,
                                             'author': author,
                                             'publisher': publisher,
@@ -444,229 +322,22 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                             'created_at': now,
                                             'updated_at': now
                                         })
-                                except Exception as e:
-                                    tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")
-                                    books_uncategorized.append({
-                                        'syllabus_code': syllabus_code,
-                                        'title': title,
-                                        'author': author,
-                                        'publisher': publisher,
-                                        'price': price,
-                                        'role': role,
-                                        'isbn': isbn,
-                                        'categorization_status': '問題ISBN: ciniiデータ不在',
-                                        'created_at': now,
-                                        'updated_at': now
-                                    })
-        except Exception as e:
-            continue
-    
-    # 参考文献情報の処理（仕様書準拠）
-    if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
-        ref_content = detail['参考文献']['内容']
-        if isinstance(ref_content, dict) and '書籍' in ref_content:
-            books_list = ref_content['書籍']
-            if isinstance(books_list, list) and books_list:  # nullでない場合のみ処理
-                for book in books_list:
-                    isbn = book.get('ISBN', '').strip()
-                    title = book.get('書籍名', '').strip()
-                    author = book.get('著者', '').strip()
-                    publisher = book.get('出版社', '').strip()
-                    price = None
-                    price_str = book.get('価格', '')
-                    if price_str and price_str.strip():
-                        try:
-                            price = int(price_str.replace(',', '').replace('円', ''))
-                        except ValueError:
-                            pass
-                    role = '参考書'
-                    now = datetime.now().isoformat()
-                    
-                    # ISBNがnullの場合
-                    if not isbn:
-                        books_uncategorized.append({
-                            'syllabus_code': syllabus_code,
-                            'title': title,
-                            'author': author,
-                            'publisher': publisher,
-                            'price': price,
-                            'role': role,
-                            'isbn': None,
-                            'categorization_status': 'ISBNなし',
-                            'created_at': now,
-                            'updated_at': now
-                        })
-                        continue
-                    
-                    # ISBN重複チェック（正規のISBNのみ）
-                    if validate_isbn(isbn) and isbn in processed_isbns:
-                        tqdm.write(f"重複ISBNをスキップ: {isbn}")
-                        continue
-                    
-                    # ISBNが存在する場合の処理
-                    if not validate_isbn(isbn):
-                        # 数字以外の文字を除去した後の長さでチェック
-                        cleaned_isbn = ''.join(c for c in isbn if c.isdigit() or c.upper() == 'X')
-                        tqdm.write(f"不正ISBN検出: {isbn} -> クリーンアップ後: {cleaned_isbn} (長さ: {len(cleaned_isbn)})")
-                        if len(cleaned_isbn) != 10 and len(cleaned_isbn) != 13:
-                            tqdm.write(f"桁数違反: {len(cleaned_isbn)}桁 (期待: 10または13桁)")
-                            books_uncategorized.append({
-                                'syllabus_code': syllabus_code,
-                                'title': title,
-                                'author': author,
-                                'publisher': publisher,
-                                'price': price,
-                                'role': role,
-                                'isbn': isbn,
-                                'categorization_status': '不正ISBN: 桁数違反',
-                                'created_at': now,
-                                'updated_at': now
-                            })
-                        else:
-                            tqdm.write(f"チェックディジット違反: {cleaned_isbn}")
-                            books_uncategorized.append({
-                                'syllabus_code': syllabus_code,
-                                'title': title,
-                                'author': author,
-                                'publisher': publisher,
-                                'price': price,
-                                'role': role,
-                                'isbn': isbn,
-                                'categorization_status': '不正ISBN: cd違反',
-                                'created_at': now,
-                                'updated_at': now
-                            })
-                        continue
-                    
-                    # ISBNが正常な場合の処理（テキストと同様）
-                    # シラバスから価格情報を取得（既に取得済みの場合は再取得しない）
-                    if price is None:
-                        price_str = book.get('価格', '')
-                        if price_str and price_str.strip():
-                            try:
-                                price = int(price_str.replace(',', '').replace('円', ''))
-                            except ValueError:
-                                pass
-                    
-                    # シラバスから書籍名を取得（類似度比較用）
-                    syllabus_title = book.get('書籍名', '').strip()
-                    
-                    # src/books/json/{ISBN}.jsonの存在確認
-                    book_json_path = Path(f"src/books/json/{isbn}.json")
-                    if not book_json_path.exists():
-                        # 既存JSONファイルが存在しない場合はCiNiiから取得
-                        try:
-                            cinii_data = get_cinii_data(isbn)
-                            if not cinii_data:
-                                tqdm.write(f"CiNiiから取得失敗: {isbn}")
-                                books_uncategorized.append({
-                                    'syllabus_code': syllabus_code,
-                                    'title': title,
-                                    'author': author,
-                                    'publisher': publisher,
-                                    'price': price,
-                                    'role': role,
-                                    'isbn': isbn,
-                                    'categorization_status': '問題ISBN: ciniiデータ不在',
-                                    'created_at': now,
-                                    'updated_at': now
-                                })
-                                continue
-                        except Exception as e:
-                            tqdm.write(f"CiNii取得中にエラー: {isbn} - {str(e)}")
-                            books_uncategorized.append({
-                                'syllabus_code': syllabus_code,
-                                'title': title,
-                                'author': author,
-                                'publisher': publisher,
-                                'price': price,
-                                'role': role,
-                                'isbn': isbn,
-                                'categorization_status': '問題ISBN: ciniiデータ不在',
-                                'created_at': now,
-                                'updated_at': now
-                            })
-                            continue
-                    
-                    # BibTeX経由で書籍情報を取得
-                    bibtex_book_info = get_book_info_from_bibtex(isbn)
-                    if bibtex_book_info:
-                        tqdm.write(f"BibTeXから取得した書籍情報: {bibtex_book_info}")
-                        
-                        # 書籍名の類似度比較
-                        existing_title = bibtex_book_info.get('title', '')
-                        if syllabus_title and existing_title:
-                            similarity = calculate_similarity(syllabus_title, existing_title)
-                            tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, BibTeX: {existing_title})")
-                            if similarity < 0.05:
-                                books_uncategorized.append({
-                                    'syllabus_code': syllabus_code,
-                                    'title': title,
-                                    'author': author,
-                                    'publisher': publisher,
-                                    'price': price,
-                                    'role': role,
-                                    'isbn': isbn,
-                                    'categorization_status': '問題レコード: 書籍名類似度低',
-                                    'created_at': now,
-                                    'updated_at': now
-                                })
-                                continue
-                        
-                        # BibTeXデータで空の項目がある場合は未分類に
-                        empty_fields = []
-                        if not bibtex_book_info.get('title', ''):
-                            empty_fields.append('タイトル')
-                        if not bibtex_book_info.get('author', ''):
-                            empty_fields.append('著者')
-                        if not bibtex_book_info.get('publisher', ''):
-                            empty_fields.append('出版社')
-                        if empty_fields:
-                            books_uncategorized.append({
-                                'syllabus_code': syllabus_code,
-                                'title': title,
-                                'author': author,
-                                'publisher': publisher,
-                                'price': price,
-                                'role': role,
-                                'isbn': isbn,
-                                'categorization_status': f'不正BibTeX データ: Null検知 - {", ".join(empty_fields)}が空',
-                                'created_at': now,
-                                'updated_at': now
-                            })
-                            continue
-                        
-                        # 正常な書籍として登録
-                        book_info = {
-                            'title': bibtex_book_info.get('title', '') if bibtex_book_info.get('title', '') else syllabus_title,
-                            'isbn': isbn,
-                            'author': bibtex_book_info.get('author', '') if bibtex_book_info.get('author', '') else author,
-                            'publisher': bibtex_book_info.get('publisher', '') if bibtex_book_info.get('publisher', '') else publisher,
-                            'price': price,
-                            'created_at': now
-                        }
-                        books.append(book_info)
-                        processed_isbns.add(isbn)
-                    else:
-                        # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
-                        tqdm.write(f"BibTeX取得に失敗、既存CiNiiデータを使用: {isbn}")
-                        try:
-                            with open(book_json_path, 'r', encoding='utf-8') as f:
-                                existing_data = json.load(f)
-                            
-                            if '@graph' in existing_data and len(existing_data['@graph']) > 0:
-                                channel = existing_data['@graph'][0]
-                                if 'items' in channel and len(channel['items']) > 0:
-                                    item = channel['items'][0]
+                                        continue
+                                    continue
+                                
+                                # BibTeX経由で書籍情報を取得
+                                bibtex_book_info = get_book_info_from_bibtex(isbn)
+                                if bibtex_book_info:
+                                    # tqdm.write(f"BibTeXから取得した書籍情報: {bibtex_book_info}")
                                     
                                     # 書籍名の類似度比較
-                                    existing_title = item.get('title', '')
+                                    existing_title = bibtex_book_info.get('title', '')
                                     if syllabus_title and existing_title:
                                         similarity = calculate_similarity(syllabus_title, existing_title)
-                                        tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, CiNii: {existing_title})")
+                                        # tqdm.write(f"類似度: {similarity:.3f} (シラバス: {syllabus_title}, BibTeX: {existing_title})")
                                         if similarity < 0.05:
                                             books_uncategorized.append({
-                                                'syllabus_code': syllabus_code,
+                                                'syllabus_id': syllabus_id,
                                                 'title': title,
                                                 'author': author,
                                                 'publisher': publisher,
@@ -679,93 +350,178 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                             })
                                             continue
                                     
-                                    # CiNiiデータで空の項目がある場合は未分類に
+                                    # BibTeXデータで空の項目がある場合は未分類に
                                     empty_fields = []
-                                    if not item.get('title', ''):
+                                    if not bibtex_book_info.get('title', ''):
                                         empty_fields.append('タイトル')
-                                    if not item.get('dc:creator', ''):
+                                    if not bibtex_book_info.get('author', ''):
                                         empty_fields.append('著者')
-                                    if not item.get('dc:publisher', ''):
+                                    if not bibtex_book_info.get('publisher', ''):
                                         empty_fields.append('出版社')
                                     if empty_fields:
                                         books_uncategorized.append({
-                                            'syllabus_code': syllabus_code,
+                                            'syllabus_id': syllabus_id,
                                             'title': title,
                                             'author': author,
                                             'publisher': publisher,
                                             'price': price,
                                             'role': role,
                                             'isbn': isbn,
-                                            'categorization_status': f'不正CiNii データ: Null検知 - {", ".join(empty_fields)}が空',
+                                            'categorization_status': f'不正BibTeX データ: Null検知 - {", ".join(empty_fields)}が空',
                                             'created_at': now,
                                             'updated_at': now
                                         })
+                                        stats['uncategorized_books'] += 1
                                         continue
                                     
                                     # 正常な書籍として登録
-                                    cinii_title = item.get('title', '')
-                                    cinii_author = item.get('dc:creator', '')
-                                    cinii_publisher = item.get('dc:publisher', '')
-                                    
                                     book_info = {
-                                        'title': cinii_title if cinii_title else syllabus_title,
+                                        'title': bibtex_book_info.get('title', '') if bibtex_book_info.get('title', '') else syllabus_title,
                                         'isbn': isbn,
-                                        'author': cinii_author if cinii_author else author,
-                                        'publisher': cinii_publisher if cinii_publisher else publisher,
+                                        'author': bibtex_book_info.get('author', '') if bibtex_book_info.get('author', '') else author,
+                                        'publisher': bibtex_book_info.get('publisher', '') if bibtex_book_info.get('publisher', '') else publisher,
                                         'price': price,
                                         'created_at': now
                                     }
-                                    
-                                    # publisherが配列の場合は最初の要素を使用
-                                    if isinstance(book_info['publisher'], list):
-                                        book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
-                                    
                                     books.append(book_info)
                                     processed_isbns.add(isbn)
+                                    stats['valid_books'] += 1
                                 else:
-                                    # itemsが見つからない場合は未分類に
-                                    books_uncategorized.append({
-                                        'syllabus_code': syllabus_code,
-                                        'title': title,
-                                        'author': author,
-                                        'publisher': publisher,
-                                        'price': price,
-                                        'role': role,
-                                        'isbn': isbn,
-                                        'categorization_status': '問題ISBN: ciniiデータ不在',
-                                        'created_at': now,
-                                        'updated_at': now
-                                    })
-                            else:
-                                # @graphが見つからない場合は未分類に
-                                books_uncategorized.append({
-                                    'syllabus_code': syllabus_code,
-                                    'title': title,
-                                    'author': author,
-                                    'publisher': publisher,
-                                    'price': price,
-                                    'role': role,
-                                    'isbn': isbn,
-                                    'categorization_status': '問題ISBN: ciniiデータ不在',
-                                    'created_at': now,
-                                    'updated_at': now
-                                })
-                        except Exception as e:
-                            tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")
-                            books_uncategorized.append({
-                                'syllabus_code': syllabus_code,
-                                'title': title,
-                                'author': author,
-                                'publisher': publisher,
-                                'price': price,
-                                'role': role,
-                                'isbn': isbn,
-                                'categorization_status': '問題ISBN: ciniiデータ不在',
-                                'created_at': now,
-                                'updated_at': now
-                            })
-    
-    return books, books_uncategorized
+                                    # BibTeX取得に失敗した場合は既存のCiNiiデータを使用
+                                    try:
+                                        with open(book_json_path, 'r', encoding='utf-8') as f:
+                                            existing_data = json.load(f)
+                                        
+                                        if '@graph' in existing_data and len(existing_data['@graph']) > 0:
+                                            channel = existing_data['@graph'][0]
+                                            if 'items' in channel and len(channel['items']) > 0:
+                                                item = channel['items'][0]
+                                                
+                                                # 書籍名の類似度比較
+                                                existing_title = item.get('title', '')
+                                                if syllabus_title and existing_title:
+                                                    similarity = calculate_similarity(syllabus_title, existing_title)
+                                                    if similarity < 0.05:
+                                                        books_uncategorized.append({
+                                                            'syllabus_id': syllabus_id,
+                                                            'title': title,
+                                                            'author': author,
+                                                            'publisher': publisher,
+                                                            'price': price,
+                                                            'role': role,
+                                                            'isbn': isbn,
+                                                            'categorization_status': '問題レコード: 書籍名類似度低',
+                                                            'created_at': now,
+                                                            'updated_at': now
+                                                        })
+                                                        stats['uncategorized_books'] += 1
+                                                        continue
+                                                
+                                                # CiNiiデータで空の項目がある場合は未分類に
+                                                empty_fields = []
+                                                if not item.get('title', ''):
+                                                    empty_fields.append('タイトル')
+                                                if not item.get('dc:creator', ''):
+                                                    empty_fields.append('著者')
+                                                if not item.get('dc:publisher', ''):
+                                                    empty_fields.append('出版社')
+                                                if empty_fields:
+                                                    books_uncategorized.append({
+                                                        'syllabus_id': syllabus_id,
+                                                        'title': title,
+                                                        'author': author,
+                                                        'publisher': publisher,
+                                                        'price': price,
+                                                        'role': role,
+                                                        'isbn': isbn,
+                                                        'categorization_status': f'不正CiNii データ: Null検知 - {", ".join(empty_fields)}が空',
+                                                        'created_at': now,
+                                                        'updated_at': now
+                                                    })
+                                                    stats['uncategorized_books'] += 1
+                                                    continue
+                                                
+                                                # 正常な書籍として登録
+                                                cinii_title = item.get('title', '')
+                                                cinii_author = item.get('dc:creator', '')
+                                                cinii_publisher = item.get('dc:publisher', '')
+                                                
+                                                book_info = {
+                                                    'title': cinii_title if cinii_title else syllabus_title,
+                                                    'isbn': isbn,
+                                                    'author': cinii_author if cinii_author else author,
+                                                    'publisher': cinii_publisher if cinii_publisher else publisher,
+                                                    'price': price,
+                                                    'created_at': now
+                                                }
+                                                
+                                                # publisherが配列の場合は最初の要素を使用
+                                                if isinstance(book_info['publisher'], list):
+                                                    book_info['publisher'] = book_info['publisher'][0] if book_info['publisher'] else ''
+                                                
+                                                books.append(book_info)
+                                                processed_isbns.add(isbn)
+                                                stats['valid_books'] += 1
+                                            else:
+                                                # itemsが見つからない場合は未分類に
+                                                books_uncategorized.append({
+                                                    'syllabus_id': syllabus_id,
+                                                    'title': title,
+                                                    'author': author,
+                                                    'publisher': publisher,
+                                                    'price': price,
+                                                    'role': role,
+                                                    'isbn': isbn,
+                                                    'categorization_status': '問題ISBN: ciniiデータ不在',
+                                                    'created_at': now,
+                                                    'updated_at': now
+                                                })
+                                                stats['uncategorized_books'] += 1
+                                                stats['cinii_failures'] += 1
+                                    except Exception as e:
+                                        # tqdm.write(f"警告: 既存JSONファイル {book_json_path} の読み込みに失敗: {str(e)}")
+                                        books_uncategorized.append({
+                                            'syllabus_id': syllabus_id,
+                                            'title': title,
+                                            'author': author,
+                                            'publisher': publisher,
+                                            'price': price,
+                                            'role': role,
+                                            'isbn': isbn,
+                                            'categorization_status': '問題ISBN: ciniiデータ不在',
+                                            'created_at': now,
+                                            'updated_at': now
+                                        })
+                                        stats['uncategorized_books'] += 1
+                                        stats['cinii_failures'] += 1
+            except Exception as e:
+                continue
+        
+        # 最終統計の表示
+        tqdm.write("\n" + "="*60)
+        tqdm.write("処理完了 - 統計情報")
+        tqdm.write("="*60)
+        tqdm.write(f"総ファイル数: {stats['total_files']}")
+        tqdm.write(f"処理済みファイル数: {stats['processed_files']}")
+        tqdm.write(f"総書籍数: {stats['total_books']}")
+        tqdm.write(f"正常書籍数: {stats['valid_books']}")
+        tqdm.write(f"未分類書籍数: {stats['uncategorized_books']}")
+        tqdm.write(f"重複ISBN数: {stats['duplicate_isbns']}")
+        tqdm.write(f"不正ISBN数: {stats['invalid_isbns']}")
+        tqdm.write(f"CiNii取得失敗数: {stats['cinii_failures']}")
+        tqdm.write("="*60)
+        
+        return books, books_uncategorized
+        
+    except Exception as e:
+        tqdm.write(f"書籍情報取得中にエラーが発生しました: {str(e)}")
+        import traceback
+        tqdm.write(f"エラーの詳細: {traceback.format_exc()}")
+        return books, books_uncategorized
+    finally:
+        # データベース接続を閉じる
+        if session:
+            session.close()
 
 def get_cinii_data(isbn: str) -> Optional[Dict[str, str]]:
     """ciniiから書籍データを取得する"""
@@ -856,7 +612,7 @@ def create_book_uncategorized_json(books_uncategorized: List[Dict[str, Any]]) ->
     
     data = {
         "book_uncategorized": [{
-            "syllabus_code": book["syllabus_code"],
+            "syllabus_id": book["syllabus_id"],
             "title": book["title"],
             "author": book["author"],
             "publisher": book["publisher"],
@@ -866,7 +622,7 @@ def create_book_uncategorized_json(books_uncategorized: List[Dict[str, Any]]) ->
             "categorization_status": book["categorization_status"],
             "created_at": book["created_at"],
             "updated_at": book["updated_at"]
-        } for book in sorted(books_uncategorized, key=lambda x: (x["title"], x["syllabus_code"]))]
+        } for book in sorted(books_uncategorized, key=lambda x: (x["title"], x["syllabus_id"]))]
     }
     
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -898,7 +654,7 @@ def save_bibtex_file(bn: str, bibtex_content: str):
     with open(bibtex_file, 'w', encoding='utf-8') as f:
         f.write(bibtex_content)
     
-    tqdm.write(f"BibTeXファイルを保存しました: {bibtex_file}")
+    # tqdm.write(f"BibTeXファイルを保存しました: {bibtex_file}")
 
 def extract_bn_from_cinii_json(data: dict) -> Optional[str]:
     """CiNii JSONからBNを抽出"""
@@ -914,7 +670,7 @@ def extract_bn_from_cinii_json(data: dict) -> Optional[str]:
                     return bn
         return None
     except Exception as e:
-        tqdm.write(f"BN抽出に失敗: {str(e)}")
+        # tqdm.write(f"BN抽出に失敗: {str(e)}")
         return None
 
 def get_bibtex_from_bn(bn: str) -> Optional[str]:
@@ -925,7 +681,7 @@ def get_bibtex_from_bn(bn: str) -> Optional[str]:
         response.raise_for_status()
         return response.text
     except Exception as e:
-        tqdm.write(f"BibTeX取得に失敗: {bn} - {str(e)}")
+        # tqdm.write(f"BibTeX取得に失敗: {bn} - {str(e)}")
         return None
 
 def parse_bibtex(bibtex_text: str) -> Optional[Dict[str, str]]:
@@ -961,10 +717,10 @@ def parse_bibtex(bibtex_text: str) -> Optional[Dict[str, str]]:
                     elif value_part.startswith('"') and value_part.endswith('"'):
                         book_info['publisher'] = value_part[1:-1]
         
-        tqdm.write(f"BibTeXパース結果: {book_info}")  # デバッグ情報
+        # tqdm.write(f"BibTeXパース結果: {book_info}")  # デバッグ情報
         return book_info if book_info else None
     except Exception as e:
-        tqdm.write(f"BibTeXパースに失敗: {str(e)}")
+        # tqdm.write(f"BibTeXパースに失敗: {str(e)}")
         return None
 
 def get_book_info_from_bibtex(isbn: str) -> Optional[Dict[str, str]]:
@@ -988,7 +744,7 @@ def get_book_info_from_bibtex(isbn: str) -> Optional[Dict[str, str]]:
         
         if os.path.exists(bibtex_file):
             # 既存のBibTeXファイルを読み込み
-            tqdm.write(f"既存のBibTeXファイルを使用: {bibtex_file}")
+            # tqdm.write(f"既存のBibTeXファイルを使用: {bibtex_file}")
             with open(bibtex_file, 'r', encoding='utf-8') as f:
                 bibtex_content = f.read()
         else:
@@ -1005,41 +761,58 @@ def get_book_info_from_bibtex(isbn: str) -> Optional[Dict[str, str]]:
         return parse_bibtex(bibtex_content)
         
     except Exception as e:
-        tqdm.write(f"BibTeX経由の書籍情報取得に失敗: {isbn} - {str(e)}")
+        # tqdm.write(f"BibTeX経由の書籍情報取得に失敗: {isbn} - {str(e)}")
         return None
 
 def main():
     """メイン処理"""
+    session = None
     try:
         # 年度の取得
         year = get_year_from_user()
-        tqdm.write(f"処理対象年度: {year}")
+        tqdm.write(f"\n{'='*60}")
+        tqdm.write(f"書籍情報抽出処理開始 - 対象年度: {year}")
+        tqdm.write(f"{'='*60}")
         
         # 書籍情報の取得
-        tqdm.write("書籍情報の取得を開始します...")
+        tqdm.write("\n📚 書籍情報の取得を開始します...")
         books, books_uncategorized = get_book_info(year)
-        tqdm.write(f"抽出された正常書籍: {len(books)}件")
-        tqdm.write(f"抽出された未分類書籍: {len(books_uncategorized)}件")
+        
+        # 結果サマリー
+        tqdm.write(f"\n{'='*60}")
+        tqdm.write("📊 抽出結果サマリー")
+        tqdm.write(f"{'='*60}")
+        tqdm.write(f"✅ 正常書籍: {len(books)}件")
+        tqdm.write(f"⚠️  未分類書籍: {len(books_uncategorized)}件")
+        tqdm.write(f"📈 合計: {len(books) + len(books_uncategorized)}件")
         
         # JSONファイルの作成
-        tqdm.write("JSONファイルの作成を開始します...")
+        tqdm.write(f"\n💾 JSONファイルの作成を開始します...")
         if books:
             book_output_file = create_book_json(books)
-            tqdm.write(f"正常書籍JSONファイルを作成しました: {book_output_file}")
+            tqdm.write(f"✅ 正常書籍JSONファイルを作成しました: {book_output_file}")
         else:
-            tqdm.write("正常書籍は0件でした")
+            tqdm.write("ℹ️  正常書籍は0件でした")
             
         if books_uncategorized:
             uncategorized_output_file = create_book_uncategorized_json(books_uncategorized)
-            tqdm.write(f"未分類書籍JSONファイルを作成しました: {uncategorized_output_file}")
+            tqdm.write(f"⚠️  未分類書籍JSONファイルを作成しました: {uncategorized_output_file}")
         else:
-            tqdm.write("未分類書籍は0件でした")
+            tqdm.write("ℹ️  未分類書籍は0件でした")
+        
+        tqdm.write(f"\n{'='*60}")
+        tqdm.write("🎉 処理が完了しました！")
+        tqdm.write(f"{'='*60}")
         
     except Exception as e:
-        tqdm.write(f"エラーが発生しました: {str(e)}")
+        tqdm.write(f"\n❌ エラーが発生しました: {str(e)}")
         import traceback
-        tqdm.write(f"エラーの詳細: {traceback.format_exc()}")
+        tqdm.write(f"📋 エラーの詳細: {traceback.format_exc()}")
         raise
+    finally:
+        # データベース接続を閉じる
+        if session:
+            session.close()
 
 if __name__ == "__main__":
     # 類似度テスト

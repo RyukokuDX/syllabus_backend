@@ -109,6 +109,19 @@ CREATE TABLE IF NOT EXISTS book (
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
 CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
 
+-- syllabus_master（シラバスマスタ）
+CREATE TABLE IF NOT EXISTS syllabus_master (
+    syllabus_id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_code, syllabus_year)
+);
+
+CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
+
 -- book_uncategorized（未分類書籍）
 CREATE TABLE IF NOT EXISTS book_uncategorized (
     id SERIAL PRIMARY KEY,
@@ -138,19 +151,6 @@ CREATE TABLE IF NOT EXISTS book_author (
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
-
--- syllabus_master（シラバスマスタ）
-CREATE TABLE IF NOT EXISTS syllabus_master (
-    syllabus_id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    syllabus_year INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(syllabus_code, syllabus_year)
-);
-
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
 
 -- syllabus（シラバス情報）
 CREATE TABLE IF NOT EXISTS syllabus (

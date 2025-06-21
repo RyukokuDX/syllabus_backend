@@ -1,5 +1,20 @@
+# File Version: v1.3.1
+# Project Version: v1.3.21
+# Last Updated: 2025-06-21
+
 from datetime import datetime
 import unicodedata
+import sys
+import os
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
+
+# プロジェクトルートをパスに追加
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
+
+from src.db.database import SessionLocal
+from src.db.models import SyllabusMaster
 
 def normalize_subject_name(name: str) -> str:
     """科目名を正規化する"""
@@ -86,4 +101,40 @@ def get_year_from_user() -> int:
                 return year
             print("2000年から2100年の間で入力してください。")
         except ValueError:
-            print("有効な数値を入力してください。") 
+            print("有効な数値を入力してください。")
+
+def get_db_connection():
+    """データベース接続を取得する"""
+    user = os.getenv('POSTGRES_USER', 'postgres')
+    password = os.getenv('POSTGRES_PASSWORD', 'postgres')
+    host = os.getenv('POSTGRES_HOST', 'localhost')
+    port = os.getenv('POSTGRES_PORT', '5432')
+    db = os.getenv('POSTGRES_DB', 'syllabus_db')  # デフォルトをsyllabus_dbに明示
+
+    connection_string = f"postgresql://{user}:{password}@{host}:{port}/{db}"
+    engine = create_engine(
+        connection_string,
+        connect_args={'options': '-c client_encoding=utf-8'}
+    )
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    session.execute(text("SET client_encoding TO 'utf-8'"))
+    session.commit()
+    return session
+
+def get_syllabus_master_id_from_db(session, syllabus_code: str, year: int) -> int:
+    try:
+        query = text("""
+            SELECT syllabus_id 
+            FROM syllabus_master 
+            WHERE syllabus_code = :code 
+            AND syllabus_year = :year
+        """)
+        result = session.execute(
+            query,
+            {"code": syllabus_code, "year": year}
+        ).first()
+        return result[0] if result else None
+    except Exception as e:
+        print(f"[DB接続エラー] syllabus_master取得時にエラー: {str(e)}")
+        raise 

@@ -1,14 +1,14 @@
 ---
 title: データベース構造定義
-file_version: v1.3.6
-project_version: v1.3.20
+file_version: v1.3.7
+project_version: v1.3.21
 last_updated: 2025-06-21
 ---
 
 # データベース構造定義
 
-- File Version: v1.3.6
-- Project Version: v1.3.20
+- File Version: v1.3.7
+- Project Version: v1.3.21
 - Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -21,9 +21,9 @@ last_updated: 2025-06-21
 3. [faculty 開講学部・課程](#faculty-開講学部課程)
 4. [subject_name 科目名マスタ](#subject_name-科目名マスタ)
 5. [instructor 教員](#instructor-教員)
-6. [book 書籍](#book-書籍)
-7. [book_uncategorized 未分類書籍](#book_uncategorized-未分類書籍)
-8. [syllabus_master シラバスマスタ](#syllabus_master-シラバスマスタ)
+6. [syllabus_master シラバスマスタ](#syllabus_master-シラバスマスタ)
+7. [book 書籍](#book-書籍)
+8. [book_uncategorized 未分類書籍](#book_uncategorized-未分類書籍)
 9. [syllabus シラバス情報](#syllabus-シラバス情報)
 10. [subject_grade 科目履修可能学年](#subject_grade-科目履修可能学年)
 11. [lecture_time 講義時間](#lecture_time-講義時間)
@@ -172,6 +172,35 @@ last_updated: 2025-06-21
 
 [🔝 ページトップへ](#データベース構造定義)
 
+### syllabus_master シラバスマスタ
+
+#### テーブル概要
+シラバスコードと年度の組み合わせを管理するマスターテーブル。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| syllabus_id | INTEGER | NO | シラバスID（主キー） | システム生成 |
+| syllabus_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
+| syllabus_year | INTEGER | NO | シラバス年 | Web Syllabus |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | syllabus_id | 主キー |
+| UNIQUE | (syllabus_code, syllabus_year) | シラバスコードと年度の一意性 |
+| idx_syllabus_master_code | syllabus_code | シラバスコードでの検索用 |
+| idx_syllabus_master_year | syllabus_year | 年度での検索用 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| - | - | - |
+
+[🔝 ページトップへ](#データベース構造定義)
+
 ### book 書籍
 
 #### テーブル概要
@@ -245,35 +274,6 @@ last_updated: 2025-06-21
 - 正規のbookテーブルに分類できない全ての書籍情報を管理
 - categorization_statusで未分類理由を明示
 - シラバスIDとの関連を保持し、どのシラバスで参照されているかを追跡可能
-
-[🔝 ページトップへ](#データベース構造定義)
-
-### syllabus_master シラバスマスタ
-
-#### テーブル概要
-シラバスコードと年度の組み合わせを管理するマスターテーブル。
-
-#### カラム定義
-| カラム名 | データ型 | NULL | 説明 | 情報源 |
-|----------|----------|------|------|--------|
-| syllabus_id | INTEGER | NO | シラバスID（主キー） | システム生成 |
-| syllabus_code | TEXT | NO | シラバス管理番号 | Web Syllabus |
-| syllabus_year | INTEGER | NO | シラバス年 | Web Syllabus |
-| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
-| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
-
-#### インデックス
-| インデックス名 | カラム | 説明 |
-|---------------|--------|------|
-| PRIMARY KEY | syllabus_id | 主キー |
-| UNIQUE | (syllabus_code, syllabus_year) | シラバスコードと年度の一意性 |
-| idx_syllabus_master_code | syllabus_code | シラバスコードでの検索用 |
-| idx_syllabus_master_year | syllabus_year | 年度での検索用 |
-
-#### 外部キー制約
-| 参照元 | 参照先 | 削除時の動作 |
-|--------|--------|-------------|
-| - | - | - |
 
 [🔝 ページトップへ](#データベース構造定義)
 

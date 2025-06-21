@@ -1,14 +1,14 @@
 ---
 title: データベースER図
-file_version: v1.3.1
-project_version: v1.3.20
+file_version: v1.3.2
+project_version: v1.3.21
 last_updated: 2025-06-21
 ---
 
 # データベースER図
 
-- File Version: v1.3.1
-- Project Version: v1.3.20
+- File Version: v1.3.2
+- Project Version: v1.3.21
 - Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
@@ -52,6 +52,13 @@ erDiagram
         TEXT name_kana
         TIMESTAMP created_at
     }
+    syllabus_master {
+        INTEGER syllabus_id PK
+        TEXT syllabus_code
+        INTEGER syllabus_year
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
     book {
         INTEGER book_id PK
         TEXT title
@@ -88,13 +95,6 @@ erDiagram
     }
 
     %% トランザクションテーブル
-    syllabus_master {
-        INTEGER syllabus_id PK
-        TEXT syllabus_code
-        INTEGER syllabus_year
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
     syllabus {
         INTEGER syllabus_id PK,FK
         INTEGER subject_name_id FK

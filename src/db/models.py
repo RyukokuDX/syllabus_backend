@@ -8,6 +8,54 @@ from typing import Optional, List
 Base = declarative_base()
 
 # SQLAlchemyモデル
+class Instructor(Base):
+    __tablename__ = 'instructor'
+
+    instructor_id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    name_kana = Column(Text)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_instructor_name', 'name'),
+        Index('idx_instructor_name_kana', 'name_kana'),
+    )
+
+class SyllabusMaster(Base):
+    __tablename__ = 'syllabus_master'
+
+    syllabus_id = Column(Integer, primary_key=True)
+    syllabus_code = Column(Text, nullable=False)
+    syllabus_year = Column(Integer, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        UniqueConstraint('syllabus_code', 'syllabus_year', name='uix_syllabus_master_code_year'),
+        Index('idx_syllabus_master_code', 'syllabus_code'),
+        Index('idx_syllabus_master_year', 'syllabus_year'),
+    )
+
+    lecture_times = relationship("LectureTime", back_populates="syllabus", cascade="all, delete-orphan")
+    source_study_systems = relationship("SyllabusStudySystem", foreign_keys="SyllabusStudySystem.source_syllabus_id", back_populates="source_syllabus")
+
+class Book(Base):
+    __tablename__ = 'book'
+
+    book_id = Column(Integer, primary_key=True)
+    title = Column(Text, nullable=False)
+    author = Column(Text)
+    publisher = Column(Text)
+    price = Column(Integer)
+    isbn = Column(Text)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+
+    __table_args__ = (
+        Index('idx_book_title', 'title'),
+        Index('idx_book_isbn', 'isbn'),
+        UniqueConstraint('isbn', name='uix_book_isbn'),
+    )
+
 class Class(Base):
     __tablename__ = 'class'
 
@@ -52,36 +100,6 @@ class Faculty(Base):
 
     syllabus_enrollment_years = relationship("SyllabusEnrollmentYear", back_populates="faculty", cascade="all, delete-orphan")
     requirement_headers = relationship("RequirementHeaderModel", back_populates="faculty")
-
-class Instructor(Base):
-    __tablename__ = 'instructor'
-
-    instructor_id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False)
-    name_kana = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_instructor_name', 'name'),
-        Index('idx_instructor_name_kana', 'name_kana'),
-    )
-
-class Book(Base):
-    __tablename__ = 'book'
-
-    book_id = Column(Integer, primary_key=True)
-    title = Column(Text, nullable=False)
-    author = Column(Text)
-    publisher = Column(Text)
-    price = Column(Integer)
-    isbn = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-
-    __table_args__ = (
-        Index('idx_book_title', 'title'),
-        Index('idx_book_isbn', 'isbn'),
-        UniqueConstraint('isbn', name='uix_book_isbn'),
-    )
 
 class BookUncategorized(Base):
     __tablename__ = 'book_uncategorized'
@@ -129,24 +147,6 @@ class SubjectName(Base):
     )
 
     requirement_headers = relationship("RequirementHeaderModel", back_populates="subject_name")
-
-class SyllabusMaster(Base):
-    __tablename__ = 'syllabus_master'
-
-    syllabus_id = Column(Integer, primary_key=True)
-    syllabus_code = Column(Text, nullable=False)
-    syllabus_year = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
-
-    __table_args__ = (
-        UniqueConstraint('syllabus_code', 'syllabus_year', name='uix_syllabus_master_code_year'),
-        Index('idx_syllabus_master_code', 'syllabus_code'),
-        Index('idx_syllabus_master_year', 'syllabus_year'),
-    )
-
-    lecture_times = relationship("LectureTime", back_populates="syllabus", cascade="all, delete-orphan")
-    source_study_systems = relationship("SyllabusStudySystem", foreign_keys="SyllabusStudySystem.source_syllabus_id", back_populates="source_syllabus")
 
 class Syllabus(Base):
     __tablename__ = 'syllabus'

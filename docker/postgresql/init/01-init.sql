@@ -109,10 +109,23 @@ CREATE TABLE IF NOT EXISTS book (
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
 CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
 
+-- syllabus_master（シラバスマスタ）
+CREATE TABLE IF NOT EXISTS syllabus_master (
+    syllabus_id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    syllabus_year INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_code, syllabus_year)
+);
+
+CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
+
 -- book_uncategorized（未分類書籍）
 CREATE TABLE IF NOT EXISTS book_uncategorized (
     id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     author TEXT,
     publisher TEXT,
@@ -124,7 +137,7 @@ CREATE TABLE IF NOT EXISTS book_uncategorized (
     updated_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_book_uncategorized_syllabus_code ON book_uncategorized(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_syllabus ON book_uncategorized(syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_book_uncategorized_title ON book_uncategorized(title);
 CREATE INDEX IF NOT EXISTS idx_book_uncategorized_isbn ON book_uncategorized(isbn);
 CREATE INDEX IF NOT EXISTS idx_book_uncategorized_status ON book_uncategorized(categorization_status);
@@ -138,19 +151,6 @@ CREATE TABLE IF NOT EXISTS book_author (
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
-
--- syllabus_master（シラバスマスタ）
-CREATE TABLE IF NOT EXISTS syllabus_master (
-    syllabus_id SERIAL PRIMARY KEY,
-    syllabus_code TEXT NOT NULL,
-    syllabus_year INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(syllabus_code, syllabus_year)
-);
-
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_code ON syllabus_master(syllabus_code);
-CREATE INDEX IF NOT EXISTS idx_syllabus_master_year ON syllabus_master(syllabus_year);
 
 -- syllabus（シラバス情報）
 CREATE TABLE IF NOT EXISTS syllabus (
@@ -215,6 +215,20 @@ CREATE TABLE IF NOT EXISTS lecture_session (
 CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session_number);
 
+-- lecture_session_irregular（不定形講義回数）
+CREATE TABLE IF NOT EXISTS lecture_session_irregular (
+    lecture_session_irregular_id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    session_pattern TEXT NOT NULL,
+    contents TEXT,
+    other_info TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_syllabus ON lecture_session_irregular(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_pattern ON lecture_session_irregular(session_pattern);
+
 -- syllabus_instructor（シラバス教員関連）
 CREATE TABLE IF NOT EXISTS syllabus_instructor (
     id SERIAL PRIMARY KEY,
@@ -242,6 +256,20 @@ CREATE TABLE IF NOT EXISTS lecture_session_instructor (
 
 CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_session ON lecture_session_instructor(lecture_session_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_instructor ON lecture_session_instructor(instructor_id);
+
+-- lecture_session_irregular_instructor（不定形講義回数担当者）
+CREATE TABLE IF NOT EXISTS lecture_session_irregular_instructor (
+    id SERIAL PRIMARY KEY,
+    lecture_session_irregular_id INTEGER NOT NULL REFERENCES lecture_session_irregular(lecture_session_irregular_id) ON DELETE CASCADE,
+    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
+    role TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(lecture_session_irregular_id, instructor_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_instructor_session ON lecture_session_irregular_instructor(lecture_session_irregular_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_instructor_instructor ON lecture_session_irregular_instructor(instructor_id);
 
 -- syllabus_book（シラバス教科書関連）
 CREATE TABLE IF NOT EXISTS syllabus_book (
@@ -344,5 +372,4 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250619213358__insert_facultys.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225007__insert_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225948__insert_syllabus_masters.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250621164515__insert_books.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250621165433__insert_book_uncategorizeds.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250621183238__insert_subject_names.sql
