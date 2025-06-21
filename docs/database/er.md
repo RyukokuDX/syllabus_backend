@@ -47,7 +47,7 @@ erDiagram
         TEXT author
         TEXT publisher
         INTEGER price
-        TEXT isbn
+        TEXT isbn UNIQUE
         TIMESTAMP created_at
     }
     book_uncategorized {

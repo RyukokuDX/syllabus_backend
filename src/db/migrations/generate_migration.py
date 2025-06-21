@@ -25,6 +25,7 @@ TABLE_NAME_PLURAL = {
     'subject_name': 'subject_names',
     'instructor': 'instructors',
     'book': 'books',
+    'book_uncategorized': 'book_uncategorized',
     'syllabus_master': 'syllabus_masters',
     'syllabus': 'syllabuses',
     'subject_grade': 'subject_grades',
@@ -68,6 +69,9 @@ def read_json_files(directory, table_name):
                     # bookテーブルの場合、roleカラムを除外
                     if table_name == 'book':
                         records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
+                    # book_uncategorizedテーブルの場合、全てのカラムを保持
+                    elif table_name == 'book_uncategorized':
+                        records = records  # そのまま保持
                     print(f"Found {len(records)} records in {file}")
                     data.extend(records)
                 else:
@@ -88,6 +92,9 @@ def generate_sql_insert(table_name, records):
     # bookテーブルの場合、authorカラムを除外
     if table_name == 'book':
         columns = [col for col in columns if col != 'author']
+    # book_uncategorizedテーブルの場合、全てのカラムを保持
+    elif table_name == 'book_uncategorized':
+        columns = list(columns)
     columns_str = ', '.join(columns)
 
     # VALUES句を生成
@@ -122,7 +129,8 @@ def generate_sql_insert(table_name, records):
         "subject_attribute": ["attribute_name"],
         "subject_attribute_value": ["subject_id", "attribute_id"],
         "instructor": None,  # 一意性制約がないため、ON CONFLICT句は不要
-        "book": None,
+        "book": ["isbn"],  # ISBNのUNIQUE制約に対応
+        "book_uncategorized": None,  # 一意性制約がないため、ON CONFLICT句は不要
         "book_author": ["book_id", "author_name"],
         "lecture_time": ["syllabus_id", "day_of_week", "period"],
         "lecture_session": ["syllabus_id", "session_number"],
@@ -146,7 +154,8 @@ def generate_sql_insert(table_name, records):
         "subject_attribute": ["attribute_name", "description"],
         "subject_attribute_value": ["value"],
         "instructor": None,  # 一意性制約がないため、更新対象カラムも不要
-        "book": None,
+        "book": ["title", "author", "publisher", "price"],  # ISBN以外のカラムを更新対象に
+        "book_uncategorized": None,  # 一意性制約がないため、更新対象カラムも不要
         "book_author": ["book_id", "author_name"],
         "lecture_time": ["day_of_week", "period"],
         "lecture_session": ["session_number", "contents", "other_info"],
@@ -228,6 +237,20 @@ CREATE TABLE IF NOT EXISTS book (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(isbn),
     UNIQUE(title, publisher)
+);""",
+        'book_uncategorized': """
+CREATE TABLE IF NOT EXISTS book_uncategorized (
+    id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    title TEXT NOT NULL,
+    author TEXT,
+    publisher TEXT,
+    price INTEGER,
+    role TEXT NOT NULL,
+    isbn TEXT,
+    categorization_status TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );""",
         'book_author': """
 CREATE TABLE IF NOT EXISTS book_author (
@@ -396,6 +419,11 @@ CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);"""
         'book': """
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
 CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);""",
+        'book_uncategorized': """
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_syllabus ON book_uncategorized(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_title ON book_uncategorized(title);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_isbn ON book_uncategorized(isbn);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_status ON book_uncategorized(categorization_status);""",
         'book_author': """
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
 CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);""",
@@ -530,6 +558,11 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'book',
                 'table_name': 'book',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'book_uncategorized',
+                'table_name': 'book_uncategorized',
                 'source': 'web_syllabus'
             },
             {

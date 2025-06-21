@@ -102,13 +102,32 @@ CREATE TABLE IF NOT EXISTS book (
     author TEXT,
     publisher TEXT,
     price INTEGER,
-    isbn TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(title, publisher)
+    isbn TEXT UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
 CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);
+
+-- book_uncategorized（未分類書籍）
+CREATE TABLE IF NOT EXISTS book_uncategorized (
+    id SERIAL PRIMARY KEY,
+    syllabus_code TEXT NOT NULL,
+    title TEXT NOT NULL,
+    author TEXT,
+    publisher TEXT,
+    price INTEGER,
+    role TEXT NOT NULL,
+    isbn TEXT,
+    categorization_status TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_syllabus_code ON book_uncategorized(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_title ON book_uncategorized(title);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_isbn ON book_uncategorized(isbn);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_status ON book_uncategorized(categorization_status);
 
 -- book_author（書籍著者）
 CREATE TABLE IF NOT EXISTS book_author (
@@ -324,3 +343,6 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250619213231__insert_subclasss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250619213358__insert_facultys.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250619213519__insert_subject_names.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250620225007__insert_instructors.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250620225948__insert_syllabus_masters.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250621164515__insert_books.sql

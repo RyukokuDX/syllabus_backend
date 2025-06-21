@@ -1,14 +1,14 @@
 ---
 title: データベース構造定義
-file_version: v1.3.4
-project_version: v1.3.14
+file_version: v1.3.5
+project_version: v1.3.15
 last_updated: 2025-06-21
 ---
 
 # データベース構造定義
 
-- File Version: v1.3.4
-- Project Version: v1.3.14
+- File Version: v1.3.5
+- Project Version: v1.3.15
 - Last Updated: 2025-06-21
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -200,8 +200,8 @@ last_updated: 2025-06-21
 | - | - | - |
 
 #### 補足
-- ISBN番号には不正な値が混入する可能性があるため、UNIQUE制約は設定していない
-- ISBN番号での検索は可能だが、重複を許容する
+- ISBN番号は正規の書籍データとして管理するため、UNIQUE制約を設定
+- 不正なISBNや問題のある書籍データはbook_uncategorizedテーブルで管理
 
 [🔝 ページトップへ](#データベース構造定義)
 
