@@ -1,4 +1,15 @@
+---
+title: ユーティリティ関数ガイドライン
+file_version: v1.3.1
+project_version: v1.3.23
+last_updated: 2025-06-21
+---
+
 # ユーティリティ関数ガイドライン
+
+- File Version: v1.3.1
+- Project Version: v1.3.23
+- Last Updated: 2025-06-21
 
 [readmeへ](../README.md) | [docへ](./doc.md)
 
@@ -37,8 +48,8 @@ def normalize_subject_name(name: str) -> str:
     """科目名を正規化する"""
     pass
 
-def get_subject_name_id_from_db(name: str) -> int:
-    """データベースから科目名IDを取得する"""
+def get_syllabus_master_id_from_db(session, syllabus_code: str, year: int) -> int:
+    """データベースからシラバスマスターIDを取得する"""
     pass
 ```
 
@@ -154,11 +165,11 @@ print(normalized)  # "データベース基礎I"
 
 ### エラー処理の例
 ```python
-from utils import get_subject_name_id_from_db
+from utils import get_syllabus_master_id_from_db
 
 try:
-    subject_id = get_subject_name_id_from_db("存在しない科目名")
-except ValueError as e:
+    syllabus_id = get_syllabus_master_id_from_db(session, "CS101", 2024)
+except Exception as e:
     print(f"エラー: {e}")
 ```
 
@@ -198,19 +209,95 @@ def get_year_from_user() -> int:
             print("有効な数値を入力してください。")
 ```
 
+### データベース接続
+データベース接続は、以下の関数を使用します：
+
+```python
+def get_db_connection():
+    """データベース接続を取得する
+    
+    Returns:
+        Session: SQLAlchemyセッションオブジェクト
+        
+    Note:
+        環境変数から接続情報を取得し、UTF-8エンコーディングを設定します
+    """
+    user = os.getenv('POSTGRES_USER', 'postgres')
+    password = os.getenv('POSTGRES_PASSWORD', 'postgres')
+    host = os.getenv('POSTGRES_HOST', 'localhost')
+    port = os.getenv('POSTGRES_PORT', '5432')
+    db = os.getenv('POSTGRES_DB', 'syllabus_db')  # デフォルトをsyllabus_dbに明示
+
+    connection_string = f"postgresql://{user}:{password}@{host}:{port}/{db}"
+    engine = create_engine(
+        connection_string,
+        connect_args={'options': '-c client_encoding=utf-8'}
+    )
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    session.execute(text("SET client_encoding TO 'utf-8'"))
+    session.commit()
+    return session
+```
+
+### シラバスマスターID取得
+シラバスマスターIDの取得は、以下の関数を使用します：
+
+```python
+def get_syllabus_master_id_from_db(session, syllabus_code: str, year: int) -> int:
+    """データベースからシラバスマスターIDを取得する
+    
+    Args:
+        session: SQLAlchemyセッション
+        syllabus_code (str): シラバスコード
+        year (int): 年度
+        
+    Returns:
+        int: シラバスマスターID（見つからない場合はNone）
+        
+    Raises:
+        Exception: データベース接続エラー時
+    """
+    try:
+        query = text("""
+            SELECT syllabus_id 
+            FROM syllabus_master 
+            WHERE syllabus_code = :code 
+            AND syllabus_year = :year
+        """)
+        result = session.execute(
+            query,
+            {"code": syllabus_code, "year": year}
+        ).first()
+        return result[0] if result else None
+    except Exception as e:
+        print(f"[DB接続エラー] syllabus_master取得時にエラー: {str(e)}")
+        raise
+```
+
 ### 使用例
 ```python
-from utils import get_year_from_user
+from utils import get_year_from_user, get_db_connection, get_syllabus_master_id_from_db
 
 # 年度の取得
 year = get_year_from_user()
 print(f"処理対象年度: {year}")
+
+# データベース接続
+session = get_db_connection()
+
+# シラバスマスターIDの取得
+try:
+    syllabus_id = get_syllabus_master_id_from_db(session, "CS101", year)
+    if syllabus_id:
+        print(f"シラバスID: {syllabus_id}")
+    else:
+        print("シラバスが見つかりませんでした")
+except Exception as e:
+    print(f"エラー: {e}")
+finally:
+    session.close()
 ```
 
-## 更新履歴
-
-| 日付 | バージョン | 更新者 | 内容 |
-|------|------------|--------|------|
-| 2024-03-20 | 1.0.1 | 開発者名 | 初版作成 |
 
 [🔝 ページトップへ](#ユーティリティ関数ガイドライン) 

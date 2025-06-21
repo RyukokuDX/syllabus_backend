@@ -1,15 +1,15 @@
 ---
 title: パーサー一覧
-file_version: v1.1.1
-project_version: v1.3.8
-last_updated: 2025-06-19
+file_version: v1.3.1
+project_version: v1.3.23
+last_updated: 2025-06-21
 ---
 
 # パーサー一覧
 
-- File Version: v1.1.1
-- Project Version: v1.3.8
-- Last Updated: 2025-06-19
+- File Version: v1.3.1
+- Project Version: v1.3.23
+- Last Updated: 2025-06-21
 
 [readmeへ](../../README.md)
 
@@ -17,6 +17,7 @@ last_updated: 2025-06-19
 1. [概要](#概要)
 2. [パーサー一覧](#パーサー一覧)
 3. [実行方法](#実行方法)
+4. [基本方針](#基本方針)
 
 ## 概要
 
@@ -34,7 +35,7 @@ last_updated: 2025-06-19
 | 学部パーサー | 03_faculty.py | 学部情報の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | faculty |
 | 科目名パーサー | 04_subject_name.py | 科目名の抽出 | `src/syllabus/{year}/json/*.json` | subject_name |
 | 教員パーサー | 05_instructor.py | 教員情報の抽出 | `src/syllabus/{year}/json/*.json` | instructor |
-| 書籍パーサー | 06_book.py | 書籍情報の抽出 | `src/syllabus/{year}/json/*.json` | book |
+| 書籍パーサー | 06_book.py | 書籍情報の抽出 | `src/syllabus/{year}/json/*.json` | book, book_uncategorized |
 | シラバスマスターパーサー | 07_syllabus_master.py | シラバスマスター情報の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_master |
 | シラバスパーサー | 09_syllabus.py | シラバス詳細情報の抽出 | `src/syllabus/{year}/json/*.json` | syllabus |
 | 科目履修可能学年パーサー | 10_subject_grade.py | 履修可能学年の抽出 | `src/syllabus/{year}/json/*.json` | subject_grade |
@@ -70,5 +71,120 @@ last_updated: 2025-06-19
 ./syllabus.sh parser 01  # 科目区分パーサーを実行
 ./syllabus.sh parser class  # 科目区分パーサーを実行
 ```
+
+## 基本方針
+
+### tqdmメッセージ表示の基本方針
+
+#### 1. 処理開始時のメッセージ
+```python
+tqdm.write(f"\n{'='*60}")
+tqdm.write(f"処理名 - 対象年度: {year}")
+tqdm.write(f"{'='*60}")
+```
+
+#### 2. ファイル処理の進捗表示
+```python
+# ファイル処理の進捗バー
+for json_file in tqdm(json_files, desc="ファイル処理中", unit="file"):
+    # 処理内容
+    pass
+```
+
+#### 3. 詳細処理の進捗表示
+```python
+# 詳細処理の進捗バー（leave=Falseで親バーの下に表示）
+for item in tqdm(items, desc=f"詳細処理中 ({identifier})", leave=False):
+    # 処理内容
+    pass
+```
+
+#### 4. 統計情報の表示
+処理完了時に以下の形式で統計情報を表示します：
+
+```python
+# 最終統計の表示
+tqdm.write("\n" + "="*60)
+tqdm.write("処理完了 - 統計情報")
+tqdm.write("="*60)
+tqdm.write(f"総ファイル数: {stats['total_files']}")
+tqdm.write(f"処理済みファイル数: {stats['processed_files']}")
+tqdm.write(f"総データ数: {stats['total_items']}")
+tqdm.write(f"正常データ数: {stats['valid_items']}")
+tqdm.write(f"エラーデータ数: {stats['error_items']}")
+tqdm.write("="*60)
+```
+
+#### 5. 結果サマリーの表示
+```python
+tqdm.write(f"\n{'='*60}")
+tqdm.write("📊 抽出結果サマリー")
+tqdm.write(f"{'='*60}")
+tqdm.write(f"✅ 正常データ: {len(valid_data)}件")
+tqdm.write(f"⚠️  エラーデータ: {len(error_data)}件")
+tqdm.write(f"📈 合計: {len(valid_data) + len(error_data)}件")
+```
+
+#### 6. エラーメッセージの表示
+```python
+# 重要なエラーは表示、軽微なエラーはコメントアウト
+tqdm.write(f"エラー: {error_message}")  # 重要なエラー
+# tqdm.write(f"警告: {warning_message}")  # 軽微なエラー（コメントアウト）
+```
+
+### データベースアクセスの基本方針
+
+#### syllabus_masterへの問い合わせ
+syllabus_masterテーブルへの問い合わせは、必ず`utils.md`で定義された関数を使用します：
+
+```python
+from .utils import get_syllabus_master_id_from_db
+
+# シラバスマスターIDの取得
+try:
+    syllabus_id = get_syllabus_master_id_from_db(session, syllabus_code, year)
+    if not syllabus_id:
+        tqdm.write(f"syllabus_masterに対応するレコードがありません（科目コード: {syllabus_code}, 年度: {year}）")
+        continue
+except Exception as e:
+    tqdm.write(f"致命的なDB接続エラー: {e}")
+    raise
+```
+
+#### データベース接続
+データベース接続も`utils.md`の関数を使用します：
+
+```python
+from .utils import get_db_connection
+
+# データベース接続
+session = get_db_connection()
+try:
+    # 処理内容
+    pass
+finally:
+    session.close()
+```
+
+### 統計情報の管理
+
+各パーサーでは以下の統計情報を管理します：
+
+```python
+stats = {
+    'total_files': 0,      # 総ファイル数
+    'processed_files': 0,  # 処理済みファイル数
+    'total_items': 0,      # 総データ数
+    'valid_items': 0,      # 正常データ数
+    'error_items': 0,      # エラーデータ数
+    'specific_errors': {}  # 特定のエラー種別ごとのカウント
+}
+```
+
+### エラーハンドリング
+
+- 致命的なエラー：例外を再送出して処理を停止
+- 軽微なエラー：統計に記録して処理を継続
+- デバッグメッセージ：必要最小限に抑制（コメントアウト）
 
 [🔝 ページトップへ](#パーサー一覧) 
