@@ -21,10 +21,18 @@ last_updated: 2025-06-22
 - `||--||` : 1対1の関連（1つのエンティティが1つのエンティティに属する）
 - `}o--o{` : 多対多の関連（複数のエンティティが複数のエンティティに属する）
 
+### 制約記号
+- `PK` : 主キー（Primary Key）
+- `FK` : 外部キー（Foreign Key）
+- `UK` : ユニーク制約（Unique Constraint）
+- `PK,UK` : 主キーかつユニーク制約
+- `"NOT NULL"` : 非NULL制約（必ず最後に配置）
+
 <!--
 erDiagram template
 Table{
-   field_name field_type key(PK or FK or PK/FK or "" )
+   field_name field_type key(PK or FK or UK or PK/FK or "" )
+   field_name field_type key(PK or FK or UK or PK/FK or "" ) "NOT NULL"
 }
 -->
 
@@ -35,76 +43,76 @@ erDiagram
 %% ===========================
 CLASS_TABLE {
     class_id int PK
-    class_name text
-    created_at timestamp
+    class_name text UK "NOT NULL"
+    created_at timestamp "NOT NULL"
 }
 SUBCLASS_TABLE {
     subclass_id int PK
-    subclass_name text
-    created_at timestamp
+    subclass_name text UK "NOT NULL"
+    created_at timestamp "NOT NULL"
 }
 FACULTY {
     faculty_id int PK
-    faculty_name text
-    created_at timestamp
+    faculty_name text UK "NOT NULL"
+    created_at timestamp "NOT NULL"
 }
 SUBJECT_NAME {
     subject_name_id int PK
-    name text
-    created_at timestamp
+    name text UK "NOT NULL"
+    created_at timestamp "NOT NULL"
 }
 INSTRUCTOR {
     instructor_id int PK
-    name text
+    name text "NOT NULL"
     name_kana text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
 }
 SYLLABUS_MASTER {
     syllabus_id int PK
-    syllabus_code text
-    syllabus_year int
-    created_at timestamp
+    syllabus_code text "NOT NULL"
+    syllabus_year int "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 BOOK {
     book_id int PK
-    title text
+    title text "NOT NULL"
     author text
     publisher text
     price int
-    isbn text
-    created_at timestamp
+    isbn text UK
+    created_at timestamp "NOT NULL"
 }
 BOOK_UNCATEGORIZED {
     id int PK
-    syllabus_id int FK
-    title text
+    syllabus_id int FK "NOT NULL"
+    title text "NOT NULL"
     author text
     publisher text
     price int
-    role text
+    role text "NOT NULL"
     isbn text
     categorization_status text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 SUBJECT_ATTRIBUTE {
     attribute_id int PK
-    attribute_name text
+    attribute_name text UK "NOT NULL"
     description text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
 }
 
 %% ===========================
 %% Transaction Tables
 %% ===========================
 SYLLABUS {
-    syllabus_id int PK,FK
-    subject_name_id int FK
+    syllabus_id int PK,FK "NOT NULL"
+    subject_name_id int FK "NOT NULL"
     subtitle text
-    term text
-    campus text
-    credits int
+    term text "NOT NULL"
+    campus text "NOT NULL"
+    credits int "NOT NULL"
     goals text
     summary text
     attainment text
@@ -113,81 +121,81 @@ SYLLABUS {
     textbook_comment text
     reference_comment text
     advice text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 SUBJECT_GRADE {
     id int PK
-    syllabus_id int FK
-    grade text
-    created_at timestamp
+    syllabus_id int FK "NOT NULL"
+    grade text "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 LECTURE_TIME {
     id int PK
-    syllabus_id int FK
-    day_of_week text
-    period int
-    created_at timestamp
+    syllabus_id int FK "NOT NULL"
+    day_of_week text "NOT NULL"
+    period int "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 LECTURE_SESSION {
     lecture_session_id int PK
-    syllabus_id int FK
-    session_number int
+    syllabus_id int FK "NOT NULL"
+    session_number int "NOT NULL"
     contents text
     other_info text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 LECTURE_SESSION_IRREGULAR {
     lecture_session_irregular_id int PK
-    syllabus_id int FK
-    session_pattern text
+    syllabus_id int FK "NOT NULL"
+    session_pattern text "NOT NULL"
     contents text
     other_info text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 SYLLABUS_INSTRUCTOR {
     id int PK
-    syllabus_id int FK
-    instructor_id int FK
+    syllabus_id int FK "NOT NULL"
+    instructor_id int FK "NOT NULL"
     role text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 LECTURE_SESSION_INSTRUCTOR {
     id int PK
-    lecture_session_id int FK
-    instructor_id int FK
+    lecture_session_id int FK "NOT NULL"
+    instructor_id int FK "NOT NULL"
     role text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 LECTURE_SESSION_IRREGULAR_INSTRUCTOR {
     id int PK
-    lecture_session_irregular_id int FK
-    instructor_id int FK
+    lecture_session_irregular_id int FK "NOT NULL"
+    instructor_id int FK "NOT NULL"
     role text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 SYLLABUS_BOOK {
     id int PK
-    syllabus_id int FK
-    book_id int FK
-    role text
+    syllabus_id int FK "NOT NULL"
+    book_id int FK "NOT NULL"
+    role text "NOT NULL"
     note text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
 }
 GRADING_CRITERION {
     id int PK
-    syllabus_id int FK
-    criteria_type text
+    syllabus_id int FK "NOT NULL"
+    criteria_type text "NOT NULL"
     ratio int
     note text
-    created_at timestamp
+    created_at timestamp "NOT NULL"
 }
 
 %% ===========================
@@ -195,13 +203,13 @@ GRADING_CRITERION {
 %% ===========================
 SUBJECT {
     subject_id int PK
-    subject_name_id int FK
-    faculty_id int FK
-    curriculum_year int
-    class_id int FK
+    subject_name_id int FK "NOT NULL"
+    faculty_id int FK "NOT NULL"
+    curriculum_year int "NOT NULL"
+    class_id int FK "NOT NULL"
     subclass_id int FK
-    requirement_type text
-    created_at timestamp
+    requirement_type text "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 
@@ -210,24 +218,24 @@ SUBJECT {
 %% ===========================
 SUBJECT_SYLLABUS {
     id int PK
-    subject_id int FK
-    syllabus_id int FK
-    created_at timestamp
+    subject_id int FK "NOT NULL"
+    syllabus_id int FK "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 SUBJECT_ATTRIBUTE_VALUE {
     id int PK
-    subject_id int FK
-    attribute_id int FK
-    value text
-    created_at timestamp
+    subject_id int FK "NOT NULL"
+    attribute_id int FK "NOT NULL"
+    value text "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 SYLLABUS_STUDY_SYSTEM {
     id int PK
-    source_syllabus_id int FK
-    target text
-    created_at timestamp
+    source_syllabus_id int FK "NOT NULL"
+    target text "NOT NULL"
+    created_at timestamp "NOT NULL"
     updated_at timestamp
 }
 
