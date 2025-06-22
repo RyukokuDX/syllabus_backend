@@ -1,247 +1,267 @@
 ---
 title: データベースER図
-file_version: v1.3.2
-project_version: v1.3.21
-last_updated: 2025-06-21
+file_version: v1.3.3
+project_version: v1.3.25
+last_updated: 2025-06-22
 ---
 
 # データベースER図
 
-- File Version: v1.3.2
-- Project Version: v1.3.21
-- Last Updated: 2025-06-21
+- File Version: v1.3.3
+- Project Version: v1.3.25
+- Last Updated: 2025-06-22
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
 
-## ER図
 
-### 凡例
+## 凡例
 - `||--o{` : 1対多の関連（1つのエンティティが複数のエンティティを持つ）
 - `}o--||` : 多対1の関連（複数のエンティティが1つのエンティティに属する）
 - `}o--o|` : 多対0または1の関連（複数のエンティティが0または1つのエンティティに属する）
 - `||--||` : 1対1の関連（1つのエンティティが1つのエンティティに属する）
 - `}o--o{` : 多対多の関連（複数のエンティティが複数のエンティティに属する）
 
+<!--
+erDiagram template
+Table{
+   field_name field_type key(PK or FK or PK/FK or "" )
+}
+-->
+
 ```mermaid
 erDiagram
+%% ===========================
+%% Master Tables
+%% ===========================
+CLASS_TABLE {
+    class_id int PK
+    class_name text
+    created_at timestamp
+}
+SUBCLASS_TABLE {
+    subclass_id int PK
+    subclass_name text
+    created_at timestamp
+}
+FACULTY {
+    faculty_id int PK
+    faculty_name text
+    created_at timestamp
+}
+SUBJECT_NAME {
+    subject_name_id int PK
+    name text
+    created_at timestamp
+}
+INSTRUCTOR {
+    instructor_id int PK
+    name text
+    name_kana text
+    created_at timestamp
+}
+SYLLABUS_MASTER {
+    syllabus_id int PK
+    syllabus_code text
+    syllabus_year int
+    created_at timestamp
+    updated_at timestamp
+}
+BOOK {
+    book_id int PK
+    title text
+    author text
+    publisher text
+    price int
+    isbn text
+    created_at timestamp
+}
+BOOK_UNCATEGORIZED {
+    id int PK
+    syllabus_id int FK
+    title text
+    author text
+    publisher text
+    price int
+    role text
+    isbn text
+    categorization_status text
+    created_at timestamp
+    updated_at timestamp
+}
+SUBJECT_ATTRIBUTE {
+    attribute_id int PK
+    attribute_name text
+    description text
+    created_at timestamp
+}
 
-    %% マスターテーブル
-    class {
-        INTEGER class_id PK
-        TEXT class_name UNIQUE
-        TIMESTAMP created_at
-    }
-    subclass {
-        INTEGER subclass_id PK
-        TEXT subclass_name UNIQUE
-        TIMESTAMP created_at
-    }
-    faculty {
-        INTEGER faculty_id PK
-        TEXT faculty_name UNIQUE
-        TIMESTAMP created_at
-    }
-    subject_name {
-        INTEGER subject_name_id PK
-        TEXT name
-        TIMESTAMP created_at
-    }
-    instructor {
-        INTEGER instructor_id PK
-        TEXT name
-        TEXT name_kana
-        TIMESTAMP created_at
-    }
-    syllabus_master {
-        INTEGER syllabus_id PK
-        TEXT syllabus_code
-        INTEGER syllabus_year
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    book {
-        INTEGER book_id PK
-        TEXT title
-        TEXT author
-        TEXT publisher
-        INTEGER price
-        TEXT isbn UNIQUE
-        TIMESTAMP created_at
-    }
-    book_uncategorized {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        TEXT title
-        TEXT author
-        TEXT publisher
-        INTEGER price
-        TEXT role
-        TEXT isbn
-        TEXT categorization_status
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    book_author {
-        INTEGER book_author_id PK
-        INTEGER book_id FK
-        TEXT author_name
-        TIMESTAMP created_at
-    }
-    subject_attribute {
-        INTEGER attribute_id PK
-        TEXT attribute_name
-        TEXT description
-        TIMESTAMP created_at
-    }
+%% ===========================
+%% Transaction Tables
+%% ===========================
+SYLLABUS {
+    syllabus_id int PK,FK
+    subject_name_id int FK
+    subtitle text
+    term text
+    campus text
+    credits int
+    goals text
+    summary text
+    attainment text
+    methods text
+    outside_study text
+    textbook_comment text
+    reference_comment text
+    advice text
+    created_at timestamp
+    updated_at timestamp
+}
+SUBJECT_GRADE {
+    id int PK
+    syllabus_id int FK
+    grade text
+    created_at timestamp
+    updated_at timestamp
+}
+LECTURE_TIME {
+    id int PK
+    syllabus_id int FK
+    day_of_week text
+    period int
+    created_at timestamp
+    updated_at timestamp
+}
+LECTURE_SESSION {
+    lecture_session_id int PK
+    syllabus_id int FK
+    session_number int
+    contents text
+    other_info text
+    created_at timestamp
+    updated_at timestamp
+}
+LECTURE_SESSION_IRREGULAR {
+    lecture_session_irregular_id int PK
+    syllabus_id int FK
+    session_pattern text
+    contents text
+    other_info text
+    created_at timestamp
+    updated_at timestamp
+}
+SYLLABUS_INSTRUCTOR {
+    id int PK
+    syllabus_id int FK
+    instructor_id int FK
+    role text
+    created_at timestamp
+    updated_at timestamp
+}
+LECTURE_SESSION_INSTRUCTOR {
+    id int PK
+    lecture_session_id int FK
+    instructor_id int FK
+    role text
+    created_at timestamp
+    updated_at timestamp
+}
+LECTURE_SESSION_IRREGULAR_INSTRUCTOR {
+    id int PK
+    lecture_session_irregular_id int FK
+    instructor_id int FK
+    role text
+    created_at timestamp
+    updated_at timestamp
+}
+SYLLABUS_BOOK {
+    id int PK
+    syllabus_id int FK
+    book_id int FK
+    role text
+    note text
+    created_at timestamp
+}
+GRADING_CRITERION {
+    id int PK
+    syllabus_id int FK
+    criteria_type text
+    ratio int
+    note text
+    created_at timestamp
+}
 
-    %% トランザクションテーブル
-    syllabus {
-        INTEGER syllabus_id PK,FK
-        INTEGER subject_name_id FK
-        TEXT subtitle
-        TEXT term
-        TEXT campus
-        INTEGER credits
-        TEXT goals
-        TEXT summary
-        TEXT attainment
-        TEXT methods
-        TEXT outside_study
-        TEXT textbook_comment
-        TEXT reference_comment
-        TEXT advice
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    subject_grade {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        TEXT grade
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    lecture_time {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        TEXT day_of_week
-        SMALLINT period
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    lecture_session {
-        INTEGER lecture_session_id PK
-        INTEGER syllabus_id FK
-        INTEGER session_number
-        TEXT contents
-        TEXT other_info
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    syllabus_instructor {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        INTEGER instructor_id FK
-        TEXT role
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    lecture_session_instructor {
-        INTEGER id PK
-        INTEGER lecture_session_id FK
-        INTEGER instructor_id FK
-        TEXT role
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    syllabus_book {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        INTEGER book_id FK
-        TEXT role
-        TEXT note
-        TIMESTAMP created_at
-    }
-    grading_criterion {
-        INTEGER id PK
-        INTEGER syllabus_id FK
-        TEXT criteria_type
-        INTEGER ratio
-        TEXT note
-        TIMESTAMP created_at
-    }
+%% ===========================
+%% Basic Table
+%% ===========================
+SUBJECT {
+    subject_id int PK
+    subject_name_id int FK
+    faculty_id int FK
+    curriculum_year int
+    class_id int FK
+    subclass_id int FK
+    requirement_type text
+    created_at timestamp
+    updated_at timestamp
+}
 
-    %% 基本テーブル
-    subject {
-        INTEGER subject_id PK
-        INTEGER subject_name_id FK
-        INTEGER faculty_id FK
-        INTEGER curriculum_year
-        INTEGER class_id FK
-        INTEGER subclass_id FK
-        TEXT requirement_type
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
+%% ===========================
+%% Relation Tables
+%% ===========================
+SUBJECT_SYLLABUS {
+    id int PK
+    subject_id int FK
+    syllabus_id int FK
+    created_at timestamp
+    updated_at timestamp
+}
+SUBJECT_ATTRIBUTE_VALUE {
+    id int PK
+    subject_id int FK
+    attribute_id int FK
+    value text
+    created_at timestamp
+    updated_at timestamp
+}
+SYLLABUS_STUDY_SYSTEM {
+    id int PK
+    source_syllabus_id int FK
+    target text
+    created_at timestamp
+    updated_at timestamp
+}
 
-    %% 関連テーブル
-    subject_syllabus {
-        INTEGER id PK
-        INTEGER subject_id FK
-        INTEGER syllabus_id FK
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    subject_attribute_value {
-        INTEGER id PK
-        INTEGER subject_id FK
-        INTEGER attribute_id FK
-        TEXT value
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
-    syllabus_study_system {
-        INTEGER id PK
-        INTEGER source_syllabus_id FK
-        TEXT target
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-    }
+%% ===========================
+%% Relationships
+%% ===========================
+SUBJECT_NAME ||--o{ SUBJECT : subject_name_id
+FACULTY ||--o{ SUBJECT : faculty_id
+CLASS_TABLE ||--o{ SUBJECT : class_id
+SUBCLASS_TABLE }o--o| SUBJECT : subclass_id
 
-    %% 関連の定義
-    %% マスターテーブル → 基本テーブル
-    subject_name ||--o{ subject : "subject_name_id"
-    faculty ||--o{ subject : "faculty_id"
-    class ||--o{ subject : "class_id"
-    subclass }o--o| subject : "subclass_id"
+SUBJECT_NAME ||--o{ SYLLABUS : subject_name_id
+INSTRUCTOR ||--o{ SYLLABUS_INSTRUCTOR : instructor_id
+INSTRUCTOR ||--o{ LECTURE_SESSION_INSTRUCTOR : instructor_id
+INSTRUCTOR ||--o{ LECTURE_SESSION_IRREGULAR_INSTRUCTOR : instructor_id
+BOOK ||--o{ SYLLABUS_BOOK : book_id
+SUBJECT_ATTRIBUTE ||--o{ SUBJECT_ATTRIBUTE_VALUE : attribute_id
+SYLLABUS_MASTER ||--o{ BOOK_UNCATEGORIZED : syllabus_id
 
-    %% マスターテーブル → トランザクションテーブル
-    subject_name ||--o{ syllabus : "subject_name_id"
-    instructor ||--o{ syllabus_instructor : "instructor_id"
-    instructor ||--o{ lecture_session_instructor : "instructor_id"
-    instructor ||--o{ lecture_session_irregular_instructor : "instructor_id"
-    book ||--o{ syllabus_book : "book_id"
-    book ||--o{ book_author : "book_id"
-    subject_attribute ||--o{ subject_attribute_value : "attribute_id"
-    syllabus_master ||--o{ book_uncategorized : "syllabus_id"
+SUBJECT ||--o{ SUBJECT_SYLLABUS : subject_id
+SUBJECT ||--o{ SUBJECT_ATTRIBUTE_VALUE : subject_id
 
-    %% 基本テーブル → 関連テーブル
-    subject ||--o{ subject_syllabus : "subject_id"
-    subject ||--o{ subject_attribute_value : "subject_id"
-
-    %% トランザクションテーブル → 関連テーブル
-    syllabus_master ||--|| syllabus : "syllabus_id"
-    syllabus_master ||--o{ subject_grade : "syllabus_id"
-    syllabus_master ||--o{ lecture_time : "syllabus_id"
-    syllabus_master ||--o{ lecture_session : "syllabus_id"
-    syllabus_master ||--o{ lecture_session_irregular : "syllabus_id"
-    syllabus_master ||--o{ syllabus_instructor : "syllabus_id"
-    syllabus_master ||--o{ syllabus_book : "syllabus_id"
-    syllabus_master ||--o{ grading_criterion : "syllabus_id"
-    syllabus_master ||--o{ syllabus_study_system : "source_syllabus_id"
-    syllabus_master ||--o{ subject_syllabus : "syllabus_id"
-
-    lecture_session ||--o{ lecture_session_instructor : "lecture_session_id"
-    lecture_session_irregular ||--o{ lecture_session_irregular_instructor : "lecture_session_irregular_id"
+SYLLABUS_MASTER ||--|| SYLLABUS : syllabus_id
+SYLLABUS_MASTER ||--o{ SUBJECT_GRADE : syllabus_id
+SYLLABUS_MASTER ||--o{ LECTURE_TIME : syllabus_id
+SYLLABUS_MASTER ||--o{ LECTURE_SESSION : syllabus_id
+SYLLABUS_MASTER ||--o{ LECTURE_SESSION_IRREGULAR : syllabus_id
+SYLLABUS_MASTER ||--o{ SYLLABUS_INSTRUCTOR : syllabus_id
+SYLLABUS_MASTER ||--o{ SYLLABUS_BOOK : syllabus_id
+SYLLABUS_MASTER ||--o{ GRADING_CRITERION : syllabus_id
+SYLLABUS_MASTER ||--o{ SYLLABUS_STUDY_SYSTEM : source_syllabus_id
+SYLLABUS_MASTER ||--o{ SUBJECT_SYLLABUS : syllabus_id
+LECTURE_SESSION ||--o{ LECTURE_SESSION_INSTRUCTOR : lecture_session_id
+LECTURE_SESSION_IRREGULAR ||--o{ LECTURE_SESSION_IRREGULAR_INSTRUCTOR : lecture_session_irregular_id
 ```
 
 [目次へ戻る](#目次) 

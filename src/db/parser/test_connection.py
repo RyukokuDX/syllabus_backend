@@ -5,107 +5,107 @@
 import sys
 import os
 
-# ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆãƒ«ãƒ¼ãƒˆã‚’ãƒ‘ã‚¹ã«è¿½åŠ 
+# ¥×¥í¥¸¥§¥¯¥È¥ë¡¼¥È¤ò¥Ñ¥¹¤ËÄÉ²Ã
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
 
 def test_imports():
-    """ã‚¤ãƒ³ãƒãƒ¼ãƒˆã®ãƒ†ã‚¹ãƒˆ"""
+    """¥¤¥ó¥İ¡¼¥È¤Î¥Æ¥¹¥È"""
     try:
         from src.db.database import SessionLocal
-        print("âœ“ SessionLocal ã‚¤ãƒ³ãƒãƒ¼ãƒˆæˆåŠŸ")
+        print(" SessionLocal ¥¤¥ó¥İ¡¼¥ÈÀ®¸ù")
         
         from src.db.models import SyllabusMaster
-        print("âœ“ SyllabusMaster ã‚¤ãƒ³ãƒãƒ¼ãƒˆæˆåŠŸ")
+        print(" SyllabusMaster ¥¤¥ó¥İ¡¼¥ÈÀ®¸ù")
         
         return True
     except Exception as e:
-        print(f"âœ— ã‚¤ãƒ³ãƒãƒ¼ãƒˆã‚¨ãƒ©ãƒ¼: {str(e)}")
+        print(f" ¥¤¥ó¥İ¡¼¥È¥¨¥é¡¼: {str(e)}")
         return False
 
 def test_db_connection():
-    """ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šã®ãƒ†ã‚¹ãƒˆ"""
+    """¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¤Î¥Æ¥¹¥È"""
     try:
         from src.db.database import SessionLocal
         
         session = SessionLocal()
-        print("âœ“ ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šæˆåŠŸ")
+        print(" ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³À®¸ù")
         
-        # ãƒ†ãƒ¼ãƒ–ãƒ«ãŒå­˜åœ¨ã™ã‚‹ã‹ãƒ†ã‚¹ãƒˆ
+        # ¥Æ¡¼¥Ö¥ë¤¬Â¸ºß¤¹¤ë¤«¥Æ¥¹¥È
         result = session.execute("SELECT COUNT(*) FROM syllabus_master")
         count = result.scalar()
-        print(f"âœ“ syllabus_masterãƒ†ãƒ¼ãƒ–ãƒ«å­˜åœ¨ç¢ºèª: {count}ä»¶ã®ãƒ¬ã‚³ãƒ¼ãƒ‰")
+        print(f" syllabus_master¥Æ¡¼¥Ö¥ëÂ¸ºß³ÎÇ§: {count}·ï¤Î¥ì¥³¡¼¥É")
         
         session.close()
         return True
     except Exception as e:
-        print(f"âœ— ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šã‚¨ãƒ©ãƒ¼: {str(e)}")
+        print(f" ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¥¨¥é¡¼: {str(e)}")
         return False
 
 def test_syllabus_master_query():
-    """syllabus_masterãƒ†ãƒ¼ãƒ–ãƒ«ã®ã‚¯ã‚¨ãƒªãƒ†ã‚¹ãƒˆ"""
+    """syllabus_master¥Æ¡¼¥Ö¥ë¤Î¥¯¥¨¥ê¥Æ¥¹¥È"""
     try:
         from src.db.database import SessionLocal
         from src.db.models import SyllabusMaster
         
         session = SessionLocal()
         
-        # å…¨ä»¶å–å¾—
+        # Á´·ï¼èÆÀ
         all_records = session.query(SyllabusMaster).all()
-        print(f"âœ“ syllabus_masterå…¨ä»¶å–å¾—: {len(all_records)}ä»¶")
+        print(f" syllabus_masterÁ´·ï¼èÆÀ: {len(all_records)}·ï")
         
         if all_records:
-            # æœ€åˆã®ãƒ¬ã‚³ãƒ¼ãƒ‰ã®è©³ç´°ã‚’è¡¨ç¤º
+            # ºÇ½é¤Î¥ì¥³¡¼¥É¤Î¾ÜºÙ¤òÉ½¼¨
             first_record = all_records[0]
-            print(f"  æœ€åˆã®ãƒ¬ã‚³ãƒ¼ãƒ‰: ID={first_record.syllabus_id}, "
-                  f"ã‚³ãƒ¼ãƒ‰={first_record.syllabus_code}, "
-                  f"å¹´åº¦={first_record.syllabus_year}")
+            print(f"  ºÇ½é¤Î¥ì¥³¡¼¥É: ID={first_record.syllabus_id}, "
+                  f"¥³¡¼¥É={first_record.syllabus_code}, "
+                  f"Ç¯ÅÙ={first_record.syllabus_year}")
         
         session.close()
         return True
     except Exception as e:
-        print(f"âœ— syllabus_masterã‚¯ã‚¨ãƒªã‚¨ãƒ©ãƒ¼: {str(e)}")
+        print(f" syllabus_master¥¯¥¨¥ê¥¨¥é¡¼: {str(e)}")
         return False
 
 def test_get_syllabus_master_id():
-    """get_syllabus_master_id_from_dbé–¢æ•°ã®ãƒ†ã‚¹ãƒˆ"""
+    """get_syllabus_master_id_from_db´Ø¿ô¤Î¥Æ¥¹¥È"""
     try:
         from utils import get_db_connection, get_syllabus_master_id_from_db
         
         session = get_db_connection()
-        print("âœ“ get_db_connectionæˆåŠŸ")
+        print(" get_db_connectionÀ®¸ù")
         
-        # ãƒ†ã‚¹ãƒˆç”¨ã®ã‚¯ã‚¨ãƒªï¼ˆå­˜åœ¨ã—ãªã„ã‚³ãƒ¼ãƒ‰ï¼‰
+        # ¥Æ¥¹¥ÈÍÑ¤Î¥¯¥¨¥ê¡ÊÂ¸ºß¤·¤Ê¤¤¥³¡¼¥É¡Ë
         result = get_syllabus_master_id_from_db(session, "TEST001", 2025)
-        print(f"âœ“ get_syllabus_master_id_from_dbå®Ÿè¡Œ: {result}")
+        print(f" get_syllabus_master_id_from_db¼Â¹Ô: {result}")
         
         session.close()
         return True
     except Exception as e:
-        print(f"âœ— get_syllabus_master_id_from_dbã‚¨ãƒ©ãƒ¼: {str(e)}")
+        print(f" get_syllabus_master_id_from_db¥¨¥é¡¼: {str(e)}")
         return False
 
 if __name__ == "__main__":
-    print("=== ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šãƒ†ã‚¹ãƒˆ ===")
+    print("=== ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¥Æ¥¹¥È ===")
     
-    # 1. ã‚¤ãƒ³ãƒãƒ¼ãƒˆãƒ†ã‚¹ãƒˆ
-    print("\n1. ã‚¤ãƒ³ãƒãƒ¼ãƒˆãƒ†ã‚¹ãƒˆ")
+    # 1. ¥¤¥ó¥İ¡¼¥È¥Æ¥¹¥È
+    print("\n1. ¥¤¥ó¥İ¡¼¥È¥Æ¥¹¥È")
     if not test_imports():
         sys.exit(1)
     
-    # 2. ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šãƒ†ã‚¹ãƒˆ
-    print("\n2. ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šãƒ†ã‚¹ãƒˆ")
+    # 2. ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¥Æ¥¹¥È
+    print("\n2. ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¥Æ¥¹¥È")
     if not test_db_connection():
         sys.exit(1)
     
-    # 3. syllabus_masterã‚¯ã‚¨ãƒªãƒ†ã‚¹ãƒˆ
-    print("\n3. syllabus_masterã‚¯ã‚¨ãƒªãƒ†ã‚¹ãƒˆ")
+    # 3. syllabus_master¥¯¥¨¥ê¥Æ¥¹¥È
+    print("\n3. syllabus_master¥¯¥¨¥ê¥Æ¥¹¥È")
     if not test_syllabus_master_query():
         sys.exit(1)
     
-    # 4. é–¢æ•°ãƒ†ã‚¹ãƒˆ
-    print("\n4. é–¢æ•°ãƒ†ã‚¹ãƒˆ")
+    # 4. ´Ø¿ô¥Æ¥¹¥È
+    print("\n4. ´Ø¿ô¥Æ¥¹¥È")
     if not test_get_syllabus_master_id():
         sys.exit(1)
     
-    print("\n=== å…¨ã¦ã®ãƒ†ã‚¹ãƒˆãŒæˆåŠŸã—ã¾ã—ãŸ ===") 
+    print("\n=== Á´¤Æ¤Î¥Æ¥¹¥È¤¬À®¸ù¤·¤Ş¤·¤¿ ===") 
