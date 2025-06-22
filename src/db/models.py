@@ -184,6 +184,7 @@ class SubjectGrade(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
+        UniqueConstraint('syllabus_id', 'grade', name='uix_subject_grade_syllabus_grade'),
         Index('idx_subject_grade_grade', 'grade'),
         Index('idx_subject_grade_syllabus', 'syllabus_id'),
     )
@@ -199,6 +200,7 @@ class LectureTime(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
+        UniqueConstraint('syllabus_id', 'day_of_week', 'period', name='uix_lecture_time_syllabus_day_period'),
         Index('idx_lecture_time_day_period', 'day_of_week', 'period'),
         Index('idx_lecture_time_syllabus', 'syllabus_id'),
     )

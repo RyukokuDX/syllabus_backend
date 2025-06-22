@@ -81,6 +81,46 @@ def read_json_files(directory, table_name):
         except Exception as e:
             print(f"Error reading {file}: {str(e)}")
     
+    # 重複データを除去
+    if data:
+        # テーブルごとのユニークキーを定義
+        unique_keys = {
+            "class": lambda r: r.get('class_name'),
+            "subclass": lambda r: r.get('subclass_name'),
+            "faculty": lambda r: r.get('faculty_name'),
+            "subject_name": lambda r: r.get('name'),
+            "syllabus_master": lambda r: (r.get('syllabus_code'), r.get('syllabus_year')),
+            "syllabus": lambda r: r.get('syllabus_id'),
+            "subject": lambda r: (r.get('subject_name_id'), r.get('faculty_id'), r.get('class_id'), r.get('subclass_id'), r.get('curriculum_year')),
+            "subject_syllabus": lambda r: (r.get('subject_id'), r.get('syllabus_id')),
+            "subject_attribute": lambda r: r.get('attribute_name'),
+            "subject_attribute_value": lambda r: (r.get('subject_id'), r.get('attribute_id')),
+            "lecture_time": lambda r: (r.get('syllabus_id'), r.get('day_of_week'), r.get('period')),
+            "lecture_session": lambda r: (r.get('syllabus_id'), r.get('session_number')),
+            "lecture_session_irregular": lambda r: (r.get('syllabus_id'), r.get('session_pattern')),
+            "lecture_session_instructor": lambda r: (r.get('lecture_session_id'), r.get('instructor_id')),
+            "lecture_session_irregular_instructor": lambda r: (r.get('lecture_session_irregular_id'), r.get('instructor_id')),
+            "syllabus_instructor": lambda r: (r.get('syllabus_id'), r.get('instructor_id')),
+            "syllabus_book": lambda r: (r.get('syllabus_id'), r.get('book_id')),
+            "grading_criterion": lambda r: (r.get('syllabus_id'), r.get('criteria_type')),
+            "syllabus_study_system": lambda r: (r.get('source_syllabus_id'), r.get('target')),
+            "subject_grade": lambda r: (r.get('syllabus_id'), r.get('grade'))
+        }
+        
+        if table_name in unique_keys:
+            unique_data = []
+            seen_keys = set()
+            key_func = unique_keys[table_name]
+            
+            for record in data:
+                key = key_func(record)
+                if key is not None and key not in seen_keys:
+                    seen_keys.add(key)
+                    unique_data.append(record)
+            
+            print(f"Removed {len(data) - len(unique_data)} duplicate records for {table_name}")
+            data = unique_data
+    
     print(f"Total records found for {table_name}: {len(data)}")
     return data
 
@@ -134,7 +174,6 @@ def generate_sql_insert(table_name, records):
         "instructor": None,  # 一意性制約がないため、ON CONFLICT句は不要
         "book": ["isbn"],  # ISBNのUNIQUE制約に対応
         "book_uncategorized": None,  # 一意性制約がないため、ON CONFLICT句は不要
-        "book_author": ["book_id", "author_name"],
         "lecture_time": ["syllabus_id", "day_of_week", "period"],
         "lecture_session": ["syllabus_id", "session_number"],
         "lecture_session_irregular": ["syllabus_id", "session_pattern"],
@@ -144,7 +183,7 @@ def generate_sql_insert(table_name, records):
         "syllabus_book": ["syllabus_id", "book_id"],
         "grading_criterion": ["syllabus_id", "criteria_type"],
         "syllabus_study_system": ["source_syllabus_id", "target"],
-        "subject_grade": ["syllabus_id", "grade"]
+        "subject_grade": ["syllabus_id", "grade"]  # 新しく追加したユニーク制約に対応
     }
 
     # 更新対象カラムの設定
@@ -162,7 +201,6 @@ def generate_sql_insert(table_name, records):
         "instructor": None,  # 一意性制約がないため、更新対象カラムも不要
         "book": ["title", "author", "publisher", "price"],  # ISBN以外のカラムを更新対象に
         "book_uncategorized": None,  # 一意性制約がないため、更新対象カラムも不要
-        "book_author": ["book_id", "author_name"],
         "lecture_time": ["day_of_week", "period"],
         "lecture_session": ["session_number", "contents", "other_info"],
         "lecture_session_irregular": ["session_pattern", "contents", "other_info"],
@@ -172,7 +210,7 @@ def generate_sql_insert(table_name, records):
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
         "grading_criterion": ["criteria_type", "ratio", "note"],
         "syllabus_study_system": ["target"],
-        "subject_grade": ["grade"]
+        "subject_grade": ["grade"]  # gradeカラムを更新対象に
     }
 
     # ON CONFLICT句の生成
@@ -310,7 +348,8 @@ CREATE TABLE IF NOT EXISTS lecture_time (
     day_of_week TEXT NOT NULL,
     period SMALLINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, day_of_week, period)
 );""",
         'lecture_session': """
 CREATE TABLE IF NOT EXISTS lecture_session (

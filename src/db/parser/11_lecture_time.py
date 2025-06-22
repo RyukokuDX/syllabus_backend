@@ -1,5 +1,5 @@
-# File Version: v1.3.0
-# Project Version: v1.3.18
+# File Version: v1.3.2
+# Project Version: v1.3.26
 # Last Updated: 2025/6/21
 
 import os
@@ -13,32 +13,32 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import unicodedata
 
-# ¸½ºß¤Î¥Ç¥£¥ì¥¯¥È¥ê¤òPython¥Ñ¥¹¤ËÄÉ²Ã
+# ç¾åœ¨ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’Pythonãƒ‘ã‚¹ã«è¿½åŠ 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
-# utils.py¤«¤éÀµµ¬²½´Ø¿ô¤ò¥¤¥ó¥İ¡¼¥È
+# utils.pyã‹ã‚‰é–¢æ•°ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
 try:
 	from utils import normalize_subject_name
 except ImportError:
-	# utils.py¤¬¸«¤Ä¤«¤é¤Ê¤¤¾ì¹ç¤Î¥Õ¥©¡¼¥ë¥Ğ¥Ã¥¯
+	# utils.pyãŒè¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã®ãƒ•ã‚©ãƒ¼ãƒ«ãƒãƒƒã‚¯
 	def normalize_subject_name(text: str) -> str:
-		"""¥Æ¥­¥¹¥È¤òÀµµ¬²½¤¹¤ë¡Ê¥Õ¥©¡¼¥ë¥Ğ¥Ã¥¯¡Ë"""
+		"""æ–‡å­—åˆ—ã‚’æ­£è¦åŒ–ã™ã‚‹é–¢æ•°"""
 		return unicodedata.normalize('NFKC', text)
 
 def get_db_connection():
-	"""¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¤ò¼èÆÀ¤¹¤ë"""
-	# ´Ä¶­ÊÑ¿ô¤«¤éÀÜÂ³¾ğÊó¤ò¼èÆÀ
+	"""ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šã‚’å–å¾—ã™ã‚‹"""
+	# ç’°å¢ƒå¤‰æ•°ã‹ã‚‰æ¥ç¶šæƒ…å ±ã‚’å–å¾—
 	user = os.getenv('POSTGRES_USER', 'postgres')
 	password = os.getenv('POSTGRES_PASSWORD', 'postgres')
 	host = os.getenv('POSTGRES_HOST', 'localhost')
 	port = os.getenv('POSTGRES_PORT', '5432')
 	db = os.getenv('POSTGRES_DB', 'syllabus_db')
 
-	# ÀÜÂ³Ê¸»úÎó¤òºîÀ®
+	# æ¥ç¶šæ–‡å­—åˆ—ã‚’ä½œæˆ
 	connection_string = f"postgresql://{user}:{password}@{host}:{port}/{db}"
 	
-	# ¥¨¥ó¥¸¥ó¤òºîÀ®
+	# ã‚¨ãƒ³ã‚¸ãƒ³ã‚’ä½œæˆ
 	engine = create_engine(
 		connection_string,
 		connect_args={
@@ -46,20 +46,20 @@ def get_db_connection():
 		}
 	)
 	
-	# ¥»¥Ã¥·¥ç¥ó¤òºîÀ®
+	# ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’ä½œæˆ
 	Session = sessionmaker(bind=engine)
 	session = Session()
 	
-	# ¥»¥Ã¥·¥ç¥óºîÀ®»ş¤Ë°ìÅÙ¤À¤±Ê¸»ú¥¨¥ó¥³¡¼¥Ç¥£¥ó¥°¤òÀßÄê
+	# ã‚»ãƒƒã‚·ãƒ§ãƒ³ä½œæˆæ™‚ã«ä¸€åº¦ã ã‘æ–‡å­—ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’è¨­å®š
 	session.execute(text("SET client_encoding TO 'utf-8'"))
 	session.commit()
 	
 	return session
 
 def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: int) -> int:
-	"""¥·¥é¥Ğ¥¹¥Ş¥¹¥¿¡¼ID¤ò¼èÆÀ¤¹¤ë"""
+	"""ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼IDã‚’å–å¾—ã™ã‚‹"""
 	try:
-		# ¥·¥é¥Ğ¥¹¥Ş¥¹¥¿¡¼ID¤ò¼èÆÀ
+		# ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼IDã‚’å–å¾—
 		query = text("""
 			SELECT syllabus_id 
 			FROM syllabus_master 
@@ -78,78 +78,85 @@ def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: i
 		return None
 
 def get_current_year() -> int:
-	"""¸½ºß¤ÎÇ¯ÅÙ¤ò¼èÆÀ¤¹¤ë"""
+	"""ç¾åœ¨ã®å¹´ã‚’å–å¾—ã™ã‚‹"""
 	return datetime.now().year
 
 def get_year_from_user() -> int:
-	"""¥æ¡¼¥¶¡¼¤«¤éÇ¯ÅÙ¤òÆşÎÏ¤·¤Æ¤â¤é¤¦"""
+	"""ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‹ã‚‰å¹´ã‚’å…¥åŠ›ã—ã¦ã‚‚ã‚‰ã†"""
 	while True:
 		try:
-			year = input("Ç¯ÅÙ¤òÆşÎÏ¤·¤Æ¤¯¤À¤µ¤¤¡Ê¶õ¤Î¾ì¹ç¤Ï¸½ºß¤ÎÇ¯ÅÙ¡Ë: ").strip()
+			year = input("å¹´ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ï¼ˆç©ºã®å ´åˆã¯ç¾åœ¨ã®å¹´ï¼‰: ").strip()
 			if not year:
 				return get_current_year()
 			year = int(year)
-			if 2000 <= year <= 2100:  # ÂÅÅö¤ÊÇ¯ÅÙ¤ÎÈÏ°Ï¤ò¥Á¥§¥Ã¥¯
+			if 2000 <= year <= 2100:  # å¦¥å½“ãªå¹´ã®ç¯„å›²ã‚’ãƒã‚§ãƒƒã‚¯
 				return year
-			print("2000Ç¯¤«¤é2100Ç¯¤Î´Ö¤ÇÆşÎÏ¤·¤Æ¤¯¤À¤µ¤¤¡£")
+			print("2000å¹´ã‹ã‚‰2100å¹´ã®é–“ã§å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚")
 		except ValueError:
-			print("Í­¸ú¤Ê¿ôÃÍ¤òÆşÎÏ¤·¤Æ¤¯¤À¤µ¤¤¡£")
+			print("æœ‰åŠ¹ãªæ•°å€¤ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚")
 
 def parse_lecture_time(time_text: str) -> List[Dict]:
-	"""¹ÖµÁ»ş´Ö¥Æ¥­¥¹¥È¤ò²òÀÏ¤·¤ÆÍËÆü¤È»ş¸Â¤òÃê½Ğ¤¹¤ë"""
+	"""è¬›ç¾©æ™‚é–“ã®æ–‡å­—åˆ—ã‚’è§£æã—ã¦æ›œæ—¥ã¨æ™‚é™ã®æƒ…å ±ã‚’æŠ½å‡ºã™ã‚‹"""
 	lecture_times = []
 	
 	if not time_text:
 		return lecture_times
 	
-	# ½¸Ãæ¹ÖµÁ¤Î¾ì¹ç
-	if '½¸Ãæ' in time_text:
+	# é›†ä¸­è¬›ç¾©ã®å ´åˆ
+	if 'é›†ä¸­' in time_text:
 		lecture_times.append({
-			'day_of_week': '½¸Ãæ',
+			'day_of_week': 'é›†ä¸­',
 			'period': 0
 		})
 		return lecture_times
 	
-	# ÄÌ¾ï¤Î¹ÖµÁ»ş´Ö¤ò²òÀÏ
-	# Îã: "¸å´ü ¿å£²(Y019)" ¢ª ¿åÍËÆü2¸Â
-	# Îã: "Á°´ü ·î£±¡¦¿å£³" ¢ª ·îÍËÆü1¸Â¡¢¿åÍËÆü3¸Â
-	# Îã: "£±£Ñ ÌÚ£´(YJ11)¡¦ÌÚ£µ¡Ê¥Ú¥¢¡Ë" ¢ª ÌÚÍËÆü4¸Â¡¢ÌÚÍËÆü5¸Â
+	# è¤‡æ•°ã®è¬›ç¾©æ™‚é–“ãŒã‚ã‚‹å ´åˆ
+	# ä¾‹: "ï¼’ï¼± ç«ï¼”(Y553)" ã¯ ç«æ›œ4é™
+	# ä¾‹: "å‰æœŸ æ°´1,3" ã¯ æ°´æ›œ1é™ã¨3é™
+	# ä¾‹: "å¾ŒæœŸ é‡‘4(YJ11),5(é‡‘æ›œ)" ã¯ é‡‘æ›œ4é™ã¨5é™
 	
-	# ÍËÆü¤Î¥Ş¥Ã¥Ô¥ó¥°
+	# æ›œæ—¥ã®ãƒãƒƒãƒ”ãƒ³ã‚°
 	day_mapping = {
-		'·î': '·î',
-		'²Ğ': '²Ğ', 
-		'¿å': '¿å',
-		'ÌÚ': 'ÌÚ',
-		'¶â': '¶â',
-		'ÅÚ': 'ÅÚ',
-		'Æü': 'Æü'
+		'æœˆ': 'æœˆ',
+		'ç«': 'ç«', 
+		'æ°´': 'æ°´',
+		'æœ¨': 'æœ¨',
+		'é‡‘': 'é‡‘',
+		'åœŸ': 'åœŸ',
+		'æ—¥': 'æ—¥'
 	}
 	
-	# utils.py¤ÎÀµµ¬²½µ¡Ç½¤ò»ÈÍÑ¤·¤ÆÁ´³Ñ¿ô»ú¤òÈ¾³Ñ¤ËÊÑ´¹
+	# utils.pyã®é–¢æ•°ã‚’ä½¿ã£ã¦æ–‡å­—åˆ—ã‚’æ­£è¦åŒ–
 	time_text_normalized = normalize_subject_name(time_text)
 	
-	# Ê£¿ô¤Î»ş¸Â¤òÊ¬³ä¡Ê¡¦¤Ç¶èÀÚ¤é¤ì¤Æ¤¤¤ë¾ì¹ç¡Ë
-	time_parts = time_text_normalized.split('')  # Àµµ¬²½¤µ¤ì¤¿ÃæÅÀ¤ÇÊ¬³ä
+	# ã‚«ãƒ³ãƒã§åŒºåˆ‡ã‚‰ã‚ŒãŸéƒ¨åˆ†ã‚’åˆ†å‰²
+	time_parts = time_text_normalized.split(',')  # ã‚«ãƒ³ãƒã§åŒºåˆ‡ã‚‰ã‚ŒãŸéƒ¨åˆ†
 	
 	for part in time_parts:
 		part = part.strip()
 		if not part:
 			continue
 		
-		# ÍËÆü¤È»ş¸Â¤Î¥Ñ¥¿¡¼¥ó¤ò¸¡º÷
-		# ¥Ñ¥¿¡¼¥ó: ÍËÆü + ¿ô»ú¡Ê1-6¸Â¡Ë
-		pattern = r'([·î²Ğ¿åÌÚ¶âÅÚÆü])([1-6])'
+		# æ›œæ—¥ã¨æ™‚é™ã®ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒãƒƒãƒãƒ³ã‚°
+		# ãƒ‘ã‚¿ãƒ¼ãƒ³: æ›œæ—¥ + æ™‚é™1-6é™ï¼ˆå…¨è§’ãƒ»åŠè§’æ•°å­—å¯¾å¿œï¼‰
+		pattern = r'([æœˆç«æ°´æœ¨é‡‘åœŸæ—¥])([1-6ï¼‘ï¼’ï¼“ï¼”ï¼•ï¼–])'
 		matches = re.findall(pattern, part)
 		
 		for day_char, period_str in matches:
 			if day_char in day_mapping:
+				# å…¨è§’æ•°å­—ã‚’åŠè§’æ•°å­—ã«å¤‰æ›
+				period_map = {
+					'ï¼‘': '1', 'ï¼’': '2', 'ï¼“': '3', 'ï¼”': '4', 'ï¼•': '5', 'ï¼–': '6',
+					'1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6'
+				}
+				period = period_map.get(period_str, '0')
+				
 				lecture_times.append({
 					'day_of_week': day_mapping[day_char],
-					'period': int(period_str)
+					'period': int(period)
 				})
 	
-	# ¥Ş¥Ã¥Á¤·¤Ê¤¤¾ì¹ç¤Ï¡¢¥Æ¥­¥¹¥ÈÁ´ÂÎ¤ò¤½¤Î¤Ş¤Ş»ÈÍÑ
+	# ãƒãƒƒãƒã—ãªã„å ´åˆã¯ã€ãã®ã¾ã¾ã®æ–‡å­—åˆ—ã‚’è¿”ã™
 	if not lecture_times and time_text.strip():
 		lecture_times.append({
 			'day_of_week': time_text.strip(),
@@ -159,73 +166,90 @@ def parse_lecture_time(time_text: str) -> List[Dict]:
 	return lecture_times
 
 def get_json_files(year: int) -> List[str]:
-	"""»ØÄê¤µ¤ì¤¿Ç¯ÅÙ¤Î¤¹¤Ù¤Æ¤ÎJSON¥Õ¥¡¥¤¥ë¤Î¥Ñ¥¹¤ò¼èÆÀ¤¹¤ë"""
+	"""æŒ‡å®šã•ã‚ŒãŸå¹´ã®ã™ã¹ã¦ã®JSONãƒ•ã‚¡ã‚¤ãƒ«ã‚’å–å¾—ã™ã‚‹"""
 	json_dir = os.path.join("src", "syllabus", str(year), "json")
 	if not os.path.exists(json_dir):
-		raise FileNotFoundError(f"¥Ç¥£¥ì¥¯¥È¥ê¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó: {json_dir}")
+		raise FileNotFoundError(f"ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“: {json_dir}")
 	
 	json_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
 	if not json_files:
-		raise FileNotFoundError(f"JSON¥Õ¥¡¥¤¥ë¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó: {json_dir}")
+		raise FileNotFoundError(f"JSONãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“: {json_dir}")
 	
 	return [os.path.join(json_dir, f) for f in json_files]
 
 def extract_lecture_time_from_single_json(json_data: Dict, session, year: int) -> List[Dict]:
-	"""Ã±°ì¤ÎJSON¥Õ¥¡¥¤¥ë¤«¤é¹ÖµÁ»ş´Ö¾ğÊó¤òÃê½Ğ¤¹¤ë"""
+	"""å˜ä¸€JSONãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’æŠ½å‡ºã™ã‚‹"""
 	lecture_times = []
 	
-	# ²ÊÌÜ¥³¡¼¥É¤ò¼èÆÀ
-	syllabus_code = json_data.get("²ÊÌÜ¥³¡¼¥É", "")
+	# ç§‘ç›®ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—
+	syllabus_code = json_data.get("ç§‘ç›®ã‚³ãƒ¼ãƒ‰", "")
 	
-	# ³«¹Ö´ü¡¦ÍË¹Ö»ş¤ò¼èÆÀ
-	basic_info = json_data.get("´ğËÜ¾ğÊó", {})
-	time_info = basic_info.get("³«¹Ö´ü¡¦ÍË¹Ö»ş", {})
-	time_text = time_info.get("ÆâÍÆ", "") if isinstance(time_info, dict) else str(time_info)
+	# åŸºæœ¬æƒ…å ±ã‹ã‚‰è¬›ç¾©æ™‚é–“ã‚’å–å¾—
+	basic_info = json_data.get("åŸºæœ¬æƒ…å ±", {})
+	time_info = basic_info.get("é–‹è¬›æœŸãƒ»æ›œè¬›æ™‚", {})
+	time_text = time_info.get("å†…å®¹", "") if isinstance(time_info, dict) else str(time_info)
 	
 	if time_text and syllabus_code:
-		# syllabus_master¤«¤ésyllabus_id¤ò¼èÆÀ
+		# syllabus_masterã‹ã‚‰syllabus_idã‚’å–å¾—
 		syllabus_id = get_syllabus_master_id_from_db(session, syllabus_code, year)
 		
 		if syllabus_id:
-			# ¹ÖµÁ»ş´Ö¤ò²òÀÏ
+			# è¬›ç¾©æ™‚é–“ã‚’è§£æ
 			parsed_times = parse_lecture_time(time_text)
+			
+			# é‡è¤‡ã‚’é™¤å»ï¼ˆåŒã˜syllabus_idå†…ã§day_of_weekã¨periodã®çµ„ã¿åˆã‚ã›ãŒãƒ¦ãƒ‹ãƒ¼ã‚¯ï¼‰
+			seen_times = set()
 			for time_data in parsed_times:
-				lecture_times.append({
-					'syllabus_id': syllabus_id,
-					'day_of_week': time_data['day_of_week'],
-					'period': time_data['period']
-				})
+				unique_key = (time_data['day_of_week'], time_data['period'])
+				if unique_key not in seen_times:
+					seen_times.add(unique_key)
+					lecture_times.append({
+						'syllabus_id': syllabus_id,
+						'day_of_week': time_data['day_of_week'],
+						'period': time_data['period']
+					})
 	
 	return lecture_times
 
 def process_lecture_time_json(json_file: str, session, year: int) -> tuple[List[Dict], List[str]]:
-	"""¸ÄÊÌ¤Î¹ÖµÁ»ş´ÖJSON¥Õ¥¡¥¤¥ë¤ò½èÍı¤¹¤ë"""
+	"""JSONãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’æŠ½å‡ºã™ã‚‹"""
 	errors = []
 	try:
 		with open(json_file, 'r', encoding='utf-8') as f:
 			json_data = json.load(f)
 		
-		# ¹ÖµÁ»ş´Ö¾ğÊó¤òÃê½Ğ
+		# è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’æŠ½å‡º
 		lecture_times = extract_lecture_time_from_single_json(json_data, session, year)
 		
 		if not lecture_times:
-			errors.append("¹ÖµÁ»ş´Ö¾ğÊó¤¬¸«¤Ä¤«¤é¤Ê¤¤¤«¡¢syllabus_master¤ËÂĞ±ş¤¹¤ë¥ì¥³¡¼¥É¤¬¤¢¤ê¤Ş¤»¤ó")
+			errors.append("è¬›ç¾©æ™‚é–“æƒ…å ±ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚syllabus_masterã«ãƒ‡ãƒ¼ã‚¿ãŒå­˜åœ¨ã—ãªã„å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚")
 		
 		return lecture_times, errors
 		
 	except json.JSONDecodeError as e:
-		errors.append(f"JSON¥Õ¥¡¥¤¥ë¤Î²òÀÏ¥¨¥é¡¼: {str(e)}")
+		errors.append(f"JSONãƒ•ã‚¡ã‚¤ãƒ«ã®è§£æã«å¤±æ•—ã—ã¾ã—ãŸ: {str(e)}")
 		return [], errors
 	except Exception as e:
-		errors.append(f"½èÍıÃæ¤Ë¥¨¥é¡¼¤¬È¯À¸: {str(e)}")
+		errors.append(f"äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: {str(e)}")
 		return [], errors
 
 def create_lecture_time_json(lecture_times: List[Dict]) -> str:
-	"""¹ÖµÁ»ş´Ö¾ğÊó¤ÎJSON¥Õ¥¡¥¤¥ë¤òºîÀ®¤¹¤ë"""
+	"""è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’JSONãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹"""
 	output_dir = os.path.join("updates", "lecture_time", "add")
 	os.makedirs(output_dir, exist_ok=True)
 	
-	# ¸½ºß¤ÎÆü»ş¤ò¼èÆÀ¤·¤Æ¥Õ¥¡¥¤¥ëÌ¾¤òÀ¸À®
+	# é‡è¤‡ã‚’é™¤å»ï¼ˆsyllabus_id, day_of_week, periodã®çµ„ã¿åˆã‚ã›ã§ãƒ¦ãƒ‹ãƒ¼ã‚¯ã«ã™ã‚‹ï¼‰
+	unique_lecture_times = []
+	seen = set()
+	
+	for time_data in lecture_times:
+		# ãƒ¦ãƒ‹ãƒ¼ã‚¯ã‚­ãƒ¼ã‚’ä½œæˆ
+		unique_key = (time_data["syllabus_id"], time_data["day_of_week"], time_data["period"])
+		if unique_key not in seen:
+			seen.add(unique_key)
+			unique_lecture_times.append(time_data)
+	
+	# ç¾åœ¨ã®æ™‚åˆ»ã‚’å–å¾—
 	current_time = datetime.now()
 	filename = f"lecture_time_{current_time.strftime('%Y%m%d_%H%M')}.json"
 	output_file = os.path.join(output_dir, filename)
@@ -236,7 +260,7 @@ def create_lecture_time_json(lecture_times: List[Dict]) -> str:
 			"day_of_week": time["day_of_week"],
 			"period": time["period"],
 			"created_at": current_time.isoformat()
-		} for time in sorted(lecture_times, key=lambda x: (x["syllabus_id"], x["day_of_week"], x["period"]))]
+		} for time in sorted(unique_lecture_times, key=lambda x: (x["syllabus_id"], x["day_of_week"], x["period"]))]
 	}
 	
 	with open(output_file, 'w', encoding='utf-8') as f:
@@ -245,30 +269,30 @@ def create_lecture_time_json(lecture_times: List[Dict]) -> str:
 	return output_file
 
 def main():
-	"""¥á¥¤¥ó½èÍı"""
+	"""ãƒ¡ã‚¤ãƒ³é–¢æ•°"""
 	session = None
 	try:
-		# Ç¯ÅÙ¤Î¼èÆÀ
+		# å¹´ã‚’å…¥åŠ›
 		year = get_year_from_user()
-		print(f"½èÍıÂĞ¾İÇ¯ÅÙ: {year}")
+		print(f"å¯¾è±¡ã¨ãªã‚‹å¹´: {year}")
 		
-		# ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³
+		# ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šã‚’å–å¾—
 		session = get_db_connection()
 		
-		# ¤¹¤Ù¤Æ¤ÎJSON¥Õ¥¡¥¤¥ë¤ò¼èÆÀ
+		# æŒ‡å®šã•ã‚ŒãŸå¹´ã®ã™ã¹ã¦ã®JSONãƒ•ã‚¡ã‚¤ãƒ«ã‚’å–å¾—
 		json_files = get_json_files(year)
-		print(f"½èÍıÂĞ¾İ¥Õ¥¡¥¤¥ë¿ô: {len(json_files)}")
+		print(f"å¯¾è±¡ã¨ãªã‚‹JSONãƒ•ã‚¡ã‚¤ãƒ«ã®æ•°: {len(json_files)}")
 		
-		# ¹ÖµÁ»ş´Ö¾ğÊó¤ò½èÍı
+		# è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’æŠ½å‡º
 		all_lecture_times = []
 		processed_count = 0
 		error_count = 0
 		skipped_count = 0
 		
-		# ¥¨¥é¡¼¾ğÊó¤ò¼ı½¸
+		# ã‚¨ãƒ©ãƒ¼æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹ãƒªã‚¹ãƒˆ
 		all_errors = []
 		
-		# Åı·×¾ğÊó
+		# å‡¦ç†çµ±è¨ˆã‚’æ ¼ç´ã™ã‚‹è¾æ›¸
 		stats = {
 			"total_files": len(json_files),
 			"successful_files": 0,
@@ -276,12 +300,12 @@ def main():
 			"total_lecture_times": 0
 		}
 		
-		print(f"\n½èÍı³«»Ï: {len(json_files)}¸Ä¤ÎJSON¥Õ¥¡¥¤¥ë")
+		print(f"\nå‡¦ç†å¯¾è±¡: {len(json_files)}å€‹ã®JSONãƒ•ã‚¡ã‚¤ãƒ«")
 		
-		# tqdm¤ò»ÈÍÑ¤·¤Æ¥×¥í¥°¥ì¥¹¥Ğ¡¼¤òÉ½¼¨
-		for json_file in tqdm(json_files, desc="JSON¥Õ¥¡¥¤¥ë¤ò½èÍıÃæ"):
+		# tqdmã‚’ä½¿ã£ã¦é€²æ—ã‚’è¡¨ç¤º
+		for json_file in tqdm(json_files, desc="JSONãƒ•ã‚¡ã‚¤ãƒ«ã®å‡¦ç†"):
 			try:
-				# ¸ÄÊÌ¤ÎJSON¥Õ¥¡¥¤¥ë¤ò½èÍı
+				# JSONãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’æŠ½å‡º
 				lecture_times, errors = process_lecture_time_json(json_file, session, year)
 				
 				if lecture_times:
@@ -293,7 +317,7 @@ def main():
 					skipped_count += 1
 					stats["error_files"] += 1
 				
-				# ¥¨¥é¡¼¾ğÊó¤ò¼ı½¸
+				# ã‚¨ãƒ©ãƒ¼æƒ…å ±ã‚’æ ¼ç´
 				if errors:
 					for error in errors:
 						all_errors.append(f"{os.path.basename(json_file)}: {error}")
@@ -301,36 +325,36 @@ def main():
 			except Exception as e:
 				error_count += 1
 				stats["error_files"] += 1
-				all_errors.append(f"{os.path.basename(json_file)}: ½èÍıÃæ¤Ë¥¨¥é¡¼¤¬È¯À¸: {str(e)}")
+				all_errors.append(f"{os.path.basename(json_file)}: äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: {str(e)}")
 				continue
 		
-		print(f"\n½èÍı·ë²Ì:")
-		print(f"- Áí¥Õ¥¡¥¤¥ë¿ô: {stats['total_files']}")
-		print(f"- À®¸ù¥Õ¥¡¥¤¥ë¿ô: {stats['successful_files']}")
-		print(f"- ¥¨¥é¡¼¥Õ¥¡¥¤¥ë¿ô: {stats['error_files']}")
-		print(f"- Áí¹ÖµÁ»ş´Ö¿ô: {stats['total_lecture_times']}")
-		print(f"- À®¸ù: {processed_count}·ï")
-		print(f"- ¥¨¥é¡¼: {error_count}·ï")
-		print(f"- ¥¹¥­¥Ã¥×: {skipped_count}·ï")
+		print(f"\nå‡¦ç†çµæœ:")
+		print(f"- å¯¾è±¡ã¨ãªã‚‹ãƒ•ã‚¡ã‚¤ãƒ«æ•°: {stats['total_files']}")
+		print(f"- æ­£å¸¸ã«å‡¦ç†ã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«æ•°: {stats['successful_files']}")
+		print(f"- ã‚¨ãƒ©ãƒ¼ã¨ãªã£ãŸãƒ•ã‚¡ã‚¤ãƒ«æ•°: {stats['error_files']}")
+		print(f"- æŠ½å‡ºã•ã‚ŒãŸè¬›ç¾©æ™‚é–“æ•°: {stats['total_lecture_times']}")
+		print(f"- æ­£å¸¸ã«å‡¦ç†ã•ã‚ŒãŸè¬›ç¾©æ™‚é–“æ•°: {processed_count}")
+		print(f"- ã‚¨ãƒ©ãƒ¼ã¨ãªã£ãŸè¬›ç¾©æ™‚é–“æ•°: {error_count}")
+		print(f"- ã‚¹ã‚­ãƒƒãƒ—ã•ã‚ŒãŸè¬›ç¾©æ™‚é–“æ•°: {skipped_count}")
 		
-		# ¥¨¥é¡¼¾ğÊó¤ò¤Ş¤È¤á¤ÆÉ½¼¨
+		# ã‚¨ãƒ©ãƒ¼æƒ…å ±ã‚’è¡¨ç¤º
 		if all_errors:
-			print(f"\n¥¨¥é¡¼¾ÜºÙ ({len(all_errors)}·ï):")
+			print(f"\nã‚¨ãƒ©ãƒ¼ä¸€è¦§ ({len(all_errors)}ä»¶):")
 			print("=" * 80)
 			for i, error in enumerate(all_errors, 1):
 				print(f"{i:3d}. {error}")
 			print("=" * 80)
 		
-		# JSON¥Õ¥¡¥¤¥ë¤ÎºîÀ®
+		# è¬›ç¾©æ™‚é–“æƒ…å ±ã‚’JSONãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜
 		if all_lecture_times:
 			output_file = create_lecture_time_json(all_lecture_times)
-			print(f"\nJSON¥Õ¥¡¥¤¥ë¤òºîÀ®¤·¤Ş¤·¤¿: {output_file}")
+			print(f"\nè¬›ç¾©æ™‚é–“æƒ…å ±ã‚’JSONãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã—ã¾ã—ãŸ: {output_file}")
 		else:
-			print("\n½èÍı²ÄÇ½¤Ê¹ÖµÁ»ş´Ö¥Ç¡¼¥¿¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£")
+			print("\nè¬›ç¾©æ™‚é–“æƒ…å ±ãŒæŠ½å‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚syllabus_masterã«ãƒ‡ãƒ¼ã‚¿ãŒå­˜åœ¨ã—ãªã„å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚")
 		
 	except Exception as e:
-		print(f"¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿: {str(e)}")
-		print(f"¥¨¥é¡¼¤Î¼ïÎà: {type(e)}")
+		print(f"äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: {str(e)}")
+		print(f"ã‚¨ãƒ©ãƒ¼ã®ç¨®é¡: {type(e)}")
 		raise
 	finally:
 		if session:

@@ -1,15 +1,15 @@
 ---
 title: データベース構造定義
-file_version: v1.3.7
-project_version: v1.3.21
-last_updated: 2025-06-21
+file_version: v1.3.8
+project_version: v1.3.26
+last_updated: 2025-06-22
 ---
 
 # データベース構造定義
 
-- File Version: v1.3.7
-- Project Version: v1.3.21
-- Last Updated: 2025-06-21
+- File Version: v1.3.8
+- Project Version: v1.3.26
+- Last Updated: 2025-06-22
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -336,6 +336,7 @@ last_updated: 2025-06-21
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
+| UNIQUE | (syllabus_id, grade) | シラバスと学年の一意性 |
 | idx_subject_grade_grade | grade | 学年での検索用 |
 | idx_subject_grade_syllabus | syllabus_id | シラバスIDでの検索用 |
 
@@ -371,6 +372,7 @@ gradeの値は以下の形式で、学生の学年を表します：
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
+| UNIQUE | (syllabus_id, day_of_week, period) | シラバスと曜日・時限の一意性 |
 | idx_lecture_time_day_period | (day_of_week, period) | 曜日・時限での検索用 |
 | idx_lecture_time_syllabus | syllabus_id | シラバスIDでの検索用 |
 

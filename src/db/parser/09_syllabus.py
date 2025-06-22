@@ -1,6 +1,6 @@
-# File Version: v1.3.2
-# Project Version: v1.3.16
-# Last Updated: 2025-06-21
+# File Version: v1.3.4
+# Project Version: v1.3.26
+# Last Updated: 2025-06-22
 
 import os
 import json
@@ -208,20 +208,30 @@ def process_syllabus_json(json_file: str, session) -> tuple[List[Dict], List[str
 			errors.append(f"シラバスマスターが見つかりません - コード: {syllabus_code}, 年度: {syllabus_year}")
 			return [], errors
 		
-		# 開講期・曜講時から学期とキャンパスを抽出
+		# 開講期・曜講時から学期を抽出
 		term_info = basic_info.get("開講期・曜講時", {}).get("内容", "")
 		term = ""
-		campus = basic_info.get("開講キャンパス", {}).get("内容", "")
 		
-		# 学期の抽出（前期、後期、通年など）
+		# 学期の抽出（前期、後期、通年、1Q、2Q、3Q、4Qなど）
 		if "前期" in term_info:
 			term = "前期"
 		elif "後期" in term_info:
 			term = "後期"
 		elif "通年" in term_info:
 			term = "通年"
+		elif "１Ｑ" in term_info or "1Q" in term_info:
+			term = "1Q"
+		elif "２Ｑ" in term_info or "2Q" in term_info:
+			term = "2Q"
+		elif "３Ｑ" in term_info or "3Q" in term_info:
+			term = "3Q"
+		elif "４Ｑ" in term_info or "4Q" in term_info:
+			term = "4Q"
 		else:
 			term = term_info  # その他の場合はそのまま使用
+		
+		# キャンパス情報の取得
+		campus = basic_info.get("開講キャンパス", {}).get("内容", "")
 		
 		# 単位数の取得
 		credits = int(basic_info.get("単位", {}).get("内容", "0"))
@@ -246,8 +256,10 @@ def process_syllabus_json(json_file: str, session) -> tuple[List[Dict], List[str
 		# 履修上の注意
 		advice = detail_info.get("履修上の注意・担当者からの一言", {}).get("内容", "")
 		
-		# サブタイトル（備考から抽出）
-		subtitle = basic_info.get("備考", {}).get("内容", "")
+		# サブタイトル（サブタイトルフィールドから取得）
+		subtitle = basic_info.get("サブタイトル", {}).get("内容", "")
+		if subtitle is None:
+			subtitle = ""
 		
 		syllabus_info = {
 			"syllabus_id": syllabus_master_id,

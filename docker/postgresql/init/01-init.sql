@@ -142,16 +142,6 @@ CREATE INDEX IF NOT EXISTS idx_book_uncategorized_title ON book_uncategorized(ti
 CREATE INDEX IF NOT EXISTS idx_book_uncategorized_isbn ON book_uncategorized(isbn);
 CREATE INDEX IF NOT EXISTS idx_book_uncategorized_status ON book_uncategorized(categorization_status);
 
--- book_author（書籍著者）
-CREATE TABLE IF NOT EXISTS book_author (
-    book_author_id SERIAL PRIMARY KEY,
-    book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
-    author_name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
-
 -- syllabus（シラバス情報）
 CREATE TABLE IF NOT EXISTS syllabus (
     syllabus_id INTEGER PRIMARY KEY REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
@@ -182,7 +172,8 @@ CREATE TABLE IF NOT EXISTS subject_grade (
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     grade TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, grade)
 );
 
 CREATE INDEX IF NOT EXISTS idx_subject_grade_grade ON subject_grade(grade);
@@ -195,7 +186,8 @@ CREATE TABLE IF NOT EXISTS lecture_time (
     day_of_week TEXT NOT NULL,
     period SMALLINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, day_of_week, period)
 );
 
 CREATE INDEX IF NOT EXISTS idx_lecture_time_day_period ON lecture_time(day_of_week, period);
@@ -373,3 +365,7 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250620225007__insert_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225948__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250621183238__insert_subject_names.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_book_uncategorizeds.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_books.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_syllabuss.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250622213107__insert_subject_grades.sql

@@ -1,5 +1,5 @@
-# File Version: v1.3.1
-# Project Version: v1.3.18
+# File Version: v1.3.2
+# Project Version: v1.3.26
 # Last Updated: 2025/6/21
 
 import os
@@ -92,7 +92,7 @@ def expand_grade_range(grade_text: str) -> List[str]:
 	
 	# 全学年の場合
 	if '全学年' in grade_text:
-		return ['1年', '2年', '3年', '4年', '5年', '6年']
+		return ['学部1年', '学部2年', '学部3年', '学部4年', '修士1年', '修士2年', '博士1年', '博士2年', '博士3年']
 	
 	# ～を含む範囲の場合
 	if '～' in grade_text:
@@ -104,17 +104,59 @@ def expand_grade_range(grade_text: str) -> List[str]:
 		end = parts[1].strip()
 		
 		# 学年の数値を取得
-		start_year = int(re.search(r'(\d+)年', start).group(1))
-		end_year = int(re.search(r'(\d+)年', end).group(1))
+		start_match = re.search(r'(\d+)年', start)
+		end_match = re.search(r'(\d+)年', end)
+		
+		if not start_match or not end_match:
+			return [grade_text]
+		
+		start_year = int(start_match.group(1))
+		end_year = int(end_match.group(1))
 		
 		# 範囲内の学年を生成
-		return [f"{year}年" for year in range(start_year, end_year + 1)]
+		grades = []
+		for year in range(start_year, end_year + 1):
+			if year <= 4:
+				grades.append(f"学部{year}年")
+			elif year <= 6:
+				grades.append(f"修士{year-4}年")
+			else:
+				grades.append(f"博士{year-6}年")
+		
+		return grades
 	
 	# カンマ区切りの場合
 	if '、' in grade_text:
-		return [grade.strip() for grade in grade_text.split('、')]
+		grade_list = [grade.strip() for grade in grade_text.split('、')]
+		converted_grades = []
+		for grade in grade_list:
+			converted_grades.extend(convert_grade_format(grade))
+		return converted_grades
 	
 	# 単一の学年の場合
+	return convert_grade_format(grade_text)
+
+def convert_grade_format(grade_text: str) -> List[str]:
+	"""学年の形式を変換する"""
+	if not grade_text:
+		return []
+	
+	# 既に正しい形式の場合はそのまま返す
+	if any(prefix in grade_text for prefix in ['学部', '修士', '博士']):
+		return [grade_text]
+	
+	# 数字のみの場合（例：1年、2年など）
+	match = re.search(r'(\d+)年', grade_text)
+	if match:
+		year = int(match.group(1))
+		if year <= 4:
+			return [f"学部{year}年"]
+		elif year <= 6:
+			return [f"修士{year-4}年"]
+		else:
+			return [f"博士{year-6}年"]
+	
+	# その他の形式の場合はそのまま返す
 	return [grade_text]
 
 def get_json_files(year: int) -> List[str]:
