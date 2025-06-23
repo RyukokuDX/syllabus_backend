@@ -1,15 +1,15 @@
 ---
 title: 講義セッション情報抽出処理
-file_version: v1.3.0
-project_version: v1.3.26
-last_updated: 2025-06-22
+file_version: v1.3.1
+project_version: v1.3.31
+last_updated: 2025-06-23
 ---
 
 # 講義セッション情報抽出処理
 
-- File Version: v1.3.0
-- Project Version: v1.3.26
-- Last Updated: 2025-06-22
+- File Version: v1.3.1
+- Project Version: v1.3.31
+- Last Updated: 2025-06-23
 
 [readmeへ](../README.md) | [docへ](./doc.md)
 
@@ -136,6 +136,7 @@ session_halfwidth = unicodedata.normalize('NFKC', session_normalized)
 - 50回以上の範囲指定
 - 範囲指定（開始 > 終了）
     - "1-15"は一見だとうだが、これは"1"から"15"なのか, "1"の"15"なのか判断できないため.
+- リスト内に、１件でも不規則なレコードがある場合
 
 #### 通常として扱う場合
 - 単一の数値（例：「1」「1回目」）
@@ -211,33 +212,6 @@ if len(session_parts) >= 2:
 cd src/db/parser
 python 12_lecture_session.py
 ```
-
-### 実行時の表示例
-```
-講義セッション情報抽出処理を開始します...
-年を入力してください（空の場合は現在の年）: 2025
-処理対象年: 2025
-処理対象ファイル数: 1422
-データベース接続成功
-JSONファイル処理を開始します...
-JSONファイル処理中: 100%|██████████| 1422/1422 [02:30<00:00, 9.48it/s]
-JSONファイル処理が完了しました
-通常の講義セッション: 28,456件
-不規則な講義セッション: 580件
-エラー: 0件
-結果保存処理を開始します...
-通常の講義セッション情報を保存しました: updates/lecture_session/add/lecture_session_20250622_143022.json
-処理件数: 28,456件
-不規則な講義セッション情報を保存しました: updates/lecture_session_irregular/add/lecture_session_irregular_20250622_143023.json
-処理件数: 580件
-セッションを閉じます...
-講義セッション情報抽出処理が完了しました
-```
-
-### 処理件数の目安
-- **通常の講義セッション**: 約2-3万件
-- **不規則な講義セッション**: 約500-1000件
-- **エラー件数**: 通常0-数件
 
 ## 注意事項
 
