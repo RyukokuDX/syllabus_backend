@@ -1,15 +1,15 @@
 ---
 title: パーサー一覧
-file_version: v1.3.1
-project_version: v1.3.23
-last_updated: 2025-06-21
+file_version: v1.3.3
+project_version: v1.3.29
+last_updated: 2025-06-23
 ---
 
 # パーサー一覧
 
-- File Version: v1.3.1
-- Project Version: v1.3.23
-- Last Updated: 2025-06-21
+- File Version: v1.3.3
+- Project Version: v1.3.29
+- Last Updated: 2025-06-23
 
 [readmeへ](../../README.md)
 
@@ -35,10 +35,12 @@ last_updated: 2025-06-21
 | 学部パーサー | 03_faculty.py | 学部情報の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | faculty |
 | 科目名パーサー | 04_subject_name.py | 科目名の抽出 | `src/syllabus/{year}/json/*.json` | subject_name |
 | 教員パーサー | 05_instructor.py | 教員情報の抽出 | `src/syllabus/{year}/json/*.json` | instructor |
-| 書籍パーサー | 06_book.py | 書籍情報の抽出 | `src/syllabus/{year}/json/*.json` | book, book_uncategorized |
-| シラバスマスターパーサー | 07_syllabus_master.py | シラバスマスター情報の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_master |
+| シラバスマスターパーサー | 06_syllabus_master.py | シラバスマスター情報の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_master |
+| 書籍パーサー | 07_book.py | 書籍情報の抽出 | `src/syllabus/{year}/json/*.json` | book, book_uncategorized |
 | シラバスパーサー | 09_syllabus.py | シラバス詳細情報の抽出 | `src/syllabus/{year}/json/*.json` | syllabus |
 | 科目履修可能学年パーサー | 10_subject_grade.py | 履修可能学年の抽出 | `src/syllabus/{year}/json/*.json` | subject_grade |
+| 講義時間パーサー | 11_lecture_time.py | 講義時間情報の抽出 | `src/syllabus/{year}/json/*.json` | lecture_time |
+| 講義セッションパーサー | 12_lecture_session.py | 講義セッション情報の抽出 | `src/syllabus/{year}/json/*.json` | lecture_session |
 | 科目属性パーサー | 16_subject_attribute.py | 科目属性の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute |
 | 科目パーサー | 17_subject.py | 科目情報の統合 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject |
 | 科目属性値パーサー | 19_subject_attribute_value.py | 科目属性値の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute_value |
@@ -49,8 +51,6 @@ last_updated: 2025-06-21
 
 | パーサー名 | ファイル名 | 処理内容 | データソース | 対応テーブル |
 |------------|------------|----------|--------------|--------------|
-| 講義時間パーサー | 11_lecture_time.py | 講義時間情報の抽出 | `src/syllabus/{year}/json/*.json` | lecture_time |
-| 講義セッションパーサー | 12_lecture_session.py | 講義セッション情報の抽出 | `src/syllabus/{year}/json/*.json` | lecture_session |
 | シラバス教員関連パーサー | 13_syllabus_instructor.py | シラバス教員関連の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_instructor |
 | 講義セッション教員パーサー | 14_lecture_session_instructor.py | 講義セッション教員の抽出 | `src/syllabus/{year}/json/*.json` | lecture_session_instructor |
 | シラバス教科書関連パーサー | 15_syllabus_book.py | シラバス教科書関連の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_book |
