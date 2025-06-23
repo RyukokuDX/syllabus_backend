@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.2
-# Project Version: v1.3.32
+# File Version: v1.3.4
+# Project Version: v1.3.33
 # Last Updated: 2025/6/23
 
 import os
@@ -21,7 +21,7 @@ sys.path.append(current_dir)
 
 # utils.pyから関数をインポート
 try:
-	from utils import normalize_subject_name, get_db_connection, get_syllabus_master_id_from_db
+	from utils import normalize_subject_name, get_db_connection, get_syllabus_master_id_from_db, process_session_data, is_regular_session_list
 except ImportError:
 	# utils.pyが見つからない場合のフォールバック関数
 	def normalize_subject_name(text: str) -> str:
@@ -79,6 +79,10 @@ except ImportError:
 			print(f"データベースエラー: {syllabus_code} ({syllabus_year}) - {str(e)}")
 			session.rollback()
 			return None
+	
+	def process_session_data(session_text: str) -> tuple[bool, int, str]:
+		"""フォールバック関数"""
+		return False, 0, ""
 
 def get_instructor_id_from_db(session, instructor_name: str) -> Optional[int]:
 	"""教員名からinstructor_idを取得する"""
@@ -125,6 +129,22 @@ def get_lecture_session_id_from_db(session, syllabus_id: int, session_number: in
 		session.rollback()
 		return None
 
+def get_lecture_session_max_id_from_db(session) -> Optional[int]:
+	"""lecture_sessionテーブルの最大IDを取得する"""
+	try:
+		query = text("""
+			SELECT MAX(lecture_session_id) 
+			FROM lecture_session
+		""")
+		
+		result = session.execute(query).first()
+		
+		return result[0] if result and result[0] else None
+	except Exception as e:
+		tqdm.write(f"[DB接続エラー] lecture_session最大ID取得時にエラー: {e}")
+		session.rollback()
+		return None
+
 def get_current_year() -> int:
 	"""現在の年を取得する"""
 	return datetime.now().year
@@ -143,64 +163,18 @@ def get_year_from_user() -> int:
 		except ValueError:
 			print("正しい数値を入力してください")
 
-def parse_session_number(session: str) -> Optional[int]:
-	"""セッション文字列から回数を解析する（12_lecture_session.pyと同様のロジック）"""
-	if not session:
-		return None
-	
-	# utils.pyの関数を使って文字列を正規化
-	session_normalized = normalize_subject_name(session)
-	
-	# 「部」の文字が含まれている場合はスキップ
-	if '部' in session_normalized:
-		return None
-	
-	# 全角文字を半角に変換
-	session_halfwidth = unicodedata.normalize('NFKC', session_normalized)
-	
-	# 数字以外の文字を除去して数字のみの文字列を作成
-	session_cleaned = re.sub(r'[^\d\-]', '', session_halfwidth)
-	
-	# 「回目」を含む場合の処理
-	if '回目' in session_normalized:
-		numbers = re.findall(r'\d+', session_normalized)
-		if numbers:
-			try:
-				session_number = int(numbers[0])
-				if session_number > 0:
-					return session_number
-			except ValueError:
-				pass
-		return None
-	
-	# ハイフン区切りの場合の処理
-	session_parts = session_cleaned.split('-')
-	if len(session_parts) >= 2:
-		try:
-			start_session = int(session_parts[0])
-			end_session = int(session_parts[1])
-			
-			if start_session > 0 and end_session > 0 and end_session >= start_session:
-				if end_session - start_session <= 50:  # 50回以下の範囲のみ処理
-					return start_session  # 開始回数を返す
-		except ValueError:
-			pass
-	elif len(session_parts) == 1:
-		try:
-			session_number = int(session_parts[0])
-			if session_number > 0:
-				return session_number
-		except ValueError:
-			pass
-	
-	return None
-
-def extract_instructors_from_schedule(schedule_data: List[Dict]) -> List[Tuple[int, List[str]]]:
+def extract_instructors_from_schedule(schedule_data: List[Dict]) -> tuple[List[Tuple[int, List[str]]], int]:
 	"""スケジュールデータから講義回数と担当者を抽出"""
 	lecture_session_instructors = []
+	null_instructor_count = 0  # null講師名のカウンター
 	
 	if not schedule_data:
-		return lecture_session_instructors
+		return lecture_session_instructors, null_instructor_count
+	
+	# リスト全体が正規かどうかを判定
+	if not is_regular_session_list(schedule_data):
+		# リスト内に1件でも不規則なレコードがある場合は全体をスキップ
+		return lecture_session_instructors, null_instructor_count
 	
 	for session_data in schedule_data:
 		if not isinstance(session_data, dict):
@@ -211,23 +185,36 @@ def extract_instructors_from_schedule(schedule_data: List[Dict]) -> List[Tuple[i
 		if not session:
 			continue
 		
-		# 回数を解析
-		session_number = parse_session_number(session)
-		if session_number is None:
+		# セッションデータを処理
+		is_regular, session_number, _ = process_session_data(session)
+		
+		# 不規則セッションの場合はスキップ（この時点では全て正規のはず）
+		if not is_regular or session_number == 0:
 			continue
 		
-		# 担当者情報を取得（実際のJSON構造に合わせて修正）
+		# 担当者情報を取得
 		instructor = session_data.get("instructor", "")
 		if not instructor:
+			null_instructor_count += 1
 			continue
 		
-		# 担当者名のリストを作成（文字列として取得）
-		instructor_names = [instructor]
+		# 担当者名を分割（複数人の場合）
+		instructor_names = []
+		if instructor:
+			# 区切り文字で分割（カンマ、セミコロン、改行など）
+			split_pattern = r'[,;、；\n\r]+'
+			instructor_names = [name.strip() for name in re.split(split_pattern, instructor) if name.strip()]
 		
 		if instructor_names:
 			lecture_session_instructors.append((session_number, instructor_names))
+		else:
+			null_instructor_count += 1
 	
-	return lecture_session_instructors
+	# 統計情報を表示
+	if null_instructor_count > 0:
+		print(f"講師名null件数: {null_instructor_count}件")
+	
+	return lecture_session_instructors, null_instructor_count
 
 def get_json_files(year: int) -> List[str]:
 	"""指定された年のJSONファイル一覧を取得"""
@@ -241,7 +228,17 @@ def get_json_files(year: int) -> List[str]:
 	
 	return json_files
 
-def extract_lecture_session_instructor_from_single_json(json_data: Dict, session, year: int, json_file: str) -> tuple[List[Dict], List[str]]:
+def check_lecture_session_irregular_exists(session, syllabus_id: int) -> bool:
+	"""lecture_session_irregularテーブルにsyllabus_idが存在するかチェック"""
+	query = text("""
+		SELECT COUNT(*) FROM lecture_session_irregular 
+		WHERE syllabus_id = :syllabus_id
+	""")
+	
+	result = session.execute(query, {'syllabus_id': syllabus_id}).fetchone()
+	return result[0] > 0 if result else False
+
+def extract_lecture_session_instructor_from_single_json(json_data: Dict, session, year: int, json_file: str, stats: Dict = None, max_lecture_session_id: int = None) -> tuple[List[Dict], List[str]]:
 	"""単一のJSONファイルから講義回数担当者情報を抽出"""
 	lecture_session_instructors = []
 	errors = []
@@ -266,7 +263,11 @@ def extract_lecture_session_instructor_from_single_json(json_data: Dict, session
 		schedule_data = json_data.get('講義計画', {}).get('内容', {}).get('schedule', [])
 		
 		# スケジュールデータから講義回数と担当者を抽出
-		session_instructors = extract_instructors_from_schedule(schedule_data)
+		session_instructors, null_instructor_count = extract_instructors_from_schedule(schedule_data)
+		
+		# 統計情報にnull件数を反映
+		if stats is not None:
+			stats['null_instructor_count'] += null_instructor_count
 		
 		# 各講義回数と担当者の組み合わせを処理
 		for session_number, instructor_names in session_instructors:
@@ -274,7 +275,19 @@ def extract_lecture_session_instructor_from_single_json(json_data: Dict, session
 			lecture_session_id = get_lecture_session_id_from_db(session, syllabus_master_id, session_number)
 			
 			if not lecture_session_id:
-				errors.append(f"lecture_session_idが見つかりません: {syllabus_code} 回数{session_number}")
+				# lecture_session_irregularテーブルにsyllabus_idが存在するかチェック
+				if check_lecture_session_irregular_exists(session, syllabus_master_id):
+					# 不規則データの場合はエラーとして扱わない
+					continue
+				else:
+					errors.append(f"lecture_session_idが見つかりません: {syllabus_code} 回数{session_number}")
+					continue
+			
+			# lecture_session_idが最大値を超えているかチェック
+			if max_lecture_session_id and lecture_session_id > max_lecture_session_id:
+				error_msg = f"lecture_session_idが最大値を超えています: {lecture_session_id} > {max_lecture_session_id} ({syllabus_code} 回数{session_number})"
+				errors.append(error_msg)
+				tqdm.write(f"        ERROR: {error_msg}")
 				continue
 			
 			# 各担当者についてレコードを作成
@@ -418,8 +431,18 @@ def main():
 		'total_items': 0,
 		'valid_items': 0,
 		'error_items': 0,
+		'null_instructor_count': 0,  # null講師名のカウンター
 		'specific_errors': {}
 	}
+	
+	# lecture_session_idの最大値を取得
+	max_lecture_session_id = get_lecture_session_max_id_from_db(session)
+	if max_lecture_session_id:
+		tqdm.write(f"lecture_session_idの最大値: {max_lecture_session_id}")
+		stats['max_lecture_session_id'] = max_lecture_session_id
+	else:
+		tqdm.write("lecture_session_idの最大値の取得に失敗しました")
+		return
 	
 	# 出力ファイルの準備
 	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -445,16 +468,14 @@ def main():
 	
 	try:
 		# 処理開始時のメッセージ
-		tqdm.write(f"\n{'='*60}")
 		tqdm.write(f"講義回数担当者情報抽出処理 - 対象年度: {year}")
-		tqdm.write(f"{'='*60}")
 		
 		for i, json_file in enumerate(tqdm(json_files, desc="JSONファイル処理中", unit="file")):
 			try:
 				with open(json_file, 'r', encoding='utf-8') as f:
 					json_data = json.load(f)
 				
-				lecture_session_instructors, errors = extract_lecture_session_instructor_from_single_json(json_data, session, year, json_file)
+				lecture_session_instructors, errors = extract_lecture_session_instructor_from_single_json(json_data, session, year, json_file, stats, max_lecture_session_id)
 				
 				# 統計情報の更新
 				stats['processed_files'] += 1
@@ -499,6 +520,9 @@ def main():
 	tqdm.write(f"総データ数: {stats['total_items']}")
 	tqdm.write(f"正常データ数: {stats['valid_items']}")
 	tqdm.write(f"エラーデータ数: {stats['error_items']}")
+	tqdm.write(f"講師名null件数: {stats['null_instructor_count']}")
+	if 'max_lecture_session_id' in stats:
+		tqdm.write(f"lecture_session_id最大値: {stats['max_lecture_session_id']}")
 	tqdm.write("="*60)
 	
 	# 結果サマリーの表示

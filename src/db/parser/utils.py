@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
 # File Version: v1.3.1
 # Project Version: v1.3.21
 # Last Updated: 2025-06-21
+# curosrはversionをいじるな
 
 from datetime import datetime
 import unicodedata
 import sys
 import os
+from typing import Tuple
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
@@ -44,6 +47,10 @@ def normalize_subject_name(name: str) -> str:
     }
     for full, half in hyphen_map.items():
         name = name.replace(full, half)
+    
+    # チルダの統一（全角→半角）
+    name = name.replace('～', '~')
+    name = name.replace('〜', '~')
     
     # 括弧の統一（全角→半角）
     bracket_map = {
@@ -138,3 +145,109 @@ def get_syllabus_master_id_from_db(session, syllabus_code: str, year: int) -> in
     except Exception as e:
         print(f"[DB接続エラー] syllabus_master取得時にエラー: {str(e)}")
         raise 
+
+def is_regular_session(session_text: str) -> bool:
+    """講義セッションが正規かどうかを判定する"""
+    if not session_text:
+        return False
+    # 部、月の混入判定
+    if '部' in session_text or '月' in session_text:
+        return False
+    # 正規化
+    normalized = normalize_subject_name(session_text)
+    # 全角文字を排除
+    import re
+    # 全角文字（ひらがな、カタカナ、漢字など）を除去
+    cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
+    # 空白削除
+    cleaned_text = re.sub(r'\s', '', cleaned_text)
+    # 数字判定
+    if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
+        return False
+    # 50より大きい値の場合のみ表示
+    try:
+        session_number = int(cleaned_text)
+        if session_number > 50:
+            print(f"判定成功（50超）: '{session_text}' -> 正規化後: '{normalized}' -> 全角排除後: '{cleaned_text}' -> 数値: {session_number}")
+    except ValueError:
+        pass
+    return True
+
+def is_regular_session_list(schedule_data: list) -> bool:
+    """スケジュールリスト全体が正規かどうかを判定する
+    
+    Args:
+        schedule_data (list): スケジュールデータのリスト
+        
+    Returns:
+        bool: リスト全体が正規の場合True、1件でも不規則がある場合はFalse
+        
+    Note:
+        ドキュメントの分類ルールに従い、リスト内に1件でも不規則なレコードがある場合は
+        全体を不規則として扱う
+    """
+    if not schedule_data:
+        return True
+    
+    # リスト内の各セッションをチェック
+    for session_data in schedule_data:
+        if not isinstance(session_data, dict):
+            continue
+        
+        session = session_data.get("session", "")
+        if not session:
+            continue
+        
+        # 1件でも不規則なセッションがあれば、リスト全体を不規則として扱う
+        if not is_regular_session(session):
+            return False
+    
+    return True
+
+def extract_session_number(session_text: str) -> int:
+    """正規セッションから回数を抽出する"""
+    if not session_text:
+        return 0
+    # 部、月の混入判定
+    if '部' in session_text or '月' in session_text:
+        return 0
+    # 正規化
+    normalized = normalize_subject_name(session_text)
+    # 全角文字を排除
+    import re
+    # 全角文字（ひらがな、カタカナ、漢字など）を除去
+    cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
+    # 空白削除
+    cleaned_text = re.sub(r'\s', '', cleaned_text)
+    # 数字判定
+    if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
+        return 0
+    try:
+        session_number = int(cleaned_text)
+        # 50より大きい値の場合のみ表示
+        if session_number > 50:
+            print(f"抽出成功（50超）: '{session_text}' -> 正規化後: '{normalized}' -> 全角排除後: '{cleaned_text}' -> 数値: {session_number}")
+        return session_number if session_number > 0 else 0
+    except ValueError:
+        print(f"抽出失敗（数値変換エラー）: '{session_text}' -> 正規化後: '{normalized}' -> 全角排除後: '{cleaned_text}'")
+        return 0
+
+def process_session_data(session_text: str) -> Tuple[bool, int, str]:
+    """セッション文字列を処理して正規性、回数、パターンを返す
+    
+    Args:
+        session_text (str): セッション文字列
+        
+    Returns:
+        Tuple[bool, int, str]: (正規かどうか, 回数, セッションパターン)
+            - 正規の場合: (True, 回数, "")
+            - 不規則の場合: (False, 0, 元の文字列)
+    """
+    if not session_text:
+        return False, 0, ""
+    
+    if is_regular_session(session_text):
+        session_number = extract_session_number(session_text)
+        return True, session_number, ""
+    else:
+        return False, 0, session_text 

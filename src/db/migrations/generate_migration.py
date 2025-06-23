@@ -712,6 +712,11 @@ def generate_migration():
                 'source': 'web_syllabus'
             },
             {
+                'json_dir': project_root / 'updates' / 'lecture_session_irregular_instructor',
+                'table_name': 'lecture_session_irregular_instructor',
+                'source': 'web_syllabus'
+            },
+            {
                 'json_dir': project_root / 'updates' / 'syllabus_instructor',
                 'table_name': 'syllabus_instructor',
                 'source': 'web_syllabus'

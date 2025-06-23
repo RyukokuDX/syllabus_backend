@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.5
+# File Version: v1.0.2
 # Project Version: v1.3.33
 # Last Updated: 2025/6/23
-# Cursorはversionをいじるな
 
 import os
 import json
 import sys
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict
 from datetime import datetime
 import re
 from tqdm import tqdm
@@ -29,7 +28,7 @@ except ImportError:
 		"""文字列を正規化する関数"""
 		return unicodedata.normalize('NFKC', text)
 	
-	def process_session_data(session_text: str) -> Tuple[bool, int, str]:
+	def process_session_data(session_text: str) -> tuple[bool, int, str]:
 		"""フォールバック関数"""
 		return False, 0, ""
 	
@@ -67,7 +66,7 @@ def get_db_connection():
 	
 	return session
 
-def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: int) -> Optional[int]:
+def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: int) -> int:
 	"""シラバスマスターのIDを取得する"""
 	try:
 		# シラバスマスターのIDを検索
@@ -83,15 +82,7 @@ def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: i
 			{"code": syllabus_code, "year": syllabus_year}
 		).first()
 		
-		if result and result[0] is not None:
-			syllabus_id = result[0]
-			# 整数型であることを確認
-			if isinstance(syllabus_id, int) and syllabus_id > 0:
-				return syllabus_id
-			else:
-				print(f"警告: 無効なsyllabus_idが返されました: {syllabus_id} (型: {type(syllabus_id)})")
-				return None
-		return None
+		return result[0] if result else None
 	except Exception as e:
 		print(f"データベースエラー: {syllabus_code} ({syllabus_year}) - {str(e)}")
 		session.rollback()
@@ -115,67 +106,46 @@ def get_year_from_user() -> int:
 		except ValueError:
 			print("正しい数値を入力してください")
 
-def parse_lecture_sessions_from_schedule(schedule_data: List[Dict]) -> List[Dict]:
-	"""スケジュールデータから通常の講義セッションのみを解析して正規化する"""
+def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) -> List[Dict]:
+	"""スケジュールデータから不規則な講義セッションのみを解析して正規化する"""
 	import re  # 関数内でインポート
 	
-	lecture_sessions = []  # 通常の講義セッションのみ
+	lecture_sessions_irregular = []  # 不規則な講義セッションのみ
 	
 	if not schedule_data:
-		return lecture_sessions
+		return lecture_sessions_irregular
 	
 	# リスト全体が正規かどうかを判定
-	if not is_regular_session_list(schedule_data):
-		return lecture_sessions
+	if is_regular_session_list(schedule_data):
+		return lecture_sessions_irregular
 	
 	for session_data in schedule_data:
 		if not isinstance(session_data, dict):
 			continue
 		
-		# セッション情報を取得: "1回目" → 1, "2回目" → 2など
+		# セッション情報を取得
 		session = session_data.get("session", "")
 		if not session:
 			continue
 		
 		# セッションデータを処理
-		is_regular, session_number, _ = process_session_data(session)
+		is_regular, _, session_pattern = process_session_data(session)
 		
-		# 不規則セッションの場合はスキップ
-		if not is_regular:
-			continue
-		
-		# セッション番号の妥当性チェック
-		if not isinstance(session_number, int) or session_number <= 0:
-			print(f"警告: 無効なセッション番号が検出されました: {session_number} (型: {type(session_number)})")
-			continue
-		
-		# 異常に大きなセッション番号のチェック（通常の講義は100回を超えることはない）
-		if session_number > 100:
-			print(f"警告: 異常に大きなセッション番号が検出されました: {session_number} - この値は正しいですか？")
-			# 異常な値の場合はスキップ
+		# 正規セッションの場合はスキップ
+		if is_regular:
 			continue
 		
 		# 内容を取得
 		contents = session_data.get("content", "")
 		
-		lecture_sessions.append({
+		lecture_sessions_irregular.append({
 			'syllabus_id': None,  # 後で設定
-			'session_number': session_number,
+			'session_pattern': session_pattern,
 			'contents': contents if contents else None,
 			'other_info': None
 		})
 	
-	# 重複チェック用のセット
-	seen_sessions = set()
-	unique_sessions = []
-	for session_data in lecture_sessions:
-		if 'session_number' in session_data:
-			session_number = session_data['session_number']
-			if session_number not in seen_sessions:
-				unique_sessions.append(session_data)
-				seen_sessions.add(session_number)
-	
-	return unique_sessions
+	return lecture_sessions_irregular
 
 def get_json_files(year: int) -> List[str]:
 	"""指定された年のJSONファイル一覧を取得"""
@@ -189,9 +159,9 @@ def get_json_files(year: int) -> List[str]:
 	
 	return json_files
 
-def extract_lecture_session_from_single_json(json_data: Dict, session, year: int, json_file: str) -> tuple[List[Dict], List[str]]:
-	"""単一のJSONファイルから通常の講義セッション情報を抽出"""
-	lecture_sessions = []
+def extract_lecture_session_irregular_from_single_json(json_data: Dict, session, year: int, json_file: str) -> tuple[List[Dict], List[str]]:
+	"""単一のJSONファイルから不規則な講義セッション情報を抽出"""
+	lecture_sessions_irregular = []
 	errors = []
 	
 	try:
@@ -201,79 +171,74 @@ def extract_lecture_session_from_single_json(json_data: Dict, session, year: int
 		
 		if not syllabus_code:
 			errors.append(f"科目コードが見つかりません: {json_file}")
-			return lecture_sessions, errors
+			return lecture_sessions_irregular, errors
 		
 		# シラバスマスターのIDを取得
 		syllabus_master_id = get_syllabus_master_id_from_db(session, syllabus_code, syllabus_year)
 		
 		if not syllabus_master_id:
 			errors.append(f"シラバスマスターIDが見つかりません: {syllabus_code} ({syllabus_year})")
-			return lecture_sessions, errors
-		
-		# syllabus_master_idの妥当性チェック
-		if not isinstance(syllabus_master_id, int) or syllabus_master_id <= 0:
-			errors.append(f"無効なシラバスマスターID: {syllabus_master_id} (型: {type(syllabus_master_id)}) - {syllabus_code} ({syllabus_year})")
-			return lecture_sessions, errors
+			return lecture_sessions_irregular, errors
 		
 		# スケジュールデータを取得
 		schedule_data = json_data.get('講義計画', {}).get('内容', {}).get('schedule', [])
 		
-		# スケジュールデータから通常の講義セッションを解析
-		parsed_sessions = parse_lecture_sessions_from_schedule(schedule_data)
+		# スケジュールデータから不規則な講義セッションを解析
+		parsed_sessions_irregular = parse_lecture_sessions_irregular_from_schedule(schedule_data)
 		
 		# シラバスマスターIDを追加
-		for session_data in parsed_sessions:
+		for session_data in parsed_sessions_irregular:
 			session_data['syllabus_id'] = syllabus_master_id
-			lecture_sessions.append(session_data)
+			lecture_sessions_irregular.append(session_data)
 		
 	except Exception as e:
 		error_msg = f"エラーが発生しました: {str(e)}"
 		print(f"        EXTRACT ERROR: {error_msg}")
 		errors.append(error_msg)
 	
-	return lecture_sessions, errors
+	return lecture_sessions_irregular, errors
 
-def process_lecture_session_json(json_file: str, session, year: int) -> tuple[List[Dict], List[str]]:
-	"""JSONファイルを処理して通常の講義セッション情報を抽出"""
-	all_lecture_sessions = []
+def process_lecture_session_irregular_json(json_file: str, session, year: int) -> tuple[List[Dict], List[str]]:
+	"""JSONファイルを処理して不規則な講義セッション情報を抽出"""
+	all_lecture_sessions_irregular = []
 	all_errors = []
 	
 	try:
 		with open(json_file, 'r', encoding='utf-8') as f:
 			json_data = json.load(f)
 		
-		lecture_sessions, errors = extract_lecture_session_from_single_json(json_data, session, year, json_file)
+		lecture_sessions_irregular, errors = extract_lecture_session_irregular_from_single_json(json_data, session, year, json_file)
 		
-		all_lecture_sessions.extend(lecture_sessions)
+		all_lecture_sessions_irregular.extend(lecture_sessions_irregular)
 		all_errors.extend(errors)
 		
 	except Exception as e:
 		all_errors.append(f"ファイル読み込みエラー {json_file}: {str(e)}")
 	
-	return all_lecture_sessions, all_errors
+	return all_lecture_sessions_irregular, all_errors
 
-def create_lecture_session_json(lecture_sessions: List[Dict]) -> str:
-	"""講義セッション情報をJSONファイルとして保存"""
-	output_dir = os.path.join("updates", "lecture_session", "add")
+def create_lecture_session_irregular_json(lecture_sessions_irregular: List[Dict]) -> str:
+	"""不規則な講義セッション情報をJSONファイルとして保存"""
+	output_dir = os.path.join("updates", "lecture_session_irregular", "add")
 	os.makedirs(output_dir, exist_ok=True)
 	
 	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-	filename = f"lecture_session_{timestamp}.json"
+	filename = f"lecture_session_irregular_{timestamp}.json"
 	filepath = os.path.join(output_dir, filename)
 	
 	print(f"  JSONファイルに書き込み中: {filename}")
-	print(f"  データ件数: {len(lecture_sessions):,}件")
+	print(f"  データ件数: {len(lecture_sessions_irregular):,}件")
 	
 	# データサイズを確認
-	data_size = len(json.dumps(lecture_sessions, ensure_ascii=False))
+	data_size = len(json.dumps(lecture_sessions_irregular, ensure_ascii=False))
 	print(f"  データサイズ: {data_size:,} バイト ({data_size/1024/1024:.2f} MB)")
 	
 	try:
 		# 大量データの場合は分割処理
-		if len(lecture_sessions) > 100000:  # 10万件以上
+		if len(lecture_sessions_irregular) > 100000:  # 10万件以上
 			print(f"  大量データのため分割処理を実行中...")
 			chunk_size = 50000  # 5万件ずつ分割
-			chunks = [lecture_sessions[i:i + chunk_size] for i in range(0, len(lecture_sessions), chunk_size)]
+			chunks = [lecture_sessions_irregular[i:i + chunk_size] for i in range(0, len(lecture_sessions_irregular), chunk_size)]
 			
 			with open(filepath, 'w', encoding='utf-8') as f:
 				f.write('[\n')
@@ -289,7 +254,7 @@ def create_lecture_session_json(lecture_sessions: List[Dict]) -> str:
 			print(f"  ストリーミング書き込みを実行中...")
 			with open(filepath, 'w', encoding='utf-8') as f:
 				f.write('[\n')
-				for i, session in tqdm(enumerate(lecture_sessions), total=len(lecture_sessions), desc="  ストリーミング書き込み"):
+				for i, session in tqdm(enumerate(lecture_sessions_irregular), total=len(lecture_sessions_irregular), desc="  ストリーミング書き込み"):
 					if i > 0:
 						f.write(',\n')
 					json.dump(session, f, ensure_ascii=False, indent=2)
@@ -308,7 +273,7 @@ def create_error_csv(all_errors: List[str], final_session_errors: List[str], yea
 	os.makedirs(output_dir, exist_ok=True)
 	
 	timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-	filename = f"lecture_session_{timestamp}.csv"
+	filename = f"lecture_session_irregular_{timestamp}.csv"
 	filepath = os.path.join(output_dir, filename)
 	
 	print(f"  CSVファイルに書き込み中: {filename}")
@@ -326,7 +291,7 @@ def create_error_csv(all_errors: List[str], final_session_errors: List[str], yea
 
 def main():
 	"""メイン処理"""
-	print("通常講義セッション情報抽出処理を開始します...")
+	print("不規則講義セッション情報抽出処理を開始します...")
 	
 	# 年を取得
 	year = get_year_from_user()
@@ -357,29 +322,29 @@ def main():
 	# 出力ファイルの準備
 	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 	
-	# 通常の講義セッション用ファイル
-	lecture_session_dir = os.path.join("updates", "lecture_session", "add")
-	os.makedirs(lecture_session_dir, exist_ok=True)
-	lecture_session_file = os.path.join(lecture_session_dir, f"lecture_session_{timestamp}.json")
+	# 不規則な講義セッション用ファイル
+	lecture_session_irregular_dir = os.path.join("updates", "lecture_session_irregular", "add")
+	os.makedirs(lecture_session_irregular_dir, exist_ok=True)
+	lecture_session_irregular_file = os.path.join(lecture_session_irregular_dir, f"lecture_session_irregular_{timestamp}.json")
 	
 	# エラー情報用ファイル
 	error_dir = os.path.join("warning", str(year))
 	os.makedirs(error_dir, exist_ok=True)
-	error_file = os.path.join(error_dir, f"lecture_session_{timestamp}.csv")
+	error_file = os.path.join(error_dir, f"lecture_session_irregular_{timestamp}.csv")
 	
 	# ファイルを開いて書き込み開始
-	lecture_session_count = 0
+	lecture_session_irregular_count = 0
 	all_errors = []
 	
-	# 通常の講義セッションファイルを開く
-	lecture_f = open(lecture_session_file, 'w', encoding='utf-8')
-	lecture_f.write('[\n')
-	lecture_first = True
+	# 不規則な講義セッションファイルを開く
+	irregular_f = open(lecture_session_irregular_file, 'w', encoding='utf-8')
+	irregular_f.write('[\n')
+	irregular_first = True
 	
 	try:
 		# 処理開始時のメッセージ
 		tqdm.write(f"\n{'='*60}")
-		tqdm.write(f"通常講義セッション情報抽出処理 - 対象年度: {year}")
+		tqdm.write(f"不規則講義セッション情報抽出処理 - 対象年度: {year}")
 		tqdm.write(f"{'='*60}")
 		
 		for i, json_file in enumerate(tqdm(json_files, desc="JSONファイル処理中", unit="file")):
@@ -387,21 +352,21 @@ def main():
 				with open(json_file, 'r', encoding='utf-8') as f:
 					json_data = json.load(f)
 				
-				lecture_sessions, errors = extract_lecture_session_from_single_json(json_data, session, year, json_file)
+				lecture_sessions_irregular, errors = extract_lecture_session_irregular_from_single_json(json_data, session, year, json_file)
 				
 				# 統計情報の更新
 				stats['processed_files'] += 1
-				stats['total_items'] += len(lecture_sessions)
-				stats['valid_items'] += len(lecture_sessions)
+				stats['total_items'] += len(lecture_sessions_irregular)
+				stats['valid_items'] += len(lecture_sessions_irregular)
 				stats['error_items'] += len(errors)
 				
-				# 通常の講義セッションを書き込み
-				for session_data in lecture_sessions:
-					if not lecture_first:
-						lecture_f.write(',\n')
-					json.dump(session_data, lecture_f, ensure_ascii=False, indent=2)
-					lecture_first = False
-					lecture_session_count += 1
+				# 不規則な講義セッションを書き込み
+				for session_data in lecture_sessions_irregular:
+					if not irregular_first:
+						irregular_f.write(',\n')
+					json.dump(session_data, irregular_f, ensure_ascii=False, indent=2)
+					irregular_first = False
+					lecture_session_irregular_count += 1
 				
 				all_errors.extend(errors)
 				
@@ -412,13 +377,13 @@ def main():
 				stats['error_items'] += 1
 		
 		# ファイルを閉じる
-		lecture_f.write('\n]')
-		lecture_f.close()
+		irregular_f.write('\n]')
+		irregular_f.close()
 		
 	except Exception as e:
 		# エラーが発生した場合もファイルを閉じる
 		try:
-			lecture_f.close()
+			irregular_f.close()
 		except:
 			pass
 		raise e
@@ -438,17 +403,17 @@ def main():
 	tqdm.write(f"\n{'='*60}")
 	tqdm.write("📊 抽出結果サマリー")
 	tqdm.write(f"{'='*60}")
-	tqdm.write(f"✅ 通常セッション: {lecture_session_count:,}件")
+	tqdm.write(f"✅ 不規則セッション: {lecture_session_irregular_count:,}件")
 	tqdm.write(f"⚠️  エラーデータ: {len(all_errors)}件")
-	tqdm.write(f"📈 合計: {lecture_session_count:,}件")
+	tqdm.write(f"📈 合計: {lecture_session_irregular_count:,}件")
 	
 	# 結果を表示
 	final_session_errors = []
 	
-	if lecture_session_count > 0:
-		tqdm.write(f"通常の講義セッション情報を保存しました: {lecture_session_file}")
+	if lecture_session_irregular_count > 0:
+		tqdm.write(f"不規則な講義セッション情報を保存しました: {lecture_session_irregular_file}")
 	else:
-		final_session_errors.append("通常の講義セッション情報が見つかりませんでした")
+		final_session_errors.append("不規則な講義セッション情報が見つかりませんでした")
 	
 	# エラー情報を保存
 	if all_errors or final_session_errors:
@@ -467,7 +432,7 @@ def main():
 	# セッションを閉じる
 	session.close()
 	
-	tqdm.write("通常講義セッション情報抽出処理が完了しました")
+	tqdm.write("不規則講義セッション情報抽出処理が完了しました")
 
 if __name__ == "__main__":
 	main() 
