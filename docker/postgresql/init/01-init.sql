@@ -201,7 +201,8 @@ CREATE TABLE IF NOT EXISTS lecture_session (
     contents TEXT,
     other_info TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, session_number)
 );
 
 CREATE INDEX IF NOT EXISTS idx_lecture_session_syllabus ON lecture_session(syllabus_id);
@@ -211,11 +212,12 @@ CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session
 CREATE TABLE IF NOT EXISTS lecture_session_irregular (
     lecture_session_irregular_id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    session_pattern TEXT NOT NULL,
+    session_pattern TEXT,
     contents TEXT,
     other_info TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, session_pattern)
 );
 
 CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_syllabus ON lecture_session_irregular(syllabus_id);
@@ -369,3 +371,5 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_syllabuss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622213107__insert_subject_grades.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250622213946__insert_lecture_times.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250623105053__insert_lecture_sessions.sql

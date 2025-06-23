@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 from datetime import datetime
@@ -63,21 +64,31 @@ def read_json_files(directory, table_name):
         try:
             with open(file, 'r', encoding='utf-8') as f:
                 json_data = json.load(f)
+                
                 # テーブル名に応じた配列名を取得
                 array_name = TABLE_NAME_PLURAL.get(table_name, f"{table_name}s")
                 
-                if array_name in json_data:
+                # 配列が直接格納されている場合と、キー名の配列の場合の両方に対応
+                if isinstance(json_data, list):
+                    # 配列が直接格納されている場合
+                    records = json_data
+                    print(f"Found {len(records)} records in {file} (direct array)")
+                elif array_name in json_data:
+                    # キー名の配列の場合
                     records = json_data[array_name]
-                    # bookテーブルの場合、roleカラムを除外
-                    if table_name == 'book':
-                        records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
-                    # book_uncategorizedテーブルの場合、全てのカラムを保持
-                    elif table_name == 'book_uncategorized':
-                        records = records  # そのまま保持
-                    print(f"Found {len(records)} records in {file}")
-                    data.extend(records)
+                    print(f"Found {len(records)} records in {file} (keyed array)")
                 else:
-                    print(f"Warning: {file} does not contain '{array_name}' array")
+                    print(f"Warning: {file} does not contain '{array_name}' array or direct array")
+                    continue
+                
+                # bookテーブルの場合、roleカラムを除外
+                if table_name == 'book':
+                    records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
+                # book_uncategorizedテーブルの場合、全てのカラムを保持
+                elif table_name == 'book_uncategorized':
+                    records = records  # そのまま保持
+                
+                data.extend(records)
         except Exception as e:
             print(f"Error reading {file}: {str(e)}")
     
@@ -129,14 +140,60 @@ def generate_sql_insert(table_name, records):
     if not records:
         return ""
 
-    # カラム名を取得
-    columns = records[0].keys()
+    # カラム名を取得（存在するカラムのみ）
+    all_columns = set()
+    for record in records:
+        all_columns.update(record.keys())
+    
+    # テーブルごとの必須カラムを定義
+    required_columns = {
+        "lecture_session": ["syllabus_id", "session_number"],
+        "lecture_session_irregular": ["syllabus_id", "session_pattern"],
+        # 他のテーブルも必要に応じて追加
+    }
+    
+    # テーブルごとの存在するカラムのみをフィルタリング
+    table_columns = {
+        "lecture_session": ["lecture_session_id", "syllabus_id", "session_number", "contents", "other_info", "created_at", "updated_at"],
+        "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "created_at", "updated_at"],
+        # 他のテーブルも必要に応じて追加
+    }
+    
+    # 必須カラムが存在するかチェック
+    if table_name in required_columns:
+        missing_columns = []
+        for required_col in required_columns[table_name]:
+            if required_col not in all_columns:
+                missing_columns.append(required_col)
+        
+        if missing_columns:
+            print(f"Warning: Missing required columns for {table_name}: {missing_columns}")
+            # 必須カラムが不足している場合は、存在するカラムのみで処理
+            if table_name in table_columns:
+                # テーブル定義に存在するカラムのみをフィルタリング
+                columns = [col for col in all_columns if col in table_columns[table_name]]
+            else:
+                columns = list(all_columns)
+        else:
+            if table_name in table_columns:
+                # テーブル定義に存在するカラムのみをフィルタリング
+                columns = [col for col in all_columns if col in table_columns[table_name]]
+            else:
+                columns = list(all_columns)
+    else:
+        if table_name in table_columns:
+            # テーブル定義に存在するカラムのみをフィルタリング
+            columns = [col for col in all_columns if col in table_columns[table_name]]
+        else:
+            columns = list(all_columns)
+    
     # bookテーブルの場合、authorカラムを除外
     if table_name == 'book':
         columns = [col for col in columns if col != 'author']
     # book_uncategorizedテーブルの場合、全てのカラムを保持
     elif table_name == 'book_uncategorized':
         columns = list(columns)
+    
     columns_str = ', '.join(columns)
 
     # VALUES句を生成
@@ -144,7 +201,7 @@ def generate_sql_insert(table_name, records):
     for record in records:
         values_list = []
         for column in columns:
-            value = record[column]
+            value = record.get(column)  # get()を使用してKeyErrorを防ぐ
             if value is None:
                 values_list.append('NULL')
             elif isinstance(value, (int, float)):
@@ -642,6 +699,11 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'lecture_session',
                 'table_name': 'lecture_session',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'lecture_session_irregular',
+                'table_name': 'lecture_session_irregular',
                 'source': 'web_syllabus'
             },
             {

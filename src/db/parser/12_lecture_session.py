@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.1
-# Project Version: v1.3.21
+# File Version: v1.3.2
+# Project Version: v1.3.28
 # Last Updated: 2025/6/21
 
 import os
@@ -15,32 +15,32 @@ from sqlalchemy.orm import sessionmaker
 import unicodedata
 import csv
 
-# ¸½ºß¤Î¥Ç¥£¥ì¥¯¥È¥ê¤òPython¥Ñ¥¹¤ËÄÉ²Ã
+# ç¾åœ¨ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®Pythonãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
-# utils.py¤«¤éÀµµ¬²½´Ø¿ô¤ò¥¤¥ó¥İ¡¼¥È
+# utils.pyã‹ã‚‰é–¢æ•°ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
 try:
 	from utils import normalize_subject_name
 except ImportError:
-	# utils.py¤¬¸«¤Ä¤«¤é¤Ê¤¤¾ì¹ç¤Î¥Õ¥©¡¼¥ë¥Ğ¥Ã¥¯
+	# utils.pyãŒè¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã®ãƒ•ã‚©ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
 	def normalize_subject_name(text: str) -> str:
-		"""¥Æ¥­¥¹¥È¤òÀµµ¬²½¤¹¤ë¡Ê¥Õ¥©¡¼¥ë¥Ğ¥Ã¥¯¡Ë"""
+		"""æ–‡å­—åˆ—ã‚’æ­£è¦åŒ–ã™ã‚‹é–¢æ•°"""
 		return unicodedata.normalize('NFKC', text)
 
 def get_db_connection():
-	"""¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³¤ò¼èÆÀ¤¹¤ë"""
-	# ´Ä¶­ÊÑ¿ô¤«¤éÀÜÂ³¾ğÊó¤ò¼èÆÀ
+	"""ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šã‚’å–å¾—ã™ã‚‹"""
+	# ç’°å¢ƒå¤‰æ•°ã‹ã‚‰æ¥ç¶šæƒ…å ±ã‚’å–å¾—
 	user = os.getenv('POSTGRES_USER', 'postgres')
 	password = os.getenv('POSTGRES_PASSWORD', 'postgres')
 	host = os.getenv('POSTGRES_HOST', 'localhost')
 	port = os.getenv('POSTGRES_PORT', '5432')
 	db = os.getenv('POSTGRES_DB', 'syllabus_db')
 
-	# ÀÜÂ³Ê¸»úÎó¤òºîÀ®
+	# æ¥ç¶šæ–‡å­—åˆ—ã‚’ä½œæˆ
 	connection_string = f"postgresql://{user}:{password}@{host}:{port}/{db}"
 	
-	# ¥¨¥ó¥¸¥ó¤òºîÀ®
+	# ã‚¨ãƒ³ã‚¸ãƒ³ã‚’ä½œæˆ
 	engine = create_engine(
 		connection_string,
 		connect_args={
@@ -48,20 +48,20 @@ def get_db_connection():
 		}
 	)
 	
-	# ¥»¥Ã¥·¥ç¥ó¤òºîÀ®
+	# ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’ä½œæˆ
 	Session = sessionmaker(bind=engine)
 	session = Session()
 	
-	# ¥»¥Ã¥·¥ç¥óºîÀ®»ş¤Ë°ìÅÙ¤À¤±Ê¸»ú¥¨¥ó¥³¡¼¥Ç¥£¥ó¥°¤òÀßÄê
+	# ã‚»ãƒƒã‚·ãƒ§ãƒ³ä½œæˆå¾Œã«ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’è¨­å®š
 	session.execute(text("SET client_encoding TO 'utf-8'"))
 	session.commit()
 	
 	return session
 
 def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: int) -> int:
-	"""¥·¥é¥Ğ¥¹¥Ş¥¹¥¿¡¼ID¤ò¼èÆÀ¤¹¤ë"""
+	"""ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼ã®IDã‚’å–å¾—ã™ã‚‹"""
 	try:
-		# ¥·¥é¥Ğ¥¹¥Ş¥¹¥¿¡¼ID¤ò¼èÆÀ
+		# ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼ã®IDã‚’æ¤œç´¢
 		query = text("""
 			SELECT syllabus_id 
 			FROM syllabus_master 
@@ -76,543 +76,601 @@ def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: i
 		
 		return result[0] if result else None
 	except Exception as e:
+		print(f"ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã‚¨ãƒ©ãƒ¼: {syllabus_code} ({syllabus_year}) - {str(e)}")
 		session.rollback()
 		return None
 
 def get_current_year() -> int:
-	"""¸½ºß¤ÎÇ¯ÅÙ¤ò¼èÆÀ¤¹¤ë"""
+	"""ç¾åœ¨ã®å¹´ã‚’å–å¾—ã™ã‚‹"""
 	return datetime.now().year
 
 def get_year_from_user() -> int:
-	"""¥æ¡¼¥¶¡¼¤«¤éÇ¯ÅÙ¤òÆşÎÏ¤·¤Æ¤â¤é¤¦"""
+	"""ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‹ã‚‰å¹´ã‚’å…¥åŠ›ã—ã¦ã‚‚ã‚‰ã†"""
 	while True:
 		try:
-			year = input("Ç¯ÅÙ¤òÆşÎÏ¤·¤Æ¤¯¤À¤µ¤¤¡Ê¶õ¤Î¾ì¹ç¤Ï¸½ºß¤ÎÇ¯ÅÙ¡Ë: ").strip()
+			year = input("å¹´ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ï¼ˆç©ºã®å ´åˆã¯ç¾åœ¨ã®å¹´ï¼‰: ").strip()
 			if not year:
 				return get_current_year()
 			year = int(year)
-			if 2000 <= year <= 2100:  # ÂÅÅö¤ÊÇ¯ÅÙ¤ÎÈÏ°Ï¤ò¥Á¥§¥Ã¥¯
+			if 2000 <= year <= 2100:  # å¦¥å½“ãªå¹´ã®ç¯„å›²ã‚’ãƒã‚§ãƒƒã‚¯
 				return year
-			print("2000Ç¯¤«¤é2100Ç¯¤Î´Ö¤ÇÆşÎÏ¤·¤Æ¤¯¤À¤µ¤¤¡£")
+			print("2000å¹´ã‹ã‚‰2100å¹´ã®é–“ã§å…¥åŠ›ã—ã¦ãã ã•ã„")
 		except ValueError:
-			print("Í­¸ú¤Ê¿ôÃÍ¤òÆşÎÏ¤·¤Æ¤¯¤À¤µ¤¤¡£")
+			print("æ­£ã—ã„æ•°å€¤ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„")
 
 def parse_lecture_sessions_from_schedule(schedule_data: List[Dict]) -> tuple[List[Dict], List[Dict]]:
-	"""¹ÖµÁ·×²è¤ÎscheduleÇÛÎó¤«¤é¹ÖµÁ²ó¿ô¥Ç¡¼¥¿¤ò²òÀÏ¤·¤Æ¹½Â¤²½¤¹¤ë
-	ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤ÈÉÔÄê·Á¹ÖµÁ²ó¿ô¤ËÊ¬¤±¤ÆÊÖ¤¹"""
-	import re  # ´Ø¿ô¤ÎÀèÆ¬¤Ç¥¤¥ó¥İ¡¼¥È
+	"""ã‚¹ã‚±ã‚¸ãƒ¥ãƒ¼ãƒ«ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’è§£æã—ã¦æ­£è¦åŒ–ã™ã‚‹
+	é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã¨ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã«åˆ†é¡ã™ã‚‹
+	ä¸è¦å‰‡ãªã‚‚ã®ãŒ1ä»¶ã§ã‚‚ã‚ã‚Œã°ã€ãã®ãƒªã‚¹ãƒˆå…¨ä½“ã‚’ä¸è¦å‰‡ã¨ã—ã¦æ‰±ã†"""
+	import re  # é–¢æ•°å†…ã§ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
 	
-	lecture_sessions = []  # ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¡Ê1-15²ó¡Ë
-	lecture_sessions_irregular = []  # ÉÔÄê·Á¹ÖµÁ²ó¿ô
+	lecture_sessions = []  # é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³
+	lecture_sessions_irregular = []  # ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³
 	
 	if not schedule_data:
 		return lecture_sessions, lecture_sessions_irregular
+	
+	# ä¸è¦å‰‡ãªã‚»ãƒƒã‚·ãƒ§ãƒ³ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+	has_irregular = False
+	all_sessions = []  # ã™ã¹ã¦ã®ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’ä¸€æ™‚ä¿å­˜
 	
 	for session_data in schedule_data:
 		if not isinstance(session_data, dict):
 			continue
 		
-		# ²ó¿ô¤ò¼èÆÀ¡ÊÎã: "1-1" ¢ª 1, "2-2" ¢ª 2, "1²óÌÜ" ¢ª 1¡Ë
+		# ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’å–å¾—: "1-1" â†’ 1, "2-2" â†’ 2, "1å›ç›®" â†’ 1ãªã©
 		session = session_data.get("session", "")
 		if not session:
 			continue
 		
-		# utils.py¤ÎÀµµ¬²½µ¡Ç½¤ò»ÈÍÑ¤·¤ÆÁ´³ÑÊ¸»ú¤òÈ¾³Ñ¤ËÊÑ´¹
+		# utils.pyã®é–¢æ•°ã‚’ä½¿ã£ã¦æ–‡å­—åˆ—ã‚’æ­£è¦åŒ–
 		session_normalized = normalize_subject_name(session)
 		
-		# Á´³ÑÊ¸»ú¤ò½üµî¡Ê¿ô»ú°Ê³°¤ÎÁ´³ÑÊ¸»ú¤òºï½ü¡Ë
-		session_cleaned = re.sub(r'[^\d\-]', '', session_normalized)
+		# ã€Œéƒ¨ã€ã®æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã‚‹å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦æ‰±ã†
+		if 'éƒ¨' in session_normalized:
+			has_irregular = True
+			all_sessions.append({
+				'syllabus_id': None,  # å¾Œã§è¨­å®š
+				'session_pattern': session,
+				'contents': session_data.get("content", "") if session_data.get("content", "") else None,
+				'other_info': None
+			})
+			continue
 		
-		# ¥Ç¥Ğ¥Ã¥°ÍÑ: Àµµ¬²½Á°¸å¤ÎÃÍ¤ò³ÎÇ§
-		# print(f"DEBUG: session='{session}' -> normalized='{session_normalized}' -> cleaned='{session_cleaned}'")
+		# å…¨è§’æ–‡å­—ã‚’åŠè§’ã«å¤‰æ›
+		session_halfwidth = unicodedata.normalize('NFKC', session_normalized)
 		
-		# ÆâÍÆ¤ò¼èÆÀ
+		# æ•°å­—ä»¥å¤–ã®æ–‡å­—ã‚’é™¤å»ã—ã¦æ•°å­—ã®ã¿ã®æ–‡å­—åˆ—ã‚’ä½œæˆ
+		session_cleaned = re.sub(r'[^\d\-]', '', session_halfwidth)
+		
+		# å†…å®¹ã‚’å–å¾—
 		contents = session_data.get("content", "")
 		
-		# Ã´Åö¼Ô¾ğÊó¤ò¼èÆÀ¡Êlecture_session_instructor¥Æ¡¼¥Ö¥ëÍÑ¡Ë
-		instructor = session_data.get("instructor", "")
+		# ã‚»ãƒƒã‚·ãƒ§ãƒ³ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’ä¿å­˜
+		session_pattern = session  # å…ƒã®ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’ä¿å­˜
 		
-		# ²ó¿ô¥Ñ¥¿¡¼¥ó¤ÎÊ¬Îà
-		session_pattern = session  # ¸µ¤Î¥Ñ¥¿¡¼¥ó¤òÊİ»ı
-		
-		# ¤Ş¤º¡Ö²óÌÜ¡×·Á¼°¤ò¥Á¥§¥Ã¥¯
-		if '²óÌÜ' in session_normalized:
-			# ¿ô»ú¤òÃê½Ğ
+		# ã¾ãšã€Œå›ç›®ã€ã‚’å«ã‚€å ´åˆã®å‡¦ç†
+		if 'å›ç›®' in session_normalized:
+			# æ•°å­—ã‚’æŠ½å‡º
 			numbers = re.findall(r'\d+', session_normalized)
 			if numbers:
 				try:
 					session_number = int(numbers[0])
-					# 1-15²ó¤ÎÈÏ°ÏÆâ¤«¥Á¥§¥Ã¥¯
-					if 1 <= session_number <= 15:
-						# ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤È¤·¤Æ½èÍı
-						lecture_sessions.append({
+					# å›æ•°åˆ¶é™ã‚’æ’¤å»ƒ - ã™ã¹ã¦ã®æ­£ã®æ•´æ•°ã‚’è¨±å¯
+					if session_number > 0:
+						# é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã¨ã—ã¦è¿½åŠ 
+						all_sessions.append({
+							'syllabus_id': None,  # å¾Œã§è¨­å®š
 							'session_number': session_number,
 							'contents': contents if contents else None,
-							'other_info': None,
-							'instructor': instructor if instructor else None
+							'other_info': None
 						})
 					else:
-						# ÈÏ°Ï³°¤Î¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-						lecture_sessions_irregular.append({
+						# 0ä»¥ä¸‹ã®å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+						has_irregular = True
+						all_sessions.append({
+							'syllabus_id': None,  # å¾Œã§è¨­å®š
 							'session_pattern': session_pattern,
 							'contents': contents if contents else None,
-							'other_info': None,
-							'instructor': instructor if instructor else None
+							'other_info': None
 						})
 				except ValueError:
-					# ¿ôÃÍÊÑ´¹¤Ç¤­¤Ê¤¤¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-					lecture_sessions_irregular.append({
+					# æ•°å€¤å¤‰æ›ã§ããªã„å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+					has_irregular = True
+					all_sessions.append({
+						'syllabus_id': None,  # å¾Œã§è¨­å®š
 						'session_pattern': session_pattern,
 						'contents': contents if contents else None,
-						'other_info': None,
-						'instructor': instructor if instructor else None
+						'other_info': None
 					})
 			else:
-				# ¿ô»ú¤¬¸«¤Ä¤«¤é¤Ê¤¤¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-				lecture_sessions_irregular.append({
+				# æ•°å­—ãŒè¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+				has_irregular = True
+				all_sessions.append({
+					'syllabus_id': None,  # å¾Œã§è¨­å®š
 					'session_pattern': session_pattern,
 					'contents': contents if contents else None,
-					'other_info': None,
-					'instructor': instructor if instructor else None
+					'other_info': None
 				})
 		else:
-			# ¥Ï¥¤¥Õ¥ó¶èÀÚ¤ê¤Î·Á¼°¤ò¥Á¥§¥Ã¥¯
+			# ãƒã‚¤ãƒ•ãƒ³åŒºåˆ‡ã‚Šã®å ´åˆã®å‡¦ç†
 			session_parts = session_cleaned.split('-')
 			if len(session_parts) >= 2:
 				try:
 					start_session = int(session_parts[0])
 					end_session = int(session_parts[1])
 					
-					# ÈÏ°Ï¤¬1-15²óÆâ¤Ç¡¢Ï¢Â³¤·¤Æ¤¤¤ë¾ì¹ç¤ÏÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤È¤·¤Æ½èÍı
-					if (1 <= start_session <= 15 and 1 <= end_session <= 15 and 
-						end_session >= start_session and end_session - start_session <= 14):
-						# ÈÏ°ÏÆâ¤Î¤¹¤Ù¤Æ¤Î²ó¿ô¤òÀ¸À®
-						for session_number in range(start_session, end_session + 1):
-							lecture_sessions.append({
-								'session_number': session_number,
+					# å›æ•°åˆ¶é™ã‚’æ’¤å»ƒ - ç¯„å›²æŒ‡å®šï¼ˆé–‹å§‹ <= çµ‚äº†ï¼‰
+					if start_session > 0 and end_session > 0 and end_session >= start_session:
+						# ç¯„å›²ãŒå¤§ãã™ãã‚‹å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦æ‰±ã†
+						if end_session - start_session > 50:  # 50å›ä»¥ä¸Šã®ç¯„å›²ã¯ä¸è¦å‰‡
+							has_irregular = True
+							all_sessions.append({
+								'syllabus_id': None,  # å¾Œã§è¨­å®š
+								'session_pattern': session_pattern,
 								'contents': contents if contents else None,
-								'other_info': None,
-								'instructor': instructor if instructor else None
+								'other_info': None
 							})
+						else:
+							# ç¯„å›²å†…ã®ã™ã¹ã¦ã®ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’è¿½åŠ 
+							for session_number in range(start_session, end_session + 1):
+								all_sessions.append({
+									'syllabus_id': None,  # å¾Œã§è¨­å®š
+									'session_number': session_number,
+									'contents': contents if contents else None,
+									'other_info': None
+								})
 					else:
-						# ÈÏ°Ï³°¤Ş¤¿¤ÏÉÔÏ¢Â³¤Î¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-						lecture_sessions_irregular.append({
+						# ç¯„å›²æŒ‡å®šï¼ˆé–‹å§‹ > çµ‚äº†ï¼‰ã®å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+						has_irregular = True
+						all_sessions.append({
+							'syllabus_id': None,  # å¾Œã§è¨­å®š
 							'session_pattern': session_pattern,
 							'contents': contents if contents else None,
-							'other_info': None,
-							'instructor': instructor if instructor else None
+							'other_info': None
 						})
 				except ValueError:
-					# ¿ôÃÍÊÑ´¹¤Ç¤­¤Ê¤¤¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-					lecture_sessions_irregular.append({
+					# æ•°å€¤å¤‰æ›ã§ããªã„å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+					has_irregular = True
+					all_sessions.append({
+						'syllabus_id': None,  # å¾Œã§è¨­å®š
 						'session_pattern': session_pattern,
 						'contents': contents if contents else None,
-						'other_info': None,
-						'instructor': instructor if instructor else None
+						'other_info': None
 					})
 			elif len(session_parts) == 1:
 				try:
 					session_number = int(session_parts[0])
-					# 1-15²ó¤ÎÈÏ°ÏÆâ¤«¥Á¥§¥Ã¥¯
-					if 1 <= session_number <= 15:
-						# ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤È¤·¤Æ½èÍı
-						lecture_sessions.append({
+					# å›æ•°åˆ¶é™ã‚’æ’¤å»ƒ - ã™ã¹ã¦ã®æ­£ã®æ•´æ•°ã‚’è¨±å¯
+					if session_number > 0:
+						# é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã¨ã—ã¦è¿½åŠ 
+						all_sessions.append({
+							'syllabus_id': None,  # å¾Œã§è¨­å®š
 							'session_number': session_number,
 							'contents': contents if contents else None,
-							'other_info': None,
-							'instructor': instructor if instructor else None
+							'other_info': None
 						})
 					else:
-						# ÈÏ°Ï³°¤Î¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-						lecture_sessions_irregular.append({
+						# 0ä»¥ä¸‹ã®å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+						has_irregular = True
+						all_sessions.append({
+							'syllabus_id': None,  # å¾Œã§è¨­å®š
 							'session_pattern': session_pattern,
 							'contents': contents if contents else None,
-							'other_info': None,
-							'instructor': instructor if instructor else None
+							'other_info': None
 						})
 				except ValueError:
-					# ¿ôÃÍÊÑ´¹¤Ç¤­¤Ê¤¤¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-					lecture_sessions_irregular.append({
+					# æ•°å€¤å¤‰æ›ã§ããªã„å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+					has_irregular = True
+					all_sessions.append({
+						'syllabus_id': None,  # å¾Œã§è¨­å®š
 						'session_pattern': session_pattern,
 						'contents': contents if contents else None,
-						'other_info': None,
-						'instructor': instructor if instructor else None
+						'other_info': None
 					})
 			else:
-				# Í­¸ú¤Ê·Á¼°¤Ç¤Ê¤¤¾ì¹ç¤ÏÉÔÄê·Á¤È¤·¤Æ½èÍı
-				lecture_sessions_irregular.append({
+				# ãã®ä»–ã®å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦è¿½åŠ 
+				has_irregular = True
+				all_sessions.append({
+					'syllabus_id': None,  # å¾Œã§è¨­å®š
 					'session_pattern': session_pattern,
 					'contents': contents if contents else None,
-					'other_info': None,
-					'instructor': instructor if instructor else None
+					'other_info': None
 				})
 	
-	# print(f"DEBUG: Total lecture_sessions created: {len(lecture_sessions)}")
-	# print(f"DEBUG: Total lecture_sessions_irregular created: {len(lecture_sessions_irregular)}")
+	# ä¸è¦å‰‡ãªã‚»ãƒƒã‚·ãƒ§ãƒ³ãŒ1ä»¶ã§ã‚‚ã‚ã‚Œã°ã€ã™ã¹ã¦ä¸è¦å‰‡ã¨ã—ã¦æ‰±ã†
+	if has_irregular:
+		lecture_sessions_irregular = all_sessions
+	else:
+		# é‡è¤‡ãƒã‚§ãƒƒã‚¯ç”¨ã®ã‚»ãƒƒãƒˆ
+		seen_sessions = set()
+		for session_data in all_sessions:
+			if 'session_number' in session_data:
+				session_number = session_data['session_number']
+				if session_number not in seen_sessions:
+					lecture_sessions.append(session_data)
+					seen_sessions.add(session_number)
+			else:
+				# session_numberãŒãªã„å ´åˆã¯ä¸è¦å‰‡ã¨ã—ã¦æ‰±ã†
+				lecture_sessions_irregular.append(session_data)
+	
 	return lecture_sessions, lecture_sessions_irregular
 
 def get_json_files(year: int) -> List[str]:
-	"""»ØÄê¤µ¤ì¤¿Ç¯ÅÙ¤Î¤¹¤Ù¤Æ¤ÎJSON¥Õ¥¡¥¤¥ë¤Î¥Ñ¥¹¤ò¼èÆÀ¤¹¤ë"""
+	"""æŒ‡å®šã•ã‚ŒãŸå¹´ã®JSONãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§ã‚’å–å¾—"""
 	json_dir = os.path.join("src", "syllabus", str(year), "json")
-	if not os.path.exists(json_dir):
-		raise FileNotFoundError(f"¥Ç¥£¥ì¥¯¥È¥ê¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó: {json_dir}")
+	json_files = []
 	
-	json_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
-	if not json_files:
-		raise FileNotFoundError(f"JSON¥Õ¥¡¥¤¥ë¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó: {json_dir}")
+	if os.path.exists(json_dir):
+		for file in os.listdir(json_dir):
+			if file.endswith('.json'):
+				json_files.append(os.path.join(json_dir, file))
 	
-	return [os.path.join(json_dir, f) for f in json_files]
+	return json_files
 
-def extract_lecture_session_from_single_json(json_data: Dict, session, year: int) -> tuple[List[Dict], List[Dict], List[str]]:
-	"""Ã±°ì¤ÎJSON¥Õ¥¡¥¤¥ë¤«¤é¹ÖµÁ²ó¿ô¾ğÊó¤òÃê½Ğ¤¹¤ë
-	ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤ÈÉÔÄê·Á¹ÖµÁ²ó¿ô¤òÊ¬¤±¤ÆÊÖ¤¹"""
-	lecture_sessions = []  # ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô
-	lecture_sessions_irregular = []  # ÉÔÄê·Á¹ÖµÁ²ó¿ô
+def extract_lecture_session_from_single_json(json_data: Dict, session, year: int, json_file: str) -> tuple[List[Dict], List[Dict], List[str]]:
+	"""å˜ä¸€ã®JSONãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’æŠ½å‡º"""
+	lecture_sessions = []
+	lecture_sessions_irregular = []
 	errors = []
 	
-	# ²ÊÌÜ¥³¡¼¥É¤ò¼èÆÀ
-	syllabus_code = json_data.get("²ÊÌÜ¥³¡¼¥É", "")
-	
-	if not syllabus_code:
-		errors.append("²ÊÌÜ¥³¡¼¥É¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó")
-		return lecture_sessions, lecture_sessions_irregular, errors
-	
-	# syllabus_master¤«¤ésyllabus_id¤ò¼èÆÀ
-	syllabus_id = get_syllabus_master_id_from_db(session, syllabus_code, year)
-	
-	if not syllabus_id:
-		errors.append(f"syllabus_master¤ËÂĞ±ş¤¹¤ë¥ì¥³¡¼¥É¤¬¤¢¤ê¤Ş¤»¤ó¡Ê²ÊÌÜ¥³¡¼¥É: {syllabus_code}¡Ë")
-		return lecture_sessions, lecture_sessions_irregular, errors
-	
-	# ¹ÖµÁ·×²è¤ò¼èÆÀ
-	lecture_plan = json_data.get("¹ÖµÁ·×²è", {})
-	schedule_data = lecture_plan.get("ÆâÍÆ", {})
-	
-	if isinstance(schedule_data, dict):
-		schedule = schedule_data.get("schedule", [])
-	else:
-		schedule = []
-	
-	if not schedule:
-		errors.append("¹ÖµÁ·×²è¤Îschedule¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó")
-		return lecture_sessions, lecture_sessions_irregular, errors
-	
-	# ¹ÖµÁ²ó¿ô¤ò²òÀÏ
-	parsed_sessions, parsed_sessions_irregular = parse_lecture_sessions_from_schedule(schedule)
-	
-	if not parsed_sessions and not parsed_sessions_irregular:
-		errors.append("¹ÖµÁ²ó¿ô¤Î²òÀÏ·ë²Ì¤¬¶õ¤Ç¤¹")
-		return lecture_sessions, lecture_sessions_irregular, errors
-	
-	# ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤ò½èÍı
-	for session_data in parsed_sessions:
-		lecture_sessions.append({
-			'syllabus_id': syllabus_id,
-			'session_number': session_data['session_number'],
-			'contents': session_data['contents'],
-			'other_info': session_data['other_info'],
-			'instructor': session_data['instructor']
-		})
-	
-	# ÉÔÄê·Á¹ÖµÁ²ó¿ô¤ò½èÍı
-	for session_data in parsed_sessions_irregular:
-		lecture_sessions_irregular.append({
-			'syllabus_id': syllabus_id,
-			'session_pattern': session_data['session_pattern'],
-			'contents': session_data['contents'],
-			'other_info': session_data['other_info'],
-			'instructor': session_data['instructor']
-		})
-	
-	# ½¸Ãæ¹ÖµÁ¤«¤É¤¦¤«¤ò¥Á¥§¥Ã¥¯
-	basic_info = json_data.get("´ğËÜ¾ğÊó", {})
-	time_info = basic_info.get("³«¹Ö´ü¡¦ÍË¹Ö»ş", {})
-	time_text = time_info.get("ÆâÍÆ", "") if isinstance(time_info, dict) else str(time_info)
-	
-	# ½¸Ãæ¹ÖµÁ¤Ç¤Ê¤¤¾ì¹ç¡¢ºÇ½ª²ó¤ò¥Á¥§¥Ã¥¯¡ÊÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤Î¤ß¡Ë
-	if time_text and '½¸Ãæ' not in time_text:
-		if lecture_sessions:
-			max_session = max(session['session_number'] for session in lecture_sessions)
-			if max_session not in [15, 30]:
-				errors.append(f"ºÇ½ª²ó¤¬{max_session}²ó¡Ê´üÂÔÃÍ: 15²ó¤Ş¤¿¤Ï30²ó¡Ë")
+	try:
+		# JSONãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ç§‘ç›®ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—
+		syllabus_code = json_data.get('ç§‘ç›®ã‚³ãƒ¼ãƒ‰')
+		syllabus_year = year
+		
+		if not syllabus_code:
+			errors.append(f"ç§‘ç›®ã‚³ãƒ¼ãƒ‰ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“: {json_file}")
+			return lecture_sessions, lecture_sessions_irregular, errors
+		
+		# ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼ã®IDã‚’å–å¾—
+		syllabus_master_id = get_syllabus_master_id_from_db(session, syllabus_code, syllabus_year)
+		
+		if not syllabus_master_id:
+			errors.append(f"ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼IDãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“: {syllabus_code} ({syllabus_year})")
+			return lecture_sessions, lecture_sessions_irregular, errors
+		
+		# ã‚¹ã‚±ã‚¸ãƒ¥ãƒ¼ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
+		schedule_data = json_data.get('è¬›ç¾©è¨ˆç”»', {}).get('å†…å®¹', {}).get('schedule', [])
+		
+		# ã‚¹ã‚±ã‚¸ãƒ¥ãƒ¼ãƒ«ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’è§£æ
+		parsed_sessions, parsed_sessions_irregular = parse_lecture_sessions_from_schedule(schedule_data)
+		
+		# ã‚·ãƒ©ãƒã‚¹ãƒã‚¹ã‚¿ãƒ¼IDã‚’è¿½åŠ 
+		for session_data in parsed_sessions:
+			session_data['syllabus_id'] = syllabus_master_id
+			lecture_sessions.append(session_data)
+		
+		for session_data in parsed_sessions_irregular:
+			session_data['syllabus_id'] = syllabus_master_id
+			lecture_sessions_irregular.append(session_data)
+		
+	except Exception as e:
+		error_msg = f"ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: {str(e)}"
+		print(f"        EXTRACT ERROR: {error_msg}")
+		errors.append(error_msg)
 	
 	return lecture_sessions, lecture_sessions_irregular, errors
 
 def process_lecture_session_json(json_file: str, session, year: int) -> tuple[List[Dict], List[Dict], List[str]]:
-	"""¸ÄÊÌ¤Î¹ÖµÁ²ó¿ôJSON¥Õ¥¡¥¤¥ë¤ò½èÍı¤¹¤ë
-	ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¤ÈÉÔÄê·Á¹ÖµÁ²ó¿ô¤òÊ¬¤±¤ÆÊÖ¤¹"""
-	errors = []
+	"""JSONãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‡¦ç†ã—ã¦è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’æŠ½å‡º"""
+	all_lecture_sessions = []
+	all_lecture_sessions_irregular = []
+	all_errors = []
+	
 	try:
 		with open(json_file, 'r', encoding='utf-8') as f:
 			json_data = json.load(f)
 		
-		# ¹ÖµÁ²ó¿ô¾ğÊó¤òÃê½Ğ
-		lecture_sessions, lecture_sessions_irregular, extraction_errors = extract_lecture_session_from_single_json(json_data, session, year)
+		lecture_sessions, lecture_sessions_irregular, errors = extract_lecture_session_from_single_json(json_data, session, year, json_file)
 		
-		# Ãê½Ğ¥¨¥é¡¼¤òÄÉ²Ã
-		errors.extend(extraction_errors)
+		all_lecture_sessions.extend(lecture_sessions)
+		all_lecture_sessions_irregular.extend(lecture_sessions_irregular)
+		all_errors.extend(errors)
 		
-		# ¥¨¥é¡¼¤¬¤Ê¤¤¾ì¹ç¤ÏÀ®¸ù
-		if not errors and (lecture_sessions or lecture_sessions_irregular):
-			return lecture_sessions, lecture_sessions_irregular, []
-		
-		# ¥¨¥é¡¼¤¬¤¢¤ë¾ì¹ç¤Ï¾ÜºÙ¤òµ­Ï¿
-		if errors:
-			return [], [], errors
-		
-		# ¹ÖµÁ²ó¿ô¾ğÊó¤¬¶õ¤Î¾ì¹ç
-		return [], [], ["¹ÖµÁ²ó¿ô¾ğÊó¤¬Ãê½Ğ¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿"]
-		
-	except json.JSONDecodeError as e:
-		errors.append(f"JSON¥Õ¥¡¥¤¥ë¤Î²òÀÏ¥¨¥é¡¼: {str(e)}")
-		return [], [], errors
 	except Exception as e:
-		errors.append(f"½èÍıÃæ¤Ë¥¨¥é¡¼¤¬È¯À¸: {str(e)}")
-		return [], [], errors
+		all_errors.append(f"ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼ {json_file}: {str(e)}")
+	
+	return all_lecture_sessions, all_lecture_sessions_irregular, all_errors
 
 def create_lecture_session_json(lecture_sessions: List[Dict]) -> str:
-	"""¹ÖµÁ²ó¿ô¾ğÊó¤ÎJSON¥Õ¥¡¥¤¥ë¤òºîÀ®¤¹¤ë"""
-	# lecture_sessionÍÑ¤Î¥Ç¥£¥ì¥¯¥È¥ê
-	session_output_dir = os.path.join("updates", "lecture_session", "add")
-	os.makedirs(session_output_dir, exist_ok=True)
+	"""è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’JSONãƒ•ã‚¡ã‚¤ãƒ«ã¨ã—ã¦ä¿å­˜"""
+	output_dir = os.path.join("updates", "lecture_session", "add")
+	os.makedirs(output_dir, exist_ok=True)
 	
-	# ¸½ºß¤ÎÆü»ş¤ò¼èÆÀ¤·¤Æ¥Õ¥¡¥¤¥ëÌ¾¤òÀ¸À®
-	current_time = datetime.now()
+	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+	filename = f"lecture_session_{timestamp}.json"
+	filepath = os.path.join(output_dir, filename)
 	
-	# lecture_sessionÍÑ¤ÎJSON¥Õ¥¡¥¤¥ë
-	filename = f"lecture_session_{current_time.strftime('%Y%m%d_%H%M')}.json"
-	output_file = os.path.join(session_output_dir, filename)
+	print(f"  JSONãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãè¾¼ã¿ä¸­: {filename}")
+	print(f"  ãƒ‡ãƒ¼ã‚¿ä»¶æ•°: {len(lecture_sessions):,}ä»¶")
 	
-	data = {
-		"lecture_sessions": [{
-			"syllabus_id": session["syllabus_id"],
-			"session_number": session["session_number"],
-			"contents": session["contents"],
-			"other_info": session["other_info"],
-			"created_at": current_time.isoformat()
-		} for session in sorted(lecture_sessions, key=lambda x: (x["syllabus_id"], x["session_number"]))]
-	}
+	# ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚ºã‚’ç¢ºèª
+	data_size = len(json.dumps(lecture_sessions, ensure_ascii=False))
+	print(f"  ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º: {data_size:,} ãƒã‚¤ãƒˆ ({data_size/1024/1024:.2f} MB)")
 	
-	with open(output_file, 'w', encoding='utf-8') as f:
-		json.dump(data, f, ensure_ascii=False, indent=2)
+	try:
+		# å¤§é‡ãƒ‡ãƒ¼ã‚¿ã®å ´åˆã¯åˆ†å‰²å‡¦ç†
+		if len(lecture_sessions) > 100000:  # 10ä¸‡ä»¶ä»¥ä¸Š
+			print(f"  å¤§é‡ãƒ‡ãƒ¼ã‚¿ã®ãŸã‚åˆ†å‰²å‡¦ç†ã‚’å®Ÿè¡Œä¸­...")
+			chunk_size = 50000  # 5ä¸‡ä»¶ãšã¤åˆ†å‰²
+			chunks = [lecture_sessions[i:i + chunk_size] for i in range(0, len(lecture_sessions), chunk_size)]
+			
+			with open(filepath, 'w', encoding='utf-8') as f:
+				f.write('[\n')
+				for chunk_idx, chunk in enumerate(chunks):
+					print(f"    ãƒãƒ£ãƒ³ã‚¯ {chunk_idx + 1}/{len(chunks)} ã‚’å‡¦ç†ä¸­...")
+					for i, session in enumerate(chunk):
+						if chunk_idx > 0 or i > 0:
+							f.write(',\n')
+						json.dump(session, f, ensure_ascii=False, indent=2)
+				f.write('\n]')
+		else:
+			# é€šå¸¸ã®ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ›¸ãè¾¼ã¿
+			print(f"  ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ›¸ãè¾¼ã¿ã‚’å®Ÿè¡Œä¸­...")
+			with open(filepath, 'w', encoding='utf-8') as f:
+				f.write('[\n')
+				for i, session in tqdm(enumerate(lecture_sessions), total=len(lecture_sessions), desc="  ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ›¸ãè¾¼ã¿"):
+					if i > 0:
+						f.write(',\n')
+					json.dump(session, f, ensure_ascii=False, indent=2)
+				f.write('\n]')
+		
+		print(f"  æ›¸ãè¾¼ã¿å®Œäº†: {filepath}")
+	except Exception as e:
+		print(f"  æ›¸ãè¾¼ã¿ã‚¨ãƒ©ãƒ¼: {str(e)}")
+		raise
 	
-	return output_file
+	return filepath
 
 def create_lecture_session_irregular_json(lecture_sessions_irregular: List[Dict]) -> str:
-	"""ÉÔÄê·Á¹ÖµÁ²ó¿ô¾ğÊó¤ÎJSON¥Õ¥¡¥¤¥ë¤òºîÀ®¤¹¤ë"""
-	# lecture_session_irregularÍÑ¤Î¥Ç¥£¥ì¥¯¥È¥ê
-	session_output_dir = os.path.join("updates", "lecture_session_irregular", "add")
-	os.makedirs(session_output_dir, exist_ok=True)
+	"""ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’JSONãƒ•ã‚¡ã‚¤ãƒ«ã¨ã—ã¦ä¿å­˜"""
+	output_dir = os.path.join("updates", "lecture_session_irregular", "add")
+	os.makedirs(output_dir, exist_ok=True)
 	
-	# ¸½ºß¤ÎÆü»ş¤ò¼èÆÀ¤·¤Æ¥Õ¥¡¥¤¥ëÌ¾¤òÀ¸À®
-	current_time = datetime.now()
+	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+	filename = f"lecture_session_irregular_{timestamp}.json"
+	filepath = os.path.join(output_dir, filename)
 	
-	# lecture_session_irregularÍÑ¤ÎJSON¥Õ¥¡¥¤¥ë
-	filename = f"lecture_session_irregular_{current_time.strftime('%Y%m%d_%H%M')}.json"
-	output_file = os.path.join(session_output_dir, filename)
+	print(f"  JSONãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãè¾¼ã¿ä¸­: {filename}")
+	print(f"  ãƒ‡ãƒ¼ã‚¿ä»¶æ•°: {len(lecture_sessions_irregular):,}ä»¶")
 	
-	data = {
-		"lecture_session_irregulars": [{
-			"syllabus_id": session["syllabus_id"],
-			"session_pattern": session["session_pattern"],
-			"contents": session["contents"],
-			"other_info": session["other_info"],
-			"created_at": current_time.isoformat()
-		} for session in sorted(lecture_sessions_irregular, key=lambda x: (x["syllabus_id"], x["session_pattern"]))]
-	}
+	# ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚ºã‚’ç¢ºèª
+	data_size = len(json.dumps(lecture_sessions_irregular, ensure_ascii=False))
+	print(f"  ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º: {data_size:,} ãƒã‚¤ãƒˆ ({data_size/1024/1024:.2f} MB)")
 	
-	with open(output_file, 'w', encoding='utf-8') as f:
-		json.dump(data, f, ensure_ascii=False, indent=2)
+	try:
+		# å¤§é‡ãƒ‡ãƒ¼ã‚¿ã®å ´åˆã¯åˆ†å‰²å‡¦ç†
+		if len(lecture_sessions_irregular) > 100000:  # 10ä¸‡ä»¶ä»¥ä¸Š
+			print(f"  å¤§é‡ãƒ‡ãƒ¼ã‚¿ã®ãŸã‚åˆ†å‰²å‡¦ç†ã‚’å®Ÿè¡Œä¸­...")
+			chunk_size = 50000  # 5ä¸‡ä»¶ãšã¤åˆ†å‰²
+			chunks = [lecture_sessions_irregular[i:i + chunk_size] for i in range(0, len(lecture_sessions_irregular), chunk_size)]
+			
+			with open(filepath, 'w', encoding='utf-8') as f:
+				f.write('[\n')
+				for chunk_idx, chunk in enumerate(chunks):
+					print(f"    ãƒãƒ£ãƒ³ã‚¯ {chunk_idx + 1}/{len(chunks)} ã‚’å‡¦ç†ä¸­...")
+					for i, session in enumerate(chunk):
+						if chunk_idx > 0 or i > 0:
+							f.write(',\n')
+						json.dump(session, f, ensure_ascii=False, indent=2)
+				f.write('\n]')
+		else:
+			# é€šå¸¸ã®ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ›¸ãè¾¼ã¿
+			print(f"  ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ›¸ãè¾¼ã¿ã‚’å®Ÿè¡Œä¸­...")
+			with open(filepath, 'w', encoding='utf-8') as f:
+				f.write('[\n')
+				for i, session in tqdm(enumerate(lecture_sessions_irregular), total=len(lecture_sessions_irregular), desc="  ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ›¸ãè¾¼ã¿"):
+					if i > 0:
+						f.write(',\n')
+					json.dump(session, f, ensure_ascii=False, indent=2)
+				f.write('\n]')
+		
+		print(f"  æ›¸ãè¾¼ã¿å®Œäº†: {filepath}")
+	except Exception as e:
+		print(f"  æ›¸ãè¾¼ã¿ã‚¨ãƒ©ãƒ¼: {str(e)}")
+		raise
 	
-	return output_file
+	return filepath
 
 def create_error_csv(all_errors: List[str], final_session_errors: List[str], year: int) -> str:
-	"""¥¨¥é¡¼ÆâÍÆ¤òCSV¥Õ¥¡¥¤¥ë¤È¤·¤Æ½ĞÎÏ¤¹¤ë"""
-	warning_dir = os.path.join("warning", str(year))
-	os.makedirs(warning_dir, exist_ok=True)
+	"""ã‚¨ãƒ©ãƒ¼æƒ…å ±ã‚’CSVãƒ•ã‚¡ã‚¤ãƒ«ã¨ã—ã¦ä¿å­˜"""
+	output_dir = os.path.join("warning", str(year))
+	os.makedirs(output_dir, exist_ok=True)
 	
-	# ¸½ºß¤ÎÆü»ş¤ò¼èÆÀ¤·¤Æ¥Õ¥¡¥¤¥ëÌ¾¤òÀ¸À®
-	current_time = datetime.now()
-	filename = f"lecture_session_{current_time.strftime('%Y%m%d_%H%M')}.csv"
-	output_file = os.path.join(warning_dir, filename)
+	timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+	filename = f"lecture_session_{timestamp}.csv"
+	filepath = os.path.join(output_dir, filename)
 	
-	# ¥¨¥é¡¼¾ğÊó¤òÀ°Íı
-	error_data = []
-	
-	# ÄÌ¾ï¥¨¥é¡¼¤ò½èÍı
-	for error in all_errors:
-		# ¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸¤«¤éJSON¥Õ¥¡¥¤¥ëÌ¾¤òÃê½Ğ
-		if ": " in error:
-			json_name, error_message = error.split(": ", 1)
-		else:
-			json_name = "unknown"
-			error_message = error
+	print(f"  CSVãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãè¾¼ã¿ä¸­: {filename}")
+	with open(filepath, 'w', encoding='utf-8', newline='') as f:
+		writer = csv.writer(f)
+		writer.writerow(['ã‚¨ãƒ©ãƒ¼ã‚¿ã‚¤ãƒ—', 'ã‚¨ãƒ©ãƒ¼å†…å®¹'])
 		
-		error_data.append({
-			'json_name': json_name,
-			'error_message': error_message,
-			'date': current_time.strftime('%Y-%m-%d %H:%M:%S')
-		})
-	
-	# ºÇ½ª²ó¥¨¥é¡¼¤ò½èÍı
-	for error in final_session_errors:
-		# ¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸¤«¤éJSON¥Õ¥¡¥¤¥ëÌ¾¤òÃê½Ğ
-		if ": " in error:
-			json_name, error_message = error.split(": ", 1)
-		else:
-			json_name = "unknown"
-			error_message = error
+		for error in all_errors:
+			writer.writerow(['å‡¦ç†ã‚¨ãƒ©ãƒ¼', error])
 		
-		error_data.append({
-			'json_name': json_name,
-			'error_message': error_message,
-			'date': current_time.strftime('%Y-%m-%d %H:%M:%S')
-		})
+		for error in final_session_errors:
+			writer.writerow(['æœ€çµ‚ã‚¨ãƒ©ãƒ¼', error])
 	
-	# CSV¥Õ¥¡¥¤¥ë¤Ë½ñ¤­¹ş¤ß
-	with open(output_file, 'w', newline='', encoding='utf-8') as f:
-		writer = csv.DictWriter(f, fieldnames=['json_name', 'error_message', 'date'])
-		writer.writeheader()
-		writer.writerows(error_data)
-	
-	return output_file
+	return filepath
 
 def main():
-	"""¥á¥¤¥ó½èÍı"""
-	session = None
+	"""ãƒ¡ã‚¤ãƒ³å‡¦ç†"""
+	print("è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±æŠ½å‡ºå‡¦ç†ã‚’é–‹å§‹ã—ã¾ã™...")
+	
+	# å¹´ã‚’å–å¾—
+	year = get_year_from_user()
+	
+	# JSONãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§ã‚’å–å¾—
+	json_files = get_json_files(year)
+	if not json_files:
+		print(f"{year}å¹´ã®JSONãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“")
+		return
+	
+	# ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶š
 	try:
-		# Ç¯ÅÙ¤Î¼èÆÀ
-		year = get_year_from_user()
-		print(f"½èÍıÂĞ¾İÇ¯ÅÙ: {year}")
-		
-		# ¥Ç¡¼¥¿¥Ù¡¼¥¹ÀÜÂ³
 		session = get_db_connection()
-		
-		# ¤¹¤Ù¤Æ¤ÎJSON¥Õ¥¡¥¤¥ë¤ò¼èÆÀ
-		json_files = get_json_files(year)
-		print(f"½èÍıÂĞ¾İ¥Õ¥¡¥¤¥ë¿ô: {len(json_files)}")
-		
-		# ¹ÖµÁ²ó¿ô¾ğÊó¤ò½èÍı
-		all_lecture_sessions = []  # ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô
-		all_lecture_sessions_irregular = []  # ÉÔÄê·Á¹ÖµÁ²ó¿ô
-		processed_count = 0
-		error_count = 0
-		skipped_count = 0
-		
-		# ¥¨¥é¡¼¾ğÊó¤ò¼ı½¸
-		all_errors = []
-		final_session_errors = []  # ºÇ½ª²ó¥¨¥é¡¼¤òÊÌÅÓ¼ı½¸
-		
-		# Åı·×¾ğÊó
-		stats = {
-			"total_files": len(json_files),
-			"successful_files": 0,
-			"error_files": 0,
-			"total_lecture_sessions": 0,
-			"total_lecture_sessions_irregular": 0,
-			"final_session_error_files": 0
-		}
-		
-		print(f"\n½èÍı³«»Ï: {len(json_files)}¸Ä¤ÎJSON¥Õ¥¡¥¤¥ë")
-		
-		# tqdm¤ò»ÈÍÑ¤·¤Æ¥×¥í¥°¥ì¥¹¥Ğ¡¼¤òÉ½¼¨
-		for json_file in tqdm(json_files, desc="JSON¥Õ¥¡¥¤¥ë¤ò½èÍıÃæ"):
-			try:
-				lecture_sessions, lecture_sessions_irregular, errors = process_lecture_session_json(json_file, session, year)
-				
-				# ºÇ½ª²ó¥¨¥é¡¼¤òÊ¬Î¥
-				final_session_error = None
-				other_errors = []
-				for error in errors:
-					if "ºÇ½ª²ó¤¬" in error:
-						final_session_error = error
-					else:
-						other_errors.append(error)
-				
-				if other_errors:
-					all_errors.extend([f"{os.path.basename(json_file)}: {error}" for error in other_errors])
-					error_count += 1
-					stats["error_files"] += 1
-				else:
-					if lecture_sessions or lecture_sessions_irregular:
-						all_lecture_sessions.extend(lecture_sessions)
-						all_lecture_sessions_irregular.extend(lecture_sessions_irregular)
-						processed_count += 1
-						stats["successful_files"] += 1
-						stats["total_lecture_sessions"] += len(lecture_sessions)
-						stats["total_lecture_sessions_irregular"] += len(lecture_sessions_irregular)
-					else:
-						skipped_count += 1
-				
-				# ºÇ½ª²ó¥¨¥é¡¼¤òµ­Ï¿
-				if final_session_error:
-					final_session_errors.append(f"{os.path.basename(json_file)}: {final_session_error}")
-					stats["final_session_error_files"] += 1
-						
-			except Exception as e:
-				error_msg = f"{os.path.basename(json_file)}: Í½´ü¤·¤Ê¤¤¥¨¥é¡¼: {str(e)}"
-				all_errors.append(error_msg)
-				error_count += 1
-				stats["error_files"] += 1
-		
-		# ·ë²Ì¤òÉ½¼¨
-		print(f"\n½èÍı´°Î»:")
-		print(f"  À®¸ù: {processed_count}¥Õ¥¡¥¤¥ë")
-		print(f"  ¥¨¥é¡¼: {error_count}¥Õ¥¡¥¤¥ë")
-		print(f"  ¥¹¥­¥Ã¥×: {skipped_count}¥Õ¥¡¥¤¥ë")
-		print(f"  Ãê½Ğ¤µ¤ì¤¿ÄÌ¾ï¹ÖµÁ²ó¿ô: {len(all_lecture_sessions)}·ï")
-		print(f"  Ãê½Ğ¤µ¤ì¤¿ÉÔÄê·Á¹ÖµÁ²ó¿ô: {len(all_lecture_sessions_irregular)}·ï")
-		print(f"  ºÇ½ª²ó¥¨¥é¡¼: {stats['final_session_error_files']}¥Õ¥¡¥¤¥ë")
-		
-		# ¥¨¥é¡¼¤¬¤¢¤ë¾ì¹ç¤ÏÉ½¼¨
-		if all_errors:
-			print(f"\n¥¨¥é¡¼¾ÜºÙ ({len(all_errors)}·ï):")
-			for error in all_errors[:10]:  # ºÇ½é¤Î10·ï¤Î¤ßÉ½¼¨
-				print(f"  - {error}")
-			if len(all_errors) > 10:
-				print(f"  ... Â¾ {len(all_errors) - 10}·ï¤Î¥¨¥é¡¼")
-		
-		# ºÇ½ª²ó¥¨¥é¡¼¥ê¥¹¥È¤òÉ½¼¨
-		if final_session_errors:
-			print(f"\nºÇ½ª²ó¥¨¥é¡¼¥ê¥¹¥È ({len(final_session_errors)}·ï):")
-			for error in final_session_errors:
-				print(f"  - {error}")
-		
-		# ÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¾ğÊó¤¬¤¢¤ë¾ì¹ç¤ÏJSON¥Õ¥¡¥¤¥ë¤òºîÀ®
-		if all_lecture_sessions:
-			output_file = create_lecture_session_json(all_lecture_sessions)
-			print(f"\nÄÌ¾ï¤Î¹ÖµÁ²ó¿ô¾ğÊó¤òÊİÂ¸¤·¤Ş¤·¤¿: {output_file}")
-		
-		# ÉÔÄê·Á¹ÖµÁ²ó¿ô¾ğÊó¤¬¤¢¤ë¾ì¹ç¤ÏJSON¥Õ¥¡¥¤¥ë¤òºîÀ®
-		if all_lecture_sessions_irregular:
-			output_file = create_lecture_session_irregular_json(all_lecture_sessions_irregular)
-			print(f"\nÉÔÄê·Á¹ÖµÁ²ó¿ô¾ğÊó¤òÊİÂ¸¤·¤Ş¤·¤¿: {output_file}")
-		
-		# Åı·×¾ğÊó¤òÉ½¼¨
-		if all_lecture_sessions or all_lecture_sessions_irregular:
-			print(f"\nÅı·×¾ğÊó:")
-			print(f"  ½èÍıÂĞ¾İ¥Õ¥¡¥¤¥ë¿ô: {stats['total_files']}")
-			print(f"  À®¸ù¥Õ¥¡¥¤¥ë¿ô: {stats['successful_files']}")
-			print(f"  ¥¨¥é¡¼¥Õ¥¡¥¤¥ë¿ô: {stats['error_files']}")
-			print(f"  ºÇ½ª²ó¥¨¥é¡¼¥Õ¥¡¥¤¥ë¿ô: {stats['final_session_error_files']}")
-			print(f"  Ãê½Ğ¤µ¤ì¤¿ÄÌ¾ï¹ÖµÁ²ó¿ôÁí¿ô: {stats['total_lecture_sessions']}")
-			print(f"  Ãê½Ğ¤µ¤ì¤¿ÉÔÄê·Á¹ÖµÁ²ó¿ôÁí¿ô: {stats['total_lecture_sessions_irregular']}")
-		else:
-			print("\n¹ÖµÁ²ó¿ô¾ğÊó¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£")
-		
-		# ¥¨¥é¡¼ÆâÍÆ¤òCSV¥Õ¥¡¥¤¥ë¤È¤·¤Æ½ĞÎÏ
-		error_csv_file = create_error_csv(all_errors, final_session_errors, year)
-		print(f"\n¥¨¥é¡¼ÆâÍÆ¤òCSV¥Õ¥¡¥¤¥ë¤È¤·¤Æ½ĞÎÏ¤·¤Ş¤·¤¿: {error_csv_file}")
-		
-	except FileNotFoundError as e:
-		print(f"¥¨¥é¡¼: {e}")
-	except KeyboardInterrupt:
-		print("\n½èÍı¤¬ÃæÃÇ¤µ¤ì¤Ş¤·¤¿¡£")
 	except Exception as e:
-		print(f"Í½´ü¤·¤Ê¤¤¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿: {e}")
-	finally:
-		if session:
-			session.close()
+		print(f"ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šã‚¨ãƒ©ãƒ¼: {str(e)}")
+		return
+	
+	# çµ±è¨ˆæƒ…å ±ã®åˆæœŸåŒ–
+	stats = {
+		'total_files': len(json_files),
+		'processed_files': 0,
+		'total_items': 0,
+		'valid_items': 0,
+		'error_items': 0,
+		'specific_errors': {}
+	}
+	
+	# å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«ã®æº–å‚™
+	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+	
+	# é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ç”¨ãƒ•ã‚¡ã‚¤ãƒ«
+	lecture_session_dir = os.path.join("updates", "lecture_session", "add")
+	os.makedirs(lecture_session_dir, exist_ok=True)
+	lecture_session_file = os.path.join(lecture_session_dir, f"lecture_session_{timestamp}.json")
+	
+	# ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ç”¨ãƒ•ã‚¡ã‚¤ãƒ«
+	lecture_session_irregular_dir = os.path.join("updates", "lecture_session_irregular", "add")
+	os.makedirs(lecture_session_irregular_dir, exist_ok=True)
+	lecture_session_irregular_file = os.path.join(lecture_session_irregular_dir, f"lecture_session_irregular_{timestamp}.json")
+	
+	# ã‚¨ãƒ©ãƒ¼æƒ…å ±ç”¨ãƒ•ã‚¡ã‚¤ãƒ«
+	error_dir = os.path.join("warning", str(year))
+	os.makedirs(error_dir, exist_ok=True)
+	error_file = os.path.join(error_dir, f"lecture_session_{timestamp}.csv")
+	
+	# ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã„ã¦æ›¸ãè¾¼ã¿é–‹å§‹
+	lecture_session_count = 0
+	lecture_session_irregular_count = 0
+	all_errors = []
+	
+	# é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
+	lecture_f = open(lecture_session_file, 'w', encoding='utf-8')
+	lecture_f.write('[\n')
+	lecture_first = True
+	
+	# ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
+	irregular_f = open(lecture_session_irregular_file, 'w', encoding='utf-8')
+	irregular_f.write('[\n')
+	irregular_first = True
+	
+	try:
+		# å‡¦ç†é–‹å§‹æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+		tqdm.write(f"\n{'='*60}")
+		tqdm.write(f"è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±æŠ½å‡ºå‡¦ç† - å¯¾è±¡å¹´åº¦: {year}")
+		tqdm.write(f"{'='*60}")
+		
+		for i, json_file in enumerate(tqdm(json_files, desc="JSONãƒ•ã‚¡ã‚¤ãƒ«å‡¦ç†ä¸­", unit="file")):
+			try:
+				with open(json_file, 'r', encoding='utf-8') as f:
+					json_data = json.load(f)
+				
+				lecture_sessions, lecture_sessions_irregular, errors = extract_lecture_session_from_single_json(json_data, session, year, json_file)
+				
+				# çµ±è¨ˆæƒ…å ±ã®æ›´æ–°
+				stats['processed_files'] += 1
+				stats['total_items'] += len(lecture_sessions) + len(lecture_sessions_irregular)
+				stats['valid_items'] += len(lecture_sessions) + len(lecture_sessions_irregular)
+				stats['error_items'] += len(errors)
+				
+				# é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’æ›¸ãè¾¼ã¿
+				for session_data in lecture_sessions:
+					if not lecture_first:
+						lecture_f.write(',\n')
+					json.dump(session_data, lecture_f, ensure_ascii=False, indent=2)
+					lecture_first = False
+					lecture_session_count += 1
+				
+				# ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’æ›¸ãè¾¼ã¿
+				for session_data in lecture_sessions_irregular:
+					if not irregular_first:
+						irregular_f.write(',\n')
+					json.dump(session_data, irregular_f, ensure_ascii=False, indent=2)
+					irregular_first = False
+					lecture_session_irregular_count += 1
+				
+				all_errors.extend(errors)
+				
+			except Exception as e:
+				error_msg = f"ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼ {json_file}: {str(e)}"
+				tqdm.write(f"ã‚¨ãƒ©ãƒ¼: {error_msg}")
+				all_errors.append(error_msg)
+				stats['error_items'] += 1
+		
+		# ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹
+		irregular_f.write('\n]')
+		irregular_f.close()
+		
+		lecture_f.write('\n]')
+		lecture_f.close()
+		
+	except Exception as e:
+		# ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ãŸå ´åˆã‚‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹
+		try:
+			irregular_f.close()
+		except:
+			pass
+		try:
+			lecture_f.close()
+		except:
+			pass
+		raise e
+	
+	# æœ€çµ‚çµ±è¨ˆã®è¡¨ç¤º
+	tqdm.write("\n" + "="*60)
+	tqdm.write("å‡¦ç†å®Œäº† - çµ±è¨ˆæƒ…å ±")
+	tqdm.write("="*60)
+	tqdm.write(f"ç·ãƒ•ã‚¡ã‚¤ãƒ«æ•°: {stats['total_files']}")
+	tqdm.write(f"å‡¦ç†æ¸ˆã¿ãƒ•ã‚¡ã‚¤ãƒ«æ•°: {stats['processed_files']}")
+	tqdm.write(f"ç·ãƒ‡ãƒ¼ã‚¿æ•°: {stats['total_items']}")
+	tqdm.write(f"æ­£å¸¸ãƒ‡ãƒ¼ã‚¿æ•°: {stats['valid_items']}")
+	tqdm.write(f"ã‚¨ãƒ©ãƒ¼ãƒ‡ãƒ¼ã‚¿æ•°: {stats['error_items']}")
+	tqdm.write("="*60)
+	
+	# çµæœã‚µãƒãƒªãƒ¼ã®è¡¨ç¤º
+	tqdm.write(f"\n{'='*60}")
+	tqdm.write("ğŸ“Š æŠ½å‡ºçµæœã‚µãƒãƒªãƒ¼")
+	tqdm.write(f"{'='*60}")
+	tqdm.write(f"âœ… é€šå¸¸ã‚»ãƒƒã‚·ãƒ§ãƒ³: {lecture_session_count:,}ä»¶")
+	tqdm.write(f"âœ… ä¸è¦å‰‡ã‚»ãƒƒã‚·ãƒ§ãƒ³: {lecture_session_irregular_count:,}ä»¶")
+	tqdm.write(f"âš ï¸  ã‚¨ãƒ©ãƒ¼ãƒ‡ãƒ¼ã‚¿: {len(all_errors)}ä»¶")
+	tqdm.write(f"ğŸ“ˆ åˆè¨ˆ: {lecture_session_count + lecture_session_irregular_count:,}ä»¶")
+	
+	# çµæœã‚’è¡¨ç¤º
+	final_session_errors = []
+	
+	if lecture_session_count > 0:
+		tqdm.write(f"é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’ä¿å­˜ã—ã¾ã—ãŸ: {lecture_session_file}")
+	else:
+		final_session_errors.append("é€šå¸¸ã®è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ")
+	
+	if lecture_session_irregular_count > 0:
+		tqdm.write(f"ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ã‚’ä¿å­˜ã—ã¾ã—ãŸ: {lecture_session_irregular_file}")
+	else:
+		final_session_errors.append("ä¸è¦å‰‡ãªè¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ")
+	
+	# ã‚¨ãƒ©ãƒ¼æƒ…å ±ã‚’ä¿å­˜
+	if all_errors or final_session_errors:
+		with open(error_file, 'w', encoding='utf-8', newline='') as f:
+			writer = csv.writer(f)
+			writer.writerow(['ã‚¨ãƒ©ãƒ¼ã‚¿ã‚¤ãƒ—', 'ã‚¨ãƒ©ãƒ¼å†…å®¹'])
+			
+			for error in all_errors:
+				writer.writerow(['å‡¦ç†ã‚¨ãƒ©ãƒ¼', error])
+			
+			for error in final_session_errors:
+				writer.writerow(['æœ€çµ‚ã‚¨ãƒ©ãƒ¼', error])
+		
+		tqdm.write(f"ã‚¨ãƒ©ãƒ¼æƒ…å ±ã‚’ä¿å­˜ã—ã¾ã—ãŸ: {error_file}")
+	
+	# ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’é–‰ã˜ã‚‹
+	session.close()
+	
+	tqdm.write("è¬›ç¾©ã‚»ãƒƒã‚·ãƒ§ãƒ³æƒ…å ±æŠ½å‡ºå‡¦ç†ãŒå®Œäº†ã—ã¾ã—ãŸ")
 
 if __name__ == "__main__":
 	main() 

@@ -217,6 +217,7 @@ class LectureSession(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
+        UniqueConstraint('syllabus_id', 'session_number', name='uix_lecture_session_syllabus_number'),
         Index('idx_lecture_session_syllabus', 'syllabus_id'),
         Index('idx_lecture_session_number', 'session_number'),
     )
@@ -233,6 +234,7 @@ class LectureSessionIrregular(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
+        UniqueConstraint('syllabus_id', 'session_pattern', name='uix_lecture_session_irregular_syllabus_pattern'),
         Index('idx_lecture_session_irregular_syllabus', 'syllabus_id'),
         Index('idx_lecture_session_irregular_pattern', 'session_pattern'),
     )
