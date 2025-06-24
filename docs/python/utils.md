@@ -1,15 +1,15 @@
 ---
 title: ユーティリティ関数ガイドライン
-file_version: v1.3.1
-project_version: v1.3.23
-last_updated: 2025-06-21
+file_version: v1.3.2
+project_version: v1.3.36
+last_updated: 2025-06-24
 ---
 
 # ユーティリティ関数ガイドライン
 
-- File Version: v1.3.1
-- Project Version: v1.3.23
-- Last Updated: 2025-06-21
+- File Version: v1.3.2
+- Project Version: v1.3.36
+- Last Updated: 2025-06-24
 
 [readmeへ](../README.md) | [docへ](./doc.md)
 
@@ -275,6 +275,142 @@ def get_syllabus_master_id_from_db(session, syllabus_code: str, year: int) -> in
         raise
 ```
 
+### 講義回数の正規判定
+講義回数の正規判定は、以下の関数を使用します：
+
+```python
+def is_regular_session(session_text: str) -> bool:
+    """講義セッションが正規かどうかを判定する
+    
+    Args:
+        session_text (str): 講義セッション文字列
+        
+    Returns:
+        bool: 正規の場合True、不規則の場合False
+        
+    Note:
+        以下の処理を順次実行して判定します：
+        1. 正規化（全角→半角変換など）
+        2. 講義形式の括弧を削除（(オンライン)、(ハイブリット)）
+        3. Lを削除
+        4. 全角文字を排除
+        5. 空白削除
+        6. 先頭の0を削除
+        7. 数字判定
+    """
+    if not session_text:
+        return False
+    # 部、月の混入判定
+    if '部' in session_text or '月' in session_text:
+        return False
+    # 正規化
+    normalized = normalize_subject_name(session_text)
+    
+    # 講義形式の括弧を削除
+    import re
+    normalized = re.sub(r'\(オンライン\)', '', normalized)
+    normalized = re.sub(r'\(ハイブリット\)', '', normalized)
+    
+    # Lを削除
+    normalized = normalized.replace('L', '')
+    
+    # 全角文字を排除
+    cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
+    # 空白削除
+    cleaned_text = re.sub(r'\s', '', cleaned_text)
+    # 先頭の0を削除
+    cleaned_text = cleaned_text.lstrip('0')
+    # 数字判定
+    if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
+        return False
+    return True
+
+def extract_session_number(session_text: str) -> int:
+    """正規セッションから回数を抽出する
+    
+    Args:
+        session_text (str): 講義セッション文字列
+        
+    Returns:
+        int: 抽出された回数（抽出できない場合は0）
+        
+    Note:
+        is_regular_sessionと同じ前処理を実行してから回数を抽出します
+    """
+    if not session_text:
+        return 0
+    # 部、月の混入判定
+    if '部' in session_text or '月' in session_text:
+        return 0
+    # 正規化
+    normalized = normalize_subject_name(session_text)
+    
+    # 講義形式の括弧を削除
+    import re
+    normalized = re.sub(r'\(オンライン\)', '', normalized)
+    normalized = re.sub(r'\(ハイブリット\)', '', normalized)
+    
+    # Lを削除
+    normalized = normalized.replace('L', '')
+    
+    # 全角文字を排除
+    cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
+    # 空白削除
+    cleaned_text = re.sub(r'\s', '', cleaned_text)
+    # 先頭の0を削除
+    cleaned_text = cleaned_text.lstrip('0')
+    # 数字判定
+    if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
+        return 0
+    try:
+        session_number = int(cleaned_text)
+        return session_number if session_number > 0 else 0
+    except ValueError:
+        return 0
+
+def is_regular_session_list(schedule_data: list) -> bool:
+    """スケジュールリスト全体が正規かどうかを判定する
+    
+    Args:
+        schedule_data (list): スケジュールデータのリスト
+        
+    Returns:
+        bool: リスト全体が正規の場合True、1件でも不規則がある場合または重複がある場合はFalse
+        
+    Note:
+        ドキュメントの分類ルールに従い、リスト内に1件でも不規則なレコードがある場合は
+        全体を不規則として扱う。また、正規化後に重複が1件でもある場合も不規則として扱う。
+    """
+    if not schedule_data:
+        return True
+    
+    # 正規化後のセッション番号を格納するリスト
+    normalized_sessions = []
+    
+    # リスト内の各セッションをチェック
+    for session_data in schedule_data:
+        if not isinstance(session_data, dict):
+            continue
+        
+        session = session_data.get("session", "")
+        if not session:
+            continue
+        
+        # 1件でも不規則なセッションがあれば、リスト全体を不規則として扱う
+        if not is_regular_session(session):
+            return False
+        
+        # 正規セッションの場合、正規化後の番号を取得
+        session_number = extract_session_number(session)
+        if session_number > 0:
+            normalized_sessions.append(session_number)
+    
+    # 重複チェック
+    if len(normalized_sessions) != len(set(normalized_sessions)):
+        return False
+    
+    return True
+
 ### 使用例
 ```python
 from utils import get_year_from_user, get_db_connection, get_syllabus_master_id_from_db
@@ -297,6 +433,22 @@ except Exception as e:
     print(f"エラー: {e}")
 finally:
     session.close()
+
+# 講義回数の正規判定
+session_texts = ["L1(オンライン)", "L02(ハイブリット)", "L15", "1回目", "部1"]
+for text in session_texts:
+    is_regular = is_regular_session(text)
+    session_number = extract_session_number(text)
+    print(f"'{text}' -> 正規: {is_regular}, 回数: {session_number}")
+
+# スケジュールリストの正規判定
+schedule_data = [
+    {"session": "L1(オンライン)", "content": "導入"},
+    {"session": "L2(ハイブリット)", "content": "基礎"},
+    {"session": "L3", "content": "応用"}
+]
+is_regular_list = is_regular_session_list(schedule_data)
+print(f"スケジュールリスト正規: {is_regular_list}")
 ```
 
 

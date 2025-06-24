@@ -1,5 +1,5 @@
-# File Version: v1.3.1
-# Project Version: v1.3.33
+# File Version: v1.3.2
+# Project Version: v1.3.36
 # Last Updated: 2025-06-24
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -216,6 +216,7 @@ class LectureSession(Base):
     session_number = Column(Integer, nullable=False)
     contents = Column(Text)
     other_info = Column(Text)
+    lecture_format = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
@@ -235,6 +236,7 @@ class LectureSessionIrregular(Base):
     other_info = Column(Text)
     instructor = Column(Text)
     error_message = Column(Text, nullable=False)
+    lecture_format = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
@@ -502,6 +504,7 @@ class LectureSession:
     session_number: int
     contents: Optional[str]
     other_info: Optional[str]
+    lecture_format: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime] = None
 
@@ -535,6 +538,7 @@ class LectureSessionIrregular:
     other_info: Optional[str]
     instructor: Optional[str]
     error_message: str
+    lecture_format: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime] = None
 

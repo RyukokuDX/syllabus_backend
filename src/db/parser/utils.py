@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.2
-# Project Version: v1.3.34
+# File Version: v1.3.3
+# Project Version: v1.3.36
 # Last Updated: 2025-06-24
 # curosrはversionをいじるな
 
@@ -155,12 +155,22 @@ def is_regular_session(session_text: str) -> bool:
         return False
     # 正規化
     normalized = normalize_subject_name(session_text)
-    # 全角文字を排除
+    
+    # 講義形式の括弧を削除
     import re
+    normalized = re.sub(r'\(オンライン\)', '', normalized)
+    normalized = re.sub(r'\(ハイブリット\)', '', normalized)
+    
+    # Lを削除
+    normalized = normalized.replace('L', '')
+    
+    # 全角文字を排除
     # 全角文字（ひらがな、カタカナ、漢字など）を除去
     cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
     # 空白削除
     cleaned_text = re.sub(r'\s', '', cleaned_text)
+    # 先頭の0を削除
+    cleaned_text = cleaned_text.lstrip('0')
     # 数字判定
     if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
         return False
@@ -225,12 +235,22 @@ def extract_session_number(session_text: str) -> int:
         return 0
     # 正規化
     normalized = normalize_subject_name(session_text)
-    # 全角文字を排除
+    
+    # 講義形式の括弧を削除
     import re
+    normalized = re.sub(r'\(オンライン\)', '', normalized)
+    normalized = re.sub(r'\(ハイブリット\)', '', normalized)
+    
+    # Lを削除
+    normalized = normalized.replace('L', '')
+    
+    # 全角文字を排除
     # 全角文字（ひらがな、カタカナ、漢字など）を除去
     cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
     # 空白削除
     cleaned_text = re.sub(r'\s', '', cleaned_text)
+    # 先頭の0を削除
+    cleaned_text = cleaned_text.lstrip('0')
     # 数字判定
     if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
         return 0

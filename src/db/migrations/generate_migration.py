@@ -152,8 +152,8 @@ def generate_sql_insert(table_name, records):
     
     # テーブルごとの存在するカラムのみをフィルタリング
     table_columns = {
-        "lecture_session": ["lecture_session_id", "syllabus_id", "session_number", "contents", "other_info", "created_at", "updated_at"],
-        "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "instructor", "error_message", "created_at", "updated_at"],
+        "lecture_session": ["lecture_session_id", "syllabus_id", "session_number", "contents", "other_info", "lecture_format", "created_at", "updated_at"],
+        "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "instructor", "error_message", "lecture_format", "created_at", "updated_at"],
         # 他のテーブルも必要に応じて追加
     }
     
@@ -256,8 +256,8 @@ def generate_sql_insert(table_name, records):
         "book": ["title", "author", "publisher", "price"],  # ISBN以外のカラムを更新対象に
         "book_uncategorized": None,  # 一意性制約がないため、更新対象カラムも不要
         "lecture_time": ["day_of_week", "period"],
-        "lecture_session": ["session_number", "contents", "other_info"],
-        "lecture_session_irregular": ["session_pattern", "contents", "other_info"],
+        "lecture_session": ["session_number", "contents", "other_info", "lecture_format"],
+        "lecture_session_irregular": ["session_pattern", "contents", "other_info", "instructor", "error_message", "lecture_format"],
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.0.4
-# Project Version: v1.3.35
+# File Version: v1.0.5
+# Project Version: v1.3.36
 # Last Updated: 2025/6/23
 
 import os
@@ -175,13 +175,24 @@ def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) ->
 		# 担当者情報を取得（シラバスJSONの値をそのまま）
 		instructor = session_data.get("instructor", "")
 		
+		# 講義形式を抽出（セッション文字列から）
+		lecture_format = None
+		if session:
+			if "(オンライン)" in session:
+				lecture_format = "オンライン"
+			elif "(ハイブリット)" in session:
+				lecture_format = "ハイブリッド"
+			else:
+				lecture_format = "対面"
+		
 		lecture_sessions_irregular.append({
 			'syllabus_id': None,  # 後で設定
 			'session_pattern': session_pattern,
 			'contents': contents if contents else None,
 			'other_info': None,
 			'instructor': instructor if instructor else None,
-			'error_message': error_message
+			'error_message': error_message,
+			'lecture_format': lecture_format
 		})
 	
 	return lecture_sessions_irregular

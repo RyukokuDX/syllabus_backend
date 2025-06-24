@@ -200,6 +200,7 @@ CREATE TABLE IF NOT EXISTS lecture_session (
     session_number INTEGER NOT NULL,
     contents TEXT,
     other_info TEXT,
+    lecture_format TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     UNIQUE(syllabus_id, session_number)
@@ -217,6 +218,7 @@ CREATE TABLE IF NOT EXISTS lecture_session_irregular (
     other_info TEXT,
     instructor TEXT,
     error_message TEXT NOT NULL,
+    lecture_format TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );

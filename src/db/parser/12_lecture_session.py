@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.6
-# Project Version: v1.3.34
+# File Version: v1.3.7
+# Project Version: v1.3.36
 # Last Updated: 2025/6/23
 # Cursorはversionをいじるな
 
@@ -158,11 +158,22 @@ def parse_lecture_sessions_from_schedule(schedule_data: List[Dict]) -> List[Dict
 		# 内容を取得
 		contents = session_data.get("content", "")
 		
+		# 講義形式を抽出（セッション文字列から）
+		lecture_format = None
+		if session:
+			if "(オンライン)" in session:
+				lecture_format = "オンライン"
+			elif "(ハイブリット)" in session:
+				lecture_format = "ハイブリッド"
+			else:
+				lecture_format = "対面"
+		
 		lecture_sessions.append({
 			'syllabus_id': None,  # 後で設定
 			'session_number': session_number,
 			'contents': contents if contents else None,
-			'other_info': None
+			'other_info': None,
+			'lecture_format': lecture_format
 		})
 	
 	# 重複チェック用のセット

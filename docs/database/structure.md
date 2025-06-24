@@ -1,15 +1,15 @@
 ---
 title: データベース構造定義
-file_version: v1.3.9
-project_version: v1.3.33
+file_version: v1.3.10
+project_version: v1.3.36
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベース構造定義
 
-- File Version: v1.3.9
-- Project Version: v1.3.33
+- File Version: v1.3.10
+- Project Version: v1.3.36
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -400,6 +400,7 @@ periodは"0"とする.
 | session_number | INTEGER | NO | 回数 | Web Syllabus |
 | contents | TEXT | YES | 学修内容 | Web Syllabus |
 | other_info | TEXT | YES | その他情報 | Web Syllabus |
+| lecture_format | TEXT | YES | 講義形式（対面、オンライン、ハイブリッド） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -414,6 +415,9 @@ periodは"0"とする.
 | 参照元 | 参照先 | 削除時の動作 |
 |--------|--------|-------------|
 | syllabus_id | syllabus_master(syllabus_id) | CASCADE |
+
+#### 補足
+- lecture_formatフィールドには講義形式（対面、オンライン、ハイブリッド）を格納
 
 [🔝 ページトップへ](#データベース構造定義)
 
@@ -437,6 +441,7 @@ periodは"0"とする.
 | other_info | TEXT | YES | その他情報 | Web Syllabus |
 | instructor | TEXT | YES | 担当者名（生データ） | Web Syllabus |
 | error_message | TEXT | NO | エラーメッセージ | システム生成 |
+| lecture_format | TEXT | YES | 講義形式（対面、オンライン、ハイブリッド） | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
 
@@ -459,6 +464,7 @@ periodは"0"とする.
 - 講義回数のデータが激しく乱れているため、正規化せずに生データとして管理
 - instructorフィールドには担当者名を生データとして格納
 - error_messageフィールドにはデータ処理時のエラー情報を格納
+- lecture_formatフィールドには講義形式（対面、オンライン、ハイブリッド）を格納
 
 [🔝 ページトップへ](#データベース構造定義)
 

@@ -1,15 +1,15 @@
 ---
 title: データベースER図
-file_version: v1.3.4
-project_version: v1.3.33
+file_version: v1.3.5
+project_version: v1.3.36
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベースER図
 
-- File Version: v1.3.4
-- Project Version: v1.3.33
+- File Version: v1.3.5
+- Project Version: v1.3.36
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
@@ -146,6 +146,7 @@ LECTURE_SESSION {
     session_number int "NOT NULL"
     contents text
     other_info text
+    lecture_format text
     created_at timestamp "NOT NULL"
     updated_at timestamp
 }
@@ -157,6 +158,7 @@ LECTURE_SESSION_IRREGULAR {
     other_info text
     instructor text
     error_message text "NOT NULL"
+    lecture_format text
     created_at timestamp "NOT NULL"
     updated_at timestamp
 }
