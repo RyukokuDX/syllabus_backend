@@ -277,7 +277,8 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
     criteria_description TEXT,
     ratio INTEGER,
     note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(syllabus_id, criteria_type)
 );
 
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_type ON grading_criterion(criteria_type);

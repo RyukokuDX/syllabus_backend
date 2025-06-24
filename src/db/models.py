@@ -1,5 +1,5 @@
-# File Version: v1.3.4
-# Project Version: v1.3.40
+# File Version: v1.3.5
+# Project Version: v1.3.41
 # Last Updated: 2025-06-24
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -308,6 +308,7 @@ class GradingCriterion(Base):
     __table_args__ = (
         Index('idx_grading_criterion_type', 'criteria_type'),
         Index('idx_grading_criterion_syllabus', 'syllabus_id'),
+        UniqueConstraint('syllabus_id', 'criteria_type', name='uix_grading_criterion_syllabus_type'),
     )
 
 class SubjectAttribute(Base):

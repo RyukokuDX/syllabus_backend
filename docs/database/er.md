@@ -1,15 +1,15 @@
 ---
 title: データベースER図
-file_version: v1.3.7
-project_version: v1.3.40
+file_version: v1.3.8
+project_version: v1.3.41
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベースER図
 
-- File Version: v1.3.7
-- Project Version: v1.3.40
+- File Version: v1.3.8
+- Project Version: v1.3.41
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
@@ -196,6 +196,7 @@ GRADING_CRITERION {
     ratio int
     note text
     created_at timestamp "NOT NULL"
+    syllabus_id_criteria_type text UK
 }
 
 %% ===========================

@@ -1,15 +1,15 @@
 ---
 title: データベース構造定義
-file_version: v1.3.12
-project_version: v1.3.40
+file_version: v1.3.13
+project_version: v1.3.41
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベース構造定義
 
-- File Version: v1.3.12
-- Project Version: v1.3.40
+- File Version: v1.3.13
+- Project Version: v1.3.41
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -625,6 +625,7 @@ periodは"0"とする.
 | PRIMARY KEY | id | 主キー |
 | idx_grading_criterion_type | criteria_type | 評価種別での検索用 |
 | idx_grading_criterion_syllabus | syllabus_id | シラバスIDでの検索用 |
+| UNIQUE | (syllabus_id, criteria_type) | シラバスと評価種別の一意性 |
 
 #### 外部キー制約
 | 参照元 | 参照先 | 削除時の動作 |

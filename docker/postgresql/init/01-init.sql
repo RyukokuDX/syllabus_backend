@@ -277,7 +277,8 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
     criteria_description TEXT,
     ratio INTEGER,
     note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(syllabus_id, criteria_type)
 );
 
 CREATE INDEX IF NOT EXISTS idx_grading_criterion_type ON grading_criterion(criteria_type);
@@ -368,3 +369,4 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_sessions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112916__insert_lecture_session_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624120924__insert_syllabus_books.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250624124852__insert_syllabuss.sql
