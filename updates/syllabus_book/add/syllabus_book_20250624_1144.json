@@ -1,0 +1,1444 @@
+{
+  "syllabus_books": [
+    {
+      "syllabus_id": 33,
+      "book_id": 2,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.296847"
+    },
+    {
+      "syllabus_id": 34,
+      "book_id": 18,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.300584"
+    },
+    {
+      "syllabus_id": 36,
+      "book_id": 75,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.305973"
+    },
+    {
+      "syllabus_id": 37,
+      "book_id": 18,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.308775"
+    },
+    {
+      "syllabus_id": 41,
+      "book_id": 77,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.319645"
+    },
+    {
+      "syllabus_id": 43,
+      "book_id": 62,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.324808"
+    },
+    {
+      "syllabus_id": 44,
+      "book_id": 25,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.327513"
+    },
+    {
+      "syllabus_id": 45,
+      "book_id": 93,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.331401"
+    },
+    {
+      "syllabus_id": 48,
+      "book_id": 79,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.342288"
+    },
+    {
+      "syllabus_id": 53,
+      "book_id": 136,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.357438"
+    },
+    {
+      "syllabus_id": 58,
+      "book_id": 61,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.390445"
+    },
+    {
+      "syllabus_id": 59,
+      "book_id": 136,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.417233"
+    },
+    {
+      "syllabus_id": 60,
+      "book_id": 57,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.439515"
+    },
+    {
+      "syllabus_id": 61,
+      "book_id": 86,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.468598"
+    },
+    {
+      "syllabus_id": 63,
+      "book_id": 79,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.526633"
+    },
+    {
+      "syllabus_id": 67,
+      "book_id": 61,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.542755"
+    },
+    {
+      "syllabus_id": 68,
+      "book_id": 136,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.545679"
+    },
+    {
+      "syllabus_id": 69,
+      "book_id": 57,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.549804"
+    },
+    {
+      "syllabus_id": 70,
+      "book_id": 47,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.554265"
+    },
+    {
+      "syllabus_id": 72,
+      "book_id": 79,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.559609"
+    },
+    {
+      "syllabus_id": 76,
+      "book_id": 86,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.572778"
+    },
+    {
+      "syllabus_id": 80,
+      "book_id": 28,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.585298"
+    },
+    {
+      "syllabus_id": 81,
+      "book_id": 56,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.589532"
+    },
+    {
+      "syllabus_id": 85,
+      "book_id": 28,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.602100"
+    },
+    {
+      "syllabus_id": 86,
+      "book_id": 37,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.605479"
+    },
+    {
+      "syllabus_id": 86,
+      "book_id": 92,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.605212"
+    },
+    {
+      "syllabus_id": 141,
+      "book_id": 17,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.851324"
+    },
+    {
+      "syllabus_id": 142,
+      "book_id": 82,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.855582"
+    },
+    {
+      "syllabus_id": 144,
+      "book_id": 16,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.861227"
+    },
+    {
+      "syllabus_id": 145,
+      "book_id": 16,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.865395"
+    },
+    {
+      "syllabus_id": 146,
+      "book_id": 121,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.869686"
+    },
+    {
+      "syllabus_id": 150,
+      "book_id": 34,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.880908"
+    },
+    {
+      "syllabus_id": 153,
+      "book_id": 31,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.887571"
+    },
+    {
+      "syllabus_id": 154,
+      "book_id": 94,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.889996"
+    },
+    {
+      "syllabus_id": 156,
+      "book_id": 35,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.901718"
+    },
+    {
+      "syllabus_id": 158,
+      "book_id": 19,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.915756"
+    },
+    {
+      "syllabus_id": 160,
+      "book_id": 43,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.920565"
+    },
+    {
+      "syllabus_id": 161,
+      "book_id": 12,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.922999"
+    },
+    {
+      "syllabus_id": 162,
+      "book_id": 10,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.932411"
+    },
+    {
+      "syllabus_id": 164,
+      "book_id": 142,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.937226"
+    },
+    {
+      "syllabus_id": 167,
+      "book_id": 55,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.945464"
+    },
+    {
+      "syllabus_id": 169,
+      "book_id": 73,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.950395"
+    },
+    {
+      "syllabus_id": 173,
+      "book_id": 36,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.961506"
+    },
+    {
+      "syllabus_id": 175,
+      "book_id": 45,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:00.968020"
+    },
+    {
+      "syllabus_id": 193,
+      "book_id": 117,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.007778"
+    },
+    {
+      "syllabus_id": 194,
+      "book_id": 33,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.010175"
+    },
+    {
+      "syllabus_id": 195,
+      "book_id": 39,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.012681"
+    },
+    {
+      "syllabus_id": 204,
+      "book_id": 1,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.039479"
+    },
+    {
+      "syllabus_id": 208,
+      "book_id": 34,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.055581"
+    },
+    {
+      "syllabus_id": 209,
+      "book_id": 30,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.058199"
+    },
+    {
+      "syllabus_id": 216,
+      "book_id": 140,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.079418"
+    },
+    {
+      "syllabus_id": 217,
+      "book_id": 139,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.083126"
+    },
+    {
+      "syllabus_id": 219,
+      "book_id": 30,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.088389"
+    },
+    {
+      "syllabus_id": 220,
+      "book_id": 46,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.091234"
+    },
+    {
+      "syllabus_id": 222,
+      "book_id": 139,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.098407"
+    },
+    {
+      "syllabus_id": 223,
+      "book_id": 133,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.101415"
+    },
+    {
+      "syllabus_id": 225,
+      "book_id": 46,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.106599"
+    },
+    {
+      "syllabus_id": 229,
+      "book_id": 137,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.118330"
+    },
+    {
+      "syllabus_id": 230,
+      "book_id": 68,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.121297"
+    },
+    {
+      "syllabus_id": 235,
+      "book_id": 49,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.134527"
+    },
+    {
+      "syllabus_id": 237,
+      "book_id": 50,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.139690"
+    },
+    {
+      "syllabus_id": 241,
+      "book_id": 137,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.150990"
+    },
+    {
+      "syllabus_id": 242,
+      "book_id": 54,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.153415"
+    },
+    {
+      "syllabus_id": 244,
+      "book_id": 88,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.158315"
+    },
+    {
+      "syllabus_id": 245,
+      "book_id": 24,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.160823"
+    },
+    {
+      "syllabus_id": 248,
+      "book_id": 68,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.168639"
+    },
+    {
+      "syllabus_id": 248,
+      "book_id": 128,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.168328"
+    },
+    {
+      "syllabus_id": 254,
+      "book_id": 40,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.184792"
+    },
+    {
+      "syllabus_id": 257,
+      "book_id": 138,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.208239"
+    },
+    {
+      "syllabus_id": 258,
+      "book_id": 123,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.213815"
+    },
+    {
+      "syllabus_id": 259,
+      "book_id": 85,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.223585"
+    },
+    {
+      "syllabus_id": 312,
+      "book_id": 83,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.431980"
+    },
+    {
+      "syllabus_id": 315,
+      "book_id": 65,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.440583"
+    },
+    {
+      "syllabus_id": 318,
+      "book_id": 84,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.449100"
+    },
+    {
+      "syllabus_id": 319,
+      "book_id": 20,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.453631"
+    },
+    {
+      "syllabus_id": 320,
+      "book_id": 65,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.456660"
+    },
+    {
+      "syllabus_id": 321,
+      "book_id": 84,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.459798"
+    },
+    {
+      "syllabus_id": 322,
+      "book_id": 20,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.463120"
+    },
+    {
+      "syllabus_id": 323,
+      "book_id": 65,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.466402"
+    },
+    {
+      "syllabus_id": 324,
+      "book_id": 65,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.470250"
+    },
+    {
+      "syllabus_id": 324,
+      "book_id": 84,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.470660"
+    },
+    {
+      "syllabus_id": 325,
+      "book_id": 122,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.474295"
+    },
+    {
+      "syllabus_id": 327,
+      "book_id": 141,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.481318"
+    },
+    {
+      "syllabus_id": 328,
+      "book_id": 74,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.485036"
+    },
+    {
+      "syllabus_id": 329,
+      "book_id": 22,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.488606"
+    },
+    {
+      "syllabus_id": 330,
+      "book_id": 108,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.492489"
+    },
+    {
+      "syllabus_id": 331,
+      "book_id": 105,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.496325"
+    },
+    {
+      "syllabus_id": 332,
+      "book_id": 122,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.500987"
+    },
+    {
+      "syllabus_id": 334,
+      "book_id": 141,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.507220"
+    },
+    {
+      "syllabus_id": 335,
+      "book_id": 74,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.510159"
+    },
+    {
+      "syllabus_id": 336,
+      "book_id": 22,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.512794"
+    },
+    {
+      "syllabus_id": 337,
+      "book_id": 108,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.516766"
+    },
+    {
+      "syllabus_id": 338,
+      "book_id": 105,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.519349"
+    },
+    {
+      "syllabus_id": 339,
+      "book_id": 64,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.521783"
+    },
+    {
+      "syllabus_id": 340,
+      "book_id": 8,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.524189"
+    },
+    {
+      "syllabus_id": 341,
+      "book_id": 48,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.526590"
+    },
+    {
+      "syllabus_id": 343,
+      "book_id": 22,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.532534"
+    },
+    {
+      "syllabus_id": 344,
+      "book_id": 108,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.544931"
+    },
+    {
+      "syllabus_id": 345,
+      "book_id": 110,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.548557"
+    },
+    {
+      "syllabus_id": 346,
+      "book_id": 51,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.552139"
+    },
+    {
+      "syllabus_id": 348,
+      "book_id": 107,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.557360"
+    },
+    {
+      "syllabus_id": 349,
+      "book_id": 104,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.559731"
+    },
+    {
+      "syllabus_id": 350,
+      "book_id": 130,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.562520"
+    },
+    {
+      "syllabus_id": 352,
+      "book_id": 22,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.567759"
+    },
+    {
+      "syllabus_id": 353,
+      "book_id": 108,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.570290"
+    },
+    {
+      "syllabus_id": 354,
+      "book_id": 110,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.572630"
+    },
+    {
+      "syllabus_id": 355,
+      "book_id": 51,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.575054"
+    },
+    {
+      "syllabus_id": 357,
+      "book_id": 107,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.581149"
+    },
+    {
+      "syllabus_id": 358,
+      "book_id": 101,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.583869"
+    },
+    {
+      "syllabus_id": 359,
+      "book_id": 3,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.586339"
+    },
+    {
+      "syllabus_id": 362,
+      "book_id": 132,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.592598"
+    },
+    {
+      "syllabus_id": 363,
+      "book_id": 22,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.596222"
+    },
+    {
+      "syllabus_id": 363,
+      "book_id": 80,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.595880"
+    },
+    {
+      "syllabus_id": 365,
+      "book_id": 21,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.601971"
+    },
+    {
+      "syllabus_id": 370,
+      "book_id": 106,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.613711"
+    },
+    {
+      "syllabus_id": 371,
+      "book_id": 52,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.616619"
+    },
+    {
+      "syllabus_id": 372,
+      "book_id": 104,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.619123"
+    },
+    {
+      "syllabus_id": 372,
+      "book_id": 135,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.619401"
+    },
+    {
+      "syllabus_id": 373,
+      "book_id": 27,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.621670"
+    },
+    {
+      "syllabus_id": 377,
+      "book_id": 132,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.631073"
+    },
+    {
+      "syllabus_id": 378,
+      "book_id": 22,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.633980"
+    },
+    {
+      "syllabus_id": 378,
+      "book_id": 80,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.634285"
+    },
+    {
+      "syllabus_id": 379,
+      "book_id": 127,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.636605"
+    },
+    {
+      "syllabus_id": 380,
+      "book_id": 21,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.638921"
+    },
+    {
+      "syllabus_id": 383,
+      "book_id": 106,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.646174"
+    },
+    {
+      "syllabus_id": 384,
+      "book_id": 52,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.650517"
+    },
+    {
+      "syllabus_id": 385,
+      "book_id": 101,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.653035"
+    },
+    {
+      "syllabus_id": 386,
+      "book_id": 27,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.655543"
+    },
+    {
+      "syllabus_id": 387,
+      "book_id": 23,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.658661"
+    },
+    {
+      "syllabus_id": 387,
+      "book_id": 74,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.659052"
+    },
+    {
+      "syllabus_id": 390,
+      "book_id": 89,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.666469"
+    },
+    {
+      "syllabus_id": 391,
+      "book_id": 58,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.668867"
+    },
+    {
+      "syllabus_id": 395,
+      "book_id": 65,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.680760"
+    },
+    {
+      "syllabus_id": 395,
+      "book_id": 131,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.681095"
+    },
+    {
+      "syllabus_id": 396,
+      "book_id": 89,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.683787"
+    },
+    {
+      "syllabus_id": 397,
+      "book_id": 58,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.686359"
+    },
+    {
+      "syllabus_id": 400,
+      "book_id": 87,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.694948"
+    },
+    {
+      "syllabus_id": 440,
+      "book_id": 83,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.786532"
+    },
+    {
+      "syllabus_id": 443,
+      "book_id": 82,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.793151"
+    },
+    {
+      "syllabus_id": 443,
+      "book_id": 91,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.793439"
+    },
+    {
+      "syllabus_id": 444,
+      "book_id": 90,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.795848"
+    },
+    {
+      "syllabus_id": 447,
+      "book_id": 115,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.805812"
+    },
+    {
+      "syllabus_id": 449,
+      "book_id": 112,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.809997"
+    },
+    {
+      "syllabus_id": 450,
+      "book_id": 96,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.812815"
+    },
+    {
+      "syllabus_id": 451,
+      "book_id": 109,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.815818"
+    },
+    {
+      "syllabus_id": 455,
+      "book_id": 113,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.824443"
+    },
+    {
+      "syllabus_id": 456,
+      "book_id": 97,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.826632"
+    },
+    {
+      "syllabus_id": 456,
+      "book_id": 97,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.826900"
+    },
+    {
+      "syllabus_id": 456,
+      "book_id": 98,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.827177"
+    },
+    {
+      "syllabus_id": 461,
+      "book_id": 114,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.843884"
+    },
+    {
+      "syllabus_id": 464,
+      "book_id": 31,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.854082"
+    },
+    {
+      "syllabus_id": 464,
+      "book_id": 82,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.853738"
+    },
+    {
+      "syllabus_id": 466,
+      "book_id": 31,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.860657"
+    },
+    {
+      "syllabus_id": 466,
+      "book_id": 82,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.860986"
+    },
+    {
+      "syllabus_id": 468,
+      "book_id": 31,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.867111"
+    },
+    {
+      "syllabus_id": 468,
+      "book_id": 82,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.866527"
+    },
+    {
+      "syllabus_id": 468,
+      "book_id": 145,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.866849"
+    },
+    {
+      "syllabus_id": 469,
+      "book_id": 115,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.869470"
+    },
+    {
+      "syllabus_id": 470,
+      "book_id": 63,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.871953"
+    },
+    {
+      "syllabus_id": 472,
+      "book_id": 71,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.876634"
+    },
+    {
+      "syllabus_id": 473,
+      "book_id": 99,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.878892"
+    },
+    {
+      "syllabus_id": 474,
+      "book_id": 26,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.886106"
+    },
+    {
+      "syllabus_id": 475,
+      "book_id": 144,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.888570"
+    },
+    {
+      "syllabus_id": 476,
+      "book_id": 60,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.891949"
+    },
+    {
+      "syllabus_id": 477,
+      "book_id": 31,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.894773"
+    },
+    {
+      "syllabus_id": 477,
+      "book_id": 82,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.894475"
+    },
+    {
+      "syllabus_id": 478,
+      "book_id": 115,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.900633"
+    },
+    {
+      "syllabus_id": 479,
+      "book_id": 60,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.903267"
+    },
+    {
+      "syllabus_id": 481,
+      "book_id": 71,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.909106"
+    },
+    {
+      "syllabus_id": 482,
+      "book_id": 99,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.911476"
+    },
+    {
+      "syllabus_id": 483,
+      "book_id": 26,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.918168"
+    },
+    {
+      "syllabus_id": 484,
+      "book_id": 144,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.920776"
+    },
+    {
+      "syllabus_id": 485,
+      "book_id": 60,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.924260"
+    },
+    {
+      "syllabus_id": 486,
+      "book_id": 44,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.926671"
+    },
+    {
+      "syllabus_id": 488,
+      "book_id": 112,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.945281"
+    },
+    {
+      "syllabus_id": 488,
+      "book_id": 125,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.944844"
+    },
+    {
+      "syllabus_id": 490,
+      "book_id": 67,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.958379"
+    },
+    {
+      "syllabus_id": 492,
+      "book_id": 95,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.975781"
+    },
+    {
+      "syllabus_id": 493,
+      "book_id": 41,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.978983"
+    },
+    {
+      "syllabus_id": 497,
+      "book_id": 32,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:01.996103"
+    },
+    {
+      "syllabus_id": 501,
+      "book_id": 112,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.010736"
+    },
+    {
+      "syllabus_id": 501,
+      "book_id": 125,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.011060"
+    },
+    {
+      "syllabus_id": 502,
+      "book_id": 72,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.015505"
+    },
+    {
+      "syllabus_id": 507,
+      "book_id": 124,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.029521"
+    },
+    {
+      "syllabus_id": 507,
+      "book_id": 125,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.029826"
+    },
+    {
+      "syllabus_id": 510,
+      "book_id": 100,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.040659"
+    },
+    {
+      "syllabus_id": 511,
+      "book_id": 143,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.043570"
+    },
+    {
+      "syllabus_id": 512,
+      "book_id": 143,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.047114"
+    },
+    {
+      "syllabus_id": 513,
+      "book_id": 42,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.051285"
+    },
+    {
+      "syllabus_id": 516,
+      "book_id": 100,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.060644"
+    },
+    {
+      "syllabus_id": 517,
+      "book_id": 143,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.068513"
+    },
+    {
+      "syllabus_id": 518,
+      "book_id": 143,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.074822"
+    },
+    {
+      "syllabus_id": 519,
+      "book_id": 44,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.078314"
+    },
+    {
+      "syllabus_id": 543,
+      "book_id": 9,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.148188"
+    },
+    {
+      "syllabus_id": 555,
+      "book_id": 5,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.180815"
+    },
+    {
+      "syllabus_id": 573,
+      "book_id": 81,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.223911"
+    },
+    {
+      "syllabus_id": 576,
+      "book_id": 120,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.232477"
+    },
+    {
+      "syllabus_id": 577,
+      "book_id": 116,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.237793"
+    },
+    {
+      "syllabus_id": 587,
+      "book_id": 69,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.274329"
+    },
+    {
+      "syllabus_id": 590,
+      "book_id": 66,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.283781"
+    },
+    {
+      "syllabus_id": 590,
+      "book_id": 118,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.283382"
+    },
+    {
+      "syllabus_id": 591,
+      "book_id": 81,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.286646"
+    },
+    {
+      "syllabus_id": 604,
+      "book_id": 78,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.320815"
+    },
+    {
+      "syllabus_id": 608,
+      "book_id": 78,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.330642"
+    },
+    {
+      "syllabus_id": 609,
+      "book_id": 126,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.333245"
+    },
+    {
+      "syllabus_id": 682,
+      "book_id": 29,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:02.707707"
+    },
+    {
+      "syllabus_id": 842,
+      "book_id": 111,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.100396"
+    },
+    {
+      "syllabus_id": 843,
+      "book_id": 111,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.105443"
+    },
+    {
+      "syllabus_id": 848,
+      "book_id": 13,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.121726"
+    },
+    {
+      "syllabus_id": 848,
+      "book_id": 14,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.122046"
+    },
+    {
+      "syllabus_id": 849,
+      "book_id": 13,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.125085"
+    },
+    {
+      "syllabus_id": 849,
+      "book_id": 14,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.124781"
+    },
+    {
+      "syllabus_id": 851,
+      "book_id": 134,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.196702"
+    },
+    {
+      "syllabus_id": 853,
+      "book_id": 6,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.234487"
+    },
+    {
+      "syllabus_id": 854,
+      "book_id": 6,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.238691"
+    },
+    {
+      "syllabus_id": 857,
+      "book_id": 119,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.254925"
+    },
+    {
+      "syllabus_id": 858,
+      "book_id": 119,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.257845"
+    },
+    {
+      "syllabus_id": 955,
+      "book_id": 129,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.865082"
+    },
+    {
+      "syllabus_id": 956,
+      "book_id": 129,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.868526"
+    },
+    {
+      "syllabus_id": 963,
+      "book_id": 102,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.896732"
+    },
+    {
+      "syllabus_id": 964,
+      "book_id": 102,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.900732"
+    },
+    {
+      "syllabus_id": 965,
+      "book_id": 76,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.905275"
+    },
+    {
+      "syllabus_id": 966,
+      "book_id": 103,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.908752"
+    },
+    {
+      "syllabus_id": 967,
+      "book_id": 53,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.912426"
+    },
+    {
+      "syllabus_id": 968,
+      "book_id": 53,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.916894"
+    },
+    {
+      "syllabus_id": 973,
+      "book_id": 70,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.934707"
+    },
+    {
+      "syllabus_id": 974,
+      "book_id": 70,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:03.937974"
+    },
+    {
+      "syllabus_id": 1081,
+      "book_id": 11,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.343320"
+    },
+    {
+      "syllabus_id": 1082,
+      "book_id": 11,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.346414"
+    },
+    {
+      "syllabus_id": 1089,
+      "book_id": 38,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.369692"
+    },
+    {
+      "syllabus_id": 1090,
+      "book_id": 38,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.372861"
+    },
+    {
+      "syllabus_id": 1092,
+      "book_id": 4,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.378328"
+    },
+    {
+      "syllabus_id": 1092,
+      "book_id": 59,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.378766"
+    },
+    {
+      "syllabus_id": 1152,
+      "book_id": 7,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.568251"
+    },
+    {
+      "syllabus_id": 1153,
+      "book_id": 7,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.572521"
+    },
+    {
+      "syllabus_id": 1154,
+      "book_id": 7,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.575715"
+    },
+    {
+      "syllabus_id": 1155,
+      "book_id": 7,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.578674"
+    },
+    {
+      "syllabus_id": 1196,
+      "book_id": 15,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.705347"
+    },
+    {
+      "syllabus_id": 1212,
+      "book_id": 73,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.751131"
+    },
+    {
+      "syllabus_id": 1213,
+      "book_id": 73,
+      "role": "教科書",
+      "created_at": "2025-06-24T11:44:04.754141"
+    }
+  ]
+}
