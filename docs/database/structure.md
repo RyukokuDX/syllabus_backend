@@ -1,15 +1,15 @@
 ---
 title: データベース構造定義
-file_version: v1.3.13
-project_version: v1.3.41
+file_version: v1.4.0
+project_version: v1.4.0
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベース構造定義
 
-- File Version: v1.3.13
-- Project Version: v1.3.41
+- File Version: v1.4.0
+- Project Version: v1.4.0
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)

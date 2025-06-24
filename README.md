@@ -1,15 +1,15 @@
 ---
 title: Syllabus Backend
-file_version: v1.3.0
-project_version: v1.3.0
-last_updated: 2025-06-10
+file_version: v1.4.0
+project_version: v1.4.0
+last_updated: 2025-06-24
 ---
 
 # Syllabus Backend
 
-- File Version: v1.3.0
-- Project Version: v1.3.0
-- Last Updated: 2025-06-10
+- File Version: v1.4.0
+- Project Version: v1.4.0
+- Last Updated: 2025-06-24
 
 ## 概要
 シラバス情報を管理するバックエンドシステム。Web Syllabusから取得したシラバス情報をデータベースに格納し、APIを通じて提供します。

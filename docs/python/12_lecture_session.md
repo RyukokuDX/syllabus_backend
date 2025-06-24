@@ -1,15 +1,15 @@
 ---
 title: 講義セッション情報抽出処理
-file_version: v1.3.1
-project_version: v1.3.31
-last_updated: 2025-06-23
+file_version: v1.4.0
+project_version: v1.4.0
+last_updated: 2025-06-24
 ---
 
 # 講義セッション情報抽出処理
 
-- File Version: v1.3.1
-- Project Version: v1.3.31
-- Last Updated: 2025-06-23
+- File Version: v1.4.0
+- Project Version: v1.4.0
+- Last Updated: 2025-06-24
 
 [readmeへ](../README.md) | [docへ](./doc.md)
 

@@ -1,8 +1,8 @@
 ---
 title: FastAPI環境構築ガイド
-file_version: v1.3.0
-project_version: v1.3.0
-last_updated: 2025-06-10
+file_version: v1.4.0
+project_version: v1.4.0
+last_updated: 2025-06-24
 ---
 
 # FastAPI Docker環境

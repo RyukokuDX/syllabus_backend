@@ -1,6 +1,6 @@
 #!/bin/bash
-# File Version: v1.3.1
-# Project Version: v1.3.33
+# File Version: v1.4.0
+# Project Version: v1.4.0
 # Last Updated: 2025-06-24
 
 # スクリプトのディレクトリを取得
