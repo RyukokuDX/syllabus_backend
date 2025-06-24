@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.0.2
-# Project Version: v1.3.33
+# File Version: v1.0.3
+# Project Version: v1.3.34
 # Last Updated: 2025/6/23
 
 import os
@@ -207,6 +207,8 @@ def extract_lecture_session_irregular_instructor_from_single_json(json_data: Dic
 				})
 	except Exception as e:
 		error_msg = f"エラーが発生しました: {str(e)}"
+		if 'syllabus_code' in locals():
+			error_msg = f"科目コード {syllabus_code}: {error_msg}"
 		tqdm.write(f"        EXTRACT ERROR: {error_msg}")
 		errors.append(error_msg)
 	return lecture_session_irregular_instructors, errors, total_instructor_count

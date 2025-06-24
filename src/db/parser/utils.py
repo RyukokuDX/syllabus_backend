@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.1
-# Project Version: v1.3.21
-# Last Updated: 2025-06-21
+# File Version: v1.3.2
+# Project Version: v1.3.34
+# Last Updated: 2025-06-24
 # curosrはversionをいじるな
 
 from datetime import datetime
@@ -180,14 +180,17 @@ def is_regular_session_list(schedule_data: list) -> bool:
         schedule_data (list): スケジュールデータのリスト
         
     Returns:
-        bool: リスト全体が正規の場合True、1件でも不規則がある場合はFalse
+        bool: リスト全体が正規の場合True、1件でも不規則がある場合または重複がある場合はFalse
         
     Note:
         ドキュメントの分類ルールに従い、リスト内に1件でも不規則なレコードがある場合は
-        全体を不規則として扱う
+        全体を不規則として扱う。また、正規化後に重複が1件でもある場合も不規則として扱う。
     """
     if not schedule_data:
         return True
+    
+    # 正規化後のセッション番号を格納するリスト
+    normalized_sessions = []
     
     # リスト内の各セッションをチェック
     for session_data in schedule_data:
@@ -201,6 +204,15 @@ def is_regular_session_list(schedule_data: list) -> bool:
         # 1件でも不規則なセッションがあれば、リスト全体を不規則として扱う
         if not is_regular_session(session):
             return False
+        
+        # 正規セッションの場合、正規化後の番号を取得
+        session_number = extract_session_number(session)
+        if session_number > 0:
+            normalized_sessions.append(session_number)
+    
+    # 重複チェック
+    if len(normalized_sessions) != len(set(normalized_sessions)):
+        return False
     
     return True
 

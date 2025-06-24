@@ -212,12 +212,13 @@ CREATE INDEX IF NOT EXISTS idx_lecture_session_number ON lecture_session(session
 CREATE TABLE IF NOT EXISTS lecture_session_irregular (
     lecture_session_irregular_id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
-    session_pattern TEXT,
+    session_pattern TEXT NOT NULL,
     contents TEXT,
     other_info TEXT,
+    instructor TEXT,
+    error_message TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(syllabus_id, session_pattern)
+    updated_at TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_syllabus ON lecture_session_irregular(syllabus_id);
@@ -250,20 +251,6 @@ CREATE TABLE IF NOT EXISTS lecture_session_instructor (
 
 CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_session ON lecture_session_instructor(lecture_session_id);
 CREATE INDEX IF NOT EXISTS idx_lecture_session_instructor_instructor ON lecture_session_instructor(instructor_id);
-
--- lecture_session_irregular_instructor（不定形講義回数担当者）
-CREATE TABLE IF NOT EXISTS lecture_session_irregular_instructor (
-    id SERIAL PRIMARY KEY,
-    lecture_session_irregular_id INTEGER NOT NULL REFERENCES lecture_session_irregular(lecture_session_irregular_id) ON DELETE CASCADE,
-    instructor_id INTEGER NOT NULL REFERENCES instructor(instructor_id) ON DELETE CASCADE,
-    role TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(lecture_session_irregular_id, instructor_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_instructor_session ON lecture_session_irregular_instructor(lecture_session_irregular_id);
-CREATE INDEX IF NOT EXISTS idx_lecture_session_irregular_instructor_instructor ON lecture_session_irregular_instructor(instructor_id);
 
 -- syllabus_book（シラバス教科書関連）
 CREATE TABLE IF NOT EXISTS syllabus_book (
