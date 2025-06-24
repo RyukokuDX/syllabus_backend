@@ -1,10 +1,21 @@
+---
+title: ドキュメント作成ガイドライン
+file_version: v1.4.0
+project_version: v1.4.0
+last_updated: 2025-06-24
+---
+
 <!--
 - 更新の登録を要求された場合は、/docs/version_control.md に準拠して実行
 -->
 
-# ドキュメント作成ガイドライン (v1.0.0)
+# ドキュメント作成ガイドライン
 
-[readmeへ](../README.md)
+- File Version: v1.4.0
+- Project Version: v1.4.0
+- Last Updated: 2025-06-24
+
+[readmeへ](../README.md) | [Gitコミットポリシーへ](./git_commit_policy.md)
 
 ## 目次
 1. [基本方針](#基本方針)
@@ -30,14 +41,39 @@
 ## ドキュメント構成
 
 ### 必須セクション
-1. タイトル（Level 1 見出し）
-2. 関連ドキュメントへのリンク（以下の形式）
+1. YAML Front Matter
+   ```markdown
+   ---
+   title: ドキュメントタイトル
+   file_version: v1.4.0
+   project_version: v1.4.0
+   last_updated: YYYY-MM-DD
+   ---
+   ```
+
+2. タイトルとバージョン情報（Level 1 見出し）
+   ```markdown
+   # ドキュメントタイトル
+
+   - File Version: v1.4.0
+   - Project Version: v1.4.0
+   - Last Updated: YYYY-MM-DD
+   ```
+
+3. 関連ドキュメントへのリンク
    ```markdown
    [readmeへ](../README.md) | [関連ドキュメント1へ](./doc1.md) | [関連ドキュメント2へ](./doc2.md)
    ```
-3. 目次
-4. 本文
-5. 更新履歴（必要な場合）
+
+4. 目次
+   - セクション番号付きの目次
+   - 各セクションへのリンク
+
+5. 本文
+   - セクション番号に従った構成
+   - 適切な見出しレベル
+   - コード例や表の適切な使用
+
 6. ページトップへのリンク（末尾に配置）
    ```markdown
    [🔝 ページトップへ](#ドキュメントタイトル)
@@ -119,31 +155,58 @@
 
 ## バージョン管理
 
-### 更新履歴の記録
-```markdown
-# ドキュメントタイトル (v1.0.0)
-```
-
-注意：更新履歴テーブルは削除し、詳細な変更履歴はJSONファイルで管理します。
-
 ### バージョン番号付与
 - メジャー.マイナー.パッチ
-- 例：1.0.0, 1.1.0, 1.1.1
+- 例：1.0.1, 1.1.0, 1.1.1
+- バージョン情報はタイトル下に記載
 
-## 付録
+### ファイル更新時のバージョン管理
+- ファイルを更新する際は、ファイル形式に応じて以下の形式でバージョン情報を記載します：
 
-### チェックリスト
-- [ ] タイトルは適切か
-- [ ] 目次は最新か
-- [ ] 内部リンクは正常に機能するか
-- [ ] コードブロックは適切な言語指定があるか
-- [ ] 表は整形されているか
-- [ ] 更新履歴は記録されているか
+  **Markdownファイルの場合：**
+  ```markdown
+  ---
+  title: タイトル
+  file_version: v1.4.0
+  project_version: v1.4.0
+  last_updated: YYYY-MM-DD
+  ---
 
-### 推奨エディタ設定
-- エンコーディング：UTF-8
-- 改行コード：LF
-- 末尾スペース：削除
-- 最終行に空行を入れる
+  # タイトル
+
+  - File Version: v1.4.0
+  - Project Version: v1.4.0
+  - Last Updated: YYYY-MM-DD
+  ```
+
+  **Pythonファイルの場合：**
+  ```python
+  # File Version: v1.4.0
+  # Project Version: v1.4.0
+  # Last Updated: YYYY-MM-DD
+  ```
+
+  **Shellスクリプトの場合：**
+  ```bash
+  # File Version: v1.4.0
+  # Project Version: v1.4.0
+  # Last Updated: YYYY-MM-DD
+  ```
+
+  **JSONファイルの場合：**
+  ```json
+  // File Version: v1.4.0
+  // Project Version: v1.4.0
+  // Last Updated: YYYY-MM-DD
+  ```
+
+- バージョン情報の更新は`git_bump.sh`によって自動的に行われます
+- 更新時は`git_bump.sh`を実行し、生成されたコミットメッセージの「(ここに変更内容を記入)」の部分を、ファイル内容の変更から適切な内容に更新します
+- 変更内容は箇条書きで詳細を記載します
+
+### 更新履歴の管理
+- 更新履歴はGitのコミット履歴で管理します
+- ドキュメント内に更新履歴テーブルを作成する必要はありません
+- 詳細な変更履歴は`git log`で確認できます
 
 [🔝 ページトップへ](#ドキュメント作成ガイドライン) 

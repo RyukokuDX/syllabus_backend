@@ -1,40 +1,51 @@
+# File Version: v1.4.0
+# Project Version: v1.4.0
+# Last Updated: 2025-06-24
+
 import os
 import json
-import csv
-import sqlite3
+import glob
 from typing import List, Set, Dict
 from datetime import datetime
-import chardet
+from tqdm import tqdm
 from .utils import normalize_subject_name, get_year_from_user
 
 def get_subject_names(year: int) -> Set[str]:
-    """SQLiteデータベースから科目名を抽出する"""
+    """JSONファイルから科目名を抽出する"""
     subject_names = set()
-    db_path = os.path.join("src", "syllabus", str(year), "data", f"syllabus_{year}.db")
+    # スクリプトのディレクトリを基準にパスを生成
+    script_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    json_pattern = os.path.join(script_dir, "syllabus", str(year), "json", "*.json")
     
-    if not os.path.exists(db_path):
-        raise FileNotFoundError(f"データベースファイルが見つかりません: {db_path}")
+    print(f"JSONファイルパターン: {json_pattern}")
     
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+    json_files = glob.glob(json_pattern)
+    if not json_files:
+        raise FileNotFoundError(f"JSONファイルが見つかりません: {json_pattern}")
+    
+    total_files = len(json_files)
+    print(f"処理対象ファイル数: {total_files}件")
+    
+    for json_file in tqdm(json_files, desc="JSONファイル処理", unit="file"):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+                # 基本情報.科目名.内容から科目名を取得
+                if '基本情報' in data and '科目名' in data['基本情報'] and '内容' in data['基本情報']['科目名']:
+                    subject_name = data['基本情報']['科目名']['内容']
+                    if subject_name:
+                        # 科目名の正規化処理を適用
+                        normalized_name = normalize_subject_name(subject_name)
+                        if normalized_name:  # 空文字でない場合
+                            subject_names.add(normalized_name)
         
-        # course_titleカラムから科目名を取得
-        cursor.execute("SELECT DISTINCT subject_name FROM syllabus_basic WHERE subject_name IS NOT NULL")
-        rows = cursor.fetchall()
-        
-        for row in rows:
-            if row[0]:  # NULLでない場合
-                normalized_name = normalize_subject_name(row[0])
-                if normalized_name:  # 空文字でない場合
-                    subject_names.add(normalized_name)
-        
-    except sqlite3.Error as e:
-        print(f"データベースエラー: {str(e)}")
-        raise
-    finally:
-        if conn:
-            conn.close()
+        except json.JSONDecodeError as e:
+            print(f"\nJSONファイルの解析エラー ({json_file}): {str(e)}")
+            continue
+        except Exception as e:
+            print(f"\nファイル処理エラー ({json_file}): {str(e)}")
+            continue
     
     return subject_names
 

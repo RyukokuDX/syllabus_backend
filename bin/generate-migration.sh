@@ -1,4 +1,7 @@
 #!/bin/bash
+# File Version: v1.4.0
+# Project Version: v1.4.0
+# Last Updated: 2025-06-24
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 from datetime import datetime
@@ -16,6 +17,32 @@ from models import Base
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/syllabus')
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# テーブル名の複数形マッピング
+TABLE_NAME_PLURAL = {
+    'class': 'classes',
+    'subclass': 'subclasses',
+    'faculty': 'faculties',
+    'subject_name': 'subject_names',
+    'instructor': 'instructors',
+    'book': 'books',
+    'book_uncategorized': 'book_uncategorized',
+    'syllabus_master': 'syllabus_masters',
+    'syllabus': 'syllabuses',
+    'subject_grade': 'subject_grades',
+    'lecture_time': 'lecture_times',
+    'lecture_session': 'lecture_sessions',
+    'lecture_session_irregular': 'lecture_session_irregulars',
+    'syllabus_instructor': 'syllabus_instructors',
+    'lecture_session_instructor': 'lecture_session_instructors',
+    'syllabus_book': 'syllabus_books',
+    'grading_criterion': 'grading_criteria',
+    'subject_attribute': 'subject_attributes',
+    'subject': 'subjects',
+    'subject_syllabus': 'subject_syllabuses',
+    'subject_attribute_value': 'subject_attribute_values',
+    'syllabus_study_system': 'syllabus_study_systems'
+}
 
 def read_json_files(directory, table_name):
     """指定されたディレクトリ内のすべてのJSONファイルを読み込む"""
@@ -36,45 +63,72 @@ def read_json_files(directory, table_name):
         try:
             with open(file, 'r', encoding='utf-8') as f:
                 json_data = json.load(f)
-                # テーブル名に応じた配列名を取得
-                array_name = {
-                    'class': 'classes',
-                    'subclass': 'subclasses',
-                    'faculty': 'faculties',
-                    'subject_name': 'subject_names',
-                    'subject': 'subjects',
-                    'instructor': 'instructors',
-                    'book': 'books',
-                    'syllabus': 'syllabuses',
-                    'lecture_session': 'lecture_sessions',
-                    'syllabus_instructor': 'syllabus_instructors',
-                    'syllabus_book': 'syllabus_books',
-                    'grading_criterion': 'grading_criteria',
-                    'subject_grade': 'subject_grades',
-                    'subject_attribute': 'subject_attributes',
-                    'subject_attribute_value': 'subject_attribute_values',
-                    'subject_syllabus': 'subject_syllabuses',
-                    'syllabus_study_system': 'syllabus_study_systems',
-                    'lecture_session_instructor': 'lecture_session_instructors',
-                    'lecture_time': 'lecture_times',
-                    'book_author': 'book_authors',
-                    'syllabus_master': 'syllabus_masters',
-                    'requirement_header': 'requirement_headers',
-                    'requirement_attribute': 'requirement_attributes',
-                    'requirement': 'requirements'
-                }.get(table_name, f"{table_name}s")
                 
-                if array_name in json_data:
+                # テーブル名に応じた配列名を取得
+                array_name = TABLE_NAME_PLURAL.get(table_name, f"{table_name}s")
+                
+                # 配列が直接格納されている場合と、キー名の配列の場合の両方に対応
+                if isinstance(json_data, list):
+                    # 配列が直接格納されている場合
+                    records = json_data
+                    print(f"Found {len(records)} records in {file} (direct array)")
+                elif array_name in json_data:
+                    # キー名の配列の場合
                     records = json_data[array_name]
-                    # bookテーブルの場合、roleカラムを除外
-                    if table_name == 'book':
-                        records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
-                    print(f"Found {len(records)} records in {file}")
-                    data.extend(records)
+                    print(f"Found {len(records)} records in {file} (keyed array)")
                 else:
-                    print(f"Warning: {file} does not contain '{array_name}' array")
+                    print(f"Warning: {file} does not contain '{array_name}' array or direct array")
+                    continue
+                
+                # bookテーブルの場合、roleカラムを除外
+                if table_name == 'book':
+                    records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
+                # book_uncategorizedテーブルの場合、全てのカラムを保持
+                elif table_name == 'book_uncategorized':
+                    records = records  # そのまま保持
+                
+                data.extend(records)
         except Exception as e:
             print(f"Error reading {file}: {str(e)}")
+    
+    # 重複データを除去
+    if data:
+        # テーブルごとのユニークキーを定義
+        unique_keys = {
+            "class": lambda r: r.get('class_name'),
+            "subclass": lambda r: r.get('subclass_name'),
+            "faculty": lambda r: r.get('faculty_name'),
+            "subject_name": lambda r: r.get('name'),
+            "syllabus_master": lambda r: (r.get('syllabus_code'), r.get('syllabus_year')),
+            "syllabus": lambda r: r.get('syllabus_id'),
+            "subject": lambda r: (r.get('subject_name_id'), r.get('faculty_id'), r.get('class_id'), r.get('subclass_id'), r.get('curriculum_year')),
+            "subject_syllabus": lambda r: (r.get('subject_id'), r.get('syllabus_id')),
+            "subject_attribute": lambda r: r.get('attribute_name'),
+            "subject_attribute_value": lambda r: (r.get('subject_id'), r.get('attribute_id')),
+            "lecture_time": lambda r: (r.get('syllabus_id'), r.get('day_of_week'), r.get('period')),
+            "lecture_session": lambda r: (r.get('syllabus_id'), r.get('session_number')),
+            "lecture_session_irregular": lambda r: (r.get('syllabus_id'), r.get('session_pattern')),
+            "lecture_session_instructor": lambda r: (r.get('lecture_session_id'), r.get('instructor_id')),
+            "syllabus_instructor": lambda r: (r.get('syllabus_id'), r.get('instructor_id')),
+            "syllabus_book": lambda r: (r.get('syllabus_id'), r.get('book_id')),
+            "grading_criterion": lambda r: (r.get('syllabus_id'), r.get('criteria_type')),
+            "syllabus_study_system": lambda r: (r.get('source_syllabus_id'), r.get('target')),
+            "subject_grade": lambda r: (r.get('syllabus_id'), r.get('grade'))
+        }
+        
+        if table_name in unique_keys:
+            unique_data = []
+            seen_keys = set()
+            key_func = unique_keys[table_name]
+            
+            for record in data:
+                key = key_func(record)
+                if key is not None and key not in seen_keys:
+                    seen_keys.add(key)
+                    unique_data.append(record)
+            
+            print(f"Removed {len(data) - len(unique_data)} duplicate records for {table_name}")
+            data = unique_data
     
     print(f"Total records found for {table_name}: {len(data)}")
     return data
@@ -84,11 +138,60 @@ def generate_sql_insert(table_name, records):
     if not records:
         return ""
 
-    # カラム名を取得
-    columns = records[0].keys()
+    # カラム名を取得（存在するカラムのみ）
+    all_columns = set()
+    for record in records:
+        all_columns.update(record.keys())
+    
+    # テーブルごとの必須カラムを定義
+    required_columns = {
+        "lecture_session": ["syllabus_id", "session_number"],
+        "lecture_session_irregular": ["syllabus_id", "session_pattern"],
+        # 他のテーブルも必要に応じて追加
+    }
+    
+    # テーブルごとの存在するカラムのみをフィルタリング
+    table_columns = {
+        "lecture_session": ["lecture_session_id", "syllabus_id", "session_number", "contents", "other_info", "lecture_format", "created_at", "updated_at"],
+        "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "instructor", "error_message", "lecture_format", "created_at", "updated_at"],
+        # 他のテーブルも必要に応じて追加
+    }
+    
+    # 必須カラムが存在するかチェック
+    if table_name in required_columns:
+        missing_columns = []
+        for required_col in required_columns[table_name]:
+            if required_col not in all_columns:
+                missing_columns.append(required_col)
+        
+        if missing_columns:
+            print(f"Warning: Missing required columns for {table_name}: {missing_columns}")
+            # 必須カラムが不足している場合は、存在するカラムのみで処理
+            if table_name in table_columns:
+                # テーブル定義に存在するカラムのみをフィルタリング
+                columns = [col for col in all_columns if col in table_columns[table_name]]
+            else:
+                columns = list(all_columns)
+        else:
+            if table_name in table_columns:
+                # テーブル定義に存在するカラムのみをフィルタリング
+                columns = [col for col in all_columns if col in table_columns[table_name]]
+            else:
+                columns = list(all_columns)
+    else:
+        if table_name in table_columns:
+            # テーブル定義に存在するカラムのみをフィルタリング
+            columns = [col for col in all_columns if col in table_columns[table_name]]
+        else:
+            columns = list(all_columns)
+    
     # bookテーブルの場合、authorカラムを除外
     if table_name == 'book':
         columns = [col for col in columns if col != 'author']
+    # book_uncategorizedテーブルの場合、全てのカラムを保持
+    elif table_name == 'book_uncategorized':
+        columns = list(columns)
+    
     columns_str = ', '.join(columns)
 
     # VALUES句を生成
@@ -96,7 +199,7 @@ def generate_sql_insert(table_name, records):
     for record in records:
         values_list = []
         for column in columns:
-            value = record[column]
+            value = record.get(column)  # get()を使用してKeyErrorを防ぐ
             if value is None:
                 values_list.append('NULL')
             elif isinstance(value, (int, float)):
@@ -118,21 +221,23 @@ def generate_sql_insert(table_name, records):
         "faculty": ["faculty_name"],
         "subject_name": ["name"],
         "syllabus_master": ["syllabus_code", "syllabus_year"],
+        "syllabus": ["syllabus_id"],  # syllabus_idは主キーなので一意
         "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name"],
         "subject_attribute_value": ["subject_id", "attribute_id"],
         "instructor": None,  # 一意性制約がないため、ON CONFLICT句は不要
-        "book": None,
-        "book_author": ["book_id", "author_name"],
+        "book": ["isbn"],  # ISBNのUNIQUE制約に対応
+        "book_uncategorized": None,  # 一意性制約がないため、ON CONFLICT句は不要
         "lecture_time": ["syllabus_id", "day_of_week", "period"],
         "lecture_session": ["syllabus_id", "session_number"],
+        "lecture_session_irregular": None,  # ユニーク制約が削除されたため、ON CONFLICT句は不要
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id"],
         "grading_criterion": ["syllabus_id", "criteria_type"],
         "syllabus_study_system": ["source_syllabus_id", "target"],
-        "subject_grade": ["syllabus_id", "grade"]
+        "subject_grade": ["syllabus_id", "grade"]  # 新しく追加したユニーク制約に対応
     }
 
     # 更新対象カラムの設定
@@ -142,21 +247,23 @@ def generate_sql_insert(table_name, records):
         "faculty": ["faculty_name"],
         "subject_name": ["name"],
         "syllabus_master": ["syllabus_code", "syllabus_year"],
+        "syllabus": ["subject_name_id", "subtitle", "term", "campus", "credits", "goals", "summary", "attainment", "methods", "outside_study", "textbook_comment", "reference_comment", "advice"],  # syllabus_id以外のカラムを更新対象に
         "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
         "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name", "description"],
         "subject_attribute_value": ["value"],
         "instructor": None,  # 一意性制約がないため、更新対象カラムも不要
-        "book": None,
-        "book_author": ["book_id", "author_name"],
+        "book": ["title", "author", "publisher", "price"],  # ISBN以外のカラムを更新対象に
+        "book_uncategorized": None,  # 一意性制約がないため、更新対象カラムも不要
         "lecture_time": ["day_of_week", "period"],
-        "lecture_session": ["session_number", "contents", "other_info"],
+        "lecture_session": ["session_number", "contents", "other_info", "lecture_format"],
+        "lecture_session_irregular": None,  # ユニーク制約が削除されたため、更新対象カラムも不要
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
         "grading_criterion": ["criteria_type", "ratio", "note"],
         "syllabus_study_system": ["target"],
-        "subject_grade": ["grade"]
+        "subject_grade": ["grade"]  # gradeカラムを更新対象に
     }
 
     # ON CONFLICT句の生成
@@ -222,10 +329,27 @@ CREATE TABLE IF NOT EXISTS instructor (
 CREATE TABLE IF NOT EXISTS book (
     book_id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
+    author TEXT,
     publisher TEXT,
     price INTEGER,
     isbn TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(isbn),
+    UNIQUE(title, publisher)
+);""",
+        'book_uncategorized': """
+CREATE TABLE IF NOT EXISTS book_uncategorized (
+    id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    author TEXT,
+    publisher TEXT,
+    price INTEGER,
+    role TEXT NOT NULL,
+    isbn TEXT,
+    categorization_status TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );""",
         'book_author': """
 CREATE TABLE IF NOT EXISTS book_author (
@@ -255,8 +379,9 @@ CREATE TABLE IF NOT EXISTS syllabus (
     attainment TEXT,
     methods TEXT,
     outside_study TEXT,
-    notes TEXT,
-    remarks TEXT,
+    textbook_comment TEXT,
+    reference_comment TEXT,
+    advice TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );""",
@@ -276,7 +401,8 @@ CREATE TABLE IF NOT EXISTS lecture_time (
     day_of_week TEXT NOT NULL,
     period SMALLINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, day_of_week, period)
 );""",
         'lecture_session': """
 CREATE TABLE IF NOT EXISTS lecture_session (
@@ -392,7 +518,13 @@ CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attr
 CREATE INDEX IF NOT EXISTS idx_instructor_name ON instructor(name);
 CREATE INDEX IF NOT EXISTS idx_instructor_name_kana ON instructor(name_kana);""",
         'book': """
-CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);""",
+CREATE INDEX IF NOT EXISTS idx_book_title ON book(title);
+CREATE INDEX IF NOT EXISTS idx_book_isbn ON book(isbn);""",
+        'book_uncategorized': """
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_syllabus ON book_uncategorized(syllabus_code);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_title ON book_uncategorized(title);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_isbn ON book_uncategorized(isbn);
+CREATE INDEX IF NOT EXISTS idx_book_uncategorized_status ON book_uncategorized(categorization_status);""",
         'book_author': """
 CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
 CREATE INDEX IF NOT EXISTS idx_book_author_name ON book_author(author_name);""",
@@ -530,6 +662,11 @@ def generate_migration():
                 'source': 'web_syllabus'
             },
             {
+                'json_dir': project_root / 'updates' / 'book_uncategorized',
+                'table_name': 'book_uncategorized',
+                'source': 'web_syllabus'
+            },
+            {
                 'json_dir': project_root / 'updates' / 'book_author',
                 'table_name': 'book_author',
                 'source': 'web_syllabus'
@@ -558,6 +695,11 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'lecture_session',
                 'table_name': 'lecture_session',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'lecture_session_irregular',
+                'table_name': 'lecture_session_irregular',
                 'source': 'web_syllabus'
             },
             {

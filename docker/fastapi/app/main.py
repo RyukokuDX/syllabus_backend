@@ -27,7 +27,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgre
 app = FastAPI(
     title="シラバス情報API",
     description="龍谷大学のシラバス情報を提供するAPI",
-    version="1.0.0",
+    version="1.0.1",
     debug=DEBUG_MODE,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -199,7 +199,7 @@ async def execute_query(request: QueryRequest):
 # APIバージョン情報
 @router.get("/version")
 async def version():
-    return {"version": "1.0.0"}
+    return {"version": "1.0.1"}
 
 # ルーターをアプリケーションに登録
 app.include_router(router)

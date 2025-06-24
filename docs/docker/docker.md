@@ -1,4 +1,15 @@
-# Docker環境構築仕様書
+---
+title: Docker環境構築ガイド
+file_version: v1.4.0
+project_version: v1.4.0
+last_updated: 2025-06-24
+---
+
+# Docker環境構築ガイド
+
+- File Version: v1.4.0
+- Project Version: v1.4.0
+- Last Updated: 2025-06-24
 
 [readmeへ](../README.md) | [サーバー構成へ](server.md) 
 
@@ -71,7 +82,7 @@ FastAPIアプリケーションをコンテナ化して提供するための構�
     - スキーマバージョン管理
 
 - ユーティリティ
-  - python-dotenv==1.0.0
+  - python-dotenv==1.0.1
     - .env ファイルの読み込み
     - 環境変数管理
   - requests==2.31.0
@@ -254,6 +265,6 @@ docker-compose exec db bash
 
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
-| 2024-03-20 | 1.0.0 | 藤原 | 初版作成 |
+| 2024-03-20 | 1.0.1 | 藤原 | 初版作成 |
 
-[🔝 ページトップへ](#docker環境構築仕様書)
+[🔝 ページトップへ](#docker環境構築ガイド)
