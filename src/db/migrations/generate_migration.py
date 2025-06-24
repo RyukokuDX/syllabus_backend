@@ -35,7 +35,6 @@ TABLE_NAME_PLURAL = {
     'lecture_session_irregular': 'lecture_session_irregulars',
     'syllabus_instructor': 'syllabus_instructors',
     'lecture_session_instructor': 'lecture_session_instructors',
-    'lecture_session_irregular_instructor': 'lecture_session_irregular_instructors',
     'syllabus_book': 'syllabus_books',
     'grading_criterion': 'grading_criteria',
     'subject_attribute': 'subject_attributes',
@@ -110,7 +109,6 @@ def read_json_files(directory, table_name):
             "lecture_session": lambda r: (r.get('syllabus_id'), r.get('session_number')),
             "lecture_session_irregular": lambda r: (r.get('syllabus_id'), r.get('session_pattern')),
             "lecture_session_instructor": lambda r: (r.get('lecture_session_id'), r.get('instructor_id')),
-            "lecture_session_irregular_instructor": lambda r: (r.get('lecture_session_irregular_id'), r.get('instructor_id')),
             "syllabus_instructor": lambda r: (r.get('syllabus_id'), r.get('instructor_id')),
             "syllabus_book": lambda r: (r.get('syllabus_id'), r.get('book_id')),
             "grading_criterion": lambda r: (r.get('syllabus_id'), r.get('criteria_type')),
@@ -155,7 +153,7 @@ def generate_sql_insert(table_name, records):
     # テーブルごとの存在するカラムのみをフィルタリング
     table_columns = {
         "lecture_session": ["lecture_session_id", "syllabus_id", "session_number", "contents", "other_info", "created_at", "updated_at"],
-        "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "created_at", "updated_at"],
+        "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "instructor", "error_message", "created_at", "updated_at"],
         # 他のテーブルも必要に応じて追加
     }
     
@@ -235,7 +233,6 @@ def generate_sql_insert(table_name, records):
         "lecture_session": ["syllabus_id", "session_number"],
         "lecture_session_irregular": ["syllabus_id", "session_pattern"],
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
-        "lecture_session_irregular_instructor": ["lecture_session_irregular_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id"],
         "grading_criterion": ["syllabus_id", "criteria_type"],
@@ -262,7 +259,6 @@ def generate_sql_insert(table_name, records):
         "lecture_session": ["session_number", "contents", "other_info"],
         "lecture_session_irregular": ["session_pattern", "contents", "other_info"],
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
-        "lecture_session_irregular_instructor": ["lecture_session_irregular_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
         "grading_criterion": ["criteria_type", "ratio", "note"],
@@ -709,11 +705,6 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'lecture_session_instructor',
                 'table_name': 'lecture_session_instructor',
-                'source': 'web_syllabus'
-            },
-            {
-                'json_dir': project_root / 'updates' / 'lecture_session_irregular_instructor',
-                'table_name': 'lecture_session_irregular_instructor',
                 'source': 'web_syllabus'
             },
             {

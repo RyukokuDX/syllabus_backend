@@ -1,3 +1,6 @@
+# File Version: v1.3.1
+# Project Version: v1.3.33
+# Last Updated: 2025-06-24
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -230,11 +233,12 @@ class LectureSessionIrregular(Base):
     session_pattern = Column(Text, nullable=False)
     contents = Column(Text)
     other_info = Column(Text)
+    instructor = Column(Text)
+    error_message = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        UniqueConstraint('syllabus_id', 'session_pattern', name='uix_lecture_session_irregular_syllabus_pattern'),
         Index('idx_lecture_session_irregular_syllabus', 'syllabus_id'),
         Index('idx_lecture_session_irregular_pattern', 'session_pattern'),
     )
@@ -269,22 +273,6 @@ class LectureSessionInstructor(Base):
         Index('idx_lecture_session_instructor_session', 'lecture_session_id'),
         Index('idx_lecture_session_instructor_instructor', 'instructor_id'),
         UniqueConstraint('lecture_session_id', 'instructor_id', name='uix_lecture_session_instructor_unique'),
-    )
-
-class LectureSessionIrregularInstructor(Base):
-    __tablename__ = 'lecture_session_irregular_instructor'
-
-    id = Column(Integer, primary_key=True)
-    lecture_session_irregular_id = Column(Integer, ForeignKey('lecture_session_irregular.lecture_session_irregular_id', ondelete='CASCADE'), nullable=False)
-    instructor_id = Column(Integer, ForeignKey('instructor.instructor_id', ondelete='CASCADE'), nullable=False)
-    role = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
-
-    __table_args__ = (
-        Index('idx_lecture_session_irregular_instructor_session', 'lecture_session_irregular_id'),
-        Index('idx_lecture_session_irregular_instructor_instructor', 'instructor_id'),
-        UniqueConstraint('lecture_session_irregular_id', 'instructor_id', name='uix_lecture_session_irregular_instructor_unique'),
     )
 
 class SyllabusBook(Base):
@@ -545,16 +533,8 @@ class LectureSessionIrregular:
     session_pattern: str
     contents: Optional[str]
     other_info: Optional[str]
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
-@dataclass
-class LectureSessionIrregularInstructor:
-    """不定形講義回数担当者モデル"""
-    id: int
-    lecture_session_irregular_id: int
-    instructor_id: int
-    role: Optional[str]
+    instructor: Optional[str]
+    error_message: str
     created_at: datetime
     updated_at: Optional[datetime] = None
 

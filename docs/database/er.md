@@ -1,15 +1,16 @@
 ---
 title: データベースER図
-file_version: v1.3.3
-project_version: v1.3.25
-last_updated: 2025-06-22
+file_version: v1.3.4
+project_version: v1.3.33
+last_updated: 2025-06-24
 ---
+<!-- Curosr はversion 弄るな -->
 
 # データベースER図
 
-- File Version: v1.3.3
-- Project Version: v1.3.25
-- Last Updated: 2025-06-22
+- File Version: v1.3.4
+- Project Version: v1.3.33
+- Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
 
@@ -154,6 +155,8 @@ LECTURE_SESSION_IRREGULAR {
     session_pattern text "NOT NULL"
     contents text
     other_info text
+    instructor text
+    error_message text "NOT NULL"
     created_at timestamp "NOT NULL"
     updated_at timestamp
 }
@@ -168,14 +171,6 @@ SYLLABUS_INSTRUCTOR {
 LECTURE_SESSION_INSTRUCTOR {
     id int PK
     lecture_session_id int FK "NOT NULL"
-    instructor_id int FK "NOT NULL"
-    role text
-    created_at timestamp "NOT NULL"
-    updated_at timestamp
-}
-LECTURE_SESSION_IRREGULAR_INSTRUCTOR {
-    id int PK
-    lecture_session_irregular_id int FK "NOT NULL"
     instructor_id int FK "NOT NULL"
     role text
     created_at timestamp "NOT NULL"
@@ -250,7 +245,6 @@ SUBCLASS_TABLE }o--o| SUBJECT : subclass_id
 SUBJECT_NAME ||--o{ SYLLABUS : subject_name_id
 INSTRUCTOR ||--o{ SYLLABUS_INSTRUCTOR : instructor_id
 INSTRUCTOR ||--o{ LECTURE_SESSION_INSTRUCTOR : instructor_id
-INSTRUCTOR ||--o{ LECTURE_SESSION_IRREGULAR_INSTRUCTOR : instructor_id
 BOOK ||--o{ SYLLABUS_BOOK : book_id
 SUBJECT_ATTRIBUTE ||--o{ SUBJECT_ATTRIBUTE_VALUE : attribute_id
 SYLLABUS_MASTER ||--o{ BOOK_UNCATEGORIZED : syllabus_id
@@ -269,7 +263,6 @@ SYLLABUS_MASTER ||--o{ GRADING_CRITERION : syllabus_id
 SYLLABUS_MASTER ||--o{ SYLLABUS_STUDY_SYSTEM : source_syllabus_id
 SYLLABUS_MASTER ||--o{ SUBJECT_SYLLABUS : syllabus_id
 LECTURE_SESSION ||--o{ LECTURE_SESSION_INSTRUCTOR : lecture_session_id
-LECTURE_SESSION_IRREGULAR ||--o{ LECTURE_SESSION_IRREGULAR_INSTRUCTOR : lecture_session_irregular_id
 ```
 
 [目次へ戻る](#目次) 
