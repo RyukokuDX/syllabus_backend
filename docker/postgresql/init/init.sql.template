@@ -261,7 +261,8 @@ CREATE TABLE IF NOT EXISTS syllabus_book (
     book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
     role TEXT NOT NULL,
     note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(syllabus_id, book_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_syllabus_book_syllabus ON syllabus_book(syllabus_id);

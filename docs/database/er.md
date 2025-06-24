@@ -1,15 +1,15 @@
 ---
 title: データベースER図
-file_version: v1.3.5
-project_version: v1.3.36
+file_version: v1.3.6
+project_version: v1.3.39
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベースER図
 
-- File Version: v1.3.5
-- Project Version: v1.3.36
+- File Version: v1.3.6
+- Project Version: v1.3.39
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
@@ -185,6 +185,7 @@ SYLLABUS_BOOK {
     role text "NOT NULL"
     note text
     created_at timestamp "NOT NULL"
+    syllabus_id_book_id text UK
 }
 GRADING_CRITERION {
     id int PK

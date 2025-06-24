@@ -1,5 +1,5 @@
-# File Version: v1.3.2
-# Project Version: v1.3.36
+# File Version: v1.3.3
+# Project Version: v1.3.39
 # Last Updated: 2025-06-24
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -290,6 +290,7 @@ class SyllabusBook(Base):
     __table_args__ = (
         Index('idx_syllabus_book_syllabus', 'syllabus_id'),
         Index('idx_syllabus_book_book', 'book_id'),
+        UniqueConstraint('syllabus_id', 'book_id', name='uix_syllabus_book_unique'),
     )
 
 class GradingCriterion(Base):

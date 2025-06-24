@@ -261,7 +261,8 @@ CREATE TABLE IF NOT EXISTS syllabus_book (
     book_id INTEGER NOT NULL REFERENCES book(book_id) ON DELETE CASCADE,
     role TEXT NOT NULL,
     note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(syllabus_id, book_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_syllabus_book_syllabus ON syllabus_book(syllabus_id);
@@ -362,3 +363,6 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250622213107__insert_subject_grades.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622213946__insert_lecture_times.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250623185437__insert_syllabus_instructors.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_session_irregulars.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_sessions.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250624112916__insert_lecture_session_instructors.sql
