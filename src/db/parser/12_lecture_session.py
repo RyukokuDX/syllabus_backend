@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.7
-# Project Version: v1.3.36
+# File Version: v1.3.8
+# Project Version: v1.3.37
 # Last Updated: 2025/6/23
 # Cursorはversionをいじるな
 
@@ -29,9 +29,9 @@ except ImportError:
 		"""文字列を正規化する関数"""
 		return unicodedata.normalize('NFKC', text)
 	
-	def process_session_data(session_text: str) -> Tuple[bool, int, str]:
+	def process_session_data(session_text: str) -> Tuple[bool, int, str, Optional[str]]:
 		"""フォールバック関数"""
-		return False, 0, ""
+		return False, 0, "", None
 	
 	def is_regular_session_list(schedule_data: list) -> bool:
 		"""フォールバック関数"""
@@ -138,7 +138,7 @@ def parse_lecture_sessions_from_schedule(schedule_data: List[Dict]) -> List[Dict
 			continue
 		
 		# セッションデータを処理
-		is_regular, session_number, _ = process_session_data(session)
+		is_regular, session_number, _, lecture_format = process_session_data(session)
 		
 		# 不規則セッションの場合はスキップ
 		if not is_regular:
@@ -157,16 +157,6 @@ def parse_lecture_sessions_from_schedule(schedule_data: List[Dict]) -> List[Dict
 		
 		# 内容を取得
 		contents = session_data.get("content", "")
-		
-		# 講義形式を抽出（セッション文字列から）
-		lecture_format = None
-		if session:
-			if "(オンライン)" in session:
-				lecture_format = "オンライン"
-			elif "(ハイブリット)" in session:
-				lecture_format = "ハイブリッド"
-			else:
-				lecture_format = "対面"
 		
 		lecture_sessions.append({
 			'syllabus_id': None,  # 後で設定

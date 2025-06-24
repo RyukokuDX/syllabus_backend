@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.0.5
-# Project Version: v1.3.36
+# File Version: v1.0.6
+# Project Version: v1.3.37
 # Last Updated: 2025/6/23
 
 import os
 import json
 import sys
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 import re
 from tqdm import tqdm
@@ -28,9 +28,9 @@ except ImportError:
 		"""文字列を正規化する関数"""
 		return unicodedata.normalize('NFKC', text)
 	
-	def process_session_data(session_text: str) -> tuple[bool, int, str]:
+	def process_session_data(session_text: str) -> tuple[bool, int, str, Optional[str]]:
 		"""フォールバック関数"""
-		return False, 0, ""
+		return False, 0, "", None
 	
 	def is_regular_session_list(schedule_data: list) -> bool:
 		"""フォールバック関数"""
@@ -136,7 +136,7 @@ def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) ->
 			continue
 		
 		# セッションデータを処理
-		is_regular, session_number, session_pattern = process_session_data(session)
+		is_regular, session_number, session_pattern, lecture_format = process_session_data(session)
 		
 		if is_regular and session_number > 0:
 			normalized_sessions.append(session_number)
@@ -164,7 +164,7 @@ def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) ->
 			continue
 		
 		# セッションデータを処理
-		is_regular, _, session_pattern = process_session_data(session)
+		is_regular, _, session_pattern, lecture_format = process_session_data(session)
 		
 		# 正規セッションの場合はスキップ
 		if is_regular:
@@ -174,16 +174,6 @@ def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) ->
 		contents = session_data.get("content", "")
 		# 担当者情報を取得（シラバスJSONの値をそのまま）
 		instructor = session_data.get("instructor", "")
-		
-		# 講義形式を抽出（セッション文字列から）
-		lecture_format = None
-		if session:
-			if "(オンライン)" in session:
-				lecture_format = "オンライン"
-			elif "(ハイブリット)" in session:
-				lecture_format = "ハイブリッド"
-			else:
-				lecture_format = "対面"
 		
 		lecture_sessions_irregular.append({
 			'syllabus_id': None,  # 後で設定

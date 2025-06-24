@@ -240,6 +240,15 @@ case $COMMAND in
             exit 1
         fi
         ;;
+    restart)
+        if [ "$SERVICE" = "postgres" ]; then
+            "$SCRIPT_DIR/bin/stop-postgres.sh"
+            "$SCRIPT_DIR/bin/start-postgres.sh"
+        else
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
+            exit 1
+        fi
+        ;;
     ps)
         docker ps
         ;;

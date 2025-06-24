@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.3
-# Project Version: v1.3.36
+# File Version: v1.3.4
+# Project Version: v1.3.37
 # Last Updated: 2025-06-24
 # curosrはversionをいじるな
 
@@ -8,7 +8,7 @@ from datetime import datetime
 import unicodedata
 import sys
 import os
-from typing import Tuple
+from typing import Tuple, Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
@@ -146,85 +146,104 @@ def get_syllabus_master_id_from_db(session, syllabus_code: str, year: int) -> in
         print(f"[DB接続エラー] syllabus_master取得時にエラー: {str(e)}")
         raise 
 
-def is_regular_session(session_text: str) -> bool:
-    """講義セッションが正規かどうかを判定する"""
-    if not session_text:
-        return False
-    # 部、月の混入判定
-    if '部' in session_text or '月' in session_text:
-        return False
-    # 正規化
-    normalized = normalize_subject_name(session_text)
-    
-    # 講義形式の括弧を削除
-    import re
-    normalized = re.sub(r'\(オンライン\)', '', normalized)
-    normalized = re.sub(r'\(ハイブリット\)', '', normalized)
-    
-    # Lを削除
-    normalized = normalized.replace('L', '')
-    
-    # 全角文字を排除
-    # 全角文字（ひらがな、カタカナ、漢字など）を除去
-    cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
-    # 空白削除
-    cleaned_text = re.sub(r'\s', '', cleaned_text)
-    # 先頭の0を削除
-    cleaned_text = cleaned_text.lstrip('0')
-    # 数字判定
-    if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
-        return False
-    # 50より大きい値の場合のみ表示
-    try:
-        session_number = int(cleaned_text)
-        if session_number > 50:
-            print(f"判定成功（50超）: '{session_text}' -> 正規化後: '{normalized}' -> 全角排除後: '{cleaned_text}' -> 数値: {session_number}")
-    except ValueError:
-        pass
-    return True
+def is_regular_session(session_text: str) -> Tuple[bool, Optional[str]]:
+	"""講義セッションが正規かどうかを判定し、講義形式も返す
+	
+	Args:
+		session_text (str): セッション文字列
+		
+	Returns:
+		Tuple[bool, Optional[str]]: (正規かどうか, 講義形式)
+	"""
+	if not session_text:
+		return False, None
+	
+	# 講義形式の判定（正規化前の文字列で判定）
+	lecture_format = None
+	if '(オンライン)' in session_text:
+		lecture_format = 'オンライン'
+	elif '(ハイブリット)' in session_text:
+		lecture_format = 'ハイブリット'
+	
+	# 部、月の混入判定
+	if '部' in session_text or '月' in session_text:
+		return False, lecture_format
+	
+	# 正規化
+	normalized = normalize_subject_name(session_text)
+	
+	# 講義形式の括弧を削除
+	import re
+	normalized = re.sub(r'\(オンライン\)', '', normalized)
+	normalized = re.sub(r'\(ハイブリット\)', '', normalized)
+	
+	# Lを削除
+	normalized = normalized.replace('L', '')
+	
+	# 全角文字を排除
+	# 全角文字（ひらがな、カタカナ、漢字など）を除去
+	cleaned_text = re.sub(r'[^\x00-\x7F\s]', '', normalized)
+	# 空白削除
+	cleaned_text = re.sub(r'\s', '', cleaned_text)
+	# 先頭の0を削除
+	cleaned_text = cleaned_text.lstrip('0')
+	# 数字判定
+	if not cleaned_text or not re.match(r'^\d+$', cleaned_text):
+		return False, lecture_format
+	
+	# 50より大きい値の場合のみ表示
+	try:
+		session_number = int(cleaned_text)
+		if session_number > 50:
+			print(f"判定成功（50超）: '{session_text}' -> 正規化後: '{normalized}' -> 全角排除後: '{cleaned_text}' -> 数値: {session_number}")
+	except ValueError:
+		pass
+	
+	return True, lecture_format
 
 def is_regular_session_list(schedule_data: list) -> bool:
-    """スケジュールリスト全体が正規かどうかを判定する
-    
-    Args:
-        schedule_data (list): スケジュールデータのリスト
-        
-    Returns:
-        bool: リスト全体が正規の場合True、1件でも不規則がある場合または重複がある場合はFalse
-        
-    Note:
-        ドキュメントの分類ルールに従い、リスト内に1件でも不規則なレコードがある場合は
-        全体を不規則として扱う。また、正規化後に重複が1件でもある場合も不規則として扱う。
-    """
-    if not schedule_data:
-        return True
-    
-    # 正規化後のセッション番号を格納するリスト
-    normalized_sessions = []
-    
-    # リスト内の各セッションをチェック
-    for session_data in schedule_data:
-        if not isinstance(session_data, dict):
-            continue
-        
-        session = session_data.get("session", "")
-        if not session:
-            continue
-        
-        # 1件でも不規則なセッションがあれば、リスト全体を不規則として扱う
-        if not is_regular_session(session):
-            return False
-        
-        # 正規セッションの場合、正規化後の番号を取得
-        session_number = extract_session_number(session)
-        if session_number > 0:
-            normalized_sessions.append(session_number)
-    
-    # 重複チェック
-    if len(normalized_sessions) != len(set(normalized_sessions)):
-        return False
-    
-    return True
+	"""スケジュールリスト全体が正規かどうかを判定する
+	
+	Args:
+		schedule_data (list): スケジュールデータのリスト
+		
+	Returns:
+		bool: リスト全体が正規の場合True、1件でも不規則がある場合または重複がある場合はFalse
+		
+	Note:
+		ドキュメントの分類ルールに従い、リスト内に1件でも不規則なレコードがある場合は
+		全体を不規則として扱う。また、正規化後に重複が1件でもある場合も不規則として扱う。
+	"""
+	if not schedule_data:
+		return True
+	
+	# 正規化後のセッション番号を格納するリスト
+	normalized_sessions = []
+	
+	# リスト内の各セッションをチェック
+	for session_data in schedule_data:
+		if not isinstance(session_data, dict):
+			continue
+		
+		session = session_data.get("session", "")
+		if not session:
+			continue
+		
+		# 1件でも不規則なセッションがあれば、リスト全体を不規則として扱う
+		is_regular, _ = is_regular_session(session)
+		if not is_regular:
+			return False
+		
+		# 正規セッションの場合、正規化後の番号を取得
+		session_number = extract_session_number(session)
+		if session_number > 0:
+			normalized_sessions.append(session_number)
+	
+	# 重複チェック
+	if len(normalized_sessions) != len(set(normalized_sessions)):
+		return False
+	
+	return True
 
 def extract_session_number(session_text: str) -> int:
     """正規セッションから回数を抽出する"""
@@ -264,22 +283,24 @@ def extract_session_number(session_text: str) -> int:
         print(f"抽出失敗（数値変換エラー）: '{session_text}' -> 正規化後: '{normalized}' -> 全角排除後: '{cleaned_text}'")
         return 0
 
-def process_session_data(session_text: str) -> Tuple[bool, int, str]:
-    """セッション文字列を処理して正規性、回数、パターンを返す
+def process_session_data(session_text: str) -> Tuple[bool, int, str, Optional[str]]:
+    """セッション文字列を処理して正規性、回数、パターン、講義形式を返す
     
     Args:
         session_text (str): セッション文字列
         
     Returns:
-        Tuple[bool, int, str]: (正規かどうか, 回数, セッションパターン)
-            - 正規の場合: (True, 回数, "")
-            - 不規則の場合: (False, 0, 元の文字列)
+        Tuple[bool, int, str, Optional[str]]: (正規かどうか, 回数, セッションパターン, 講義形式)
+            - 正規の場合: (True, 回数, "", 講義形式)
+            - 不規則の場合: (False, 0, 元の文字列, 講義形式)
     """
     if not session_text:
-        return False, 0, ""
+        return False, 0, "", None
     
-    if is_regular_session(session_text):
+    is_regular, lecture_format = is_regular_session(session_text)
+    
+    if is_regular:
         session_number = extract_session_number(session_text)
-        return True, session_number, ""
+        return True, session_number, "", lecture_format
     else:
-        return False, 0, session_text 
+        return False, 0, session_text, lecture_format 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.3.5
-# Project Version: v1.3.34
+# File Version: v1.3.6
+# Project Version: v1.3.37
 # Last Updated: 2025/6/23
 
 import os
@@ -80,9 +80,9 @@ except ImportError:
 			session.rollback()
 			return None
 	
-	def process_session_data(session_text: str) -> tuple[bool, int, str]:
+	def process_session_data(session_text: str) -> tuple[bool, int, str, Optional[str]]:
 		"""フォールバック関数"""
-		return False, 0, ""
+		return False, 0, "", None
 
 def get_instructor_id_from_db(session, instructor_name: str) -> Optional[int]:
 	"""教員名からinstructor_idを取得する"""
@@ -186,7 +186,7 @@ def extract_instructors_from_schedule(schedule_data: List[Dict]) -> tuple[List[T
 			continue
 		
 		# セッションデータを処理
-		is_regular, session_number, _ = process_session_data(session)
+		is_regular, session_number, _, _ = process_session_data(session)
 		
 		# 不規則セッションの場合はスキップ（この時点では全て正規のはず）
 		if not is_regular or session_number == 0:

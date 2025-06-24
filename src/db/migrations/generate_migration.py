@@ -231,7 +231,7 @@ def generate_sql_insert(table_name, records):
         "book_uncategorized": None,  # 一意性制約がないため、ON CONFLICT句は不要
         "lecture_time": ["syllabus_id", "day_of_week", "period"],
         "lecture_session": ["syllabus_id", "session_number"],
-        "lecture_session_irregular": ["syllabus_id", "session_pattern"],
+        "lecture_session_irregular": None,  # ユニーク制約が削除されたため、ON CONFLICT句は不要
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id"],
@@ -257,7 +257,7 @@ def generate_sql_insert(table_name, records):
         "book_uncategorized": None,  # 一意性制約がないため、更新対象カラムも不要
         "lecture_time": ["day_of_week", "period"],
         "lecture_session": ["session_number", "contents", "other_info", "lecture_format"],
-        "lecture_session_irregular": ["session_pattern", "contents", "other_info", "instructor", "error_message", "lecture_format"],
+        "lecture_session_irregular": None,  # ユニーク制約が削除されたため、更新対象カラムも不要
         "lecture_session_instructor": ["lecture_session_id", "instructor_id"],
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
