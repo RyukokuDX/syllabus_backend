@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.0.3
-# Project Version: v1.3.34
+# File Version: v1.0.4
+# Project Version: v1.3.35
 # Last Updated: 2025/6/23
 
 import os
@@ -119,6 +119,41 @@ def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) ->
 	if is_regular_session_list(schedule_data):
 		return lecture_sessions_irregular
 	
+	# 不規則な理由を判定
+	error_reasons = []
+	
+	# 非回数データのチェック
+	has_non_numeric = False
+	# 重複回数データのチェック
+	normalized_sessions = []
+	
+	for session_data in schedule_data:
+		if not isinstance(session_data, dict):
+			continue
+		
+		session = session_data.get("session", "")
+		if not session:
+			continue
+		
+		# セッションデータを処理
+		is_regular, session_number, session_pattern = process_session_data(session)
+		
+		if is_regular and session_number > 0:
+			normalized_sessions.append(session_number)
+		else:
+			has_non_numeric = True
+	
+	# 重複チェック
+	if len(normalized_sessions) != len(set(normalized_sessions)):
+		error_reasons.append("重複回数データ包含")
+	
+	if has_non_numeric:
+		error_reasons.append("非回数データ包含")
+	
+	# エラーメッセージを生成
+	error_message = "、".join(error_reasons) if error_reasons else "不規則データ"
+	
+	# 不規則なセッションを処理
 	for session_data in schedule_data:
 		if not isinstance(session_data, dict):
 			continue
@@ -137,12 +172,16 @@ def parse_lecture_sessions_irregular_from_schedule(schedule_data: List[Dict]) ->
 		
 		# 内容を取得
 		contents = session_data.get("content", "")
+		# 担当者情報を取得（シラバスJSONの値をそのまま）
+		instructor = session_data.get("instructor", "")
 		
 		lecture_sessions_irregular.append({
 			'syllabus_id': None,  # 後で設定
 			'session_pattern': session_pattern,
 			'contents': contents if contents else None,
-			'other_info': None
+			'other_info': None,
+			'instructor': instructor if instructor else None,
+			'error_message': error_message
 		})
 	
 	return lecture_sessions_irregular
