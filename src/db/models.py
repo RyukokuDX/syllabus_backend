@@ -1,5 +1,5 @@
-# File Version: v1.3.3
-# Project Version: v1.3.39
+# File Version: v1.3.4
+# Project Version: v1.3.40
 # Last Updated: 2025-06-24
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -167,6 +167,7 @@ class Syllabus(Base):
     outside_study = Column(Text)
     textbook_comment = Column(Text)
     reference_comment = Column(Text)
+    grading_comment = Column(Text)
     advice = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP)
@@ -299,6 +300,7 @@ class GradingCriterion(Base):
     id = Column(Integer, primary_key=True)
     syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
     criteria_type = Column(Text, nullable=False)
+    criteria_description = Column(Text)
     ratio = Column(Integer)
     note = Column(Text)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
@@ -474,6 +476,7 @@ class Syllabus:
     outside_study: Optional[str]
     textbook_comment: Optional[str]
     reference_comment: Optional[str]
+    grading_comment: Optional[str]
     advice: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -559,6 +562,7 @@ class GradingCriterion:
     id: int
     syllabus_id: int
     criteria_type: str
+    criteria_description: Optional[str]
     ratio: Optional[int]
     note: Optional[str]
     created_at: datetime

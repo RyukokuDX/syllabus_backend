@@ -121,6 +121,7 @@ def create_syllabus_json(syllabi: List[Dict]) -> str:
             "outside_study": syllabus["outside_study"],
             "textbook_comment": syllabus["textbook_comment"],
             "reference_comment": syllabus["reference_comment"],
+            "grading_comment": syllabus["grading_comment"],
             "advice": syllabus["advice"],
             "created_at": current_time.isoformat()
         } for syllabus in sorted(syllabi, key=lambda x: x["syllabus_id"])]
@@ -238,20 +239,27 @@ def process_syllabus_json(json_file: str, session) -> tuple[List[Dict], List[str
 		
 		# 詳細情報の取得
 		summary = detail_info.get("講義概要", {}).get("内容", "")
-		goals = detail_info.get("到達目標", {}).get("内容", "")
+		goals = detail_info.get("目的", {}).get("内容", None)
+		attainment = detail_info.get("到達目標", {}).get("内容", "")  # 到達目標を正しく設定
 		methods = detail_info.get("講義方法", {}).get("内容", "")
 		outside_study = detail_info.get("授業外学習", {}).get("内容", "")
 		
 		# テキストと参考文献のコメント
 		textbook_info = detail_info.get("テキスト", {})
 		textbook_comment = ""
-		if textbook_info.get("自由記載"):
-			textbook_comment = textbook_info.get("自由記載", "")
+		if textbook_info.get("内容", {}).get("自由記載"):
+			textbook_comment = textbook_info.get("内容", {}).get("自由記載", "")
 		
 		reference_info = detail_info.get("参考文献", {})
 		reference_comment = ""
-		if reference_info.get("自由記載"):
-			reference_comment = reference_info.get("自由記載", "")
+		if reference_info.get("内容", {}).get("自由記載"):
+			reference_comment = reference_info.get("内容", {}).get("自由記載", "")
+		
+		# 成績評価の方法
+		grading_info = detail_info.get("成績評価の方法", {})
+		grading_comment = ""
+		if grading_info.get("内容", {}).get("自由記載"):
+			grading_comment = grading_info.get("内容", {}).get("自由記載", "")
 		
 		# 履修上の注意
 		advice = detail_info.get("履修上の注意・担当者からの一言", {}).get("内容", "")
@@ -270,11 +278,12 @@ def process_syllabus_json(json_file: str, session) -> tuple[List[Dict], List[str
 			"credits": credits,
 			"goals": goals,
 			"summary": summary,
-			"attainment": "",  # 到達目標はgoalsに含まれている
+			"attainment": attainment,
 			"methods": methods,
 			"outside_study": outside_study,
 			"textbook_comment": textbook_comment,
 			"reference_comment": reference_comment,
+			"grading_comment": grading_comment,
 			"advice": advice
 		}
 		

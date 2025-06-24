@@ -1,15 +1,15 @@
 ---
 title: データベース構造定義
-file_version: v1.3.11
-project_version: v1.3.39
+file_version: v1.3.12
+project_version: v1.3.40
 last_updated: 2025-06-24
 ---
 <!-- Curosr はversion 弄るな -->
 
 # データベース構造定義
 
-- File Version: v1.3.11
-- Project Version: v1.3.39
+- File Version: v1.3.12
+- Project Version: v1.3.40
 - Last Updated: 2025-06-24
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -331,6 +331,7 @@ last_updated: 2025-06-24
 | outside_study | TEXT | YES | 授業外学習 | Web Syllabus |
 | textbook_comment | TEXT | YES | 教科書に関するコメント | Web Syllabus |
 | reference_comment | TEXT | YES | 参考文献に関するコメント | Web Syllabus |
+| grading_comment | TEXT | YES | 成績評価に関するコメント | Web Syllabus |
 | advice | TEXT | YES | 履修上の注意 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
 | updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
@@ -613,6 +614,7 @@ periodは"0"とする.
 | id | INTEGER | NO | ID（主キー） | システム生成 |
 | syllabus_id | INTEGER | NO | シラバスID（外部キー） | システム生成 |
 | criteria_type | TEXT | NO | 評価種別 | Web Syllabus |
+| criteria_description | TEXT | YES | 評価基準の詳細説明 | Web Syllabus |
 | ratio | INTEGER | YES | 評価比率 | Web Syllabus |
 | note | TEXT | YES | 備考 | Web Syllabus |
 | created_at | TIMESTAMP | NO | 作成日時 | システム生成 |

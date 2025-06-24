@@ -157,6 +157,7 @@ CREATE TABLE IF NOT EXISTS syllabus (
     outside_study TEXT,
     textbook_comment TEXT,
     reference_comment TEXT,
+    grading_comment TEXT,
     advice TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
@@ -273,6 +274,7 @@ CREATE TABLE IF NOT EXISTS grading_criterion (
     id SERIAL PRIMARY KEY,
     syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
     criteria_type TEXT NOT NULL,
+    criteria_description TEXT,
     ratio INTEGER,
     note TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
