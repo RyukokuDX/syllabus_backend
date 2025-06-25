@@ -356,7 +356,6 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 -- （この部分はgenerate-init.shで自動挿入されます）
 \i /docker-entrypoint-initdb.d/migrations/V20250619213023__insert_classs.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250619213231__insert_subclasss.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250619213358__insert_facultys.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225007__insert_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225948__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250621183238__insert_subject_names.sql
@@ -370,3 +369,6 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250624112916__insert_lecture_session_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624120924__insert_syllabus_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624124852__insert_syllabuss.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250624171346__insert_grading_criterions.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_subject_attributes.sql

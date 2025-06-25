@@ -8,6 +8,7 @@ import glob
 from typing import List, Set
 from datetime import datetime
 from tqdm import tqdm
+from .utils import normalize_text
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -55,10 +56,11 @@ def get_faculty_names(year: int) -> Set[str]:
                         # カンマで区切られた学部名を分割して追加
                         for dept in departments.split(','):
                             dept = dept.strip()
-                            # ・を半角に変換
-                            dept = dept.replace('・', '･')
                             if dept:  # 空文字でない場合のみ追加
-                                faculty_names.add(dept)
+                                # 課程名を正規化
+                                normalized_dept = normalize_text(dept, handle_null=True)
+                                if normalized_dept != 'NULL':  # NULLでない場合のみ追加
+                                    faculty_names.add(normalized_dept)
         
         except json.JSONDecodeError as e:
             print(f"\nJSONファイルの解析エラー ({json_file}): {str(e)}")
