@@ -1,0 +1,3685 @@
+{
+  "subjects": [
+    {
+      "subject_name_id": 1,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.726765"
+    },
+    {
+      "subject_name_id": 2,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.695252"
+    },
+    {
+      "subject_name_id": 5,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.195162"
+    },
+    {
+      "subject_name_id": 6,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.196585"
+    },
+    {
+      "subject_name_id": 7,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.197466"
+    },
+    {
+      "subject_name_id": 8,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.198274"
+    },
+    {
+      "subject_name_id": 9,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.207115"
+    },
+    {
+      "subject_name_id": 10,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.208540"
+    },
+    {
+      "subject_name_id": 11,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.199149"
+    },
+    {
+      "subject_name_id": 12,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.200035"
+    },
+    {
+      "subject_name_id": 13,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.200850"
+    },
+    {
+      "subject_name_id": 14,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.201598"
+    },
+    {
+      "subject_name_id": 15,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.244077"
+    },
+    {
+      "subject_name_id": 16,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.239700"
+    },
+    {
+      "subject_name_id": 17,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.240547"
+    },
+    {
+      "subject_name_id": 18,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.204677"
+    },
+    {
+      "subject_name_id": 19,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.394386"
+    },
+    {
+      "subject_name_id": 21,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.795995"
+    },
+    {
+      "subject_name_id": 22,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.766469"
+    },
+    {
+      "subject_name_id": 23,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.761741"
+    },
+    {
+      "subject_name_id": 24,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.332350"
+    },
+    {
+      "subject_name_id": 25,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.333064"
+    },
+    {
+      "subject_name_id": 31,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.247522"
+    },
+    {
+      "subject_name_id": 32,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.248349"
+    },
+    {
+      "subject_name_id": 36,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.333813"
+    },
+    {
+      "subject_name_id": 37,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.334821"
+    },
+    {
+      "subject_name_id": 38,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.175176"
+    },
+    {
+      "subject_name_id": 38,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.278930"
+    },
+    {
+      "subject_name_id": 38,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.433620"
+    },
+    {
+      "subject_name_id": 38,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.508370"
+    },
+    {
+      "subject_name_id": 38,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.651075"
+    },
+    {
+      "subject_name_id": 38,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.729850"
+    },
+    {
+      "subject_name_id": 42,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.687638"
+    },
+    {
+      "subject_name_id": 44,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.678365"
+    },
+    {
+      "subject_name_id": 45,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.471715"
+    },
+    {
+      "subject_name_id": 50,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.307368"
+    },
+    {
+      "subject_name_id": 51,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.432669"
+    },
+    {
+      "subject_name_id": 52,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.341310"
+    },
+    {
+      "subject_name_id": 53,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.342610"
+    },
+    {
+      "subject_name_id": 55,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.213010"
+    },
+    {
+      "subject_name_id": 56,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.213681"
+    },
+    {
+      "subject_name_id": 57,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.669756"
+    },
+    {
+      "subject_name_id": 67,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.701063"
+    },
+    {
+      "subject_name_id": 68,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.696102"
+    },
+    {
+      "subject_name_id": 69,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.783494"
+    },
+    {
+      "subject_name_id": 70,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.596455"
+    },
+    {
+      "subject_name_id": 71,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.679367"
+    },
+    {
+      "subject_name_id": 72,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.316263"
+    },
+    {
+      "subject_name_id": 73,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.322360"
+    },
+    {
+      "subject_name_id": 74,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.323172"
+    },
+    {
+      "subject_name_id": 75,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.672265"
+    },
+    {
+      "subject_name_id": 76,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.674659"
+    },
+    {
+      "subject_name_id": 77,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.800414"
+    },
+    {
+      "subject_name_id": 78,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.763714"
+    },
+    {
+      "subject_name_id": 79,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.418279"
+    },
+    {
+      "subject_name_id": 81,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.173354"
+    },
+    {
+      "subject_name_id": 81,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.277853"
+    },
+    {
+      "subject_name_id": 81,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.543252"
+    },
+    {
+      "subject_name_id": 81,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.646499"
+    },
+    {
+      "subject_name_id": 81,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.729064"
+    },
+    {
+      "subject_name_id": 82,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.777151"
+    },
+    {
+      "subject_name_id": 84,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.238961"
+    },
+    {
+      "subject_name_id": 87,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.788258"
+    },
+    {
+      "subject_name_id": 88,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.693095"
+    },
+    {
+      "subject_name_id": 89,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.703553"
+    },
+    {
+      "subject_name_id": 90,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.335616"
+    },
+    {
+      "subject_name_id": 91,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.667240"
+    },
+    {
+      "subject_name_id": 92,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.697026"
+    },
+    {
+      "subject_name_id": 93,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.802292"
+    },
+    {
+      "subject_name_id": 94,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.671218"
+    },
+    {
+      "subject_name_id": 95,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.232804"
+    },
+    {
+      "subject_name_id": 96,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.233611"
+    },
+    {
+      "subject_name_id": 97,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.231080"
+    },
+    {
+      "subject_name_id": 98,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.466427"
+    },
+    {
+      "subject_name_id": 100,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.789034"
+    },
+    {
+      "subject_name_id": 101,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.685327"
+    },
+    {
+      "subject_name_id": 102,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.407379"
+    },
+    {
+      "subject_name_id": 103,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.757088"
+    },
+    {
+      "subject_name_id": 104,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.306277"
+    },
+    {
+      "subject_name_id": 105,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.187239"
+    },
+    {
+      "subject_name_id": 105,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.288401"
+    },
+    {
+      "subject_name_id": 105,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.384787"
+    },
+    {
+      "subject_name_id": 105,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.539861"
+    },
+    {
+      "subject_name_id": 105,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.644402"
+    },
+    {
+      "subject_name_id": 105,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.722368"
+    },
+    {
+      "subject_name_id": 107,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.270481"
+    },
+    {
+      "subject_name_id": 108,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.329783"
+    },
+    {
+      "subject_name_id": 109,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.330671"
+    },
+    {
+      "subject_name_id": 110,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.668063"
+    },
+    {
+      "subject_name_id": 111,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.668956"
+    },
+    {
+      "subject_name_id": 112,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.755451"
+    },
+    {
+      "subject_name_id": 113,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.751281"
+    },
+    {
+      "subject_name_id": 114,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.176860"
+    },
+    {
+      "subject_name_id": 114,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.279912"
+    },
+    {
+      "subject_name_id": 114,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.434640"
+    },
+    {
+      "subject_name_id": 114,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.652086"
+    },
+    {
+      "subject_name_id": 114,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.730738"
+    },
+    {
+      "subject_name_id": 115,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.178167"
+    },
+    {
+      "subject_name_id": 115,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.281033"
+    },
+    {
+      "subject_name_id": 115,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.435625"
+    },
+    {
+      "subject_name_id": 115,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.653169"
+    },
+    {
+      "subject_name_id": 115,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.731734"
+    },
+    {
+      "subject_name_id": 116,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.338188"
+    },
+    {
+      "subject_name_id": 117,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.156824"
+    },
+    {
+      "subject_name_id": 118,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.158390"
+    },
+    {
+      "subject_name_id": 119,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.412508"
+    },
+    {
+      "subject_name_id": 120,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.756198"
+    },
+    {
+      "subject_name_id": 121,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.752790"
+    },
+    {
+      "subject_name_id": 122,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.308685"
+    },
+    {
+      "subject_name_id": 125,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.454136"
+    },
+    {
+      "subject_name_id": 127,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.666308"
+    },
+    {
+      "subject_name_id": 131,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.411622"
+    },
+    {
+      "subject_name_id": 132,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.459801"
+    },
+    {
+      "subject_name_id": 133,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.473358"
+    },
+    {
+      "subject_name_id": 137,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.619555"
+    },
+    {
+      "subject_name_id": 140,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.785748"
+    },
+    {
+      "subject_name_id": 141,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.682037"
+    },
+    {
+      "subject_name_id": 144,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.301483"
+    },
+    {
+      "subject_name_id": 145,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.302242"
+    },
+    {
+      "subject_name_id": 146,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.676152"
+    },
+    {
+      "subject_name_id": 147,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.449052"
+    },
+    {
+      "subject_name_id": 149,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.779366"
+    },
+    {
+      "subject_name_id": 150,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.299800"
+    },
+    {
+      "subject_name_id": 151,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.300727"
+    },
+    {
+      "subject_name_id": 152,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.607529"
+    },
+    {
+      "subject_name_id": 156,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.555020"
+    },
+    {
+      "subject_name_id": 158,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.594552"
+    },
+    {
+      "subject_name_id": 169,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.776185"
+    },
+    {
+      "subject_name_id": 170,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.217537"
+    },
+    {
+      "subject_name_id": 171,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.218386"
+    },
+    {
+      "subject_name_id": 172,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.230270"
+    },
+    {
+      "subject_name_id": 173,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.205436"
+    },
+    {
+      "subject_name_id": 178,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.450802"
+    },
+    {
+      "subject_name_id": 180,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.381301"
+    },
+    {
+      "subject_name_id": 181,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.382102"
+    },
+    {
+      "subject_name_id": 185,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.144965"
+    },
+    {
+      "subject_name_id": 186,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.145966"
+    },
+    {
+      "subject_name_id": 187,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.143725"
+    },
+    {
+      "subject_name_id": 188,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.142056"
+    },
+    {
+      "subject_name_id": 189,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.140234"
+    },
+    {
+      "subject_name_id": 190,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.166971"
+    },
+    {
+      "subject_name_id": 191,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.163678"
+    },
+    {
+      "subject_name_id": 192,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.500746"
+    },
+    {
+      "subject_name_id": 193,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.245715"
+    },
+    {
+      "subject_name_id": 196,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.520055"
+    },
+    {
+      "subject_name_id": 197,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.215108"
+    },
+    {
+      "subject_name_id": 198,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.772774"
+    },
+    {
+      "subject_name_id": 209,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.246583"
+    },
+    {
+      "subject_name_id": 212,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.803100"
+    },
+    {
+      "subject_name_id": 215,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.211601"
+    },
+    {
+      "subject_name_id": 216,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.212334"
+    },
+    {
+      "subject_name_id": 219,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.597752"
+    },
+    {
+      "subject_name_id": 222,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.167965"
+    },
+    {
+      "subject_name_id": 222,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.504403"
+    },
+    {
+      "subject_name_id": 223,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.159851"
+    },
+    {
+      "subject_name_id": 223,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.536849"
+    },
+    {
+      "subject_name_id": 226,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.622576"
+    },
+    {
+      "subject_name_id": 227,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.743662"
+    },
+    {
+      "subject_name_id": 228,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.379783"
+    },
+    {
+      "subject_name_id": 230,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.380526"
+    },
+    {
+      "subject_name_id": 231,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.741208"
+    },
+    {
+      "subject_name_id": 232,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.737839"
+    },
+    {
+      "subject_name_id": 236,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.319923"
+    },
+    {
+      "subject_name_id": 237,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.686636"
+    },
+    {
+      "subject_name_id": 240,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.697934"
+    },
+    {
+      "subject_name_id": 241,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.807558"
+    },
+    {
+      "subject_name_id": 242,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.303046"
+    },
+    {
+      "subject_name_id": 243,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.549927"
+    },
+    {
+      "subject_name_id": 251,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.370086"
+    },
+    {
+      "subject_name_id": 252,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.294925"
+    },
+    {
+      "subject_name_id": 253,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.295803"
+    },
+    {
+      "subject_name_id": 254,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.767298"
+    },
+    {
+      "subject_name_id": 255,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.369364"
+    },
+    {
+      "subject_name_id": 257,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.662049"
+    },
+    {
+      "subject_name_id": 258,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.748217"
+    },
+    {
+      "subject_name_id": 259,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.745412"
+    },
+    {
+      "subject_name_id": 260,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.627440"
+    },
+    {
+      "subject_name_id": 261,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.267700"
+    },
+    {
+      "subject_name_id": 262,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.293101"
+    },
+    {
+      "subject_name_id": 263,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.702425"
+    },
+    {
+      "subject_name_id": 264,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.808974"
+    },
+    {
+      "subject_name_id": 265,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.789811"
+    },
+    {
+      "subject_name_id": 268,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.304010"
+    },
+    {
+      "subject_name_id": 275,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.610879"
+    },
+    {
+      "subject_name_id": 276,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.677372"
+    },
+    {
+      "subject_name_id": 277,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.271494"
+    },
+    {
+      "subject_name_id": 277,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.682760"
+    },
+    {
+      "subject_name_id": 280,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.673366"
+    },
+    {
+      "subject_name_id": 286,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.327068"
+    },
+    {
+      "subject_name_id": 287,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.328482"
+    },
+    {
+      "subject_name_id": 291,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.186109"
+    },
+    {
+      "subject_name_id": 291,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.269691"
+    },
+    {
+      "subject_name_id": 291,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.368559"
+    },
+    {
+      "subject_name_id": 291,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.523351"
+    },
+    {
+      "subject_name_id": 291,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.642969"
+    },
+    {
+      "subject_name_id": 291,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.721603"
+    },
+    {
+      "subject_name_id": 292,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.681247"
+    },
+    {
+      "subject_name_id": 293,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.790961"
+    },
+    {
+      "subject_name_id": 294,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.665208"
+    },
+    {
+      "subject_name_id": 298,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.739016"
+    },
+    {
+      "subject_name_id": 299,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.311548"
+    },
+    {
+      "subject_name_id": 300,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.312887"
+    },
+    {
+      "subject_name_id": 301,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.414129"
+    },
+    {
+      "subject_name_id": 303,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.623599"
+    },
+    {
+      "subject_name_id": 306,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.331580"
+    },
+    {
+      "subject_name_id": 307,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.621458"
+    },
+    {
+      "subject_name_id": 308,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.370803"
+    },
+    {
+      "subject_name_id": 310,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.146959"
+    },
+    {
+      "subject_name_id": 311,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.524574"
+    },
+    {
+      "subject_name_id": 314,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.339105"
+    },
+    {
+      "subject_name_id": 321,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "随意",
+      "created_at": "2025-06-25T18:54:10.290509"
+    },
+    {
+      "subject_name_id": 322,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "随意",
+      "created_at": "2025-06-25T18:54:10.292010"
+    },
+    {
+      "subject_name_id": 323,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.340089"
+    },
+    {
+      "subject_name_id": 326,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.590175"
+    },
+    {
+      "subject_name_id": 333,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.324307"
+    },
+    {
+      "subject_name_id": 334,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.325702"
+    },
+    {
+      "subject_name_id": 338,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.215885"
+    },
+    {
+      "subject_name_id": 339,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.216706"
+    },
+    {
+      "subject_name_id": 340,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.154007"
+    },
+    {
+      "subject_name_id": 341,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.155340"
+    },
+    {
+      "subject_name_id": 350,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.388580"
+    },
+    {
+      "subject_name_id": 351,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.458469"
+    },
+    {
+      "subject_name_id": 356,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.468307"
+    },
+    {
+      "subject_name_id": 360,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.587011"
+    },
+    {
+      "subject_name_id": 362,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.214388"
+    },
+    {
+      "subject_name_id": 363,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.206195"
+    },
+    {
+      "subject_name_id": 364,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.165899"
+    },
+    {
+      "subject_name_id": 367,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.457186"
+    },
+    {
+      "subject_name_id": 368,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.320763"
+    },
+    {
+      "subject_name_id": 369,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.321601"
+    },
+    {
+      "subject_name_id": 376,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.399762"
+    },
+    {
+      "subject_name_id": 377,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.420968"
+    },
+    {
+      "subject_name_id": 378,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.398741"
+    },
+    {
+      "subject_name_id": 379,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.400483"
+    },
+    {
+      "subject_name_id": 380,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.426991"
+    },
+    {
+      "subject_name_id": 381,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.464311"
+    },
+    {
+      "subject_name_id": 382,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.419901"
+    },
+    {
+      "subject_name_id": 384,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.582627"
+    },
+    {
+      "subject_name_id": 385,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.609249"
+    },
+    {
+      "subject_name_id": 387,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.628425"
+    },
+    {
+      "subject_name_id": 388,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.588065"
+    },
+    {
+      "subject_name_id": 389,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.589041"
+    },
+    {
+      "subject_name_id": 390,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.550998"
+    },
+    {
+      "subject_name_id": 392,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.620471"
+    },
+    {
+      "subject_name_id": 393,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.313716"
+    },
+    {
+      "subject_name_id": 394,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.314570"
+    },
+    {
+      "subject_name_id": 397,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.595448"
+    },
+    {
+      "subject_name_id": 398,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.152138"
+    },
+    {
+      "subject_name_id": 399,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.153029"
+    },
+    {
+      "subject_name_id": 405,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.804682"
+    },
+    {
+      "subject_name_id": 406,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.460922"
+    },
+    {
+      "subject_name_id": 407,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.430298"
+    },
+    {
+      "subject_name_id": 408,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.395854"
+    },
+    {
+      "subject_name_id": 414,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.602868"
+    },
+    {
+      "subject_name_id": 419,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.754705"
+    },
+    {
+      "subject_name_id": 420,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.304773"
+    },
+    {
+      "subject_name_id": 421,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.148130"
+    },
+    {
+      "subject_name_id": 422,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.149274"
+    },
+    {
+      "subject_name_id": 423,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.150224"
+    },
+    {
+      "subject_name_id": 424,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.151212"
+    },
+    {
+      "subject_name_id": 425,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.164778"
+    },
+    {
+      "subject_name_id": 426,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.162350"
+    },
+    {
+      "subject_name_id": 427,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.537843"
+    },
+    {
+      "subject_name_id": 428,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.507134"
+    },
+    {
+      "subject_name_id": 433,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.249356"
+    },
+    {
+      "subject_name_id": 433,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.477620"
+    },
+    {
+      "subject_name_id": 433,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.545252"
+    },
+    {
+      "subject_name_id": 433,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.707467"
+    },
+    {
+      "subject_name_id": 433,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.810360"
+    },
+    {
+      "subject_name_id": 434,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.343809"
+    },
+    {
+      "subject_name_id": 435,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.344866"
+    },
+    {
+      "subject_name_id": 437,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.770066"
+    },
+    {
+      "subject_name_id": 438,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.309848"
+    },
+    {
+      "subject_name_id": 439,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.310709"
+    },
+    {
+      "subject_name_id": 440,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.403466"
+    },
+    {
+      "subject_name_id": 442,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.188320"
+    },
+    {
+      "subject_name_id": 442,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.289439"
+    },
+    {
+      "subject_name_id": 442,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.385625"
+    },
+    {
+      "subject_name_id": 442,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.538822"
+    },
+    {
+      "subject_name_id": 442,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.645389"
+    },
+    {
+      "subject_name_id": 442,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.725609"
+    },
+    {
+      "subject_name_id": 443,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "随意",
+      "created_at": "2025-06-25T18:54:10.749754"
+    },
+    {
+      "subject_name_id": 444,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "随意",
+      "created_at": "2025-06-25T18:54:10.742706"
+    },
+    {
+      "subject_name_id": 445,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.691582"
+    },
+    {
+      "subject_name_id": 446,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.611940"
+    },
+    {
+      "subject_name_id": 447,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.613112"
+    },
+    {
+      "subject_name_id": 448,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.581584"
+    },
+    {
+      "subject_name_id": 449,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.544370"
+    },
+    {
+      "subject_name_id": 455,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.522274"
+    },
+    {
+      "subject_name_id": 458,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.580466"
+    },
+    {
+      "subject_name_id": 461,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.577841"
+    },
+    {
+      "subject_name_id": 462,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.614455"
+    },
+    {
+      "subject_name_id": 465,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.521193"
+    },
+    {
+      "subject_name_id": 466,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.576425"
+    },
+    {
+      "subject_name_id": 469,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.572426"
+    },
+    {
+      "subject_name_id": 470,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.573534"
+    },
+    {
+      "subject_name_id": 471,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.574840"
+    },
+    {
+      "subject_name_id": 474,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.579258"
+    },
+    {
+      "subject_name_id": 478,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.227734"
+    },
+    {
+      "subject_name_id": 479,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.229184"
+    },
+    {
+      "subject_name_id": 487,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.557138"
+    },
+    {
+      "subject_name_id": 493,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.168828"
+    },
+    {
+      "subject_name_id": 493,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.503424"
+    },
+    {
+      "subject_name_id": 494,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.160970"
+    },
+    {
+      "subject_name_id": 494,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.535887"
+    },
+    {
+      "subject_name_id": 495,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.566622"
+    },
+    {
+      "subject_name_id": 496,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.593324"
+    },
+    {
+      "subject_name_id": 499,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.700079"
+    },
+    {
+      "subject_name_id": 501,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.782644"
+    },
+    {
+      "subject_name_id": 502,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.231950"
+    },
+    {
+      "subject_name_id": 505,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.680363"
+    },
+    {
+      "subject_name_id": 508,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.785056"
+    },
+    {
+      "subject_name_id": 520,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.244850"
+    },
+    {
+      "subject_name_id": 521,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.664201"
+    },
+    {
+      "subject_name_id": 522,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.406048"
+    },
+    {
+      "subject_name_id": 523,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.410591"
+    },
+    {
+      "subject_name_id": 524,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.753681"
+    },
+    {
+      "subject_name_id": 525,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.315465"
+    },
+    {
+      "subject_name_id": 526,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.317202"
+    },
+    {
+      "subject_name_id": 527,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.317941"
+    },
+    {
+      "subject_name_id": 528,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.319123"
+    },
+    {
+      "subject_name_id": 529,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.585886"
+    },
+    {
+      "subject_name_id": 531,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.192542"
+    },
+    {
+      "subject_name_id": 531,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.476559"
+    },
+    {
+      "subject_name_id": 531,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.706383"
+    },
+    {
+      "subject_name_id": 531,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.811384"
+    },
+    {
+      "subject_name_id": 533,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.698957"
+    },
+    {
+      "subject_name_id": 534,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.615557"
+    },
+    {
+      "subject_name_id": 535,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.794431"
+    },
+    {
+      "subject_name_id": 536,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.392693"
+    },
+    {
+      "subject_name_id": 539,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.780776"
+    },
+    {
+      "subject_name_id": 540,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.209838"
+    },
+    {
+      "subject_name_id": 541,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.210755"
+    },
+    {
+      "subject_name_id": 542,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.803857"
+    },
+    {
+      "subject_name_id": 543,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.773543"
+    },
+    {
+      "subject_name_id": 544,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.378054"
+    },
+    {
+      "subject_name_id": 545,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.378810"
+    },
+    {
+      "subject_name_id": 546,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.663232"
+    },
+    {
+      "subject_name_id": 547,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.268750"
+    },
+    {
+      "subject_name_id": 548,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.294029"
+    },
+    {
+      "subject_name_id": 549,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.750519"
+    },
+    {
+      "subject_name_id": 550,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.744579"
+    },
+    {
+      "subject_name_id": 551,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.781800"
+    },
+    {
+      "subject_name_id": 552,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.616750"
+    },
+    {
+      "subject_name_id": 553,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "随意",
+      "created_at": "2025-06-25T18:54:10.770984"
+    },
+    {
+      "subject_name_id": 555,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.463182"
+    },
+    {
+      "subject_name_id": 556,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.556031"
+    },
+    {
+      "subject_name_id": 559,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.447535"
+    },
+    {
+      "subject_name_id": 561,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.422781"
+    },
+    {
+      "subject_name_id": 562,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.193892"
+    },
+    {
+      "subject_name_id": 565,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.799667"
+    },
+    {
+      "subject_name_id": 566,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.591456"
+    },
+    {
+      "subject_name_id": 569,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.421917"
+    },
+    {
+      "subject_name_id": 570,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.298132"
+    },
+    {
+      "subject_name_id": 571,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.298960"
+    },
+    {
+      "subject_name_id": 572,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.465433"
+    },
+    {
+      "subject_name_id": 573,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.336618"
+    },
+    {
+      "subject_name_id": 574,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.337421"
+    },
+    {
+      "subject_name_id": 575,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.694135"
+    },
+    {
+      "subject_name_id": 580,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.397013"
+    },
+    {
+      "subject_name_id": 580,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.801246"
+    },
+    {
+      "subject_name_id": 581,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.444928"
+    },
+    {
+      "subject_name_id": 582,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.462063"
+    },
+    {
+      "subject_name_id": 583,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.452421"
+    },
+    {
+      "subject_name_id": 585,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.752039"
+    },
+    {
+      "subject_name_id": 586,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.397911"
+    },
+    {
+      "subject_name_id": 587,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.797263"
+    },
+    {
+      "subject_name_id": 588,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.739903"
+    },
+    {
+      "subject_name_id": 589,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.748958"
+    },
+    {
+      "subject_name_id": 590,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.423866"
+    },
+    {
+      "subject_name_id": 594,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.431553"
+    },
+    {
+      "subject_name_id": 595,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.774695"
+    },
+    {
+      "subject_name_id": 596,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.189185"
+    },
+    {
+      "subject_name_id": 599,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.584952"
+    },
+    {
+      "subject_name_id": 600,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.583787"
+    },
+    {
+      "subject_name_id": 601,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.305489"
+    },
+    {
+      "subject_name_id": 602,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.219576"
+    },
+    {
+      "subject_name_id": 603,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.220417"
+    },
+    {
+      "subject_name_id": 604,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.762487"
+    },
+    {
+      "subject_name_id": 605,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.552069"
+    },
+    {
+      "subject_name_id": 606,
+      "faculty_id": 7,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.565476"
+    },
+    {
+      "subject_name_id": 607,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.376939"
+    },
+    {
+      "subject_name_id": 609,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.234688"
+    },
+    {
+      "subject_name_id": 610,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.235423"
+    },
+    {
+      "subject_name_id": 611,
+      "faculty_id": 4,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.296873"
+    },
+    {
+      "subject_name_id": 612,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.429179"
+    },
+    {
+      "subject_name_id": 614,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.746937"
+    },
+    {
+      "subject_name_id": 615,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.764786"
+    },
+    {
+      "subject_name_id": 616,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.792338"
+    },
+    {
+      "subject_name_id": 625,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.784310"
+    },
+    {
+      "subject_name_id": 626,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.771947"
+    },
+    {
+      "subject_name_id": 629,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.202411"
+    },
+    {
+      "subject_name_id": 630,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.203926"
+    },
+    {
+      "subject_name_id": 633,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.746192"
+    },
+    {
+      "subject_name_id": 634,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.760135"
+    },
+    {
+      "subject_name_id": 635,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "必修",
+      "created_at": "2025-06-25T18:54:10.375978"
+    },
+    {
+      "subject_name_id": 635,
+      "faculty_id": 5,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.409371"
+    },
+    {
+      "subject_name_id": 637,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.760974"
+    },
+    {
+      "subject_name_id": 638,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 4,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.765659"
+    },
+    {
+      "subject_name_id": 639,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.793403"
+    },
+    {
+      "subject_name_id": 644,
+      "faculty_id": 8,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.690177"
+    },
+    {
+      "subject_name_id": 647,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.243280"
+    },
+    {
+      "subject_name_id": 648,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.221317"
+    },
+    {
+      "subject_name_id": 649,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.222179"
+    },
+    {
+      "subject_name_id": 650,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.225294"
+    },
+    {
+      "subject_name_id": 651,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.226876"
+    },
+    {
+      "subject_name_id": 654,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.223049"
+    },
+    {
+      "subject_name_id": 655,
+      "faculty_id": 3,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選択",
+      "created_at": "2025-06-25T18:54:10.224112"
+    },
+    {
+      "subject_name_id": 660,
+      "faculty_id": 9,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 5,
+      "requirement_type": "選必",
+      "created_at": "2025-06-25T18:54:10.777994"
+    }
+  ]
+}

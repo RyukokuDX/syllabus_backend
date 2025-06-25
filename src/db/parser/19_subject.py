@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.4.1
-# Project Version: v1.4.2
+# File Version: v1.4.2
+# Project Version: v1.4.3
 # Last Updated: 2025-06-25
 
 import os
@@ -32,34 +32,42 @@ def get_csv_files(year: int) -> List[str]:
         if os.path.isdir(item_path):
             subdirs.append(item)
     
+    csv_files = []
+    
     if subdirs:
         print(f"見つかったcsvサブディレクトリ: {', '.join(subdirs)}")
         while True:
             subdir_input = input("処理するcsvサブディレクトリを指定してください（空の場合は全て処理）: ").strip()
             if not subdir_input:
-                # 全てのサブディレクトリを処理
+                # 全てのサブディレクトリとメインディレクトリを処理
+                # メインディレクトリ（csv）のCSVファイルを取得
+                for file in os.listdir(base_dir):
+                    if file.endswith('.csv'):
+                        csv_files.append(os.path.join(base_dir, file))
+                
+                # 全てのサブディレクトリのCSVファイルを取得
+                for subdir in subdirs:
+                    subdir_path = os.path.join(base_dir, subdir)
+                    if os.path.isdir(subdir_path):
+                        for file in os.listdir(subdir_path):
+                            if file.endswith('.csv'):
+                                csv_files.append(os.path.join(subdir_path, file))
                 break
             elif subdir_input in subdirs:
                 # 指定されたサブディレクトリのみ処理
-                subdirs = [subdir_input]
+                subdir_path = os.path.join(base_dir, subdir_input)
+                if os.path.isdir(subdir_path):
+                    for file in os.listdir(subdir_path):
+                        if file.endswith('.csv'):
+                            csv_files.append(os.path.join(subdir_path, file))
                 break
             else:
                 print(f"無効なサブディレクトリです。有効な選択肢: {', '.join(subdirs)}")
-    
-    csv_files = []
-    
-    # メインディレクトリ（csv）のCSVファイルを取得
-    for file in os.listdir(base_dir):
-        if file.endswith('.csv'):
-            csv_files.append(os.path.join(base_dir, file))
-    
-    # 指定されたサブディレクトリのCSVファイルを取得
-    for subdir in subdirs:
-        subdir_path = os.path.join(base_dir, subdir)
-        if os.path.isdir(subdir_path):
-            for file in os.listdir(subdir_path):
-                if file.endswith('.csv'):
-                    csv_files.append(os.path.join(subdir_path, file))
+    else:
+        # サブディレクトリがない場合はメインディレクトリのみ処理
+        for file in os.listdir(base_dir):
+            if file.endswith('.csv'):
+                csv_files.append(os.path.join(base_dir, file))
     
     if not csv_files:
         raise FileNotFoundError(f"CSVファイルが見つかりません: {base_dir}")
@@ -204,12 +212,10 @@ def get_faculty_id_from_db(session, faculty_name: str) -> int:
 def get_class_id_from_db(session, class_name: str) -> int:
     """科目区分IDを取得する"""
     try:
-        # 前後の空白を除去
-        class_name = class_name.strip()
         query = text("""
             SELECT class_id 
             FROM class 
-            WHERE TRIM(class_name) = :name
+            WHERE class_name = :name
             ORDER BY class_id
             LIMIT 1
         """)
@@ -233,6 +239,9 @@ def get_class_id_from_db(session, class_name: str) -> int:
 def get_subclass_id_from_db(session, subclass_name: str) -> int:
     """科目小区分IDを取得する"""
     try:
+        if not subclass_name:
+            return None
+            
         query = text("""
             SELECT subclass_id 
             FROM subclass 
@@ -257,7 +266,57 @@ def get_subclass_id_from_db(session, subclass_name: str) -> int:
         session.rollback()
         return None
 
-def extract_subject_info(csv_file: str, db_config: Dict[str, str], stats: Dict) -> List[Dict]:
+def create_warning_csv(year: int, errors: List[Dict]) -> str:
+    """エラー内容を詳細にCSVファイルに記載する"""
+    # 警告ディレクトリを作成
+    warning_dir = os.path.join("warning", str(year))
+    os.makedirs(warning_dir, exist_ok=True)
+    
+    # 現在の日時を取得してファイル名を生成
+    current_time = datetime.now()
+    filename = f"subject_{current_time.strftime('%Y%m%d_%H%M')}.csv"
+    output_file = os.path.join(warning_dir, filename)
+    
+    # CSVファイルにエラー情報を書き込み
+    with open(output_file, 'w', encoding='utf-8', newline='') as f:
+        writer = csv.writer(f)
+        
+        # ヘッダー行
+        writer.writerow([
+            'ファイル名',
+            '行番号',
+            '科目名',
+            '学部課程',
+            '年度',
+            '科目区分',
+            '科目小区分',
+            '必須度',
+            'エラータイプ',
+            'エラー詳細',
+            '正規化後科目名',
+            '処理日時'
+        ])
+        
+        # エラーデータ
+        for error in errors:
+            writer.writerow([
+                error.get('file_name', ''),
+                error.get('row_number', ''),
+                error.get('subject_name', ''),
+                error.get('faculty_name', ''),
+                error.get('year', ''),
+                error.get('class_name', ''),
+                error.get('subclass_name', ''),
+                error.get('requirement_type', ''),
+                error.get('error_type', ''),
+                error.get('error_detail', ''),
+                error.get('normalized_subject_name', ''),
+                error.get('processed_at', '')
+            ])
+    
+    return output_file
+
+def extract_subject_info(csv_file: str, db_config: Dict[str, str], stats: Dict, errors: List[Dict]) -> List[Dict]:
     """CSVから科目基本情報を抽出する"""
     subjects = []
     session = get_db_connection(db_config)
@@ -268,7 +327,7 @@ def extract_subject_info(csv_file: str, db_config: Dict[str, str], stats: Dict) 
             rows = list(reader)
             stats['total_items'] += len(rows)
             
-            for row in rows:
+            for row_idx, row in enumerate(rows, start=2):  # ヘッダー行を除いて2から開始
                 try:
                     # 科目名をクリーニングして正規化
                     subject_name = clean_subject_name(row['科目名'])
@@ -280,9 +339,48 @@ def extract_subject_info(csv_file: str, db_config: Dict[str, str], stats: Dict) 
                     class_id = get_class_id_from_db(session, row['科目区分'])
                     subclass_id = get_subclass_id_from_db(session, row['科目小区分']) if row['科目小区分'] else None
                     
-                    if subject_name_id is None or faculty_id is None or class_id is None:
+                    # エラーチェックとエラー情報の収集
+                    error_info = {
+                        'file_name': os.path.basename(csv_file),
+                        'row_number': row_idx,
+                        'subject_name': row['科目名'],
+                        'faculty_name': row['学部課程'],
+                        'year': row['年度'],
+                        'class_name': row['科目区分'],
+                        'subclass_name': row['科目小区分'],
+                        'requirement_type': row['必須度'],
+                        'normalized_subject_name': normalized_subject_name,
+                        'processed_at': datetime.now().isoformat()
+                    }
+                    
+                    if subject_name_id is None:
+                        error_info['error_type'] = '科目名ID未取得'
+                        error_info['error_detail'] = f'科目名が見つかりません: {subject_name} (正規化後: {normalized_subject_name})'
+                        errors.append(error_info)
                         stats['error_items'] += 1
-                        error_type = '必要なIDが見つからない'
+                        error_type = '科目名ID未取得'
+                        if error_type not in stats['specific_errors']:
+                            stats['specific_errors'][error_type] = 0
+                        stats['specific_errors'][error_type] += 1
+                        continue
+                        
+                    if faculty_id is None:
+                        error_info['error_type'] = '学部ID未取得'
+                        error_info['error_detail'] = f'学部が見つかりません: {row["学部課程"]}'
+                        errors.append(error_info)
+                        stats['error_items'] += 1
+                        error_type = '学部ID未取得'
+                        if error_type not in stats['specific_errors']:
+                            stats['specific_errors'][error_type] = 0
+                        stats['specific_errors'][error_type] += 1
+                        continue
+                        
+                    if class_id is None:
+                        error_info['error_type'] = '科目区分ID未取得'
+                        error_info['error_detail'] = f'科目区分が見つかりません: {row["科目区分"]}'
+                        errors.append(error_info)
+                        stats['error_items'] += 1
+                        error_type = '科目区分ID未取得'
                         if error_type not in stats['specific_errors']:
                             stats['specific_errors'][error_type] = 0
                         stats['specific_errors'][error_type] += 1
@@ -301,6 +399,21 @@ def extract_subject_info(csv_file: str, db_config: Dict[str, str], stats: Dict) 
                     stats['valid_items'] += 1
                     
                 except Exception as e:
+                    error_info = {
+                        'file_name': os.path.basename(csv_file),
+                        'row_number': row_idx,
+                        'subject_name': row.get('科目名', ''),
+                        'faculty_name': row.get('学部課程', ''),
+                        'year': row.get('年度', ''),
+                        'class_name': row.get('科目区分', ''),
+                        'subclass_name': row.get('科目小区分', ''),
+                        'requirement_type': row.get('必須度', ''),
+                        'normalized_subject_name': '',
+                        'error_type': 'データ処理エラー',
+                        'error_detail': str(e),
+                        'processed_at': datetime.now().isoformat()
+                    }
+                    errors.append(error_info)
                     stats['error_items'] += 1
                     error_type = 'データ処理エラー'
                     if error_type not in stats['specific_errors']:
@@ -362,6 +475,9 @@ def main(db_config: Dict[str, str]):
             'specific_errors': {}
         }
         
+        # エラー情報の収集用リスト
+        errors = []
+        
         # 処理開始時のメッセージ
         tqdm.write(f"\n{'='*60}")
         tqdm.write(f"科目パーサー - 対象年度: {year}")
@@ -376,7 +492,7 @@ def main(db_config: Dict[str, str]):
         all_subjects = []
         for csv_file in tqdm(csv_files, desc="CSVファイル処理中", unit="file"):
             try:
-                subjects = extract_subject_info(csv_file, db_config, stats)
+                subjects = extract_subject_info(csv_file, db_config, stats, errors)
                 all_subjects.extend(subjects)
                 stats['processed_files'] += 1
                 tqdm.write(f"ファイル {os.path.basename(csv_file)}: {len(subjects)}件の科目を抽出")
@@ -398,6 +514,11 @@ def main(db_config: Dict[str, str]):
             if combination not in seen_combinations:
                 seen_combinations.add(combination)
                 unique_subjects.append(subject)
+        
+        # エラー情報をCSVファイルに出力
+        if errors:
+            warning_file = create_warning_csv(year, errors)
+            tqdm.write(f"⚠️  エラー詳細をCSVファイルに出力しました: {warning_file}")
         
         # 最終統計の表示
         tqdm.write("\n" + "="*60)
