@@ -1,8 +1,8 @@
 ---
 title: データベースER図
-file_version: v1.4.0
-project_version: v1.4.0
-last_updated: 2025-06-24
+file_version: v1.4.2
+project_version: v1.4.5
+last_updated: 2025-06-27
 ---
 <!-- Curosr はversion 弄るな -->
 
@@ -14,9 +14,9 @@ last_updated: 2025-06-24
 
 # データベースER図
 
-- File Version: v1.4.0
-- Project Version: v1.4.0
-- Last Updated: 2025-06-24
+- File Version: v1.4.2
+- Project Version: v1.4.5
+- Last Updated: 2025-06-27
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
 
@@ -206,30 +206,8 @@ GRADING_CRITERION {
 }
 
 %% ===========================
-%% Basic Table
-%% ===========================
-SUBJECT {
-    subject_id int PK
-    subject_name_id int FK "NOT NULL"
-    faculty_id int FK "NOT NULL"
-    curriculum_year int "NOT NULL"
-    class_id int FK "NOT NULL"
-    subclass_id int FK
-    requirement_type text "NOT NULL"
-    created_at timestamp "NOT NULL"
-    updated_at timestamp
-}
-
-%% ===========================
 %% Relation Tables
 %% ===========================
-SUBJECT_SYLLABUS {
-    id int PK
-    subject_id int FK "NOT NULL"
-    syllabus_id int FK "NOT NULL"
-    created_at timestamp "NOT NULL"
-    updated_at timestamp
-}
 SUBJECT_ATTRIBUTE_VALUE {
     id int PK
     subject_id int FK "NOT NULL"
@@ -261,7 +239,6 @@ BOOK ||--o{ SYLLABUS_BOOK : book_id
 SUBJECT_ATTRIBUTE ||--o{ SUBJECT_ATTRIBUTE_VALUE : attribute_id
 SYLLABUS_MASTER ||--o{ BOOK_UNCATEGORIZED : syllabus_id
 
-SUBJECT ||--o{ SUBJECT_SYLLABUS : subject_id
 SUBJECT ||--o{ SUBJECT_ATTRIBUTE_VALUE : subject_id
 
 SYLLABUS_MASTER ||--|| SYLLABUS : syllabus_id
@@ -273,8 +250,22 @@ SYLLABUS_MASTER ||--o{ SYLLABUS_INSTRUCTOR : syllabus_id
 SYLLABUS_MASTER ||--o{ SYLLABUS_BOOK : syllabus_id
 SYLLABUS_MASTER ||--o{ GRADING_CRITERION : syllabus_id
 SYLLABUS_MASTER ||--o{ SYLLABUS_STUDY_SYSTEM : source_syllabus_id
-SYLLABUS_MASTER ||--o{ SUBJECT_SYLLABUS : syllabus_id
 LECTURE_SESSION ||--o{ LECTURE_SESSION_INSTRUCTOR : lecture_session_id
+
+%% ===========================
+%% Basic Table
+%% ===========================
+SUBJECT {
+    subject_id int PK
+    subject_name_id int FK "NOT NULL"
+    faculty_id int FK "NOT NULL"
+    curriculum_year int "NOT NULL"
+    class_id int FK "NOT NULL"
+    subclass_id int FK
+    requirement_type text "NOT NULL"
+    created_at timestamp "NOT NULL"
+    updated_at timestamp
+}
 ```
 
 [目次へ戻る](#目次) 

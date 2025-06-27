@@ -39,7 +39,6 @@ TABLE_NAME_PLURAL = {
     'grading_criterion': 'grading_criteria',
     'subject_attribute': 'subject_attributes',
     'subject': 'subjects',
-    'subject_syllabus': 'subject_syllabuses',
     'subject_attribute_value': 'subject_attribute_values',
     'syllabus_study_system': 'syllabus_study_systems'
 }
@@ -102,7 +101,6 @@ def read_json_files(directory, table_name):
             "syllabus_master": lambda r: (r.get('syllabus_code'), r.get('syllabus_year')),
             "syllabus": lambda r: r.get('syllabus_id'),
             "subject": lambda r: (r.get('subject_name_id'), r.get('faculty_id'), r.get('class_id'), r.get('subclass_id'), r.get('curriculum_year')),
-            "subject_syllabus": lambda r: (r.get('subject_id'), r.get('syllabus_id')),
             "subject_attribute": lambda r: r.get('attribute_name'),
             "subject_attribute_value": lambda r: (r.get('subject_id'), r.get('attribute_id')),
             "lecture_time": lambda r: (r.get('syllabus_id'), r.get('day_of_week'), r.get('period')),
@@ -223,7 +221,6 @@ def generate_sql_insert(table_name, records):
         "syllabus_master": ["syllabus_code", "syllabus_year"],
         "syllabus": ["syllabus_id"],  # syllabus_idは主キーなので一意
         "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
-        "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name"],
         "subject_attribute_value": ["subject_id", "attribute_id"],
         "instructor": None,  # 一意性制約がないため、ON CONFLICT句は不要
@@ -249,7 +246,6 @@ def generate_sql_insert(table_name, records):
         "syllabus_master": ["syllabus_code", "syllabus_year"],
         "syllabus": ["subject_name_id", "subtitle", "term", "campus", "credits", "goals", "summary", "attainment", "methods", "outside_study", "textbook_comment", "reference_comment", "advice"],  # syllabus_id以外のカラムを更新対象に
         "subject": ["subject_name_id", "faculty_id", "class_id", "subclass_id", "curriculum_year"],
-        "subject_syllabus": ["subject_id", "syllabus_id"],
         "subject_attribute": ["attribute_name", "description"],
         "subject_attribute_value": ["value"],
         "instructor": None,  # 一意性制約がないため、更新対象カラムも不要
@@ -458,21 +454,13 @@ CREATE TABLE IF NOT EXISTS subject (
     subject_id SERIAL PRIMARY KEY,
     subject_name_id INTEGER NOT NULL REFERENCES subject_name(subject_name_id) ON DELETE RESTRICT,
     faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE RESTRICT,
+    curriculum_year INTEGER NOT NULL,
     class_id INTEGER NOT NULL REFERENCES class(class_id) ON DELETE RESTRICT,
     subclass_id INTEGER REFERENCES subclass(subclass_id) ON DELETE RESTRICT,
-    curriculum_year INTEGER NOT NULL,
+    requirement_type TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     UNIQUE(subject_name_id, faculty_id, class_id, subclass_id, curriculum_year)
-);""",
-        'subject_syllabus': """
-CREATE TABLE IF NOT EXISTS subject_syllabus (
-    id SERIAL PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, syllabus_id)
 );""",
         'subject_attribute_value': """
 CREATE TABLE IF NOT EXISTS subject_attribute_value (
@@ -508,9 +496,6 @@ CREATE INDEX IF NOT EXISTS idx_subject_subject_name ON subject(subject_name_id);
 CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
 CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);
 CREATE INDEX IF NOT EXISTS idx_subject_curriculum_year ON subject(curriculum_year);""",
-        'subject_syllabus': """
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_id);""",
         'subject_attribute_value': """
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);""",
@@ -730,11 +715,6 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'subject_attribute_value',
                 'table_name': 'subject_attribute_value',
-                'source': 'syllabus_search'
-            },
-            {
-                'json_dir': project_root / 'updates' / 'subject_syllabus',
-                'table_name': 'subject_syllabus',
                 'source': 'syllabus_search'
             },
             {
