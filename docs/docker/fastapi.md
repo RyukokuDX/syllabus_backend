@@ -1,7 +1,7 @@
 ---
 title: FastAPI環境構築ガイド
-file_version: v1.5.0
-project_version: v1.5.0
+file_version: v2.0.0
+project_version: v2.0.0
 last_updated: 2025-06-30
 ---
 

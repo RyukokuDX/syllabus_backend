@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # cursorはversionを弄るな
 """
-# File Version: v1.5.0
-# Project Version: v1.5.0
+# File Version: v2.0.0
+# Project Version: v2.0.0
 # Last Updated: 2025-06-30
 """
 

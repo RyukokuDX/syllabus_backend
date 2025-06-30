@@ -1,7 +1,7 @@
 ---
 title: ドキュメント作成ガイドライン
-file_version: v1.5.0
-project_version: v1.5.0
+file_version: v2.0.0
+project_version: v2.0.0
 last_updated: 2025-06-30
 ---
 
@@ -11,8 +11,8 @@ last_updated: 2025-06-30
 
 # ドキュメント作成ガイドライン
 
-- File Version: v1.5.0
-- Project Version: v1.5.0
+- File Version: v2.0.0
+- Project Version: v2.0.0
 - Last Updated: 2025-06-30
 
 [readmeへ](../README.md) | [Gitコミットポリシーへ](./git_commit_policy.md)
@@ -45,8 +45,8 @@ last_updated: 2025-06-30
    ```markdown
    ---
    title: ドキュメントタイトル
-   file_version: v1.5.0
-   project_version: v1.5.0
+   file_version: v2.0.0
+   project_version: v2.0.0
    last_updated: YYYY-MM-DD
    ---
    ```
@@ -55,8 +55,8 @@ last_updated: 2025-06-30
    ```markdown
    # ドキュメントタイトル
 
-   - File Version: v1.5.0
-   - Project Version: v1.5.0
+   - File Version: v2.0.0
+   - Project Version: v2.0.0
    - Last Updated: YYYY-MM-DD
    ```
 
@@ -167,36 +167,36 @@ last_updated: 2025-06-30
   ```markdown
   ---
   title: タイトル
-  file_version: v1.5.0
-  project_version: v1.5.0
+  file_version: v2.0.0
+  project_version: v2.0.0
   last_updated: YYYY-MM-DD
   ---
 
   # タイトル
 
-  - File Version: v1.5.0
-  - Project Version: v1.5.0
+  - File Version: v2.0.0
+  - Project Version: v2.0.0
   - Last Updated: YYYY-MM-DD
   ```
 
   **Pythonファイルの場合：**
   ```python
-  # File Version: v1.5.0
-  # Project Version: v1.5.0
+  # File Version: v2.0.0
+  # Project Version: v2.0.0
   # Last Updated: YYYY-MM-DD
   ```
 
   **Shellスクリプトの場合：**
   ```bash
-  # File Version: v1.5.0
-  # Project Version: v1.5.0
+  # File Version: v2.0.0
+  # Project Version: v2.0.0
   # Last Updated: YYYY-MM-DD
   ```
 
   **JSONファイルの場合：**
   ```json
-  // File Version: v1.5.0
-  // Project Version: v1.5.0
+  // File Version: v2.0.0
+  // Project Version: v2.0.0
   // Last Updated: YYYY-MM-DD
   ```
 

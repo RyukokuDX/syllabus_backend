@@ -1,6 +1,6 @@
 #!/bin/bash
-# File Version: v1.5.0
-# Project Version: v1.5.0
+# File Version: v2.0.0
+# Project Version: v2.0.0
 # Last Updated: 2025-06-30
 
 # バージョン更新の種類を確認
