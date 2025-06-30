@@ -1,7 +1,7 @@
 ---
 title: パーサー一覧
-file_version: v1.4.1
-project_version: v1.4.9
+file_version: v1.5.0
+project_version: v1.5.0
 last_updated: 2025-06-30
 ---
 
@@ -13,8 +13,8 @@ last_updated: 2025-06-30
 
 # パーサー一覧
 
-- File Version: v1.4.1
-- Project Version: v1.4.9
+- File Version: v1.5.0
+- Project Version: v1.5.0
 - Last Updated: 2025-06-30
 
 [readmeへ](../../README.md)

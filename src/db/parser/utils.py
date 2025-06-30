@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.4.2
-# Project Version: v1.4.2
-# Last Updated: 2025-06-25
+# File Version: v1.5.0
+# Project Version: v1.5.0
+# Last Updated: 2025-06-30
 # curosrはversionをいじるな
 
 from datetime import datetime

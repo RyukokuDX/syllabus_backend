@@ -1,6 +1,6 @@
-# File Version: v1.4.2
-# Project Version: v1.4.5
-# Last Updated: 2025-06-27
+# File Version: v1.5.0
+# Project Version: v1.5.0
+# Last Updated: 2025-06-30
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
