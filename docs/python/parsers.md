@@ -1,8 +1,8 @@
 ---
 title: パーサー一覧
-file_version: v1.4.0
-project_version: v1.4.0
-last_updated: 2025-06-24
+file_version: v1.5.0
+project_version: v1.5.0
+last_updated: 2025-06-30
 ---
 
 <!--
@@ -13,9 +13,9 @@ last_updated: 2025-06-24
 
 # パーサー一覧
 
-- File Version: v1.4.0
-- Project Version: v1.4.0
-- Last Updated: 2025-06-24
+- File Version: v1.5.0
+- Project Version: v1.5.0
+- Last Updated: 2025-06-30
 
 [readmeへ](../../README.md)
 
@@ -50,6 +50,7 @@ last_updated: 2025-06-24
 | 科目属性パーサー | 16_subject_attribute.py | 科目属性の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute |
 | 科目パーサー | 17_subject.py | 科目情報の統合 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject |
 | 科目属性値パーサー | 19_subject_attribute_value.py | 科目属性値の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute_value |
+| シラバス学習システムパーサー | 21_syllabus_study_system.py | シラバス系統的履修の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_study_system |
 
 ### 未実装パーサー（structure.md準拠）
 
@@ -61,8 +62,15 @@ last_updated: 2025-06-24
 | 講義セッション教員パーサー | 14_lecture_session_instructor.py | 講義セッション教員の抽出 | `src/syllabus/{year}/json/*.json` | lecture_session_instructor |
 | シラバス教科書関連パーサー | 15_syllabus_book.py | シラバス教科書関連の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_book |
 | 成績評価基準パーサー | 18_grading_criterion.py | 成績評価基準の抽出 | `src/syllabus/{year}/json/*.json` | grading_criterion |
-| 科目シラバス関連パーサー | 20_subject_syllabus.py | 科目シラバス関連の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_syllabus |
-| シラバス系統的履修パーサー | 21_syllabus_study_system.py | シラバス系統的履修の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_study_system |
+| 科目属性値パーサー | 20_subject_attribute_value.py | 科目属性値の抽出（強化版） | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute_value |
+
+### 削除されたパーサー
+
+以下のパーサーは`structure.md`の変更により削除されました：
+
+| パーサー名 | ファイル名 | 削除理由 |
+|------------|------------|----------|
+| 科目シラバス関連パーサー | 20_subject_syllabus.py | `subject_syllabus`テーブルが削除されたため |
 
 ## 実行方法
 
@@ -76,6 +84,7 @@ last_updated: 2025-06-24
 ```bash
 ./syllabus.sh parser 01  # 科目区分パーサーを実行
 ./syllabus.sh parser class  # 科目区分パーサーを実行
+./syllabus.sh parser 21  # シラバス学習システムパーサーを実行
 ```
 
 ## 基本方針
@@ -192,5 +201,20 @@ stats = {
 - 致命的なエラー：例外を再送出して処理を停止
 - 軽微なエラー：統計に記録して処理を継続
 - デバッグメッセージ：必要最小限に抑制（コメントアウト）
+
+### エラーレポート機能
+
+最新のパーサーでは、エラー詳細をCSVファイルに出力する機能が追加されています：
+
+```python
+def create_warning_csv(year: int, errors: List[Dict]) -> str:
+    """エラー内容を詳細にCSVファイルに記載する"""
+    # 警告ディレクトリを作成
+    warning_dir = os.path.join("warning", str(year))
+    os.makedirs(warning_dir, exist_ok=True)
+    
+    # CSVファイルにエラー情報を書き込み
+    # ファイル名、行番号、エラータイプ、エラー詳細などを含む
+```
 
 [🔝 ページトップへ](#パーサー一覧) 

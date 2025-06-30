@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# File Version: v1.5.0
+# Project Version: v1.5.0
+# Last Updated: 2025-06-30
+# curosrはversionをいじるな
+
 import os
 import json
 import csv
@@ -27,16 +33,51 @@ def get_year_from_user() -> int:
             print("有効な数値を入力してください。")
 
 def get_csv_files(year: int) -> List[str]:
-    """指定された年度のCSVファイルのパスを取得する"""
-    base_dir = os.path.join("src", "course_guide", "subject_attribure")
+    """指定された年度のCSVファイルのパスを取得する（csvサブディレクトリも含む）"""
+    base_dir = os.path.join("src", "course_guide", str(year), "csv")
     if not os.path.exists(base_dir):
         raise FileNotFoundError(f"ディレクトリが見つかりません: {base_dir}")
     
-    csv_files = [f for f in os.listdir(base_dir) if f.endswith('.csv')]
+    # csvサブディレクトリの問い合わせ
+    subdirs = []
+    for item in os.listdir(base_dir):
+        item_path = os.path.join(base_dir, item)
+        if os.path.isdir(item_path):
+            subdirs.append(item)
+    
+    if subdirs:
+        print(f"見つかったcsvサブディレクトリ: {', '.join(subdirs)}")
+        while True:
+            subdir_input = input("処理するcsvサブディレクトリを指定してください（空の場合は全て処理）: ").strip()
+            if not subdir_input:
+                # 全てのサブディレクトリを処理
+                break
+            elif subdir_input in subdirs:
+                # 指定されたサブディレクトリのみ処理
+                subdirs = [subdir_input]
+                break
+            else:
+                print(f"無効なサブディレクトリです。有効な選択肢: {', '.join(subdirs)}")
+    
+    csv_files = []
+    
+    # メインディレクトリ（csv）のCSVファイルを取得
+    for file in os.listdir(base_dir):
+        if file.endswith('.csv'):
+            csv_files.append(os.path.join(base_dir, file))
+    
+    # 指定されたサブディレクトリのCSVファイルを取得
+    for subdir in subdirs:
+        subdir_path = os.path.join(base_dir, subdir)
+        if os.path.isdir(subdir_path):
+            for file in os.listdir(subdir_path):
+                if file.endswith('.csv'):
+                    csv_files.append(os.path.join(subdir_path, file))
+    
     if not csv_files:
         raise FileNotFoundError(f"CSVファイルが見つかりません: {base_dir}")
     
-    return [os.path.join(base_dir, f) for f in csv_files]
+    return csv_files
 
 def get_db_connection(db_config: Dict[str, str]):
     """データベース接続を取得する"""
@@ -62,21 +103,43 @@ def get_db_connection(db_config: Dict[str, str]):
     return session
 
 def extract_subject_attributes(csv_file: str) -> List[Dict]:
-    """CSVから科目属性情報を抽出する"""
+    """CSVから科目属性情報を抽出する（ヘッダーから指定列以外を取得）"""
     attributes = []
+    excluded_columns = {'科目名', '学部課程', '年度', '科目区分', '科目小区分', '必須度'}
     
     with open(csv_file, 'r', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if not row or not row[0].strip():
+        reader = csv.reader(f, delimiter='\t')  # タブ区切り
+        rows = list(reader)
+        
+        if not rows:
+            return attributes
+        
+        # ヘッダー行を取得
+        header = rows[0]
+        
+        # 除外列以外の列インデックスを取得
+        attribute_columns = []
+        for i, col_name in enumerate(header):
+            if col_name.strip() not in excluded_columns:
+                attribute_columns.append((i, col_name.strip()))
+        
+        # データ行から属性値を抽出
+        for row in rows[1:]:  # ヘッダー行をスキップ
+            if not row or len(row) < len(header):
                 continue
-                
-            attribute_info = {
-                'attribute_name': row[0].strip(),
-                'description': None,  # CSVには説明がないためNone
-                'created_at': datetime.now().isoformat()
-            }
-            attributes.append(attribute_info)
+            
+            for col_idx, col_name in attribute_columns:
+                if col_idx < len(row) and row[col_idx].strip():
+                    attribute_value = row[col_idx].strip()
+                    
+                    # 空でない値のみを属性として追加
+                    if attribute_value and attribute_value.lower() not in ['null', 'none', '']:
+                        attribute_info = {
+                            'attribute_name': col_name,
+                            'description': None,  # CSVには説明がないためNone
+                            'created_at': datetime.now().isoformat()
+                        }
+                        attributes.append(attribute_info)
     
     return attributes
 
@@ -117,8 +180,13 @@ def main(db_config: Dict[str, str]):
         # 科目属性情報の抽出
         all_attributes = []
         for csv_file in tqdm(csv_files, desc="CSVファイル処理中"):
-            attributes = extract_subject_attributes(csv_file)
-            all_attributes.extend(attributes)
+            try:
+                attributes = extract_subject_attributes(csv_file)
+                all_attributes.extend(attributes)
+                tqdm.write(f"ファイル {os.path.basename(csv_file)}: {len(attributes)}件の属性を抽出")
+            except Exception as e:
+                tqdm.write(f"ファイル {os.path.basename(csv_file)} の処理でエラー: {str(e)}")
+                continue
         
         # 重複を除去
         unique_attributes = []

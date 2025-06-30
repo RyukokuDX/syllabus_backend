@@ -1,6 +1,6 @@
-# File Version: v1.4.0
-# Project Version: v1.4.0
-# Last Updated: 2025-06-24
+# File Version: v1.5.0
+# Project Version: v1.5.0
+# Last Updated: 2025-06-30
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -344,21 +344,6 @@ class Subject(Base):
         Index('idx_subject_curriculum_year', 'curriculum_year'),
     )
 
-class SubjectSyllabus(Base):
-    __tablename__ = 'subject_syllabus'
-
-    id = Column(Integer, primary_key=True)
-    subject_id = Column(Integer, ForeignKey('subject.subject_id', ondelete='CASCADE'), nullable=False)
-    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='RESTRICT'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP)
-
-    __table_args__ = (
-        Index('idx_subject_syllabus_subject', 'subject_id'),
-        Index('idx_subject_syllabus_syllabus', 'syllabus_id'),
-        UniqueConstraint('subject_id', 'syllabus_id', name='idx_subject_syllabus_unique'),
-    )
-
 class SubjectAttributeValue(Base):
     __tablename__ = 'subject_attribute_value'
 
@@ -370,9 +355,9 @@ class SubjectAttributeValue(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
+        UniqueConstraint('subject_id', 'attribute_id', name='uix_subject_attribute_value_unique'),
         Index('idx_subject_attribute_value_subject', 'subject_id'),
         Index('idx_subject_attribute_value_attribute', 'attribute_id'),
-        UniqueConstraint('subject_id', 'attribute_id', name='idx_subject_attribute_value_unique'),
     )
 
 class SyllabusStudySystem(Base):
@@ -586,25 +571,6 @@ class Subject:
     class_id: int
     subclass_id: Optional[int]
     requirement_type: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
-@dataclass
-class SubjectSyllabus:
-    """科目シラバス関連モデル"""
-    id: int
-    subject_id: int
-    syllabus_id: int
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
-@dataclass
-class SubjectAttributeValue:
-    """科目属性値モデル"""
-    id: int
-    subject_id: int
-    attribute_id: int
-    value: str
     created_at: datetime
     updated_at: Optional[datetime] = None
 

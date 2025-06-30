@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File Version: v1.4.0
-# Project Version: v1.4.0
-# Last Updated: 2025-06-24
+# File Version: v1.5.0
+# Project Version: v1.5.0
+# Last Updated: 2025-06-30
 # curosrはversionをいじるな
 
 from datetime import datetime
@@ -19,85 +19,110 @@ sys.path.insert(0, project_root)
 from src.db.database import SessionLocal
 from src.db.models import SyllabusMaster
 
+def normalize_text(name: str, handle_null: bool = False) -> str:
+	"""テキストを正規化する統一的な関数
+	
+	Args:
+		name (str): 正規化対象のテキスト
+		handle_null (bool): NULL値の処理を行うかどうか（学部名用）
+		
+	Returns:
+		str: 正規化されたテキスト
+	"""
+	# 前後の空白を削除
+	name = name.strip()
+	
+	# NULL値の処理（学部名用）
+	if handle_null:
+		if not name or name.lower() in ['null', 'none', '']:
+			return 'NULL'
+	
+	# 括弧の統一（全角→半角）
+	bracket_map = {
+		'（': '(', '）': ')',
+		'［': '[', '］': ']',
+		'｛': '{', '｝': '}',
+		'【': '[', '】': ']',
+		'〔': '[', '〕': ']',
+		'〈': '<', '〉': '>',
+		'《': '<', '》': '>',
+		'〝': '"', '〟': '"',
+		'″': '"', '″': '"',
+		'′': "'", '′': "'"
+	}
+	for full, half in bracket_map.items():
+		name = name.replace(full, half)
+	
+	# 全角→半角（英数字・記号）
+	name = unicodedata.normalize('NFKC', name)
+	
+	# 全角スペースを半角スペースに変換
+	name = name.replace('　', ' ')
+	
+	# 連続するスペースを1つに
+	while '  ' in name:
+		name = name.replace('  ', ' ')
+	
+	# ハイフンの統一（全角→半角）
+	hyphen_map = {
+		'－': '-',  # 全角ハイフン
+		'ー': '-',  # 長音記号
+		'‐': '-',   # ハイフン
+		'‑': '-',   # ノーブレークハイフン
+		'‒': '-',   # フィギュアダッシュ
+		'–': '-',   # エンダッシュ
+		'—': '-',   # エムダッシュ
+		'―': '-'    # 水平バー
+	}
+	for full, half in hyphen_map.items():
+		name = name.replace(full, half)
+	
+	# チルダの統一（全角→半角）
+	name = name.replace('～', '~')
+	name = name.replace('〜', '~')
+	
+	# ローマ数字の統一（全角→半角）
+	roman_map = {
+		'Ⅰ': 'I', 'Ⅱ': 'II', 'Ⅲ': 'III', 'Ⅳ': 'IV', 'Ⅴ': 'V',
+		'Ⅵ': 'VI', 'Ⅶ': 'VII', 'Ⅷ': 'VIII', 'Ⅸ': 'IX', 'Ⅹ': 'X'
+	}
+	for full, half in roman_map.items():
+		name = name.replace(full, half)
+	
+	# 全角アルファベットの統一（全角→半角）
+	alpha_map = {
+		'Ａ': 'A', 'Ｂ': 'B', 'Ｃ': 'C', 'Ｄ': 'D', 'Ｅ': 'E',
+		'Ｆ': 'F', 'Ｇ': 'G', 'Ｈ': 'H', 'Ｉ': 'I', 'Ｊ': 'J',
+		'Ｋ': 'K', 'Ｌ': 'L', 'Ｍ': 'M', 'Ｎ': 'N', 'Ｏ': 'O',
+		'Ｐ': 'P', 'Ｑ': 'Q', 'Ｒ': 'R', 'Ｓ': 'S', 'Ｔ': 'T',
+		'Ｕ': 'U', 'Ｖ': 'V', 'Ｗ': 'W', 'Ｘ': 'X', 'Ｙ': 'Y',
+		'Ｚ': 'Z',
+		'ａ': 'a', 'ｂ': 'b', 'ｃ': 'c', 'ｄ': 'd', 'ｅ': 'e',
+		'ｆ': 'f', 'ｇ': 'g', 'ｈ': 'h', 'ｉ': 'i', 'ｊ': 'j',
+		'ｋ': 'k', 'ｌ': 'l', 'ｍ': 'm', 'ｎ': 'n', 'ｏ': 'o',
+		'ｐ': 'p', 'ｑ': 'q', 'ｒ': 'r', 'ｓ': 's', 'ｔ': 't',
+		'ｕ': 'u', 'ｖ': 'v', 'ｗ': 'w', 'ｘ': 'x', 'ｙ': 'y',
+		'ｚ': 'z'
+	}
+	for full, half in alpha_map.items():
+		name = name.replace(full, half)
+	
+	# 中点の統一（全角→半角）
+	name = name.replace('・', '·')
+	name = name.replace('･', '·')  # 半角カタカナ中点
+	name = name.replace('•', '·')  # 箇条書き中点
+	name = name.replace('▪', '·')  # 黒四角中点
+	name = name.replace('▫', '·')  # 白四角中点
+	
+	return name
+
+def normalize_faculty_name(name: str) -> str:
+	"""学部課程名を正規化する"""
+	return normalize_text(name, handle_null=True)
+
 def normalize_subject_name(name: str) -> str:
-    """科目名を正規化する"""
-    # 前後の空白を削除
-    name = name.strip()
-    
-    # 括弧の統一（全角→半角）
-    bracket_map = {
-        '（': '(', '）': ')',
-        '［': '[', '］': ']',
-        '｛': '{', '｝': '}',
-        '【': '[', '】': ']',
-        '〔': '[', '〕': ']',
-        '〈': '<', '〉': '>',
-        '《': '<', '》': '>',
-        '〝': '"', '〟': '"',
-        '″': '"', '″': '"',
-        '′': "'", '′': "'"
-    }
-    for full, half in bracket_map.items():
-        name = name.replace(full, half)
-    
-    # 全角→半角（英数字・記号）
-    name = unicodedata.normalize('NFKC', name)
-    
-    # 全角スペースを半角スペースに変換
-    name = name.replace('　', ' ')
-    
-    # 連続するスペースを1つに
-    while '  ' in name:
-        name = name.replace('  ', ' ')
-    
-    # ハイフンの統一（全角→半角）
-    hyphen_map = {
-        '－': '-',  # 全角ハイフン
-        'ー': '-',  # 長音記号
-        '‐': '-',   # ハイフン
-        '‑': '-',   # ノーブレークハイフン
-        '‒': '-',   # フィギュアダッシュ
-        '–': '-',   # エンダッシュ
-        '—': '-',   # エムダッシュ
-        '―': '-'    # 水平バー
-    }
-    for full, half in hyphen_map.items():
-        name = name.replace(full, half)
-    
-    # チルダの統一（全角→半角）
-    name = name.replace('～', '~')
-    name = name.replace('〜', '~')
-    
-    # ローマ数字の統一（全角→半角）
-    roman_map = {
-        'Ⅰ': 'I', 'Ⅱ': 'II', 'Ⅲ': 'III', 'Ⅳ': 'IV', 'Ⅴ': 'V',
-        'Ⅵ': 'VI', 'Ⅶ': 'VII', 'Ⅷ': 'VIII', 'Ⅸ': 'IX', 'Ⅹ': 'X'
-    }
-    for full, half in roman_map.items():
-        name = name.replace(full, half)
-    
-    # 全角アルファベットの統一（全角→半角）
-    alpha_map = {
-        'Ａ': 'A', 'Ｂ': 'B', 'Ｃ': 'C', 'Ｄ': 'D', 'Ｅ': 'E',
-        'Ｆ': 'F', 'Ｇ': 'G', 'Ｈ': 'H', 'Ｉ': 'I', 'Ｊ': 'J',
-        'Ｋ': 'K', 'Ｌ': 'L', 'Ｍ': 'M', 'Ｎ': 'N', 'Ｏ': 'O',
-        'Ｐ': 'P', 'Ｑ': 'Q', 'Ｒ': 'R', 'Ｓ': 'S', 'Ｔ': 'T',
-        'Ｕ': 'U', 'Ｖ': 'V', 'Ｗ': 'W', 'Ｘ': 'X', 'Ｙ': 'Y',
-        'Ｚ': 'Z',
-        'ａ': 'a', 'ｂ': 'b', 'ｃ': 'c', 'ｄ': 'd', 'ｅ': 'e',
-        'ｆ': 'f', 'ｇ': 'g', 'ｈ': 'h', 'ｉ': 'i', 'ｊ': 'j',
-        'ｋ': 'k', 'ｌ': 'l', 'ｍ': 'm', 'ｎ': 'n', 'ｏ': 'o',
-        'ｐ': 'p', 'ｑ': 'q', 'ｒ': 'r', 'ｓ': 's', 'ｔ': 't',
-        'ｕ': 'u', 'ｖ': 'v', 'ｗ': 'w', 'ｘ': 'x', 'ｙ': 'y',
-        'ｚ': 'z'
-    }
-    for full, half in alpha_map.items():
-        name = name.replace(full, half)
-    
-    # 中点の統一（全角→半角）
-    name = name.replace('・', '·')
-    
-    return name 
+	"""科目名を正規化する"""
+	return normalize_text(name, handle_null=False)
 
 def get_current_year() -> int:
     """現在の年度を取得する

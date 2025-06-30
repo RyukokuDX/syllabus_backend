@@ -1,6 +1,9 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # - 更新の登録は, /docs/version_control.md に準拠して実行
+# File Version: 1.4.0
+# Project Version: 1.4.0
+# Last Update: 2025-06-25
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -81,14 +84,20 @@ show_script_version() {
 # CSVファイルの整形
 normalize_csv() {
     local year="$1"
+    local subdir="$2"
     local csv_dir="$SCRIPT_DIR/src/course_guide/$year/csv"
+    
+    # サブディレクトリが指定されている場合は、パスに追加
+    if [ -n "$subdir" ]; then
+        csv_dir="$csv_dir/$subdir"
+    fi
     
     if [ ! -d "$csv_dir" ]; then
         echo "エラー: 指定された年度のCSVディレクトリが存在しません: $csv_dir"
         exit 1
     fi
     
-    echo "$year年度のCSVファイルを整形中..."
+    echo "$year年度のCSVファイルを整形中... (ディレクトリ: $csv_dir)"
     cd "$SCRIPT_DIR"  # スクリプトのディレクトリに移動
     
     # すべてのCSVファイルを処理
@@ -108,7 +117,7 @@ normalize_csv() {
 import sys
 import csv
 import os
-from db.parser.utils import normalize_subject_name
+from db.parser.utils import normalize_subject_name, normalize_faculty_name
 
 def normalize_csv(input_file):
     # 入力ファイルの区切り文字を判定
@@ -122,12 +131,14 @@ def normalize_csv(input_file):
         reader = csv.reader(f, delimiter=delimiter)
         # ヘッダー行を読み取り
         headers = next(reader)
-        # 科目名フィールドのインデックスを特定
+        # 科目名フィールドと課程名フィールドのインデックスを特定
         subject_name_index = None
+        course_name_index = None
         for i, header in enumerate(headers):
             if header.strip() == '科目名':
                 subject_name_index = i
-                break
+            elif header.strip() == '学部課程':
+                course_name_index = i
         
         if subject_name_index is None:
             print(f'警告: 科目名フィールドが見つかりません: {os.path.basename(input_file)}')
@@ -152,6 +163,10 @@ def normalize_csv(input_file):
         # 科目名フィールドを正規化
         if len(normalized_row) > subject_name_index and normalized_row[subject_name_index] != 'NULL':
             normalized_row[subject_name_index] = normalize_subject_name(normalized_row[subject_name_index])
+        
+        # 課程名フィールドを正規化（存在する場合）
+        if course_name_index is not None and len(normalized_row) > course_name_index and normalized_row[course_name_index] != 'NULL':
+            normalized_row[course_name_index] = normalize_faculty_name(normalized_row[course_name_index])
         
         normalized_rows.append(normalized_row)
     
@@ -227,7 +242,7 @@ show_help() {
     echo "  generate       指定されたテーブルのデータを生成"
     echo "  check          指定されたテーブルのデータをチェック"
     echo "  deploy         指定されたテーブルのデータをデプロイ"
-    echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名を正規化）"
+    echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
     echo
     echo "使用例:"
     echo "  $0 venv-init             # Python仮想環境を初期化"
@@ -242,6 +257,7 @@ show_help() {
     echo "  $0 -p check              # 指定されたテーブルのデータをチェック"
     echo "  $0 -p deploy             # 指定されたテーブルのデータをデプロイ"
     echo "  $0 csv normalize 2024    # 2024年度のCSVファイルを整形"
+    echo "  $0 csv normalize 2025 Y  # 2025年度のYサブディレクトリのCSVファイルを整形"
 }
 
 # コマンドライン引数の解析
@@ -301,10 +317,15 @@ case $COMMAND in
             normalize)
                 if [ ${#ARGS[@]} -lt 2 ]; then
                     echo "エラー: 年度が指定されていません"
-                    echo "使用方法: $0 csv normalize <year>"
+                    echo "使用方法: $0 csv normalize <year> [subdir]"
                     exit 1
                 fi
-                normalize_csv "${ARGS[1]}"
+                # サブディレクトリが指定されている場合は3番目の引数、そうでなければ空文字列
+                subdir=""
+                if [ ${#ARGS[@]} -ge 3 ]; then
+                    subdir="${ARGS[2]}"
+                fi
+                normalize_csv "${ARGS[1]}" "$subdir"
                 ;;
             *)
                 echo "エラー: 不明なCSVコマンド '${ARGS[0]}'"

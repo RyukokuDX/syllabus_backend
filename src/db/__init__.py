@@ -18,7 +18,6 @@ from .models import (
     GradingCriterion,
     SubjectAttribute,
     Subject,
-    SubjectSyllabus,
     SubjectAttributeValue,
     SyllabusStudySystem
 )
@@ -43,7 +42,6 @@ __all__ = [
     'GradingCriterion',
     'SubjectAttribute',
     'Subject',
-    'SubjectSyllabus',
     'SubjectAttributeValue',
     'SyllabusStudySystem'
 ] 
