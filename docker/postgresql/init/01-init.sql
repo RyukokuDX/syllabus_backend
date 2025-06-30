@@ -311,19 +311,6 @@ CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
 CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);
 CREATE INDEX IF NOT EXISTS idx_subject_curriculum_year ON subject(curriculum_year);
 
--- subject_syllabus（科目シラバス関連）
-CREATE TABLE IF NOT EXISTS subject_syllabus (
-    id SERIAL PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, syllabus_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_id);
-
 -- subject_attribute_value（科目属性値）
 CREATE TABLE IF NOT EXISTS subject_attribute_value (
     id SERIAL PRIMARY KEY,
@@ -372,3 +359,6 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250624171346__insert_grading_criterions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_facultys.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_subject_attributes.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250627180556__insert_subjects.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250630101938__insert_subject_attribute_values.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250630111050__insert_syllabus_study_systems.sql
