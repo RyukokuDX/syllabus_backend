@@ -243,6 +243,10 @@ show_help() {
     echo "  check          指定されたテーブルのデータをチェック"
     echo "  deploy         指定されたテーブルのデータをデプロイ"
     echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
+    echo "  cache generate   指定されたキャッシュを生成"
+    echo "  cache delete     指定されたキャッシュを削除"
+    echo "  cache list       利用可能なキャッシュ一覧を表示"
+    echo "  cache status     キャッシュの状態を表示"
     echo
     echo "使用例:"
     echo "  $0 venv-init             # Python仮想環境を初期化"
@@ -258,6 +262,10 @@ show_help() {
     echo "  $0 -p deploy             # 指定されたテーブルのデータをデプロイ"
     echo "  $0 csv normalize 2024    # 2024年度のCSVファイルを整形"
     echo "  $0 csv normalize 2025 Y  # 2025年度のYサブディレクトリのCSVファイルを整形"
+    echo "  $0 -p cache generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
+    echo "  $0 -p cache delete subject_syllabus_cache    # 科目別シラバスキャッシュを削除"
+    echo "  $0 -p cache list         # キャッシュ一覧を表示"
+    echo "  $0 -p cache status       # キャッシュの状態を表示"
 }
 
 # コマンドライン引数の解析
@@ -452,6 +460,47 @@ case $COMMAND in
     deploy)
         if [ "$SERVICE" = "postgres" ]; then
             "$SCRIPT_DIR/bin/deploy-migration.sh"
+        else
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
+            exit 1
+        fi
+        ;;
+    cache)
+        if [ "$SERVICE" = "postgres" ]; then
+            if [ ${#ARGS[@]} -eq 0 ]; then
+                echo "エラー: キャッシュコマンドのサブコマンドが指定されていません"
+                echo "使用方法: $0 -p cache [generate|delete|list|status] [cache_name]"
+                exit 1
+            fi
+            case "${ARGS[0]}" in
+                generate)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: キャッシュ名が指定されていません"
+                        echo "使用方法: $0 -p cache generate <cache_name>"
+                        exit 1
+                    fi
+                    "$SCRIPT_DIR/bin/json_cache.sh" generate "${ARGS[1]}"
+                    ;;
+                delete)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: キャッシュ名が指定されていません"
+                        echo "使用方法: $0 -p cache delete <cache_name>"
+                        exit 1
+                    fi
+                    "$SCRIPT_DIR/bin/json_cache.sh" delete "${ARGS[1]}"
+                    ;;
+                list)
+                    "$SCRIPT_DIR/bin/json_cache.sh" list
+                    ;;
+                status)
+                    "$SCRIPT_DIR/bin/json_cache.sh" status
+                    ;;
+                *)
+                    echo "エラー: 不明なキャッシュコマンド '${ARGS[0]}'"
+                    echo "使用方法: $0 -p cache [generate|delete|list|status] [cache_name]"
+                    exit 1
+                    ;;
+            esac
         else
             echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
