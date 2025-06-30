@@ -1,0 +1,29 @@
+services:
+  postgres-db:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: postgres-db
+    env_file:
+      - ../../.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./init/02-init-dev.sql:/docker-entrypoint-initdb.d/02-init-dev.sql:ro
+      - ./init/migrations:/docker-entrypoint-initdb.d/migrations:ro
+      - ./migrations_dev:/docker-entrypoint-initdb.d/migrations_dev:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - syllabus-network
+
+volumes:
+  postgres-data:
+
+networks:
+  syllabus-network:
+    driver: bridge

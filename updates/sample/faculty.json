@@ -1,0 +1,7 @@
+{
+  "faculties": [
+    { "faculty_id": 1, "faculty_name": "情報理工学部" },
+    { "faculty_id": 2, "faculty_name": "理工学部" },
+    { "faculty_id": 3, "faculty_name": "経済学部" }
+  ]
+} 

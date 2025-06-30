@@ -1,0 +1,16 @@
+{
+  "subject_programs": [
+    {
+      "id": 1,
+      "syllabus_code": "K250622250",
+      "program_code": "PROG001",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 2,
+      "syllabus_code": "EU25731000",
+      "program_code": "PROG002",
+      "created_at": "2025-03-20T00:00:00"
+    }
+  ]
+} 

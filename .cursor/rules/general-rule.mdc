@@ -1,0 +1,53 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<!-- Version: v1.0.1 -->
+
+ - 編集時
+    インデントはタブでtabstopは3
+
+ - コマンド実行時
+    - 使用している環境がpsの場合は、wslとしてコマンドを実行してください。
+
+ - 更新時の規約
+    - 指示していない新規ファイルの生成/削除は禁止, 必ず承認を得る
+    - 指示していない箇所の類推による変更は承認を必ず得る
+    - 準拠と指示した場合は、類推を禁止。準拠元を厳密に反映
+    - 更新は既存のファイルの更新であり、新規ファイルの生成要求ではない
+    - 更新に際して、cursorはversion情報を更新しない
+    - 更新に際して、文頭にファイル毎に定めたversion情報が記載されているかを確認
+        - 無い場合は [project_version.txt](mdc:project_version.txt) を参考に、 patchレベル0で追加
+    - 更新承認後にgitへのpushの確認をする.
+    - version情報を更新してからpushする
+        - mdの場合は更新時にタイトル下のversion情報を更新、なければ加筆
+        - 他のスクリプトの場合はShebang行があればそれ以降に、なければ文頭にファイルのヴァージョンとプロジェクトのヴァージョンを更新、無ければ加筆
+
+### ファイルの更新について
+- git bumpによって更新処理を行います
+- cursorはcommit_msg更新の指示で、 git bumpによって生成されたcommit_msgの「(ここに変更内容を記入)」の部分を、ファイル内容の変更から適当なものに変更します。
+- 変更は箇条書きで詳細を書きます
+### version情報凡例
+- python
+``` python
+# File Version: v1.3.2
+# Project Version: v1.3.2
+# Last Updated: 2025-06-14
+```
+
+- md
+``` md
+---
+title: タイトル
+file_version: v1.3.1
+project_version: v1.3.8
+last_updated: 2025-06-19
+---
+
+# タイトル
+
+- File Version: v1.3.1
+- Project Version: v1.3.8
+- Last Updated: 2025-06-19
+```

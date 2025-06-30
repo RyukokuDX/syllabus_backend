@@ -1,0 +1,20 @@
+{
+  "syllabus_books": [
+    {
+      "id": 1,
+      "syllabus_code": "K250622250",
+      "book_id": 1,
+      "role": 1,
+      "note": "教科書",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 2,
+      "syllabus_code": "EU25731000",
+      "book_id": 2,
+      "role": 1,
+      "note": "教科書",
+      "created_at": "2025-03-20T00:00:00"
+    }
+  ]
+} 

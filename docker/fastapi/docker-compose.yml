@@ -1,0 +1,20 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-api
+    ports:
+      - "5000:5000"  # ホスト:コンテナ ポート対応
+    volumes:
+      - ./app:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-db:5432/syllabus_db
+    networks:
+      - syllabus-network
+    env_file:
+      - ../.env
+
+networks:
+  syllabus-network:
+    external: true

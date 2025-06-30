@@ -1,0 +1,29 @@
+CREATE TABLE class (
+    class_id INTEGER PRIMARY KEY,
+    class_name TEXT NOT NULL
+);
+
+CREATE TABLE subclass (
+    subclass_id INTEGER PRIMARY KEY,
+    subclass_name TEXT NOT NULL
+);
+
+CREATE TABLE class_note (
+    class_note_id INTEGER PRIMARY KEY,
+    class_note TEXT NOT NULL
+);
+
+CREATE TABLE faculty (
+    faculty_id INTEGER PRIMARY KEY,
+    faculty_name TEXT NOT NULL
+);
+
+CREATE TABLE subject_name (
+    subject_name_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE program (
+    program_id INTEGER PRIMARY KEY,
+    program_name TEXT NOT NULL
+); 

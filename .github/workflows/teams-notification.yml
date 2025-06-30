@@ -2,22 +2,63 @@ name: Teams Notification
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, fujiwara/feature/teamsnotice ]
   pull_request:
     branches: [ main, develop ]
-
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Microsoft Teams Notification
-        uses: skitionek/notify-microsoft-teams@master
-        if: always()
-        with:
-          webhook_url: ${{ secrets.TEAMS_WEBHOOK }}
-          needs: ${{ toJson(needs) }}
-          job: ${{ toJson(job) }}
-          steps: ${{ toJson(steps) }}
-          overwrite: '{"title":"🔔 ${{ github.repository }} - ${{ github.event_name }}通知","text":"## ブランチ情報\n- 対象ブランチ: `${{ github.ref_name }}`\n\n## 変更情報\n- リポジトリ: ${{ github.repository }}\n- イベント: ${{ github.event_name }}\n- 実行者: ${{ github.actor }}\n\n[変更を確認](${{ github.event.head_commit.url }}"}' 
+      - name: Notify to Microsoft Teams via webhook
+        run: |
+          curl -H "Content-Type: application/json" -d '{
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": null,
+                "content": {
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "type": "AdaptiveCard",
+                  "version": "1.2",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "size": "Large",
+                      "weight": "Bolder",
+                      "text": "🚀 GitHub Actions 通知"
+                    },
+                    {
+                      "type": "FactSet",
+                      "facts": [
+                        {
+                          "title": "リポジトリ",
+                          "value": "${{ github.repository }}"
+                        },
+                        {
+                          "title": "ブランチ",
+                          "value": "${{ github.ref_name }}"
+                        },
+                        {
+                          "title": "イベント",
+                          "value": "${{ github.event_name }}"
+                        },
+                        {
+                          "title": "実行者",
+                          "value": "${{ github.actor }}"
+                        },
+                        {
+                          "title": "ステータス",
+                          "value": "${{ job.status }}"
+                        },
+                        {
+                          "title": "コミットメッセージ",
+                          "value": "${{ github.event.head_commit.message }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }' "${{ secrets.TEAMS_WEBHOOK }}"

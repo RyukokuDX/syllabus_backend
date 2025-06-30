@@ -1,0 +1,44 @@
+{
+  "grading_criteria": [
+    {
+      "id": 1,
+      "syllabus_code": "K250622250",
+      "criteria_type": "平常",
+      "ratio": 30,
+      "note": "出席と授業参加度",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 2,
+      "syllabus_code": "K250622250",
+      "criteria_type": "レポ",
+      "ratio": 30,
+      "note": "プログラミング課題",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 3,
+      "syllabus_code": "K250622250",
+      "criteria_type": "定期",
+      "ratio": 40,
+      "note": "期末試験",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 4,
+      "syllabus_code": "EU25731000",
+      "criteria_type": "平常",
+      "ratio": 20,
+      "note": "演習問題の提出",
+      "created_at": "2025-03-20T00:00:00"
+    },
+    {
+      "id": 5,
+      "syllabus_code": "EU25731000",
+      "criteria_type": "定期",
+      "ratio": 80,
+      "note": "期末試験",
+      "created_at": "2025-03-20T00:00:00"
+    }
+  ]
+} 

@@ -1,0 +1,25 @@
+{
+  "requirement_types": [
+    {
+      "requirement_code": "REQ001",
+      "name": "必修",
+      "description": "卒業に必要な必修科目",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
+    },
+    {
+      "requirement_code": "REQ002",
+      "name": "選択必修",
+      "description": "指定された科目群から選択する必要がある科目",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
+    },
+    {
+      "requirement_code": "REQ003",
+      "name": "選択",
+      "description": "自由に選択できる科目",
+      "created_at": "2025-03-20T00:00:00",
+      "updated_at": null
+    }
+  ]
+} 

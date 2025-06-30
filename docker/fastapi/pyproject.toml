@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "syllabus_backend"
+version = "0.1.0"
+description = "龍大のシラバス情報を集約して提供するバックエンド"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+sqlalchemy = "^2.0.0"
+psycopg2-binary = "^2.9.0"  # PostgreSQL用ドライバ
+alembic = "^1.13.0"  # データベースマイグレーション用
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+loguru = "^0.7.2"
+prometheus-client = "^0.19.0"
+fastapi-health = "^0.4.0"
+apscheduler = "^3.10.4"
+aiohttp = "^3.9.3"
+backoff = "^2.2.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+black = "^23.0.0"
+flake8 = "^6.0.0"
+mypy = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+
+[[tool.mypy.overrides]]
+module = ["sqlalchemy.*"]
+ignore_missing_imports = true 

@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- 指示外の事はするな
+- 更新の指示に対しては、[structure.md](mdc:docs/database/structure.md) に準拠して以下を更新
+   - [er.md](mdc:docs/database/er.md)
+   - [models.py](mdc:src/db/models.py)
+   - [init.sql.template](mdc:docker/postgresql/init/init.sql.template) 
+   - [generate_migration.py](mdc:src/db/migrations/generate_migration.py)
+- 整合性確認の指示に対しては、@structure.md に準拠して以下の整合性を確認
+   - @er.md
+   - @models.py
+   - @init.sql.template 
+   - @generate_migration.py
+   - @generate-migration.sh  - [generate-migration.sh](mdc:bin/generate-migration.sh)
