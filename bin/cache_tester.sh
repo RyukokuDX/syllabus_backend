@@ -1,7 +1,7 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v2.0.0
-# Project Version: v2.0.6
+# File Version: v2.0.1
+# Project Version: v2.0.8
 # Last Updated: 2025-07-01
 
 # スクリプトのディレクトリを取得
@@ -30,7 +30,7 @@ DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
 DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
 
 # 出力ファイル名
-OUTPUT_FILE="$PROJECT_DIR/output/intelligent_info_courses.json"
+OUTPUT_FILE="$PROJECT_DIR/tests/json_output/intelligent_info_courses.json"
 
 # ヘルプメッセージを表示
 show_help() {
@@ -38,15 +38,16 @@ show_help() {
     echo
     echo "オプション:"
     echo "  -h, --help     このヘルプメッセージを表示"
-    echo "  -o, --output   出力ファイル名を指定（デフォルト: output/intelligent_info_courses.json）"
+    echo "  -o, --output   出力ファイル名を指定（デフォルト: tests/json_output/intelligent_info_courses.json）"
     echo
     echo "説明:"
-    echo "  知能情報課程の履修情報のみを絞ったJSONリストファイルを出力します。"
-    echo "  出力ファイルには、学部課程が「知能情報課程」の科目のみが含まれます。"
+    echo "  知能情報メディア課程の履修情報のみを絞ったJSONリストファイルを出力します。"
+    echo "  出力ファイルには、学部課程が「知能情報メディア課程」の科目のみが含まれます。"
     echo
     echo "使用例:"
     echo "  $0                                    # デフォルトファイル名で出力"
     echo "  $0 -o custom_output.json             # カスタムファイル名で出力"
+    echo ""
 }
 
 # 出力ディレクトリの作成
@@ -60,13 +61,13 @@ create_output_directory() {
 
 # 知能情報課程の履修情報を取得してJSONファイルに出力
 generate_intelligent_info_courses() {
-    echo -e "${BLUE}知能情報課程の履修情報を取得中...${NC}"
+    echo -e "${BLUE}知能情報メディア課程の履修情報を取得中...${NC}"
     
     # 出力ディレクトリの作成
     create_output_directory
     
     # 知能情報課程の履修情報を取得
-    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -A -F "," -c "
+    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
     WITH syllabus_data AS (
         SELECT 
             sm.syllabus_id,
@@ -129,8 +130,7 @@ generate_intelligent_info_courses() {
                     '書名', b.title,
                     '著者', b.author,
                     'ISBN', b.isbn,
-                    '値段', b.price,
-                    '備考', sb.note
+                    '値段', b.price
                 ) as book_info
             FROM syllabus_book sb
             JOIN book b ON sb.book_id = b.book_id
@@ -145,8 +145,7 @@ generate_intelligent_info_courses() {
                     '書名', bu.title,
                     '著者', bu.author,
                     'ISBN', bu.isbn,
-                    '値段', bu.price,
-                    '備考', bu.note
+                    '値段', bu.price
                 ) as book_info
             FROM book_uncategorized bu
             WHERE bu.role = '教科書'
@@ -165,8 +164,7 @@ generate_intelligent_info_courses() {
                     '書名', b.title,
                     '著者', b.author,
                     'ISBN', b.isbn,
-                    '値段', b.price,
-                    '備考', sb.note
+                    '値段', b.price
                 ) as book_info
             FROM syllabus_book sb
             JOIN book b ON sb.book_id = b.book_id
@@ -181,8 +179,7 @@ generate_intelligent_info_courses() {
                     '書名', bu.title,
                     '著者', bu.author,
                     'ISBN', bu.isbn,
-                    '値段', bu.price,
-                    '備考', bu.note
+                    '値段', bu.price
                 ) as book_info
             FROM book_uncategorized bu
             WHERE bu.role = '参考書'
@@ -223,29 +220,29 @@ generate_intelligent_info_courses() {
         LEFT JOIN subject_attribute_value sav ON sub.subject_id = sav.subject_id
         LEFT JOIN subject_attribute sa ON sav.attribute_id = sa.attribute_id
             AND sa.attribute_name = '課程別エンティティ'
-        WHERE f.faculty_name = '知能情報課程'
+        WHERE f.faculty_name = '知能情報メディア課程'
         GROUP BY sub.subject_name_id, sub.curriculum_year
     ),
     cache_data AS (
         SELECT 
             sd.syllabus_id,
             json_build_object(
-                '科目名', sd.subject_name,
+                '科目名', COALESCE(sd.subject_name, ''),
                 '開講情報', json_agg(
                     json_build_object(
                         '年', sd.syllabus_year,
                         'シラバス', json_build_object(
                             '担当', COALESCE(id.instructors, '[]'::json),
-                            '学期', sd.term,
+                            '学期', COALESCE(sd.term, ''),
                             '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
                             '時限', COALESCE(ltd.periods, '[]'::json),
-                            '単位', sd.credits,
+                            '単位', COALESCE(sd.credits, 0),
                             '教科書', COALESCE(td.textbooks, '[]'::json),
-                            '教科書コメント', sd.textbook_comment,
+                            '教科書コメント', COALESCE(REPLACE(sd.textbook_comment, E'\n', '\\n'), ''),
                             '参考書', COALESCE(rd.references, '[]'::json),
-                            '参考書コメント', sd.reference_comment,
+                            '参考書コメント', COALESCE(REPLACE(sd.reference_comment, E'\n', '\\n'), ''),
                             '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                            '成績コメント', sd.grading_comment
+                            '成績コメント', COALESCE(REPLACE(sd.grading_comment, E'\n', '\\n'), '')
                         )
                     )
                 ),
@@ -267,22 +264,37 @@ generate_intelligent_info_courses() {
         GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_id
     )
     SELECT json_agg(cd.cache_data) as courses
-    FROM cache_data cd;
-    " > "$OUTPUT_FILE"
+    FROM cache_data cd
+    WHERE cd.cache_data IS NOT NULL;
+    " > "$OUTPUT_FILE.raw"
     
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}知能情報課程の履修情報の出力が完了しました${NC}"
-        echo -e "${BLUE}出力ファイル: $OUTPUT_FILE${NC}"
+        echo -e "${GREEN}生データの出力が完了しました${NC}"
+        echo -e "${BLUE}生データファイル: $OUTPUT_FILE.raw${NC}"
         
-        # 出力された件数を確認
-        count=$(jq 'length' "$OUTPUT_FILE" 2>/dev/null || echo "0")
-        echo -e "${BLUE}出力された科目数: $count${NC}"
+        # 生データのサイズを表示
+        file_size=$(du -h "$OUTPUT_FILE.raw" | cut -f1)
+        echo -e "${BLUE}生データファイルサイズ: $file_size${NC}"
         
-        # ファイルサイズを表示
-        file_size=$(du -h "$OUTPUT_FILE" | cut -f1)
-        echo -e "${BLUE}ファイルサイズ: $file_size${NC}"
+        # JSONの整形を試行
+        echo -e "${BLUE}JSONの整形を試行中...${NC}"
+        if tail -n +3 "$OUTPUT_FILE.raw" | head -n 1 | jq '.' > "$OUTPUT_FILE" 2>/dev/null; then
+            echo -e "${GREEN}JSONの整形が完了しました${NC}"
+            echo -e "${BLUE}出力ファイル: $OUTPUT_FILE${NC}"
+            
+            # 出力された件数を確認
+            count=$(jq 'length' "$OUTPUT_FILE" 2>/dev/null || echo "0")
+            echo -e "${BLUE}出力された科目数: $count${NC}"
+            
+            # ファイルサイズを表示
+            file_size=$(du -h "$OUTPUT_FILE" | cut -f1)
+            echo -e "${BLUE}ファイルサイズ: $file_size${NC}"
+        else
+            echo -e "${YELLOW}JSONの整形に失敗しました。生データを確認してください。${NC}"
+            echo -e "${YELLOW}エラーの詳細を確認するには: jq '.' $OUTPUT_FILE.raw${NC}"
+        fi
     else
-        echo -e "${RED}知能情報課程の履修情報の出力に失敗しました${NC}"
+        echo -e "${RED}知能情報メディア課程の履修情報の出力に失敗しました${NC}"
         exit 1
     fi
 }
@@ -313,7 +325,7 @@ main() {
         esac
     done
     
-    # 知能情報課程の履修情報を生成
+    # 知能情報メディア課程の履修情報を生成
     generate_intelligent_info_courses
 }
 

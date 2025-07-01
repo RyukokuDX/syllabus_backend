@@ -1,14 +1,14 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.0.2
-project_version: v2.0.4
+file_version: v2.0.3
+project_version: v2.0.8
 last_updated: 2025-07-01
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.0.2
-- Project Version: v2.0.4
+- File Version: v2.0.3
+- Project Version: v2.0.8
 - Last Updated: 2025-07-01
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -123,7 +123,6 @@ last_updated: 2025-07-01
 - **著者**: 著者名（book.author or book_uncategorized.author）
 - **ISBN**: ISBN番号（book.isbn or book_uncategorized.isbn）
 - **値段**: 価格（book.price or book_uncategorized.price）
-- **備考**: 備考情報（syllabus_book.noteのみ、book_uncategorizedには備考フィールドなし）
 
 ##### 成績評価
 - **項目**: 評価項目（grading_criterion.criteria_type）
