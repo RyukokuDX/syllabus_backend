@@ -1,15 +1,15 @@
 ---
 title: Syllabus Backend
-file_version: v2.0.0
-project_version: v2.0.0
-last_updated: 2025-06-30
+file_version: v2.0.2
+project_version: v2.0.4
+last_updated: 2025-07-01
 ---
 
 # Syllabus Backend
 
-- File Version: v2.0.0
-- Project Version: v2.0.0
-- Last Updated: 2025-06-30
+- File Version: v2.0.2
+- Project Version: v2.0.4
+- Last Updated: 2025-07-01
 
 ## 概要
 シラバス情報を管理するバックエンドシステム。Web Syllabusから取得したシラバス情報をデータベースに格納し、APIを通じて提供します。
@@ -93,30 +93,53 @@ last_updated: 2025-06-30
 ```
 
 ## セットアップ
+### 前提
+#### Windows
+wslの利用を前提
+
+### 手順
 1. リポジトリのクローン
 ```bash
 git clone https://github.com/your-username/syllabus_backend.git
 cd syllabus_backend
 ```
 
-2. 仮想環境の作成と有効化
+2. 環境設定ファイルの準備
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linuxの場合
-venv\Scripts\activate     # Windowsの場合
+# .envファイルをコピーして編集
+cp .env.example .env
+# 必要に応じて.envファイルの設定を編集
 ```
 
-3. 依存パッケージのインストール
+3. 仮想環境の作成と初期化
 ```bash
-pip install -r requirements.txt
+./syllabus.sh venv init
 ```
 
-4. データベースの初期化
+4. データベースの起動
 ```bash
-# init.sql.templateをコピーしてinit.sqlを作成
-cp init.sql.template init.sql
-# データベースの初期化
-python src/db/init_db.py
+./syllabus.sh -p start
+```
+
+5. データベースの初期化
+```bash
+# 初期化データの生成
+./syllabus.sh -p migration generate init
+# マイグレーションのデプロイ
+./syllabus.sh -p migration deploy
+```
+
+6. データベースの起動確認
+```bash
+./syllabus.sh -p records
+```
+
+7. サンプルデータの投入（オプション）
+```bash
+# 各種パーサーを実行してサンプルデータを投入
+./syllabus.sh parser book
+./syllabus.sh parser syllabus
+./syllabus.sh parser instructor
 ```
 
 ## 開発ガイドライン

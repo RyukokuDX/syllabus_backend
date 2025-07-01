@@ -1,15 +1,15 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.0.1
-project_version: v2.0.1
-last_updated: 2025-06-30
+file_version: v2.0.2
+project_version: v2.0.4
+last_updated: 2025-07-01
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.0.1
-- Project Version: v2.0.1
-- Last Updated: 2025-06-30
+- File Version: v2.0.2
+- Project Version: v2.0.4
+- Last Updated: 2025-07-01
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -151,7 +151,7 @@ last_updated: 2025-06-30
 - **著者**: 著者名（book.author or book_uncategorized.author）
 - **ISBN**: ISBN番号（book.isbn or book_uncategorized.isbn）
 - **値段**: 価格（book.price or book_uncategorized.price）
-- **備考**: 備考情報（syllabus_book.note or book_uncategorized.note）
+- **備考**: 備考情報（syllabus_book.noteのみ、book_uncategorizedには備考フィールドなし）
 
 ##### 成績評価
 - **項目**: 評価項目（grading_criterion.criteria_type）
@@ -254,8 +254,7 @@ textbook_data AS (
                 '書名', bu.title,
                 '著者', bu.author,
                 'ISBN', bu.isbn,
-                '値段', bu.price,
-                '備考', bu.note
+                '値段', bu.price
             ) as book_info
         FROM book_uncategorized bu
         WHERE bu.role = '教科書'
@@ -290,8 +289,7 @@ reference_data AS (
                 '書名', bu.title,
                 '著者', bu.author,
                 'ISBN', bu.isbn,
-                '値段', bu.price,
-                '備考', bu.note
+                '値段', bu.price
             ) as book_info
         FROM book_uncategorized bu
         WHERE bu.role = '参考書'

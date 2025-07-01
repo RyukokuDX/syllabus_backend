@@ -1,8 +1,8 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v1.0.1
-# Project Version: v2.0.2
-# Last Updated: 2025-06-30
+# File Version: v2.0.0
+# Project Version: v2.0.4
+# Last Updated: 2025-07-01
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -44,6 +44,7 @@ show_help() {
     echo "コマンド:"
     echo "  generate <cache_name>  指定されたキャッシュを生成"
     echo "  delete <cache_name>    指定されたキャッシュを削除"
+    echo "  refresh <cache_name>   指定されたキャッシュを削除して再生成"
     echo "  list                   利用可能なキャッシュ一覧を表示"
     echo "  status                 キャッシュの状態を表示"
     echo
@@ -53,6 +54,7 @@ show_help() {
     echo "使用例:"
     echo "  $0 generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
     echo "  $0 delete subject_syllabus_cache    # 科目別シラバスキャッシュを削除"
+    echo "  $0 refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
     echo "  $0 list                             # キャッシュ一覧を表示"
     echo "  $0 status                           # キャッシュの状態を表示"
 }
@@ -61,23 +63,28 @@ show_help() {
 create_cache_table() {
     echo -e "${BLUE}キャッシュテーブルを作成中...${NC}"
     
+    # 既存のテーブルが古い構造の場合は削除
     docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
-    CREATE TABLE IF NOT EXISTS $CACHE_TABLE (
+    DROP TABLE IF EXISTS $CACHE_TABLE CASCADE;
+    "
+    
+    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+    CREATE TABLE $CACHE_TABLE (
         cache_id SERIAL PRIMARY KEY,
         cache_name VARCHAR(100) NOT NULL,
-        syllabus_id INTEGER NOT NULL,
+        subject_name_id INTEGER NOT NULL,
         cache_data JSONB NOT NULL,
         cache_version VARCHAR(10) NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        UNIQUE(cache_name, syllabus_id)
+        UNIQUE(cache_name, subject_name_id)
     );
     
     -- インデックス
-    CREATE INDEX IF NOT EXISTS idx_${CACHE_TABLE}_cache_name ON $CACHE_TABLE(cache_name);
-    CREATE INDEX IF NOT EXISTS idx_${CACHE_TABLE}_syllabus_id ON $CACHE_TABLE(syllabus_id);
-    CREATE INDEX IF NOT EXISTS idx_${CACHE_TABLE}_data ON $CACHE_TABLE USING GIN (cache_data);
-    CREATE INDEX IF NOT EXISTS idx_${CACHE_TABLE}_version ON $CACHE_TABLE(cache_version);
+    CREATE INDEX idx_${CACHE_TABLE}_cache_name ON $CACHE_TABLE(cache_name);
+    CREATE INDEX idx_${CACHE_TABLE}_subject_name_id ON $CACHE_TABLE(subject_name_id);
+    CREATE INDEX idx_${CACHE_TABLE}_data ON $CACHE_TABLE USING GIN (cache_data);
+    CREATE INDEX idx_${CACHE_TABLE}_version ON $CACHE_TABLE(cache_version);
     "
     
     if [ $? -eq 0 ]; then
@@ -161,8 +168,7 @@ generate_subject_syllabus_cache() {
                     '書名', b.title,
                     '著者', b.author,
                     'ISBN', b.isbn,
-                    '値段', b.price,
-                    '備考', sb.note
+                    '値段', b.price
                 ) as book_info
             FROM syllabus_book sb
             JOIN book b ON sb.book_id = b.book_id
@@ -177,8 +183,7 @@ generate_subject_syllabus_cache() {
                     '書名', bu.title,
                     '著者', bu.author,
                     'ISBN', bu.isbn,
-                    '値段', bu.price,
-                    '備考', bu.note
+                    '値段', bu.price
                 ) as book_info
             FROM book_uncategorized bu
             WHERE bu.role = '教科書'
@@ -197,8 +202,7 @@ generate_subject_syllabus_cache() {
                     '書名', b.title,
                     '著者', b.author,
                     'ISBN', b.isbn,
-                    '値段', b.price,
-                    '備考', sb.note
+                    '値段', b.price
                 ) as book_info
             FROM syllabus_book sb
             JOIN book b ON sb.book_id = b.book_id
@@ -213,8 +217,7 @@ generate_subject_syllabus_cache() {
                     '書名', bu.title,
                     '著者', bu.author,
                     'ISBN', bu.isbn,
-                    '値段', bu.price,
-                    '備考', bu.note
+                    '値段', bu.price
                 ) as book_info
             FROM book_uncategorized bu
             WHERE bu.role = '参考書'
@@ -259,7 +262,7 @@ generate_subject_syllabus_cache() {
     ),
     cache_data AS (
         SELECT 
-            sd.syllabus_id,
+            sd.subject_name_id,
             json_build_object(
                 '科目名', sd.subject_name,
                 '開講情報', json_agg(
@@ -294,14 +297,14 @@ generate_subject_syllabus_cache() {
         LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
         LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
         LEFT JOIN subject_data subd ON sd.subject_name_id = subd.subject_name_id
-        GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_id
+        GROUP BY sd.subject_name_id, sd.subject_name
     )
-    INSERT INTO $CACHE_TABLE (cache_name, syllabus_id, cache_data, cache_version)
+    INSERT INTO $CACHE_TABLE (cache_name, subject_name_id, cache_data, cache_version)
     SELECT 
         'subject_syllabus_cache',
-        cd.syllabus_id,
+        cd.subject_name_id,
         cd.cache_data,
-        'v2.0.1'
+        'v2.0.2'
     FROM cache_data cd;
     "
     
@@ -342,6 +345,30 @@ delete_cache() {
         echo -e "${RED}キャッシュ '$cache_name' の削除に失敗しました${NC}"
         exit 1
     fi
+}
+
+# キャッシュの削除して再生成
+refresh_cache() {
+    local cache_name="$1"
+    
+    echo -e "${BLUE}キャッシュ '$cache_name' を削除して再生成中...${NC}"
+    
+    # 既存のキャッシュを削除
+    delete_cache "$cache_name"
+    
+    # キャッシュを再生成
+    case "$cache_name" in
+        subject_syllabus_cache)
+            generate_subject_syllabus_cache
+            ;;
+        *)
+            echo -e "${RED}エラー: 不明なキャッシュ名 '$cache_name'${NC}"
+            list_caches
+            exit 1
+            ;;
+    esac
+    
+    echo -e "${GREEN}キャッシュ '$cache_name' の削除して再生成が完了しました${NC}"
 }
 
 # キャッシュ一覧の表示
@@ -415,6 +442,27 @@ main() {
             case "$2" in
                 subject_syllabus_cache)
                     delete_cache "$2"
+                    ;;
+                *)
+                    echo -e "${RED}エラー: 不明なキャッシュ名 '$2'${NC}"
+                    list_caches
+                    exit 1
+                    ;;
+            esac
+            ;;
+        refresh)
+            if [ $# -lt 2 ]; then
+                echo -e "${RED}エラー: キャッシュ名が指定されていません${NC}"
+                show_help
+                exit 1
+            fi
+            
+            # キャッシュテーブルの作成
+            create_cache_table
+            
+            case "$2" in
+                subject_syllabus_cache)
+                    refresh_cache "$2"
                     ;;
                 *)
                     echo -e "${RED}エラー: 不明なキャッシュ名 '$2'${NC}"

@@ -76,6 +76,11 @@
 - `generate`: 指定されたテーブルのデータを生成（-pオプション必須、引数必須）
 - `check`: 指定されたテーブルのデータをチェック（-pオプション必須）
 - `deploy`: 指定されたテーブルのデータをデプロイ（-pオプション必須）
+- `migration`: マイグレーション関連のコマンド（-pオプション必須）
+  - `migration generate init`: 初期化データを生成
+  - `migration generate migration`: マイグレーションデータを生成
+  - `migration check`: マイグレーションをチェック
+  - `migration deploy`: マイグレーションをデプロイ
 
 ### 使用例
 
@@ -112,14 +117,14 @@
 ./syllabus.sh csv normalize 2024
 
 # データ生成
-./syllabus.sh -p generate init
-./syllabus.sh -p generate migration
+./syllabus.sh -p migration generate init
+./syllabus.sh -p migration generate migration
 
 # データチェック
-./syllabus.sh -p check
+./syllabus.sh -p migration check
 
 # データデプロイ
-./syllabus.sh -p deploy
+./syllabus.sh -p migration deploy
 ```
 
 ## 注意事項
