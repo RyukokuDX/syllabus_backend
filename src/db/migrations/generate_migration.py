@@ -79,7 +79,7 @@ def read_json_files(directory, table_name):
                     print(f"Warning: {file} does not contain '{array_name}' array or direct array")
                     continue
                 
-                # bookテーブルの場合、roleカラムを除外
+                # bookテーブルの場合、roleカラムのみを除外（authorカラムは保持）
                 if table_name == 'book':
                     records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
                 # book_uncategorizedテーブルの場合、全てのカラムを保持
@@ -183,9 +183,9 @@ def generate_sql_insert(table_name, records):
         else:
             columns = list(all_columns)
     
-    # bookテーブルの場合、authorカラムを除外
+    # bookテーブルの場合、全てのカラムを保持（authorカラムも含む）
     if table_name == 'book':
-        columns = [col for col in columns if col != 'author']
+        columns = list(columns)  # authorカラムも含めて全て保持
     # book_uncategorizedテーブルの場合、全てのカラムを保持
     elif table_name == 'book_uncategorized':
         columns = list(columns)
