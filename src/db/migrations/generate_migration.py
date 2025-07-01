@@ -40,6 +40,7 @@ TABLE_NAME_PLURAL = {
     'subject_attribute': 'subject_attributes',
     'subject': 'subjects',
     'subject_attribute_value': 'subject_attribute_values',
+    'syllabus_faculty': 'syllabus_faculties',
     'syllabus_study_system': 'syllabus_study_systems'
 }
 
@@ -110,6 +111,7 @@ def read_json_files(directory, table_name):
             "syllabus_instructor": lambda r: (r.get('syllabus_id'), r.get('instructor_id')),
             "syllabus_book": lambda r: (r.get('syllabus_id'), r.get('book_id')),
             "grading_criterion": lambda r: (r.get('syllabus_id'), r.get('criteria_type')),
+            "syllabus_faculty": lambda r: (r.get('syllabus_id'), r.get('faculty_id')),
             "syllabus_study_system": lambda r: (r.get('source_syllabus_id'), r.get('target')),
             "subject_grade": lambda r: (r.get('syllabus_id'), r.get('grade'))
         }

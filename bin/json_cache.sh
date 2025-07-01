@@ -1,7 +1,7 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v2.1.0
-# Project Version: v2.1.0
+# File Version: v2.1.2
+# Project Version: v2.1.2
 # Last Updated: 2025-07-01
 
 # スクリプトのディレクトリを取得
@@ -260,7 +260,7 @@ generate_subject_syllabus_cache() {
             AND sa.attribute_name = '課程別エンティティ'
         GROUP BY sub.subject_name_id, sub.curriculum_year
     ),
-    syllabus_aggregated AS (
+    syllabus_by_year AS (
         SELECT 
             sd.subject_name_id,
             sd.subject_name,
@@ -290,13 +290,13 @@ generate_subject_syllabus_cache() {
     ),
     cache_data AS (
         SELECT 
-            sa.subject_name_id,
+            sby.subject_name_id,
             json_build_object(
-                '科目名', sa.subject_name,
+                '科目名', sby.subject_name,
                 '開講情報', json_agg(
                     json_build_object(
-                        '年', sa.syllabus_year,
-                        'シラバス', sa.syllabi
+                        '年', sby.syllabus_year,
+                        'シラバス', sby.syllabi
                     )
                 ),
                 '履修情報', json_agg(
@@ -306,9 +306,9 @@ generate_subject_syllabus_cache() {
                     )
                 )
             ) as cache_data
-        FROM syllabus_aggregated sa
-        LEFT JOIN subject_data subd ON sa.subject_name_id = subd.subject_name_id
-        GROUP BY sa.subject_name_id, sa.subject_name
+        FROM syllabus_by_year sby
+        LEFT JOIN subject_data subd ON sby.subject_name_id = subd.subject_name_id
+        GROUP BY sby.subject_name_id, sby.subject_name
     )
     INSERT INTO $CACHE_TABLE (cache_name, subject_name_id, cache_data, cache_version)
     SELECT 

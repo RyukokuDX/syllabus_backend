@@ -1,14 +1,14 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.1.0
-project_version: v2.1.0
+file_version: v2.1.2
+project_version: v2.1.2
 last_updated: 2025-07-01
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.1.0
-- Project Version: v2.1.0
+- File Version: v2.1.2
+- Project Version: v2.1.2
 - Last Updated: 2025-07-01
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -301,29 +301,43 @@ subject_data AS (
         AND sa.attribute_name = '課程別エンティティ'
     GROUP BY sub.subject_name_id, sub.curriculum_year
 ),
-cache_data AS (
+syllabus_by_year AS (
     SELECT 
         sd.subject_name_id,
+        sd.subject_name,
+        sd.syllabus_year,
+        json_agg(
+            json_build_object(
+                '担当', COALESCE(id.instructors, '[]'::json),
+                '学期', sd.term,
+                '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
+                '時限', COALESCE(ltd.periods, '[]'::json),
+                '単位', sd.credits,
+                '教科書', COALESCE(td.textbooks, '[]'::json),
+                '教科書コメント', sd.textbook_comment,
+                '参考書', COALESCE(rd.references, '[]'::json),
+                '参考書コメント', sd.reference_comment,
+                '成績', COALESCE(gd.grading_criteria, '[]'::json),
+                '成績コメント', sd.grading_comment
+            )
+        ) as syllabi
+    FROM syllabus_data sd
+    LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
+    LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
+    LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
+    LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
+    LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
+    GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_year
+),
+cache_data AS (
+    SELECT 
+        sby.subject_name_id,
         json_build_object(
-            '科目名', sd.subject_name,
+            '科目名', sby.subject_name,
             '開講情報', json_agg(
                 json_build_object(
-                    '年', sd.syllabus_year,
-                    'シラバス', json_agg(
-                        json_build_object(
-                            '担当', COALESCE(id.instructors, '[]'::json),
-                            '学期', sd.term,
-                            '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
-                            '時限', COALESCE(ltd.periods, '[]'::json),
-                            '単位', sd.credits,
-                            '教科書', COALESCE(td.textbooks, '[]'::json),
-                            '教科書コメント', sd.textbook_comment,
-                            '参考書', COALESCE(rd.references, '[]'::json),
-                            '参考書コメント', sd.reference_comment,
-                            '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                            '成績コメント', sd.grading_comment
-                        )
-                    )
+                    '年', sby.syllabus_year,
+                    'シラバス', sby.syllabi
                 )
             ),
             '履修情報', json_agg(
@@ -333,14 +347,9 @@ cache_data AS (
                 )
             )
         ) as cache_data
-    FROM syllabus_data sd
-    LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
-    LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
-    LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
-    LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
-    LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
-    LEFT JOIN subject_data subd ON sd.subject_name_id = subd.subject_name_id
-    GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_year
+    FROM syllabus_by_year sby
+    LEFT JOIN subject_data subd ON sby.subject_name_id = subd.subject_name_id
+    GROUP BY sby.subject_name_id, sby.subject_name
 )
 INSERT INTO syllabus_cache (cache_name, subject_name_id, cache_data, cache_version)
 SELECT 
@@ -362,6 +371,8 @@ FROM cache_data cd;
 5. **reference_data**: 参考書情報の集約（book + book_uncategorized）
 6. **grading_data**: 成績評価基準の集約
 7. **subject_data**: 履修要綱情報の集約
+8. **syllabus_by_year**: 年度別シラバス情報の集約
+9. **cache_data**: 最終的なキャッシュデータの構築
 
 #### 特徴
 
@@ -369,6 +380,6 @@ FROM cache_data cd;
 - **COALESCE**: NULL値の適切な処理
 - **json_agg**: 1対多の関係を配列として集約
 - **json_build_object**: 構造化されたJSONオブジェクトの生成
-- **GROUP BY**: 科目名単位でのデータ集約
+- **二段階GROUP BY**: 年度別集約→科目名単位集約で重複を排除
 
 [🔝 ページトップへ](#jsonbキャッシュリスト仕様書) 

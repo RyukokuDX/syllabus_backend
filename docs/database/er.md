@@ -1,7 +1,7 @@
 ---
 title: データベースER図
-file_version: v2.1.0
-project_version: v2.1.0
+file_version: v2.1.1
+project_version: v2.1.2
 last_updated: 2025-07-01
 ---
 <!-- Curosr はversion 弄るな -->
@@ -14,8 +14,8 @@ last_updated: 2025-07-01
 
 # データベースER図
 
-- File Version: v2.1.0
-- Project Version: v2.1.0
+- File Version: v2.1.1
+- Project Version: v2.1.2
 - Last Updated: 2025-07-01
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
@@ -216,6 +216,14 @@ SUBJECT_ATTRIBUTE_VALUE {
     created_at timestamp "NOT NULL"
     updated_at timestamp
 }
+SYLLABUS_FACULTY {
+    id int PK
+    syllabus_id int FK "NOT NULL"
+    faculty_id int FK "NOT NULL"
+    created_at timestamp "NOT NULL"
+    updated_at timestamp
+    syllabus_id_faculty_id text UK
+}
 SYLLABUS_STUDY_SYSTEM {
     id int PK
     source_syllabus_id int FK "NOT NULL"
@@ -238,6 +246,7 @@ INSTRUCTOR ||--o{ LECTURE_SESSION_INSTRUCTOR : instructor_id
 BOOK ||--o{ SYLLABUS_BOOK : book_id
 SUBJECT_ATTRIBUTE ||--o{ SUBJECT_ATTRIBUTE_VALUE : attribute_id
 SYLLABUS_MASTER ||--o{ BOOK_UNCATEGORIZED : syllabus_id
+FACULTY ||--o{ SYLLABUS_FACULTY : faculty_id
 
 SUBJECT ||--o{ SUBJECT_ATTRIBUTE_VALUE : subject_id
 
@@ -249,6 +258,7 @@ SYLLABUS_MASTER ||--o{ LECTURE_SESSION_IRREGULAR : syllabus_id
 SYLLABUS_MASTER ||--o{ SYLLABUS_INSTRUCTOR : syllabus_id
 SYLLABUS_MASTER ||--o{ SYLLABUS_BOOK : syllabus_id
 SYLLABUS_MASTER ||--o{ GRADING_CRITERION : syllabus_id
+SYLLABUS_MASTER ||--o{ SYLLABUS_FACULTY : syllabus_id
 SYLLABUS_MASTER ||--o{ SYLLABUS_STUDY_SYSTEM : source_syllabus_id
 LECTURE_SESSION ||--o{ LECTURE_SESSION_INSTRUCTOR : lecture_session_id
 
