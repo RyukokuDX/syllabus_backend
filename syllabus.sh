@@ -246,6 +246,7 @@ show_help() {
     echo "  cache refresh    指定されたキャッシュを削除して再生成"
     echo "  cache list       利用可能なキャッシュ一覧を表示"
     echo "  cache status     キャッシュの状態を表示"
+    echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
     echo
     echo "使用例:"
     echo "  $0 venv init             # Python仮想環境を初期化"
@@ -267,6 +268,7 @@ show_help() {
     echo "  $0 -p cache refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
     echo "  $0 -p cache list         # キャッシュ一覧を表示"
     echo "  $0 -p cache status       # キャッシュの状態を表示"
+    echo "  $0 -p sql tests/cache_sample3.sql   # SQLファイルをPostgreSQLサーバーで実行"
 }
 
 # コマンドライン引数の解析
@@ -528,6 +530,29 @@ case $COMMAND in
                     exit 1
                     ;;
             esac
+        else
+            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
+            exit 1
+        fi
+        ;;
+    sql)
+        if [ "$SERVICE" = "postgres" ]; then
+            if [ ${#ARGS[@]} -eq 0 ]; then
+                echo "エラー: SQLファイルが指定されていません"
+                echo "使用方法: $0 -p sql <sqlfile>"
+                exit 1
+            fi
+            
+            sql_file="${ARGS[0]}"
+            if [ ! -f "$sql_file" ]; then
+                echo "エラー: SQLファイルが見つかりません: $sql_file"
+                exit 1
+            fi
+            
+            echo "SQLファイルを実行中: $sql_file"
+            DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
+            DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+            docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
         else
             echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1

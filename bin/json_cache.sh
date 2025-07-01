@@ -1,7 +1,7 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v2.0.0
-# Project Version: v2.0.4
+# File Version: v2.0.6
+# Project Version: v2.0.5
 # Last Updated: 2025-07-01
 
 # スクリプトのディレクトリを取得
@@ -260,27 +260,43 @@ generate_subject_syllabus_cache() {
             AND sa.attribute_name = '課程別エンティティ'
         GROUP BY sub.subject_name_id, sub.curriculum_year
     ),
-    cache_data AS (
+    syllabus_aggregated AS (
         SELECT 
             sd.subject_name_id,
+            sd.subject_name,
+            sd.syllabus_year,
+            json_agg(
+                json_build_object(
+                    '担当', COALESCE(id.instructors, '[]'::json),
+                    '学期', sd.term,
+                    '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
+                    '時限', COALESCE(ltd.periods, '[]'::json),
+                    '単位', sd.credits,
+                    '教科書', COALESCE(td.textbooks, '[]'::json),
+                    '教科書コメント', sd.textbook_comment,
+                    '参考書', COALESCE(rd.references, '[]'::json),
+                    '参考書コメント', sd.reference_comment,
+                    '成績', COALESCE(gd.grading_criteria, '[]'::json),
+                    '成績コメント', sd.grading_comment
+                )
+            ) as syllabi
+        FROM syllabus_data sd
+        LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
+        LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
+        LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
+        LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
+        LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
+        GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_year
+    ),
+    cache_data AS (
+        SELECT 
+            sa.subject_name_id,
             json_build_object(
-                '科目名', sd.subject_name,
+                '科目名', sa.subject_name,
                 '開講情報', json_agg(
                     json_build_object(
-                        '年', sd.syllabus_year,
-                        'シラバス', json_build_object(
-                            '担当', COALESCE(id.instructors, '[]'::json),
-                            '学期', sd.term,
-                            '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
-                            '時限', COALESCE(ltd.periods, '[]'::json),
-                            '単位', sd.credits,
-                            '教科書', COALESCE(td.textbooks, '[]'::json),
-                            '教科書コメント', sd.textbook_comment,
-                            '参考書', COALESCE(rd.references, '[]'::json),
-                            '参考書コメント', sd.reference_comment,
-                            '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                            '成績コメント', sd.grading_comment
-                        )
+                        '年', sa.syllabus_year,
+                        'シラバス', sa.syllabi
                     )
                 ),
                 '履修情報', json_agg(
@@ -290,21 +306,16 @@ generate_subject_syllabus_cache() {
                     )
                 )
             ) as cache_data
-        FROM syllabus_data sd
-        LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
-        LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
-        LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
-        LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
-        LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
-        LEFT JOIN subject_data subd ON sd.subject_name_id = subd.subject_name_id
-        GROUP BY sd.subject_name_id, sd.subject_name
+        FROM syllabus_aggregated sa
+        LEFT JOIN subject_data subd ON sa.subject_name_id = subd.subject_name_id
+        GROUP BY sa.subject_name_id, sa.subject_name
     )
     INSERT INTO $CACHE_TABLE (cache_name, subject_name_id, cache_data, cache_version)
     SELECT 
         'subject_syllabus_cache',
         cd.subject_name_id,
         cd.cache_data,
-        'v2.0.2'
+        'v2.0.5'
     FROM cache_data cd;
     "
     

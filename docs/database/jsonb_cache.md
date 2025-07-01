@@ -32,7 +32,7 @@ last_updated: 2025-07-01
 ### 基本方針
 1. **LLMによるアクセス性重視** idやコードを利用しない, 自然言語による解析
 1. **階層構造の活用**: 親子関係を明確に表現
-1. **配列の活用**: 1対多の関係を配列として表現
+1. **配列の活用**: 1対多の関係を配列として表現（1件でも必ず配列）
 
 ### 更新方式
 1. **全量更新**: キャッシュ全体を再生成
@@ -49,52 +49,24 @@ last_updated: 2025-07-01
       "シラバス": [
         {
           "担当": [
-            {
-              "教員名": "田中 太郎",
-              "役割": "主担当"
-            },
-            {
-              "教員名": "佐藤 花子",
-              "役割": "副担当"
-            }
+            { "教員名": "田中 太郎", "役割": "主担当" },
+            { "教員名": "佐藤 花子", "役割": "副担当" }
           ],
           "学期": "1Q",
           "曜日": "月曜日",
           "時限": [1,2],
           "単位": 2,
           "教科書": [
-            {
-              "書名": "微分積分学入門",
-              "著者": "山田 数学",
-              "ISBN": "978-4-1234-5678-9",
-              "値段": 2500,
-              "備考": "第3版を使用"
-            }
+            { "書名": "微分積分学入門", "著者": "山田 数学", "ISBN": "978-4-1234-5678-9", "値段": 2500, "備考": "第3版を使用" }
           ],
           "教科書コメント": "買ってください",
           "参考書": [
-            {
-              "書名": "大学数学の基礎",
-              "著者": "鈴木 計算",
-              "ISBN": "978-4-9876-5432-1",
-              "値段": 1800,
-              "備考": "参考程度"
-            }
+            { "書名": "大学数学の基礎", "著者": "鈴木 計算", "ISBN": "978-4-9876-5432-1", "値段": 1800, "備考": "参考程度" }
           ],
           "参考書コメント": "借りて下さい",
           "成績": [
-            {
-              "項目": "定期試験",
-              "割合": 70,
-              "評価方法": "筆記試験",
-              "備考": "中間試験30%、期末試験40%"
-            },
-            {
-              "項目": "平常点",
-              "割合": 30,
-              "評価方法": "出席・課題提出",
-              "備考": "毎回の課題提出を評価"
-            }
+            { "項目": "定期試験", "割合": 70, "評価方法": "筆記試験", "備考": "中間試験30%、期末試験40%" },
+            { "項目": "平常点", "割合": 30, "評価方法": "出席・課題提出", "備考": "毎回の課題提出を評価" }
           ],
           "成績コメント": "慈悲はない"
         }
@@ -132,7 +104,7 @@ last_updated: 2025-07-01
 
 #### 開講情報
 - **年**: シラバスの年度（syllabus_master.syllabus_year）
-- **シラバス**: 年度内のシラバス情報の配列
+- **シラバス**: 年度内のシラバス情報の配列（1件でも必ず配列）
 
 ##### シラバス詳細
 - **担当**: 教員情報の配列
@@ -238,8 +210,7 @@ textbook_data AS (
                 '書名', b.title,
                 '著者', b.author,
                 'ISBN', b.isbn,
-                '値段', b.price,
-                '備考', sb.note
+                '値段', b.price
             ) as book_info
         FROM syllabus_book sb
         JOIN book b ON sb.book_id = b.book_id
@@ -273,8 +244,7 @@ reference_data AS (
                 '書名', b.title,
                 '著者', b.author,
                 'ISBN', b.isbn,
-                '値段', b.price,
-                '備考', sb.note
+                '値段', b.price
             ) as book_info
         FROM syllabus_book sb
         JOIN book b ON sb.book_id = b.book_id
@@ -331,43 +301,55 @@ subject_data AS (
     LEFT JOIN subject_attribute sa ON sav.attribute_id = sa.attribute_id
         AND sa.attribute_name = '課程別エンティティ'
     GROUP BY sub.subject_name_id, sub.curriculum_year
-)
-SELECT 
-    json_build_object(
-        '科目名', sd.subject_name,
-        '開講情報', json_agg(
-            json_build_object(
-                '年', sd.syllabus_year,
-                'シラバス', json_build_object(
-                    '担当', COALESCE(id.instructors, '[]'::json),
-                    '学期', sd.term,
-                    '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
-                    '時限', COALESCE(ltd.periods, '[]'::json),
-                    '単位', sd.credits,
-                    '教科書', COALESCE(td.textbooks, '[]'::json),
-                    '教科書コメント', sd.textbook_comment,
-                    '参考書', COALESCE(rd.references, '[]'::json),
-                    '参考書コメント', sd.reference_comment,
-                    '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                    '成績コメント', sd.grading_comment
+),
+cache_data AS (
+    SELECT 
+        sd.subject_name_id,
+        json_build_object(
+            '科目名', sd.subject_name,
+            '開講情報', json_agg(
+                json_build_object(
+                    '年', sd.syllabus_year,
+                    'シラバス', json_agg(
+                        json_build_object(
+                            '担当', COALESCE(id.instructors, '[]'::json),
+                            '学期', sd.term,
+                            '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
+                            '時限', COALESCE(ltd.periods, '[]'::json),
+                            '単位', sd.credits,
+                            '教科書', COALESCE(td.textbooks, '[]'::json),
+                            '教科書コメント', sd.textbook_comment,
+                            '参考書', COALESCE(rd.references, '[]'::json),
+                            '参考書コメント', sd.reference_comment,
+                            '成績', COALESCE(gd.grading_criteria, '[]'::json),
+                            '成績コメント', sd.grading_comment
+                        )
+                    )
+                )
+            ),
+            '履修情報', json_agg(
+                json_build_object(
+                    '年', subd.curriculum_year,
+                    '履修要綱', subd.subject_info
                 )
             )
-        ),
-        '履修情報', json_agg(
-            json_build_object(
-                '年', subd.curriculum_year,
-                '履修要綱', subd.subject_info
-            )
-        )
-    ) as cache_data
-FROM syllabus_data sd
-LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
-LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
-LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
-LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
-LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
-LEFT JOIN subject_data subd ON sd.subject_name_id = subd.subject_name_id
-GROUP BY sd.subject_name_id, sd.subject_name;
+        ) as cache_data
+    FROM syllabus_data sd
+    LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
+    LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
+    LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
+    LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
+    LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
+    LEFT JOIN subject_data subd ON sd.subject_name_id = subd.subject_name_id
+    GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_year
+)
+INSERT INTO syllabus_cache (cache_name, subject_name_id, cache_data, cache_version)
+SELECT 
+    'subject_syllabus_cache',
+    cd.subject_name_id,
+    cd.cache_data,
+    'v2.1.0'
+FROM cache_data cd;
 ```
 
 ### クエリ説明
