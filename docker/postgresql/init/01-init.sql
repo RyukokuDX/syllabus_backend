@@ -346,15 +346,12 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250620225007__insert_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225948__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250621183238__insert_subject_names.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_book_uncategorizeds.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622213107__insert_subject_grades.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622213946__insert_lecture_times.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250623185437__insert_syllabus_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_session_irregulars.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_sessions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112916__insert_lecture_session_instructors.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250624120924__insert_syllabus_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624124852__insert_syllabuss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624171346__insert_grading_criterions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_facultys.sql

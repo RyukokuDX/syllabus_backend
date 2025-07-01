@@ -1,8 +1,8 @@
 ---
 title: ユーティリティ関数ガイドライン
-file_version: v2.0.0
-project_version: v2.0.0
-last_updated: 2025-06-30
+file_version: v2.1.0
+project_version: v2.1.0
+last_updated: 2025-07-01
 ---
 
 <!--
@@ -13,9 +13,9 @@ last_updated: 2025-06-30
 
 # ユーティリティ関数ガイドライン
 
-- File Version: v2.0.0
-- Project Version: v2.0.0
-- Last Updated: 2025-06-30
+- File Version: v2.1.0
+- Project Version: v2.1.0
+- Last Updated: 2025-07-01
 
 [readmeへ](../README.md) | [docへ](./doc.md)
 

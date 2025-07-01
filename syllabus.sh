@@ -1,9 +1,9 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # - 更新の登録は, /docs/version_control.md に準拠して実行
-# File Version: 1.4.0
-# Project Version: 1.4.0
-# Last Update: 2025-06-25
+# File Version: 2.0.0
+# Project Version: 2.0.0
+# Last Update: 2025-07-01
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -231,7 +231,7 @@ show_help() {
     echo "  help           このヘルプメッセージを表示"
     echo "  version        syllabus.shのバージョンを表示"
     echo "  version <file> 指定されたファイルの更新履歴を表示"
-    echo "  venv-init      Python仮想環境を初期化"
+    echo "  venv init      Python仮想環境を初期化"
     echo "  start          指定されたサービスを開始"
     echo "  stop           指定されたサービスを停止"
     echo "  ps             サービスの状態を表示"
@@ -239,13 +239,17 @@ show_help() {
     echo "  shell          PostgreSQLサービスのシェルを開く"
     echo "  records        全テーブルのレコード数を表示"
     echo "  parser         指定されたテーブルのパーサースクリプトを実行"
-    echo "  generate       指定されたテーブルのデータを生成"
-    echo "  check          指定されたテーブルのデータをチェック"
-    echo "  deploy         指定されたテーブルのデータをデプロイ"
+    echo "  migration      マイグレーション関連のコマンド"
     echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
+    echo "  cache generate   指定されたキャッシュを生成"
+    echo "  cache delete     指定されたキャッシュを削除"
+    echo "  cache refresh    指定されたキャッシュを削除して再生成"
+    echo "  cache list       利用可能なキャッシュ一覧を表示"
+    echo "  cache status     キャッシュの状態を表示"
+    echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
     echo
     echo "使用例:"
-    echo "  $0 venv-init             # Python仮想環境を初期化"
+    echo "  $0 venv init             # Python仮想環境を初期化"
     echo "  $0 -p start              # PostgreSQLサービスを開始"
     echo "  $0 -p stop               # PostgreSQLサービスを停止"
     echo "  $0 -p shell              # PostgreSQLサービスのシェルを開く"
@@ -253,11 +257,18 @@ show_help() {
     echo "  $0 parser book           # 書籍パーサーを実行"
     echo "  $0 parser syllabus       # シラバスパーサーを実行"
     echo "  $0 parser instructor     # 教員パーサーを実行"
-    echo "  $0 -p generate           # 指定されたテーブルのデータを生成"
-    echo "  $0 -p check              # 指定されたテーブルのデータをチェック"
-    echo "  $0 -p deploy             # 指定されたテーブルのデータをデプロイ"
+    echo "  $0 -p migration generate init      # 初期化データを生成"
+    echo "  $0 -p migration generate migration # マイグレーションデータを生成"
+    echo "  $0 -p migration check              # マイグレーションをチェック"
+    echo "  $0 -p migration deploy             # マイグレーションをデプロイ"
     echo "  $0 csv normalize 2024    # 2024年度のCSVファイルを整形"
     echo "  $0 csv normalize 2025 Y  # 2025年度のYサブディレクトリのCSVファイルを整形"
+    echo "  $0 -p cache generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
+    echo "  $0 -p cache delete subject_syllabus_cache    # 科目別シラバスキャッシュを削除"
+    echo "  $0 -p cache refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
+    echo "  $0 -p cache list         # キャッシュ一覧を表示"
+    echo "  $0 -p cache status       # キャッシュの状態を表示"
+    echo "  $0 -p sql tests/cache_sample3.sql   # SQLファイルをPostgreSQLサーバーで実行"
 }
 
 # コマンドライン引数の解析
@@ -304,8 +315,22 @@ case $COMMAND in
             show_file_history "${ARGS[0]}"
         fi
         ;;
-    venv-init)
-        init_venv
+    venv)
+        if [ ${#ARGS[@]} -eq 0 ]; then
+            echo "エラー: venvコマンドのサブコマンドが指定されていません"
+            echo "使用方法: $0 venv [init]"
+            exit 1
+        fi
+        case "${ARGS[0]}" in
+            init)
+                init_venv
+                ;;
+            *)
+                echo "エラー: 不明なvenvコマンド '${ARGS[0]}'"
+                echo "使用方法: $0 venv [init]"
+                exit 1
+                ;;
+        esac
         ;;
     csv)
         if [ ${#ARGS[@]} -eq 0 ]; then
@@ -414,25 +439,45 @@ case $COMMAND in
         fi
         "$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
         ;;
-    generate)
+    migration)
         if [ "$SERVICE" = "postgres" ]; then
             if [ ${#ARGS[@]} -eq 0 ]; then
-                echo "エラー: 生成タイプが指定されていません"
-                echo "使用方法: $0 -p generate [init|migration]"
+                echo "エラー: マイグレーションコマンドのサブコマンドが指定されていません"
+                echo "使用方法: $0 -p migration [generate|check|deploy] [init|migration]"
                 exit 1
             fi
             case "${ARGS[0]}" in
-                init)
-                    echo "初期化データを生成中..."
-                    "$SCRIPT_DIR/bin/generate-init.sh"
+                generate)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: 生成タイプが指定されていません"
+                        echo "使用方法: $0 -p migration generate [init|migration]"
+                        exit 1
+                    fi
+                    case "${ARGS[1]}" in
+                        init)
+                            echo "初期化データを生成中..."
+                            "$SCRIPT_DIR/bin/generate-init.sh"
+                            ;;
+                        migration)
+                            echo "マイグレーションデータを生成中..."
+                            "$SCRIPT_DIR/bin/generate-migration.sh"
+                            ;;
+                        *)
+                            echo "エラー: 不明な生成タイプ '${ARGS[1]}'"
+                            echo "使用方法: $0 -p migration generate [init|migration]"
+                            exit 1
+                            ;;
+                    esac
                     ;;
-                migration)
-                    echo "マイグレーションデータを生成中..."
-                    "$SCRIPT_DIR/bin/generate-migration.sh"
+                check)
+                    "$SCRIPT_DIR/bin/check-with-dev-db.sh"
+                    ;;
+                deploy)
+                    "$SCRIPT_DIR/bin/deploy-migration.sh"
                     ;;
                 *)
-                    echo "エラー: 不明な生成タイプ '${ARGS[0]}'"
-                    echo "使用方法: $0 -p generate [init|migration]"
+                    echo "エラー: 不明なマイグレーションコマンド '${ARGS[0]}'"
+                    echo "使用方法: $0 -p migration [generate|check|deploy] [init|migration]"
                     exit 1
                     ;;
             esac
@@ -441,17 +486,73 @@ case $COMMAND in
             exit 1
         fi
         ;;
-    check)
+    cache)
         if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/check-with-dev-db.sh"
+            if [ ${#ARGS[@]} -eq 0 ]; then
+                echo "エラー: キャッシュコマンドのサブコマンドが指定されていません"
+                echo "使用方法: $0 -p cache [generate|delete|list|status] [cache_name]"
+                exit 1
+            fi
+            case "${ARGS[0]}" in
+                generate)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: キャッシュ名が指定されていません"
+                        echo "使用方法: $0 -p cache generate <cache_name>"
+                        exit 1
+                    fi
+                    "$SCRIPT_DIR/bin/json_cache.sh" generate "${ARGS[1]}"
+                    ;;
+                delete)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: キャッシュ名が指定されていません"
+                        echo "使用方法: $0 -p cache delete <cache_name>"
+                        exit 1
+                    fi
+                    "$SCRIPT_DIR/bin/json_cache.sh" delete "${ARGS[1]}"
+                    ;;
+                refresh)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: キャッシュ名が指定されていません"
+                        echo "使用方法: $0 -p cache refresh <cache_name>"
+                        exit 1
+                    fi
+                    "$SCRIPT_DIR/bin/json_cache.sh" refresh "${ARGS[1]}"
+                    ;;
+                list)
+                    "$SCRIPT_DIR/bin/json_cache.sh" list
+                    ;;
+                status)
+                    "$SCRIPT_DIR/bin/json_cache.sh" status
+                    ;;
+                *)
+                    echo "エラー: 不明なキャッシュコマンド '${ARGS[0]}'"
+                    echo "使用方法: $0 -p cache [generate|delete|refresh|list|status] [cache_name]"
+                    exit 1
+                    ;;
+            esac
         else
             echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
         fi
         ;;
-    deploy)
+    sql)
         if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/deploy-migration.sh"
+            if [ ${#ARGS[@]} -eq 0 ]; then
+                echo "エラー: SQLファイルが指定されていません"
+                echo "使用方法: $0 -p sql <sqlfile>"
+                exit 1
+            fi
+            
+            sql_file="${ARGS[0]}"
+            if [ ! -f "$sql_file" ]; then
+                echo "エラー: SQLファイルが見つかりません: $sql_file"
+                exit 1
+            fi
+            
+            echo "SQLファイルを実行中: $sql_file"
+            DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
+            DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+            docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
         else
             echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
             exit 1
