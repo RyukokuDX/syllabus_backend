@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v2.0.2
-project_version: v2.0.4
+file_version: v2.0.3
+project_version: v2.0.7
 last_updated: 2025-07-01
 ---
 
 # Syllabus Backend
 
-- File Version: v2.0.2
-- Project Version: v2.0.4
+- File Version: v2.0.3
+- Project Version: v2.0.7
 - Last Updated: 2025-07-01
 
 ## 概要
@@ -19,6 +19,7 @@ last_updated: 2025-07-01
 - シラバス情報の検索・参照APIの提供
 - データベースの自動更新とバックアップ
 - 複数年度のシラバス情報の管理
+- JSONBキャッシュによる高速検索機能
 
 ### システム構成
 - バックエンド: FastAPI (Python 3.11)
@@ -140,6 +141,15 @@ cp .env.example .env
 ./syllabus.sh parser book
 ./syllabus.sh parser syllabus
 ./syllabus.sh parser instructor
+```
+
+8. キャッシュの生成（推奨）
+```bash
+# シラバスキャッシュを生成（検索性能向上のため）
+./syllabus.sh -p cache generate
+
+# キャッシュの状態を確認
+./syllabus.sh -p cache check
 ```
 
 ## 開発ガイドライン

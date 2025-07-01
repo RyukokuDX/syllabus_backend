@@ -6,6 +6,10 @@
 
 # syllabus.sh
 
+- File Version: v1.0.1
+- Project Version: v2.0.7
+- Last Updated: 2025-07-01
+
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
 
 メインのシェルスクリプト。PostgreSQLとFastAPIサービスの管理を統一的に行うためのインターフェースを提供します。
@@ -82,6 +86,14 @@
   - `migration check`: マイグレーションをチェック
   - `migration deploy`: マイグレーションをデプロイ
 
+#### キャッシュ関連
+
+- `cache`: JSONBキャッシュ関連のコマンド（-pオプション必須）
+  - `cache generate`: シラバスキャッシュを生成
+  - `cache check`: キャッシュの状態を確認
+  - `cache clear`: キャッシュをクリア
+  - `cache test`: キャッシュのテストクエリを実行
+
 ### 使用例
 
 ```bash
@@ -125,6 +137,18 @@
 
 # データデプロイ
 ./syllabus.sh -p migration deploy
+
+# キャッシュ生成
+./syllabus.sh -p cache generate <chache名>
+
+# キャッシュ再生成
+./syllabus.sh -p cache refresh <chache名>
+
+# キャッシュ状態確認
+./syllabus.sh -p cache check
+
+# キャッシュテスト
+./syllabus.sh -p cache test
 ```
 
 ## 注意事項
@@ -138,14 +162,5 @@
 
 ### パーサー関連
 - [parser.sh](../python/parser.md) - パーサースクリプトの実行
-
-## 更新履歴
-
-| 日付 | バージョン | 更新者 | 内容 |
-|------|------------|--------|------|
-| 2024-06-05 | 1.0 | 藤原和将 | 初版作成 |
-| 2024-06-05 | 1.1 | 藤原和将  | Python仮想環境のサポートを追加、コマンド構造を整理 |
-| 2024-06-05 | 1.2 | 藤原和将  | parser関連の処理を追加 |
-| 2024-06-05 | 1.3 | 藤原和将  | CSVファイルの整形機能を追加 |
 
 [🔝 ページトップへ](#syllabussh) 
