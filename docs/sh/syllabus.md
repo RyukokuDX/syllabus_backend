@@ -6,8 +6,8 @@
 
 # syllabus.sh
 
-- File Version: v1.0.1
-- Project Version: v2.0.7
+- File Version: v2.1.0
+- Project Version: v2.1.0
 - Last Updated: 2025-07-01
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)

@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v2.0.3
-project_version: v2.0.7
+file_version: v2.1.0
+project_version: v2.1.0
 last_updated: 2025-07-01
 ---
 
 # Syllabus Backend
 
-- File Version: v2.0.3
-- Project Version: v2.0.7
+- File Version: v2.1.0
+- Project Version: v2.1.0
 - Last Updated: 2025-07-01
 
 ## 概要
