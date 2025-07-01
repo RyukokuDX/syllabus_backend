@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-# File Version: v2.0.0
-# Project Version: v2.0.0
-# Last Updated: 2025-06-30
+# File Version: v2.0.1
+# Project Version: v2.0.6
+# Last Updated: 2025-07-01
 """
 
 import os
@@ -193,19 +193,18 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                 
                 stats['processed_files'] += 1
                 
-                # テキスト情報の処理（仕様書準拠）
-                if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
-                    text_content = detail['テキスト']['内容']
-                    if isinstance(text_content, dict) and '書籍' in text_content:
-                        books_list = text_content['書籍']
-                        if isinstance(books_list, list) and books_list:  # nullでない場合のみ処理
-                            stats['total_books'] += len(books_list)
-                            
-                            # 書籍処理の進捗を表示
-                            for book in tqdm(books_list, desc=f"書籍処理中 ({syllabus_code})", leave=False):
+                # 書籍情報処理関数
+                def process_books(books_list, role_type):
+                    """書籍リストを処理する共通関数"""
+                    if isinstance(books_list, list) and books_list:  # nullでない場合のみ処理
+                        stats['total_books'] += len(books_list)
+                        
+                        # 書籍処理の進捗を表示
+                        for book in tqdm(books_list, desc=f"{role_type}処理中 ({syllabus_code})", leave=False):
                                 isbn = book.get('ISBN', '').strip()
                                 title = book.get('書籍名', '').strip()
-                                author = book.get('著者', '').strip()
+                                # 著者名を正規化
+                                author = normalize_author(book.get('著者', ''))
                                 publisher = book.get('出版社', '').strip()
                                 price = None
                                 price_str = book.get('価格', '')
@@ -214,7 +213,7 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                         price = int(price_str.replace(',', '').replace('円', ''))
                                     except ValueError:
                                         pass
-                                role = '教科書'
+                                role = role_type
                                 now = datetime.now().isoformat()
                                 
                                 # ISBNがnullの場合
@@ -378,7 +377,7 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                     book_info = {
                                         'title': bibtex_book_info.get('title', '') if bibtex_book_info.get('title', '') else syllabus_title,
                                         'isbn': isbn,
-                                        'author': bibtex_book_info.get('author', '') if bibtex_book_info.get('author', '') else author,
+                                        'author': normalize_author(bibtex_book_info.get('author', '')) if bibtex_book_info.get('author', '') else author,
                                         'publisher': bibtex_book_info.get('publisher', '') if bibtex_book_info.get('publisher', '') else publisher,
                                         'price': price,
                                         'created_at': now
@@ -443,7 +442,7 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                                 
                                                 # 正常な書籍として登録
                                                 cinii_title = item.get('title', '')
-                                                cinii_author = item.get('dc:creator', '')
+                                                cinii_author = normalize_author(item.get('dc:creator', ''))
                                                 cinii_publisher = item.get('dc:publisher', '')
                                                 
                                                 book_info = {
@@ -494,6 +493,18 @@ def get_book_info(year: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]
                                         })
                                         stats['uncategorized_books'] += 1
                                         stats['cinii_failures'] += 1
+
+                # テキスト情報の処理（教科書）
+                if 'テキスト' in detail and '内容' in detail['テキスト'] and detail['テキスト']['内容'] is not None:
+                    text_content = detail['テキスト']['内容']
+                    if isinstance(text_content, dict) and '書籍' in text_content:
+                        process_books(text_content['書籍'], '教科書')
+
+                # 参考文献情報の処理（参考書）
+                if '参考文献' in detail and '内容' in detail['参考文献'] and detail['参考文献']['内容'] is not None:
+                    ref_content = detail['参考文献']['内容']
+                    if isinstance(ref_content, dict) and '書籍' in ref_content:
+                        process_books(ref_content['書籍'], '参考書')
             except Exception as e:
                 continue
         
@@ -763,6 +774,34 @@ def get_book_info_from_bibtex(isbn: str) -> Optional[Dict[str, str]]:
     except Exception as e:
         # tqdm.write(f"BibTeX経由の書籍情報取得に失敗: {isbn} - {str(e)}")
         return None
+
+def normalize_author(author_str: str) -> str:
+    """著者名を正規化する"""
+    if not author_str:
+        return ''
+    
+    # 前後の空白を除去
+    author_str = author_str.strip()
+    
+    # 複数の区切り文字に対応（カンマ、セミコロン、and、ほか）
+    import re
+    # カンマ、セミコロン、and、ほかで分割
+    authors = re.split(r'[,;]|\s+and\s+|\s+ほか\s*', author_str)
+    
+    # 各著者名を正規化
+    normalized_authors = []
+    for author in authors:
+        author = author.strip()
+        if author:  # 空でない場合のみ追加
+            # 前後の空白を除去
+            author = author.strip()
+            # 連続する空白を1つに
+            author = re.sub(r'\s+', ' ', author)
+            normalized_authors.append(author)
+    
+    # 重複を除去してカンマ区切りで結合
+    unique_authors = list(dict.fromkeys(normalized_authors))  # 順序を保持して重複除去
+    return ', '.join(unique_authors)
 
 def main():
     """メイン処理"""

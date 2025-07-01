@@ -1,8 +1,8 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v1.0.1
-# Project Version: v2.0.3
-# Last Updated: 2025-06-30
+# File Version: v2.0.0
+# Project Version: v2.0.6
+# Last Updated: 2025-07-01
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
