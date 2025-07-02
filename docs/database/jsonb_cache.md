@@ -1,14 +1,14 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.3.2
-project_version: v2.2.3
+file_version: v2.3.3
+project_version: v2.2.4
 last_updated: 2025-07-02
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.3.2
-- Project Version: v2.2.3
+- File Version: v2.3.3
+- Project Version: v2.2.4
 - Last Updated: 2025-07-02
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
@@ -103,6 +103,18 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
 - 部分的なデータ取得
 
 ## 実装ガイドライン
+
+### 配列フィールドの型保証とエラー防止（LLM向け）
+- **配列フィールドは必ず配列型で格納すること**
+  - 例：`json_agg(...)`で生成し、`COALESCE(..., '[]'::json)`で空配列を保証する
+- **nullやスカラ値が混入すると、jsonb_array_elements等で「スカラから要素を取り出すことはできません」エラーが発生する**
+- **キャッシュ生成時、全ての配列フィールドにCOALESCEを適用し、空配列を保証すること**
+- **型チェック用のデバッグクエリを活用し、配列でない値が混入していないか定期的に検証すること**
+  - 例：
+    ```sql
+    SELECT COUNT(*) FROM syllabus_cache WHERE cache_name = 'subject_syllabus_cache' AND jsonb_typeof(cache_data->'開講情報一覧') IS DISTINCT FROM 'array';
+    ```
+- **LLMによる自動クエリ生成時も、配列型であることを前提に展開処理を記述すること**
 
 ### 開発環境での利用
 - 開発時は小規模データでのテスト
