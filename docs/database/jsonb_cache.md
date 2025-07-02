@@ -1,15 +1,15 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.1.0
-project_version: v2.1.0
-last_updated: 2025-07-01
+file_version: v2.2.0
+project_version: v2.2.0
+last_updated: 2025-07-02
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.1.0
-- Project Version: v2.1.0
-- Last Updated: 2025-07-01
+- File Version: v2.2.0
+- Project Version: v2.2.0
+- Last Updated: 2025-07-02
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -52,6 +52,7 @@ last_updated: 2025-07-01
             { "教員名": "田中 太郎", "役割": "主担当" },
             { "教員名": "佐藤 花子", "役割": "副担当" }
           ],
+          "対象学部課程": ["理工学部", "先端理工学部"],
           "学期": "1Q",
           "曜日": "月曜日",
           "時限": [1,2],
@@ -110,6 +111,7 @@ last_updated: 2025-07-01
 - **担当**: 教員情報の配列
   - **教員名**: 教員の氏名（instructor.name）
   - **役割**: 担当教員の役割（syllabus_instructor.role）
+- **対象学部課程**: 開講対象の学部課程の配列（syllabus_faculty.faculty_name）
 - **学期**: 開講学期（syllabus.term）
 - **曜日**: 開講曜日（lecture_time.day_of_week）
 - **時限**: 開講時限（lecture_time.period）
@@ -265,6 +267,14 @@ reference_data AS (
     ) combined_references
     GROUP BY syllabus_id
 ),
+faculty_data AS (
+    SELECT 
+        sf.syllabus_id,
+        json_agg(f.faculty_name) as faculties
+    FROM syllabus_faculty sf
+    JOIN faculty f ON sf.faculty_id = f.faculty_id
+    GROUP BY sf.syllabus_id
+),
 grading_data AS (
     SELECT 
         gc.syllabus_id,
@@ -301,29 +311,45 @@ subject_data AS (
         AND sa.attribute_name = '課程別エンティティ'
     GROUP BY sub.subject_name_id, sub.curriculum_year
 ),
-cache_data AS (
+syllabus_by_year AS (
     SELECT 
         sd.subject_name_id,
+        sd.subject_name,
+        sd.syllabus_year,
+        json_agg(
+            json_build_object(
+                '担当', COALESCE(id.instructors, '[]'::json),
+                '対象学部課程', COALESCE(fd.faculties, '[]'::json),
+                '学期', sd.term,
+                '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
+                '時限', COALESCE(ltd.periods, '[]'::json),
+                '単位', sd.credits,
+                '教科書', COALESCE(td.textbooks, '[]'::json),
+                '教科書コメント', sd.textbook_comment,
+                '参考書', COALESCE(rd.references, '[]'::json),
+                '参考書コメント', sd.reference_comment,
+                '成績', COALESCE(gd.grading_criteria, '[]'::json),
+                '成績コメント', sd.grading_comment
+            )
+        ) as syllabi
+    FROM syllabus_data sd
+    LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
+    LEFT JOIN faculty_data fd ON sd.syllabus_id = fd.syllabus_id
+    LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
+    LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
+    LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
+    LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
+    GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_year
+),
+cache_data AS (
+    SELECT 
+        sby.subject_name_id,
         json_build_object(
-            '科目名', sd.subject_name,
+            '科目名', sby.subject_name,
             '開講情報', json_agg(
                 json_build_object(
-                    '年', sd.syllabus_year,
-                    'シラバス', json_agg(
-                        json_build_object(
-                            '担当', COALESCE(id.instructors, '[]'::json),
-                            '学期', sd.term,
-                            '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
-                            '時限', COALESCE(ltd.periods, '[]'::json),
-                            '単位', sd.credits,
-                            '教科書', COALESCE(td.textbooks, '[]'::json),
-                            '教科書コメント', sd.textbook_comment,
-                            '参考書', COALESCE(rd.references, '[]'::json),
-                            '参考書コメント', sd.reference_comment,
-                            '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                            '成績コメント', sd.grading_comment
-                        )
-                    )
+                    '年', sby.syllabus_year,
+                    'シラバス', sby.syllabi
                 )
             ),
             '履修情報', json_agg(
@@ -333,14 +359,9 @@ cache_data AS (
                 )
             )
         ) as cache_data
-    FROM syllabus_data sd
-    LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
-    LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
-    LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
-    LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
-    LEFT JOIN grading_data gd ON sd.syllabus_id = gd.syllabus_id
-    LEFT JOIN subject_data subd ON sd.subject_name_id = subd.subject_name_id
-    GROUP BY sd.subject_name_id, sd.subject_name, sd.syllabus_year
+    FROM syllabus_by_year sby
+    LEFT JOIN subject_data subd ON sby.subject_name_id = subd.subject_name_id
+    GROUP BY sby.subject_name_id, sby.subject_name
 )
 INSERT INTO syllabus_cache (cache_name, subject_name_id, cache_data, cache_version)
 SELECT 
@@ -360,8 +381,11 @@ FROM cache_data cd;
 3. **lecture_time_data**: 講義時間情報の集約
 4. **textbook_data**: 教科書情報の集約（book + book_uncategorized）
 5. **reference_data**: 参考書情報の集約（book + book_uncategorized）
-6. **grading_data**: 成績評価基準の集約
-7. **subject_data**: 履修要綱情報の集約
+6. **faculty_data**: 対象学部課程情報の集約（syllabus_faculty）
+7. **grading_data**: 成績評価基準の集約
+8. **subject_data**: 履修要綱情報の集約
+9. **syllabus_by_year**: 年度別シラバス情報の集約
+10. **cache_data**: 最終的なキャッシュデータの構築
 
 #### 特徴
 
@@ -369,6 +393,141 @@ FROM cache_data cd;
 - **COALESCE**: NULL値の適切な処理
 - **json_agg**: 1対多の関係を配列として集約
 - **json_build_object**: 構造化されたJSONオブジェクトの生成
-- **GROUP BY**: 科目名単位でのデータ集約
+- **二段階GROUP BY**: 年度別集約→科目名単位集約で重複を排除
+
+## LLM向け構造概要
+
+### データ構造の特徴
+
+#### 配列フィールド（必ず配列形式）
+- **開講情報**: 年度別の開講情報の配列
+- **シラバス**: 各年度内のシラバス情報の配列（1件でも配列）
+- **担当**: 教員情報の配列
+- **対象学部課程**: 開講対象の学部課程名の配列（syllabus_facultyから取得）
+- **時限**: 時限番号の配列
+- **教科書**: 教科書情報の配列
+- **参考書**: 参考書情報の配列
+- **成績**: 成績評価基準の配列
+- **履修情報**: 年度別の履修情報の配列
+- **履修要綱**: 各年度内の履修要綱情報の配列
+
+#### 単一値フィールド
+- **科目名**: 文字列
+- **年**: 数値（年度）
+- **教員名**: 文字列
+- **役割**: 文字列
+- **学期**: 文字列
+- **曜日**: 文字列
+- **単位**: 数値
+- **書名**: 文字列
+- **著者**: 文字列
+- **ISBN**: 文字列
+- **値段**: 数値
+- **備考**: 文字列
+- **項目**: 文字列
+- **割合**: 数値
+- **評価方法**: 文字列
+- **学部課程**: 文字列
+- **科目区分**: 文字列
+- **科目小区分**: 文字列
+- **必須度**: 文字列
+- **課程別エンティティ**: 文字列
+
+#### コメントフィールド
+- **教科書コメント**: 文字列
+- **参考書コメント**: 文字列
+- **成績コメント**: 文字列
+
+### データアクセスパターン
+
+#### 科目検索
+```json
+// 科目名で検索
+"科目名": "微分積分学I"
+
+// 年度別の開講情報
+"開講情報": [
+  {
+    "年": 2025,
+    "シラバス": [...]
+  }
+]
+```
+
+#### 教員検索
+```json
+// 担当教員情報
+"担当": [
+  {
+    "教員名": "田中 太郎",
+    "役割": "主担当"
+  }
+]
+```
+
+#### 学部課程検索
+```json
+// 開講対象学部課程（シラバスレベル）
+"対象学部課程": ["理工学部", "先端理工学部"]
+
+// 履修要綱の学部課程（履修情報レベル）
+"学部課程": "理工学部"
+
+// 学部課程での科目検索例
+// 理工学部で開講される科目を検索
+"開講情報": [
+  {
+    "シラバス": [
+      {
+        "対象学部課程": ["理工学部", "先端理工学部"]
+      }
+    ]
+  }
+]
+
+// 特定学部課程の履修要綱を検索
+"履修情報": [
+  {
+    "履修要綱": [
+      {
+        "学部課程": "理工学部",
+        "科目区分": "専門基礎科目",
+        "必須度": "必修"
+      }
+    ]
+  }
+]
+```
+
+#### 時間検索
+```json
+// 講義時間
+"曜日": "月曜日",
+"時限": [1, 2]
+```
+
+#### 書籍検索
+```json
+// 教科書・参考書
+"教科書": [
+  {
+    "書名": "微分積分学入門",
+    "著者": "山田 数学",
+    "ISBN": "978-4-1234-5678-9",
+    "値段": 2500
+  }
+]
+```
+
+### 注意事項
+- 配列フィールドは常に配列形式（空配列の場合も含む）
+- 単一値フィールドは文字列または数値
+- 年度情報は「開講情報」と「履修情報」で別々に管理
+- 教員情報は「担当」配列内のオブジェクトとして格納
+- 書籍情報は「教科書」「参考書」配列内のオブジェクトとして格納
+- 学部課程情報は「開講情報」と「履修情報」で異なるレベルで管理
+  - 開講情報: シラバスレベルで「対象学部課程」として配列形式
+  - 履修情報: 履修要綱レベルで「学部課程」として単一値
+- 課程別エンティティは履修要綱レベルでのみ存在し、設定されていない場合はフィールド自体が存在しない
 
 [🔝 ページトップへ](#jsonbキャッシュリスト仕様書) 

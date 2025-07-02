@@ -1,8 +1,8 @@
 ---
 title: データベース構造定義
-file_version: v2.1.0
-project_version: v2.1.0
-last_updated: 2025-07-01
+file_version: v2.2.0
+project_version: v2.2.0
+last_updated: 2025-07-02
 ---
 <!-- Curosr はversion 弄るな -->
 
@@ -19,9 +19,9 @@ last_updated: 2025-07-01
 
 # データベース構造定義
 
-- File Version: v2.1.0
-- Project Version: v2.1.0
-- Last Updated: 2025-07-01
+- File Version: v2.2.0
+- Project Version: v2.2.0
+- Last Updated: 2025-07-02
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -48,7 +48,8 @@ last_updated: 2025-07-01
 18. [subject_attribute 科目属性](#subject_attribute-科目属性)
 19. [subject 科目基本情報](#subject-科目基本情報)
 20. [subject_attribute_value 科目属性値](#subject_attribute_value-科目属性値)
-21. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
+21. [syllabus_faculty シラバス学部関連](#syllabus_faculty-シラバス学部関連)
+22. [syllabus_study_system シラバス系統的履修](#syllabus_study_system-シラバス系統的履修)
 
 
 ## テーブル構成
@@ -749,6 +750,41 @@ periodは"0"とする.
 - 年度ごとに属性値が異なる場合に対応
 - 属性値は全てTEXT型で格納し、アプリケーション側で適切な型に変換
 - 科目とシラバスの関連は`subject_name_id`を通じて`subject`テーブルと`syllabus`テーブルで管理
+
+[🔝 ページトップへ](#データベース構造定義)
+
+### syllabus_faculty シラバス学部関連
+
+#### テーブル概要
+シラバスと学部・課程の関連を管理する中間テーブル。シラバスがどの学部・課程で開講されるかを管理。
+
+#### カラム定義
+| カラム名 | データ型 | NULL | 説明 | 情報源 |
+|----------|----------|------|------|--------|
+| id | INTEGER | NO | ID（主キー） | システム生成 |
+| syllabus_id | INTEGER | NO | シラバスID（外部キー） | システム生成 |
+| faculty_id | INTEGER | NO | 学部・課程ID（外部キー） | システム生成 |
+| created_at | TIMESTAMP | NO | 作成日時 | システム生成 |
+| updated_at | TIMESTAMP | YES | 更新日時 | システム生成 |
+
+#### インデックス
+| インデックス名 | カラム | 説明 |
+|---------------|--------|------|
+| PRIMARY KEY | id | 主キー |
+| idx_syllabus_faculty_syllabus | syllabus_id | シラバスIDでの検索用 |
+| idx_syllabus_faculty_faculty | faculty_id | 学部・課程IDでの検索用 |
+| UNIQUE | (syllabus_id, faculty_id) | シラバスと学部・課程の一意性 |
+
+#### 外部キー制約
+| 参照元 | 参照先 | 削除時の動作 |
+|--------|--------|-------------|
+| syllabus_id | syllabus_master(syllabus_id) | CASCADE |
+| faculty_id | faculty(faculty_id) | CASCADE |
+
+#### 補足
+- 一つのシラバスに対して複数の学部・課程が存在する可能性がある
+- 年度ごとに開講学部・課程が異なる場合に対応
+- シラバスと学部・課程の多対多の関係を管理
 
 [🔝 ページトップへ](#データベース構造定義)
 

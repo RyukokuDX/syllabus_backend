@@ -1,6 +1,6 @@
-# File Version: v2.1.0
-# Project Version: v2.1.0
-# Last Updated: 2025-07-01
+# File Version: v2.2.0
+# Project Version: v2.2.0
+# Last Updated: 2025-07-02
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -360,6 +360,21 @@ class SubjectAttributeValue(Base):
         Index('idx_subject_attribute_value_attribute', 'attribute_id'),
     )
 
+class SyllabusFaculty(Base):
+    __tablename__ = 'syllabus_faculty'
+
+    id = Column(Integer, primary_key=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus_master.syllabus_id', ondelete='CASCADE'), nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    updated_at = Column(TIMESTAMP)
+
+    __table_args__ = (
+        Index('idx_syllabus_faculty_syllabus', 'syllabus_id'),
+        Index('idx_syllabus_faculty_faculty', 'faculty_id'),
+        UniqueConstraint('syllabus_id', 'faculty_id', name='uix_syllabus_faculty_syllabus_faculty'),
+    )
+
 class SyllabusStudySystem(Base):
     __tablename__ = 'syllabus_study_system'
 
@@ -571,6 +586,15 @@ class Subject:
     class_id: int
     subclass_id: Optional[int]
     requirement_type: str
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+@dataclass
+class SyllabusFaculty:
+    """シラバス学部関連モデル"""
+    id: int
+    syllabus_id: int
+    faculty_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
 
