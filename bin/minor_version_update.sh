@@ -1,6 +1,6 @@
 #!/bin/bash
-# File Version: v1.0.1
-# Project Version: v2.2.1
+# File Version: v2.3.0
+# Project Version: v2.3.0
 # Last Updated: 2025-07-02
 
 # minor update用のシェルスクリプト
