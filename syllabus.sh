@@ -248,6 +248,7 @@ show_help() {
     echo "  cache list       利用可能なキャッシュ一覧を表示"
     echo "  cache status     キャッシュの状態を表示"
     echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
+    echo "  -g update minor <squash|noff>   minorバージョンアップをdevelopへマージ（squash/no-ff選択）"
     echo
     echo "使用例:"
     echo "  $0 venv init             # Python仮想環境を初期化"
@@ -271,6 +272,8 @@ show_help() {
     echo "  $0 -p cache list         # キャッシュ一覧を表示"
     echo "  $0 -p cache status       # キャッシュの状態を表示"
     echo "  $0 -p sql tests/cache_sample3.sql   # SQLファイルをPostgreSQLサーバーで実行"
+    echo "  $0 -g update minor squash       # squashでdevelopにminorマージ"
+    echo "  $0 -g update minor noff         # no-ffでdevelopにminorマージ"
 }
 
 # コマンドライン引数の解析
@@ -574,6 +577,23 @@ case $COMMAND in
             docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
         else
             echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
+            exit 1
+        fi
+        ;;
+    update)
+        if [ ${#ARGS[@]} -lt 2 ]; then
+            echo "エラー: updateコマンドのサブコマンドが不足しています"
+            echo "使用方法: $0 -g update minor <squash|noff>"
+            exit 1
+        fi
+        if [ "${ARGS[0]}" = "minor" ]; then
+            if [ "${ARGS[1]}" != "squash" ] && [ "${ARGS[1]}" != "noff" ]; then
+                echo "エラー: squash か noff を指定してください"
+                exit 1
+            fi
+            "$SCRIPT_DIR/bin/minor_version_update.sh" "${ARGS[1]}"
+        else
+            echo "エラー: minor以外は未対応です"
             exit 1
         fi
         ;;

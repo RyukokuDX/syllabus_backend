@@ -6,8 +6,8 @@
 
 # syllabus.sh
 
-- File Version: v2.2.0
-- Project Version: v2.2.0
+- File Version: v2.2.1
+- Project Version: v2.2.1
 - Last Updated: 2025-07-02
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
@@ -162,5 +162,18 @@
 
 ### パーサー関連
 - [parser.sh](../python/parser.md) - パーサースクリプトの実行
+
+### minorバージョンアップのsquash/no-ffマージ
+
+- `-g update minor squash` : squashでdevelopにminorマージ
+- `-g update minor noff`   : no-ffでdevelopにminorマージ
+
+```bash
+./syllabus.sh -g update minor squash
+./syllabus.sh -g update minor noff
+```
+
+現在のブランチの内容をdevelopにsquashまたはno-ffでマージします。
+内部的に `bin/minor_version_update.sh` を呼び出します。
 
 [🔝 ページトップへ](#syllabussh) 
