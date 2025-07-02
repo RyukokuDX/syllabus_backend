@@ -5,8 +5,10 @@
 
 SELECT DISTINCT
     cache_data->>'科目名' AS 科目名,
-    syllabus_lateral.syllabus->>'成績' AS 成績,
-    syllabus_lateral.syllabus->>'成績コメント' AS 成績コメント
+    syllabus_lateral.syllabus->'担当' AS 担当講師,
+    syllabus_lateral.syllabus->'対象学部課程' AS 対象学部,
+    syllabus_lateral.syllabus->>'曜日' AS 開講曜日,
+    syllabus_lateral.syllabus->'時限' AS 開講時限
 FROM syllabus_cache,
 LATERAL (
     SELECT rj
@@ -29,6 +31,11 @@ LATERAL (
     SELECT syllabus
     FROM jsonb_array_elements(kj_lateral.kj->'シラバス') AS syllabus
     WHERE jsonb_typeof(kj_lateral.kj->'シラバス') = 'array'
+    AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements_text(syllabus->'対象学部課程') AS faculty
+        WHERE faculty LIKE '%数理%'
+    )
     AND NOT EXISTS (
         SELECT 1
         FROM jsonb_array_elements(syllabus->'成績') AS grade
