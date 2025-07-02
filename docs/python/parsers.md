@@ -1,8 +1,8 @@
 ---
 title: パーサー一覧
-file_version: v2.1.0
-project_version: v2.1.0
-last_updated: 2025-07-01
+file_version: v2.1.2
+project_version: v2.1.3
+last_updated: 2025-07-02
 ---
 
 <!--
@@ -13,9 +13,9 @@ last_updated: 2025-07-01
 
 # パーサー一覧
 
-- File Version: v2.1.0
-- Project Version: v2.1.0
-- Last Updated: 2025-07-01
+- File Version: v2.1.2
+- Project Version: v2.1.3
+- Last Updated: 2025-07-02
 
 [readmeへ](../../README.md)
 
@@ -51,6 +51,7 @@ last_updated: 2025-07-01
 | 科目パーサー | 17_subject.py | 科目情報の統合 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject |
 | 科目属性値パーサー | 19_subject_attribute_value.py | 科目属性値の抽出 | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute_value |
 | シラバス学習システムパーサー | 21_syllabus_study_system.py | シラバス系統的履修の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_study_system |
+| シラバス学部関連パーサー | 22_syllabus_faculty.py | シラバス学部関連の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_faculty |
 
 ### 未実装パーサー（structure.md準拠）
 
@@ -62,7 +63,6 @@ last_updated: 2025-07-01
 | 講義セッション教員パーサー | 14_lecture_session_instructor.py | 講義セッション教員の抽出 | `src/syllabus/{year}/json/*.json` | lecture_session_instructor |
 | シラバス教科書関連パーサー | 15_syllabus_book.py | シラバス教科書関連の抽出 | `src/syllabus/{year}/json/*.json` | syllabus_book |
 | 成績評価基準パーサー | 18_grading_criterion.py | 成績評価基準の抽出 | `src/syllabus/{year}/json/*.json` | grading_criterion |
-| 科目属性値パーサー | 20_subject_attribute_value.py | 科目属性値の抽出（強化版） | `src/course_guide/{year}/csv/*.csv`（タブ区切り） | subject_attribute_value |
 
 ### 削除されたパーサー
 

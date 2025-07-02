@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File Version: v2.1.1
-# Project Version: v2.1.2
-# Last Updated: 2025-07-01
+# File Version: v2.1.3
+# Project Version: v2.1.3
+# Last Updated: 2025-07-02
 
 import os
 import json
@@ -17,70 +17,26 @@ from tqdm import tqdm
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
-from utils import normalize_subject_name, normalize_faculty_name
-
-def get_db_connection():
-    """データベース接続を取得する"""
-    # 環境変数から接続情報を取得
-    user = os.getenv('POSTGRES_USER', 'postgres')
-    password = os.getenv('POSTGRES_PASSWORD', 'postgres')
-    host = os.getenv('POSTGRES_HOST', 'localhost')
-    port = os.getenv('POSTGRES_PORT', '5432')
-    db = os.getenv('POSTGRES_DB', 'syllabus_db')
-
-    # 接続文字列を作成
-    connection_string = f"postgresql://{user}:{password}@{host}:{port}/{db}"
-    
-    # エンジンを作成
-    engine = create_engine(
-        connection_string,
-        connect_args={
-            'options': '-c client_encoding=utf-8'
-        }
-    )
-    
-    # セッションを作成
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    
-    # セッション作成時に一度だけ文字エンコーディングを設定
-    session.execute(text("SET client_encoding TO 'utf-8'"))
-    session.commit()
-    
-    return session
-
-def get_syllabus_master_id_from_db(session, syllabus_code: str, syllabus_year: int) -> int:
-    """シラバスマスターIDを取得する"""
-    try:
-        # シラバスマスターIDを取得
-        query = text("""
-            SELECT syllabus_id 
-            FROM syllabus_master 
-            WHERE syllabus_code = :code 
-            AND syllabus_year = :year
-        """)
-        
-        result = session.execute(
-            query,
-            {"code": syllabus_code, "year": syllabus_year}
-        ).first()
-        
-        return result[0] if result else None
-    except Exception as e:
-        session.rollback()
-        return None
+from utils import (
+    normalize_faculty_name, 
+    get_db_connection, 
+    get_syllabus_master_id_from_db,
+    get_year_from_user
+)
 
 def get_faculty_id_from_db(session, faculty_name: str) -> int:
     """学部・課程IDを取得する"""
     try:
         # 学部・課程名を正規化
-        normalized_name = normalize_text(faculty_name, handle_null=True)
+        normalized_name = normalize_faculty_name(faculty_name)
         
         # 学部・課程IDを取得
         query = text("""
             SELECT faculty_id 
             FROM faculty 
             WHERE faculty_name = :name
+            ORDER BY faculty_id
+            LIMIT 1
         """)
         
         result = session.execute(
@@ -191,20 +147,6 @@ def get_all_json_files(year: int) -> List[str]:
     
     return [os.path.join(data_dir, f) for f in sorted(json_files)]
 
-def get_year_from_user() -> int:
-    """ユーザーから年度を入力してもらう"""
-    while True:
-        try:
-            year = input("年度を入力してください（空の場合は現在の年度）: ").strip()
-            if not year:
-                return datetime.now().year
-            year = int(year)
-            if 2000 <= year <= 2100:  # 妥当な年度の範囲をチェック
-                return year
-            print("2000年から2100年の間で入力してください。")
-        except ValueError:
-            print("有効な数値を入力してください。")
-
 def process_syllabus_faculty_json(json_file: str, session) -> tuple[List[Dict], List[Dict]]:
     """シラバスJSONファイルから学部関連情報を抽出する"""
     syllabus_faculties = []
@@ -215,7 +157,7 @@ def process_syllabus_faculty_json(json_file: str, session) -> tuple[List[Dict], 
             data = json.load(f)
         
         # 基本情報の取得
-        syllabus_code = data.get('科目コード', '')  # 科目コードは基本情報の外にある
+        syllabus_code = data.get('科目コード', '')
         syllabus_year = data.get('基本情報', {}).get('開講年度', {}).get('内容', '')
         subject_name = data.get('基本情報', {}).get('科目名', {}).get('内容', '')
         
@@ -348,24 +290,47 @@ def main():
     try:
         # 年度の取得
         year = get_year_from_user()
-        print(f"処理対象年度: {year}")
+        
+        # 処理開始時のメッセージ
+        tqdm.write(f"\n{'='*60}")
+        tqdm.write(f"シラバス学部関連パーサー - 対象年度: {year}")
+        tqdm.write(f"{'='*60}")
         
         # データベース接続
         session = get_db_connection()
-        print("データベースに接続しました")
         
         # JSONファイルの取得
         json_files = get_all_json_files(year)
-        print(f"処理対象ファイル数: {len(json_files)}件")
+        
+        # 統計情報の初期化
+        stats = {
+            'total_files': len(json_files),
+            'processed_files': 0,
+            'total_items': 0,
+            'valid_items': 0,
+            'error_items': 0,
+            'specific_errors': {}
+        }
         
         # シラバス学部関連情報の抽出
         all_syllabus_faculties = []
         all_errors = []
         
-        for json_file in tqdm(json_files, desc="JSONファイル処理", unit="file"):
+        # ファイル処理の進捗バー
+        for json_file in tqdm(json_files, desc="ファイル処理中", unit="file"):
             syllabus_faculties, errors = process_syllabus_faculty_json(json_file, session)
             all_syllabus_faculties.extend(syllabus_faculties)
             all_errors.extend(errors)
+            
+            stats['processed_files'] += 1
+            stats['total_items'] += len(syllabus_faculties) + len(errors)
+            stats['valid_items'] += len(syllabus_faculties)
+            stats['error_items'] += len(errors)
+            
+            # エラー種別の統計
+            for error in errors:
+                error_type = error.get('error_type', 'UNKNOWN')
+                stats['specific_errors'][error_type] = stats['specific_errors'].get(error_type, 0) + 1
         
         # 重複を除去（syllabus_id, faculty_idの組み合わせでユニーク）
         unique_syllabus_faculties = []
@@ -377,24 +342,40 @@ def main():
                 seen_combinations.add(combination)
                 unique_syllabus_faculties.append(faculty)
         
-        print(f"抽出されたシラバス学部関連: {len(unique_syllabus_faculties)}件")
-        print(f"エラー件数: {len(all_errors)}件")
+        # 最終統計の表示
+        tqdm.write("\n" + "="*60)
+        tqdm.write("処理完了 - 統計情報")
+        tqdm.write("="*60)
+        tqdm.write(f"総ファイル数: {stats['total_files']}")
+        tqdm.write(f"処理済みファイル数: {stats['processed_files']}")
+        tqdm.write(f"総データ数: {stats['total_items']}")
+        tqdm.write(f"正常データ数: {stats['valid_items']}")
+        tqdm.write(f"エラーデータ数: {stats['error_items']}")
+        tqdm.write("="*60)
+        
+        # 結果サマリーの表示
+        tqdm.write(f"\n{'='*60}")
+        tqdm.write("📊 抽出結果サマリー")
+        tqdm.write(f"{'='*60}")
+        tqdm.write(f"✅ 正常データ: {len(unique_syllabus_faculties)}件")
+        tqdm.write(f"⚠️  エラーデータ: {len(all_errors)}件")
+        tqdm.write(f"📈 合計: {len(unique_syllabus_faculties) + len(all_errors)}件")
         
         # JSONファイルの作成
         if unique_syllabus_faculties:
             output_file = create_syllabus_faculty_json(unique_syllabus_faculties)
-            print(f"JSONファイルを作成しました: {output_file}")
+            tqdm.write(f"📄 JSONファイルを作成しました: {output_file}")
         
         # エラーファイルの作成
         if all_errors:
             warning_file = create_warning_csv(year, all_errors)
-            print(f"警告ファイルを作成しました: {warning_file}")
+            tqdm.write(f"⚠️  警告ファイルを作成しました: {warning_file}")
         
         session.close()
-        print("処理が完了しました")
+        tqdm.write("🎉 処理が完了しました")
         
     except Exception as e:
-        print(f"エラーが発生しました: {str(e)}")
+        tqdm.write(f"❌ エラーが発生しました: {str(e)}")
         raise
 
 if __name__ == "__main__":

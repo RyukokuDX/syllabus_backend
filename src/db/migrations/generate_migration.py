@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# File Version: v2.1.1
+# Project Version: v2.1.3
+# Last Updated: 2025-07-02
+
 import json
 import os
 from datetime import datetime
@@ -235,6 +239,7 @@ def generate_sql_insert(table_name, records):
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id"],
         "grading_criterion": ["syllabus_id", "criteria_type"],
+        "syllabus_faculty": ["syllabus_id", "faculty_id"],
         "syllabus_study_system": ["source_syllabus_id", "target"],
         "subject_grade": ["syllabus_id", "grade"]  # 新しく追加したユニーク制約に対応
     }
@@ -260,6 +265,7 @@ def generate_sql_insert(table_name, records):
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
         "grading_criterion": ["criteria_type", "ratio", "note"],
+        "syllabus_faculty": ["syllabus_id", "faculty_id"],
         "syllabus_study_system": ["target"],
         "subject_grade": ["grade"]  # gradeカラムを更新対象に
     }
@@ -482,6 +488,15 @@ CREATE TABLE IF NOT EXISTS syllabus_study_system (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     UNIQUE(source_syllabus_id, target)
+);""",
+        'syllabus_faculty': """
+CREATE TABLE IF NOT EXISTS syllabus_faculty (
+    id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, faculty_id)
 );"""
     }
     
@@ -543,6 +558,9 @@ CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(s
         'syllabus_study_system': """
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_source ON syllabus_study_system(source_syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_system(target);""",
+        'syllabus_faculty': """
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_syllabus ON syllabus_faculty(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_faculty ON syllabus_faculty(faculty_id);""",
         'subject_grade': """
 CREATE INDEX IF NOT EXISTS idx_subject_grade_grade ON subject_grade(grade);
 CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_id);"""
@@ -722,6 +740,11 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'syllabus_study_system',
                 'table_name': 'syllabus_study_system',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_faculty',
+                'table_name': 'syllabus_faculty',
                 'source': 'web_syllabus'
             },
             # 要件関連テーブル
