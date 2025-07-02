@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v2.2.0
-project_version: v2.2.0
+file_version: v2.3.0
+project_version: v2.3.0
 last_updated: 2025-07-02
 ---
 
 # Syllabus Backend
 
-- File Version: v2.2.0
-- Project Version: v2.2.0
+- File Version: v2.3.0
+- Project Version: v2.3.0
 - Last Updated: 2025-07-02
 
 ## 概要
@@ -134,16 +134,7 @@ cp .env.example .env
 ```bash
 ./syllabus.sh -p records
 ```
-
-7. サンプルデータの投入（オプション）
-```bash
-# 各種パーサーを実行してサンプルデータを投入
-./syllabus.sh parser book
-./syllabus.sh parser syllabus
-./syllabus.sh parser instructor
-```
-
-8. キャッシュの生成（推奨）
+7. キャッシュの生成（推奨）
 ```bash
 # シラバスキャッシュを生成（検索性能向上のため）
 ./syllabus.sh -p cache generate
@@ -156,6 +147,7 @@ cp .env.example .env
 - [データベース設計ポリシー](docs/database/policy.md)
 - [API仕様](docs/api/openapi.yaml)
 - [データベース構造定義](docs/database/structure.md)
+- [キャッシュ構造定義](docs/database/jsonb_cache.md)
 
 ## ライセンス
 MIT License

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # -*- coding: utf-8 -*-
-# File Version: v2.2.0
-# Project Version: v2.2.0
+# File Version: v2.3.0
+# Project Version: v2.3.0
 # Last Updated: 2025-07-02
 
 # スクリプトのディレクトリを取得
@@ -136,7 +136,7 @@ generate_subject_syllabus_cache() {
             si.syllabus_id,
             json_agg(
                 json_build_object(
-                    '教員名', i.name,
+                    '氏名', i.name,
                     '役割', COALESCE(si.role, '担当')
                 )
             ) as instructors
@@ -169,7 +169,7 @@ generate_subject_syllabus_cache() {
                     '書名', b.title,
                     '著者', b.author,
                     'ISBN', b.isbn,
-                    '値段', b.price
+                    '価格', b.price
                 ) as book_info
             FROM syllabus_book sb
             JOIN book b ON sb.book_id = b.book_id
@@ -184,7 +184,7 @@ generate_subject_syllabus_cache() {
                     '書名', bu.title,
                     '著者', bu.author,
                     'ISBN', bu.isbn,
-                    '値段', bu.price
+                    '価格', bu.price
                 ) as book_info
             FROM book_uncategorized bu
             WHERE bu.role = '教科書'
@@ -203,7 +203,7 @@ generate_subject_syllabus_cache() {
                     '書名', b.title,
                     '著者', b.author,
                     'ISBN', b.isbn,
-                    '値段', b.price
+                    '価格', b.price
                 ) as book_info
             FROM syllabus_book sb
             JOIN book b ON sb.book_id = b.book_id
@@ -218,7 +218,7 @@ generate_subject_syllabus_cache() {
                     '書名', bu.title,
                     '著者', bu.author,
                     'ISBN', bu.isbn,
-                    '値段', bu.price
+                    '価格', bu.price
                 ) as book_info
             FROM book_uncategorized bu
             WHERE bu.role = '参考書'
@@ -285,18 +285,17 @@ generate_subject_syllabus_cache() {
             sd.syllabus_year,
             json_agg(
                 json_build_object(
-                    '担当', COALESCE(id.instructors, '[]'::json),
-                    '対象学部課程', COALESCE(fd.faculties, '[]'::json),
+                    '担当教員一覧', COALESCE(id.instructors, '[]'::json),
+                    '対象学部課程一覧', COALESCE(fd.faculties, '[]'::json),
                     '学期', sd.term,
-                    '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
-                    '時限', COALESCE(ltd.periods, '[]'::json),
-                    '単位', sd.credits,
-                    '教科書', COALESCE(td.textbooks, '[]'::json),
+                    '講義時間一覧', COALESCE(ltd.lecture_times, '[]'::json),
+                    '単位数', sd.credits,
+                    '教科書一覧', COALESCE(td.textbooks, '[]'::json),
                     '教科書コメント', sd.textbook_comment,
-                    '参考書', COALESCE(rd.references, '[]'::json),
+                    '参考書一覧', COALESCE(rd.references, '[]'::json),
                     '参考書コメント', sd.reference_comment,
-                    '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                    '成績コメント', sd.grading_comment
+                    '成績評価基準一覧', COALESCE(gd.grading_criteria, '[]'::json),
+                    '成績評価コメント', sd.grading_comment
                 )
             ) as syllabi
         FROM syllabus_data sd
@@ -313,17 +312,19 @@ generate_subject_syllabus_cache() {
             sby.subject_name_id,
             json_build_object(
                 '科目名', sby.subject_name,
-                '開講情報', json_agg(
+                '開講情報一覧', json_agg(
                     json_build_object(
                         '年', sby.syllabus_year,
-                        'シラバス', sby.syllabi
+                        'シラバス一覧', sby.syllabi
                     )
                 ),
-                '履修情報', json_agg(
-                    json_build_object(
-                        '年', subd.curriculum_year,
-                        '履修要綱', subd.subject_info
-                    )
+                '履修情報一覧', COALESCE(
+                    json_agg(
+                        json_build_object(
+                            '年', subd.curriculum_year,
+                            '履修要綱一覧', COALESCE(subd.subject_info, '[]'::json)
+                        )
+                    ), '[]'::json
                 )
             ) as cache_data
         FROM syllabus_by_year sby
@@ -335,7 +336,7 @@ generate_subject_syllabus_cache() {
         'subject_syllabus_cache',
         cd.subject_name_id,
         cd.cache_data,
-        'v2.1.0'
+        'v2.2.0'
     FROM cache_data cd;
     "
     

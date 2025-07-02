@@ -1,51 +1,51 @@
--- 数理の科目で必修かつ期末試験がない科目を検索
--- File Version: v1.0.0
--- Project Version: v2.1.6
--- Last Updated: 2025-01-27
+-- 数理の科目の選択必修科目のうち、試験がないものの教科名と担当教員の一覧
+-- File Version: v1.1.0
+-- Project Version: v2.2.3
+-- Last Updated: 2025-07-02
 
 SELECT DISTINCT
-    cache_data->>'科目名' AS 科目名,
-    syllabus_lateral.syllabus->>'成績' AS 成績,
-    syllabus_lateral.syllabus->>'成績コメント' AS 成績コメント
-FROM syllabus_cache,
-LATERAL (
-    SELECT rj
-    FROM jsonb_array_elements(cache_data->'履修情報') AS rj
-    WHERE jsonb_typeof(cache_data->'履修情報') = 'array'
-) rj_lateral,
-LATERAL (
-    SELECT yk
-    FROM jsonb_array_elements(rj_lateral.rj->'履修要綱') AS yk
-    WHERE jsonb_typeof(rj_lateral.rj->'履修要綱') = 'array'
-    AND yk->>'学部課程' LIKE '%数理%'
-    AND yk->>'必須度' = '必修'
-) yk_lateral,
-LATERAL (
-    SELECT kj
-    FROM jsonb_array_elements(cache_data->'開講情報') AS kj
-    WHERE jsonb_typeof(cache_data->'開講情報') = 'array'
-) kj_lateral,
-LATERAL (
-    SELECT syllabus
-    FROM jsonb_array_elements(kj_lateral.kj->'シラバス') AS syllabus
-    WHERE jsonb_typeof(kj_lateral.kj->'シラバス') = 'array'
-    AND NOT EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(syllabus->'成績') AS grade
-        WHERE jsonb_typeof(syllabus->'成績') = 'array'
-        AND (
-            grade->>'項目' LIKE '%期末%'
-            OR grade->>'項目' LIKE '%期末試験%'
-            OR grade->>'評価方法' LIKE '%期末%'
-            OR grade->>'備考' LIKE '%期末%'
-        )
-    )
-) syllabus_lateral
+	cache_data->>'科目名' as 教科名,
+	instructor->>'氏名' as 担当教員
+FROM syllabus_cache
+	CROSS JOIN LATERAL (
+		SELECT opening_info
+		FROM jsonb_array_elements(cache_data->'開講情報一覧') as opening_info
+		WHERE jsonb_typeof(opening_info) = 'object'
+	) as opening
+	CROSS JOIN LATERAL (
+		SELECT syllabus
+		FROM jsonb_array_elements(opening.opening_info->'シラバス一覧') as syllabus
+		WHERE jsonb_typeof(syllabus) = 'object'
+	) as syl
+	CROSS JOIN LATERAL (
+		SELECT instructor
+		FROM jsonb_array_elements(syl.syllabus->'担当教員一覧') as instructor
+		WHERE jsonb_typeof(instructor) = 'object'
+	) as instructor
 WHERE cache_name = 'subject_syllabus_cache'
-ORDER BY 科目名;
-
--- 検索条件の説明:
--- 1. 学部課程に「数理」が含まれる科目
--- 2. 必須度が「必修」の科目
--- 3. 成績評価に「期末」という文字が含まれない科目
---    - 項目名、評価方法、備考のいずれにも期末試験の記載がない
+  -- 履修要綱で数理の必修科目
+  AND EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(cache_data->'履修情報一覧') as curriculum_info,
+         jsonb_array_elements(curriculum_info->'履修要綱一覧') as requirement_info
+    WHERE requirement_info->>'学部課程' LIKE '%数理%'
+      AND requirement_info->>'必須度' = '必修'
+  )
+  -- シラバスで数理の学部課程に開講
+  AND EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(syl.syllabus->'対象学部課程一覧') as faculty
+    WHERE faculty::text LIKE '%数理%'
+  )
+  AND (
+    -- 成績評価基準一覧が空の場合（試験がない）
+    jsonb_array_length(syl.syllabus->'成績評価基準一覧') = 0
+    OR
+    -- 成績評価基準一覧に「試験」を含む項目がない場合
+    NOT EXISTS (
+      SELECT 1 
+      FROM jsonb_array_elements(syl.syllabus->'成績評価基準一覧') as criteria
+      WHERE criteria->>'項目' LIKE '%試験%'
+    )
+  )
+ORDER BY 教科名, 担当教員;
