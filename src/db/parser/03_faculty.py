@@ -8,7 +8,7 @@ import glob
 from typing import List, Set
 from datetime import datetime
 from tqdm import tqdm
-from .utils import normalize_text
+from .utils import normalize_faculty_name
 
 def get_current_year() -> int:
     """現在の年度を取得する"""
@@ -57,8 +57,8 @@ def get_faculty_names(year: int) -> Set[str]:
                         for dept in departments.split(','):
                             dept = dept.strip()
                             if dept:  # 空文字でない場合のみ追加
-                                # 課程名を正規化
-                                normalized_dept = normalize_text(dept, handle_null=True)
+                                # 学部課程名を正規化（utils.pyのnormalize_faculty_nameを使用）
+                                normalized_dept = normalize_faculty_name(dept)
                                 if normalized_dept != 'NULL':  # NULLでない場合のみ追加
                                     faculty_names.add(normalized_dept)
         
