@@ -1,7 +1,7 @@
 ---
 title: パーサー一覧
-file_version: v2.1.2
-project_version: v2.1.3
+file_version: v2.2.0
+project_version: v2.2.0
 last_updated: 2025-07-02
 ---
 
@@ -13,8 +13,8 @@ last_updated: 2025-07-02
 
 # パーサー一覧
 
-- File Version: v2.1.2
-- Project Version: v2.1.3
+- File Version: v2.2.0
+- Project Version: v2.2.0
 - Last Updated: 2025-07-02
 
 [readmeへ](../../README.md)
