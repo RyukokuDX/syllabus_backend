@@ -1,8 +1,9 @@
 #!/bin/bash
+
 # -*- coding: utf-8 -*-
-# File Version: v2.1.2
-# Project Version: v2.1.2
-# Last Updated: 2025-07-01
+# File Version: v2.1.3
+# Project Version: v2.1.5
+# Last Updated: 2025-07-02
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -224,6 +225,14 @@ generate_subject_syllabus_cache() {
         ) combined_references
         GROUP BY syllabus_id
     ),
+    faculty_data AS (
+        SELECT 
+            sf.syllabus_id,
+            json_agg(f.faculty_name) as faculties
+        FROM syllabus_faculty sf
+        JOIN faculty f ON sf.faculty_id = f.faculty_id
+        GROUP BY sf.syllabus_id
+    ),
     grading_data AS (
         SELECT 
             gc.syllabus_id,
@@ -243,13 +252,23 @@ generate_subject_syllabus_cache() {
             sub.subject_name_id,
             sub.curriculum_year,
             json_agg(
-                json_build_object(
-                    '学部課程', f.faculty_name,
-                    '科目区分', c.class_name,
-                    '科目小区分', COALESCE(sc.subclass_name, ''),
-                    '必須度', sub.requirement_type,
-                    '課程別エンティティ', sav.value
-                )
+                CASE 
+                    WHEN sav.value IS NOT NULL THEN
+                        json_build_object(
+                            '学部課程', f.faculty_name,
+                            '科目区分', c.class_name,
+                            '科目小区分', COALESCE(sc.subclass_name, ''),
+                            '必須度', sub.requirement_type,
+                            '課程別エンティティ', sa.attribute_name || ': ' || sav.value
+                        )
+                    ELSE
+                        json_build_object(
+                            '学部課程', f.faculty_name,
+                            '科目区分', c.class_name,
+                            '科目小区分', COALESCE(sc.subclass_name, ''),
+                            '必須度', sub.requirement_type
+                        )
+                END
             ) as subject_info
         FROM subject sub
         JOIN faculty f ON sub.faculty_id = f.faculty_id
@@ -257,7 +276,6 @@ generate_subject_syllabus_cache() {
         LEFT JOIN subclass sc ON sub.subclass_id = sc.subclass_id
         LEFT JOIN subject_attribute_value sav ON sub.subject_id = sav.subject_id
         LEFT JOIN subject_attribute sa ON sav.attribute_id = sa.attribute_id
-            AND sa.attribute_name = '課程別エンティティ'
         GROUP BY sub.subject_name_id, sub.curriculum_year
     ),
     syllabus_by_year AS (
@@ -268,6 +286,7 @@ generate_subject_syllabus_cache() {
             json_agg(
                 json_build_object(
                     '担当', COALESCE(id.instructors, '[]'::json),
+                    '対象学部課程', COALESCE(fd.faculties, '[]'::json),
                     '学期', sd.term,
                     '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
                     '時限', COALESCE(ltd.periods, '[]'::json),
@@ -282,6 +301,7 @@ generate_subject_syllabus_cache() {
             ) as syllabi
         FROM syllabus_data sd
         LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
+        LEFT JOIN faculty_data fd ON sd.syllabus_id = fd.syllabus_id
         LEFT JOIN lecture_time_data ltd ON sd.syllabus_id = ltd.syllabus_id
         LEFT JOIN textbook_data td ON sd.syllabus_id = td.syllabus_id
         LEFT JOIN reference_data rd ON sd.syllabus_id = rd.syllabus_id
@@ -315,7 +335,7 @@ generate_subject_syllabus_cache() {
         'subject_syllabus_cache',
         cd.subject_name_id,
         cd.cache_data,
-        'v2.0.5'
+        'v2.1.0'
     FROM cache_data cd;
     "
     

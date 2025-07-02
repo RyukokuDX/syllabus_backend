@@ -372,3 +372,7 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250701153432__insert_book_uncategorizeds.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250701153432__insert_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250701153651__insert_syllabus_books.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702122920__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702123100__insert_subjects.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702123149__insert_subject_attributes.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702130556__insert_syllabus_facultys.sql

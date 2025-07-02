@@ -1,8 +1,8 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v2.1.2
-# Project Version: v2.1.2
-# Last Updated: 2025-07-01
+# File Version: v2.1.4
+# Project Version: v2.1.5
+# Last Updated: 2025-07-02
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -43,6 +43,7 @@ show_help() {
     echo "説明:"
     echo "  知能情報メディア課程の履修情報のみを絞ったJSONリストファイルを出力します。"
     echo "  出力ファイルには、学部課程が「知能情報メディア課程」の科目のみが含まれます。"
+    echo "  課程別エンティティは「<エンティティ名>: <値>」の形式で表示されます。"
     echo
     echo "使用例:"
     echo "  $0                                    # デフォルトファイル名で出力"
@@ -73,7 +74,25 @@ generate_intelligent_info_courses() {
             subject_name_id,
             jsonb_build_object(
                 '科目名', cache_data->>'科目名',
-                '開講情報', cache_data->'開講情報',
+                '開講情報', (
+                    SELECT jsonb_agg(
+                        jsonb_build_object(
+                            '年', info->>'年',
+                            'シラバス', (
+                                SELECT jsonb_agg(syllabus)
+                                FROM jsonb_array_elements(info->'シラバス') AS syllabus
+                                WHERE syllabus->'対象学部課程' @> '[\"知能情報メディア課程\"]'
+                            )
+                        )
+                    )
+                    FROM jsonb_array_elements(cache_data->'開講情報') AS info
+                    WHERE jsonb_typeof(info->'シラバス') = 'array'
+                    AND EXISTS (
+                        SELECT 1
+                        FROM jsonb_array_elements(info->'シラバス') AS syllabus
+                        WHERE syllabus->'対象学部課程' @> '[\"知能情報メディア課程\"]'
+                    )
+                ),
                 '履修情報', (
                     SELECT jsonb_agg(
                         jsonb_build_object(
@@ -86,7 +105,8 @@ generate_intelligent_info_courses() {
                         )
                     )
                     FROM jsonb_array_elements(cache_data->'履修情報') AS info
-                    WHERE EXISTS (
+                    WHERE jsonb_typeof(info->'履修要綱') = 'array'
+                    AND EXISTS (
                         SELECT 1
                         FROM jsonb_array_elements(info->'履修要綱') AS outline
                         WHERE outline->>'学部課程' = '知能情報メディア課程'
@@ -99,8 +119,7 @@ generate_intelligent_info_courses() {
     )
     SELECT json_agg(filtered_data) as courses
     FROM filtered_cache
-    WHERE filtered_data->'履修情報' IS NOT NULL
-    AND jsonb_array_length(filtered_data->'履修情報') > 0;
+    WHERE filtered_data->'履修情報' IS NOT NULL;
     " > "$OUTPUT_FILE.raw"
     
     if [ $? -eq 0 ]; then

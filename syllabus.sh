@@ -244,6 +244,7 @@ show_help() {
     echo "  cache generate   指定されたキャッシュを生成"
     echo "  cache delete     指定されたキャッシュを削除"
     echo "  cache refresh    指定されたキャッシュを削除して再生成"
+    echo "  cache get full   全キャッシュデータを取得・整形"
     echo "  cache list       利用可能なキャッシュ一覧を表示"
     echo "  cache status     キャッシュの状態を表示"
     echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
@@ -266,6 +267,7 @@ show_help() {
     echo "  $0 -p cache generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
     echo "  $0 -p cache delete subject_syllabus_cache    # 科目別シラバスキャッシュを削除"
     echo "  $0 -p cache refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
+    echo "  $0 -p cache get full     # 全キャッシュデータを取得・整形"
     echo "  $0 -p cache list         # キャッシュ一覧を表示"
     echo "  $0 -p cache status       # キャッシュの状態を表示"
     echo "  $0 -p sql tests/cache_sample3.sql   # SQLファイルをPostgreSQLサーバーで実行"
@@ -518,6 +520,23 @@ case $COMMAND in
                     fi
                     "$SCRIPT_DIR/bin/json_cache.sh" refresh "${ARGS[1]}"
                     ;;
+                get)
+                    if [ ${#ARGS[@]} -lt 2 ]; then
+                        echo "エラー: 取得タイプが指定されていません"
+                        echo "使用方法: $0 -p cache get [full]"
+                        exit 1
+                    fi
+                    case "${ARGS[1]}" in
+                        full)
+                            "$SCRIPT_DIR/bin/get_cache.sh" full
+                            ;;
+                        *)
+                            echo "エラー: 不明な取得タイプ '${ARGS[1]}'"
+                            echo "使用方法: $0 -p cache get [full]"
+                            exit 1
+                            ;;
+                    esac
+                    ;;
                 list)
                     "$SCRIPT_DIR/bin/json_cache.sh" list
                     ;;
@@ -526,7 +545,7 @@ case $COMMAND in
                     ;;
                 *)
                     echo "エラー: 不明なキャッシュコマンド '${ARGS[0]}'"
-                    echo "使用方法: $0 -p cache [generate|delete|refresh|list|status] [cache_name]"
+                    echo "使用方法: $0 -p cache [generate|delete|refresh|get|list|status] [cache_name|full]"
                     exit 1
                     ;;
             esac
