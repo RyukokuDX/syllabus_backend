@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v2.4.0
-project_version: v2.4.0
+file_version: v2.4.1
+project_version: v2.4.1
 last_updated: 2025-07-03
 ---
 
 # Syllabus Backend
 
-- File Version: v2.4.0
-- Project Version: v2.4.0
+- File Version: v2.4.1
+- Project Version: v2.4.1
 - Last Updated: 2025-07-03
 
 ## 概要
@@ -20,6 +20,7 @@ last_updated: 2025-07-03
 - データベースの自動更新とバックアップ
 - 複数年度のシラバス情報の管理
 - JSONBキャッシュによる高速検索機能
+- マルチプラットフォーム対応（Linux、macOS）
 
 ### システム構成
 - バックエンド: FastAPI (Python 3.11)
@@ -47,6 +48,9 @@ last_updated: 2025-07-03
 - ログ管理
   - ログディレクトリ（log/）
   - ログローテーション
+- マルチプラットフォーム対応
+  - Linux（Ubuntu、CentOS等）
+  - macOS（Darwin）
 
 ### 運用環境
 - VPN内のサーバーで運用
@@ -146,6 +150,12 @@ cp .env.example .env
 ./syllabus.sh -p cache list
 ```
 
+8. OS互換性の確認（オプション）
+```bash
+# OS互換性テストを実行
+./syllabus.sh test-os
+```
+
 ## 開発ガイドライン
 - [データベース設計ポリシー](docs/database/policy.md)
 - [API仕様](docs/api/openapi.yaml)
@@ -160,6 +170,7 @@ MIT License
 ### シェルスクリプト関連
 - [syllabus.sh](docs/sh/syllabus.md) - メインシェルスクリプトの使用方法
 - [git_bump.sh](docs/sh/git_bump.md) - バージョン管理スクリプトの使用方法
+- [OS互換性](docs/sh/os_compatibility.md) - マルチプラットフォーム対応について
 
 ### データベース関連
 - [ER図](docs/database/er.md) - データベースのER図
