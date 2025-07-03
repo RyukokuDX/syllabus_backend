@@ -1,4 +1,12 @@
 #!/bin/bash
+# cross-platform sed -i wrapper
+sedi() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
 # File Version: v2.3.0
 # Project Version: v2.3.0
 # Last Updated: 2025-07-02
@@ -86,12 +94,12 @@ for file in "${VERSION_FILES[@]}"; do
         else
           NEXT_FILE_VERSION=$NEXT_VERSION
         fi
-        sed -i "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/project_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/project_version: v$NEXT_VERSION/" "$file"
-        sed -i "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $TODAY/" "$file"
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        sedi "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_FILE_VERSION/" "$file"
+        sedi "s/project_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/project_version: v$NEXT_VERSION/" "$file"
+        sedi "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $TODAY/" "$file"
+        sedi "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
+        sedi "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
+        sedi "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
         ;;
       *.py|*.sh)
         # Python/Shellファイルの更新
@@ -102,9 +110,9 @@ for file in "${VERSION_FILES[@]}"; do
         else
           NEXT_FILE_VERSION=$NEXT_VERSION
         fi
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        sedi "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
+        sedi "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
+        sedi "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
         ;;
       *.json)
         # JSONファイルの更新
@@ -115,9 +123,9 @@ for file in "${VERSION_FILES[@]}"; do
         else
           NEXT_FILE_VERSION=$NEXT_VERSION
         fi
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        sedi "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
+        sedi "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
+        sedi "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
         ;;
       project_version.txt)
         # project_version.txtの更新

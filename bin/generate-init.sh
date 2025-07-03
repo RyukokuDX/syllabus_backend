@@ -2,6 +2,15 @@
 
 set -e
 
+# cross-platform sed -i wrapper
+sedi() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
 # スクリプトの絶対パスを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -26,7 +35,7 @@ echo "Generating $DEV_OUTPUT_FILE from $DEV_TEMPLATE_FILE using $ENV_FILE..."
 # .envファイルの改行コードを変換（必要に応じて）
 if command -v dos2unix >/dev/null 2>&1; then
   dos2unix "$ENV_FILE"
-  sed -i '1s/^\xEF\xBB\xBF//' "$ENV_FILE"
+  sedi '1s/^\xEF\xBB\xBF//' "$ENV_FILE"
 fi
 
 # 環境変数を読み込む
@@ -41,8 +50,8 @@ cp "$DEV_TEMPLATE_FILE" "$DEV_OUTPUT_FILE"
 # 環境変数を置換
 for var in POSTGRES_DB DEV_DB DEV_USER DEV_PASSWORD APP_USER APP_PASSWORD; do
   if [ -n "${!var}" ]; then
-    sed -i "s/\${$var}/${!var}/g" "$OUTPUT_FILE"
-    sed -i "s/\${$var}/${!var}/g" "$DEV_OUTPUT_FILE"
+    sedi "s/\${$var}/${!var}/g" "$OUTPUT_FILE"
+    sedi "s/\${$var}/${!var}/g" "$DEV_OUTPUT_FILE"
   else
     echo "Warning: $var is not set"
   fi
