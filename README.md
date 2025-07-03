@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v2.4.1
-project_version: v2.4.1
+file_version: v2.4.2
+project_version: v2.4.5
 last_updated: 2025-07-03
 ---
 
 # Syllabus Backend
 
-- File Version: v2.4.1
-- Project Version: v2.4.1
+- File Version: v2.4.2
+- Project Version: v2.4.5
 - Last Updated: 2025-07-03
 
 ## 概要
@@ -116,17 +116,26 @@ cp .env.example .env
 # 必要に応じて.envファイルの設定を編集
 ```
 
-3. 仮想環境の作成と初期化
+3. 実行権限の復元（macOSの場合）
+```bash
+# macOSでクローンした場合、実行権限が失われている可能性があります
+chmod +x bin/*.sh
+chmod +x syllabus.sh
+# または専用スクリプトを使用
+./bin/restore-permissions.sh
+```
+
+4. 仮想環境の作成と初期化
 ```bash
 ./syllabus.sh venv init
 ```
 
-4. データベースの起動
+5. データベースの起動
 ```bash
 ./syllabus.sh -p start
 ```
 
-5. データベースの初期化
+6. データベースの初期化
 ```bash
 # 初期化データの生成
 ./syllabus.sh -p migration generate init
@@ -134,11 +143,11 @@ cp .env.example .env
 ./syllabus.sh -p migration deploy
 ```
 
-6. データベースの起動確認
+7. データベースの起動確認
 ```bash
 ./syllabus.sh -p records
 ```
-7. キャッシュの生成（推奨）
+8. キャッシュの生成（推奨）
 ```bash
 # シラバスキャッシュを生成（検索性能向上のため）
 ./syllabus.sh -p cache generate subject_syllabus_cache
@@ -150,7 +159,7 @@ cp .env.example .env
 ./syllabus.sh -p cache list
 ```
 
-8. OS互換性の確認（オプション）
+9. OS互換性の確認（オプション）
 ```bash
 # OS互換性テストを実行
 ./syllabus.sh test-os

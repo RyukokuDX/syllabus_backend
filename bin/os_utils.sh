@@ -1,17 +1,27 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: 2.0.0
-# Project Version: 2.4.0
-# Last Update: 2025-07-03
+# File Version: v2.4.4
+# Project Version: v2.4.5
+# Last Updated: 2025-07-03
+
+# スクリプトの絶対パスを取得
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# binディレクトリ内のスクリプトファイルの実行権限を復元
+restore_execute_permissions() {
+    if [ -d "$SCRIPT_DIR" ]; then
+        find "$SCRIPT_DIR" -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || true
+    fi
+}
+
+# 初回実行時に権限を復元
+restore_execute_permissions
 
 # OS種類の判別
 detect_os() {
     case "$(uname -s)" in
         Darwin*)    echo "macos" ;;
         Linux*)     echo "linux" ;;
-        CYGWIN*)    echo "windows" ;;
-        MINGW*)     echo "windows" ;;
-        MSYS*)      echo "windows" ;;
         *)          echo "unknown" ;;
     esac
 }
@@ -20,18 +30,24 @@ detect_os() {
 init_os_commands() {
     local os_type=$(detect_os)
     
+    echo "DEBUG: os_type = '$os_type'"
+    
     if [ "$os_type" = "macos" ]; then
         # macOS用のコマンド
         export LS_VERSION_CMD="ls -1"  # macOSでは -v オプションが利用できないため -1 を使用
         export SORT_CMD="sort -V"      # バージョン番号でソート
         export GREP_CMD="grep"         # macOS用のgrep
         export CUT_CMD="cut"           # macOS用のcut
+        export SED_CMD="sed -i ''"     # macOS用のsed（BSD版）
+        echo "DEBUG: Setting macOS commands, SED_CMD = '$SED_CMD'"
     else
         # Linux用のコマンド
         export LS_VERSION_CMD="ls -v"  # Linuxでは -v オプションが利用可能
         export SORT_CMD="sort -V"      # バージョン番号でソート
         export GREP_CMD="grep"         # Linux用のgrep
         export CUT_CMD="cut"           # Linux用のcut
+        export SED_CMD="sed -i"        # Linux用のsed（GNU版）
+        echo "DEBUG: Setting Linux commands, SED_CMD = '$SED_CMD'"
     fi
     
     echo "$os_type"

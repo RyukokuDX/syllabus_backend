@@ -1,14 +1,14 @@
 ---
 title: OS互換性
-file_version: v1.0.1
-project_version: v2.4.1
+file_version: v1.0.2
+project_version: v2.4.5
 last_updated: 2025-07-03
 ---
 
 # OS互換性
 
-- File Version: v1.0.1
-- Project Version: v2.4.1
+- File Version: v1.0.2
+- Project Version: v2.4.5
 - Last Updated: 2025-07-03
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
@@ -29,6 +29,8 @@ last_updated: 2025-07-03
 
 本システムは、LinuxとmacOSの複数のOS環境で動作することを前提として設計されています。OS種類を自動判別し、各OSに最適なコマンドを選択することで、プラットフォーム間の互換性を確保しています。
 
+**注意**: Windows環境ではWSL（Windows Subsystem for Linux）を使用してください。
+
 ### 主な特徴
 - **自動OS判別**: `uname -s`を使用したOS種類の自動検出
 - **コマンド切り替え**: OS別の最適なコマンドを動的に選択
@@ -48,12 +50,7 @@ last_updated: 2025-07-03
 - **Apple Silicon**: M1/M2 Mac対応
 - **Intel Mac**: 従来のIntel Mac対応
 
-### Windows（実験的対応）
-- **WSL**: Windows Subsystem for Linux（Linux環境として動作）
-- **Cygwin**: Cygwin環境（Linux環境として動作）
-- **MSYS2**: MSYS2環境（Linux環境として動作）
 
-**注意**: Windows環境での動作は実験的であり、完全なテストは行われていません。
 
 ## 自動判別機能
 
@@ -63,9 +60,6 @@ detect_os() {
     case "$(uname -s)" in
         Darwin*)    echo "macos" ;;
         Linux*)     echo "linux" ;;
-        CYGWIN*)    echo "windows" ;;
-        MINGW*)     echo "windows" ;;
-        MSYS*)      echo "windows" ;;
         *)          echo "unknown" ;;
     esac
 }
@@ -74,7 +68,6 @@ detect_os() {
 ### 判別結果
 - `Darwin*` → `macos`
 - `Linux*` → `linux`
-- `CYGWIN*`, `MINGW*`, `MSYS*` → `windows`（Linux環境として動作）
 - その他 → `unknown`
 
 ## OS別コマンド設定
@@ -95,20 +88,12 @@ GREP_CMD="grep"         # 標準のgrep
 CUT_CMD="cut"           # 標準のcut
 ```
 
-### Windows用コマンド
-```bash
-# Windows環境（WSL、Cygwin、MSYS2）はLinuxと同じコマンドを使用
-LS_VERSION_CMD="ls -v"  # バージョン番号でソート済み
-SORT_CMD="sort -V"      # バージョン番号でソート
-GREP_CMD="grep"         # 標準のgrep
-CUT_CMD="cut"           # 標準のcut
-```
+
 
 ### 主な違い
 - **バージョンディレクトリ取得**:
   - macOS: `ls -1 | sort -V`（2段階処理）
   - Linux: `ls -v`（1段階処理）
-  - Windows: Linuxと同じ（`ls -v`）
 
 ## 共通ユーティリティ
 
@@ -217,6 +202,19 @@ cut コマンドのテスト:
 ## トラブルシューティング
 
 ### よくある問題
+
+#### 0. 実行権限が失われている（macOS）
+**症状**: `Permission denied`エラーが発生
+**原因**: macOSでレポジトリをクローンした際に実行権限が失われる
+**解決策**: 
+```bash
+# 手動で権限を復元
+chmod +x bin/*.sh
+chmod +x syllabus.sh
+
+# または専用スクリプトを使用
+./bin/restore-permissions.sh
+```
 
 #### 1. `ls -v`コマンドが利用できない
 **症状**: macOSでバージョンディレクトリの取得に失敗
