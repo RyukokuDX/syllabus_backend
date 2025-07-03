@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # -*- coding: utf-8 -*-
-# File Version: v2.4.2
-# Project Version: v2.4.6
+# File Version: v2.5.0
+# Project Version: v2.5.0
 # Last Updated: 2025-07-03
 
 # スクリプトのディレクトリを取得

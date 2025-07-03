@@ -1,14 +1,14 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.4.0
-project_version: v2.4.0
+file_version: v2.5.0
+project_version: v2.5.0
 last_updated: 2025-07-03
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.4.0
-- Project Version: v2.4.0
+- File Version: v2.5.0
+- Project Version: v2.5.0
 - Last Updated: 2025-07-03
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)

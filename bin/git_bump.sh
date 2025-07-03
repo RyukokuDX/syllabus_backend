@@ -1,6 +1,6 @@
 #!/bin/bash
-# File Version: v2.4.4
-# Project Version: v2.4.5
+# File Version: v2.5.0
+# Project Version: v2.5.0
 # Last Updated: 2025-07-03
 
 # スクリプトの絶対パスを取得
