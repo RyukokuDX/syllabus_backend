@@ -6,16 +6,20 @@
 # Last Update: 2025-07-01
 
 # スクリプトのディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" && pwd )"
 VENV_DIR="$SCRIPT_DIR/venv_syllabus_backend"
 PYTHON="$VENV_DIR/bin/python"
+
+# .envファイルのパスを設定
+ENV_FILE="$SCRIPT_DIR/.env"
+
+
 
 # OS別コマンド設定の読み込み
 source "$SCRIPT_DIR/bin/os_utils.sh"
 OS_TYPE=$(init_os_commands)
 
 # .envファイルの読み込み
-ENV_FILE="$SCRIPT_DIR/.env"
 if [ ! -f "$ENV_FILE" ]; then
     echo "エラー: .envファイルが見つかりません: $ENV_FILE"
     exit 1
@@ -320,6 +324,8 @@ while [[ $# -gt 0 ]]; do
 
 done
 
+
+
 # コマンドが指定されていない場合はヘルプを表示
 if [ -z "$COMMAND" ]; then
 	show_help
@@ -431,15 +437,15 @@ if [ "$SERVICE" = "postgres" ]; then
 			;;
 		shell)
 			# .envファイルからデータベース名とユーザー名を取得
-			DB_NAME=$(get_env_value "POSTGRES_DB" ".env")
-			DB_USER=$(get_env_value "POSTGRES_USER" ".env")
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 			docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME"
 			;;
 		records)
 			if [ ${#ARGS[@]} -eq 0 ]; then
 				# 引数なし: 従来通り全テーブルの件数表示
-				DB_NAME=$(get_env_value "POSTGRES_DB" ".env")
-				DB_USER=$(get_env_value "POSTGRES_USER" ".env")
+				DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+				DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 				docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
 					SELECT 
 						schemaname || '.' || relname as table_name,
@@ -450,8 +456,8 @@ if [ "$SERVICE" = "postgres" ]; then
 			else
 				# 引数あり: 指定テーブルの全件表示
 				TABLE_NAME="${ARGS[0]}"
-				DB_NAME=$(get_env_value "POSTGRES_DB" ".env")
-				DB_USER=$(get_env_value "POSTGRES_USER" ".env")
+				DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+				DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 				docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM $TABLE_NAME;"
 			fi
 			;;
@@ -580,8 +586,8 @@ if [ "$SERVICE" = "postgres" ]; then
 			fi
 			
 			echo "SQLファイルを実行中: $sql_file"
-			DB_NAME=$(get_env_value "POSTGRES_DB" ".env")
-			DB_USER=$(get_env_value "POSTGRES_USER" ".env")
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 			docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
 			;;
 		test-os)

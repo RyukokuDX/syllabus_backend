@@ -1,7 +1,7 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v2.4.2
-# Project Version: v2.4.1
+# File Version: v2.4.3
+# Project Version: v2.4.6
 # Last Updated: 2025-07-03
 
 # スクリプトのディレクトリを取得
@@ -47,7 +47,7 @@ show_help() {
     echo "説明:"
     echo "  知能情報メディア課程の履修情報のみを絞ったJSONリストファイルを出力します。"
     echo "  出力ファイルには、学部課程が「知能情報メディア課程」の科目のみが含まれます。"
-    echo "  課程別エンティティは「<エンティティ名>: <値>」の形式で表示されます。"
+    echo "  フィールド名は新しい命名規則に従い、配列フィールドは「一覧」語尾を使用します。"
     echo
     echo "使用例:"
     echo "  $0                                    # デフォルトファイル名で出力"
@@ -67,63 +67,65 @@ create_output_directory() {
 # 知能情報課程の履修情報を取得してJSONファイルに出力
 generate_intelligent_info_courses() {
     echo -e "${BLUE}知能情報メディア課程の履修情報を取得中...${NC}"
+    echo -e "${BLUE}新しい命名規則（一覧語尾）を使用します${NC}"
     
     # 出力ディレクトリの作成
     create_output_directory
     
     # 知能情報課程の履修情報を取得（キャッシュテーブルから）
+    # 新しい命名規則: 開講情報一覧、履修情報一覧、シラバス一覧、履修要綱一覧、対象学部課程一覧
     docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
     WITH filtered_cache AS (
         SELECT 
             subject_name_id,
             jsonb_build_object(
                 '科目名', cache_data->>'科目名',
-                '開講情報', (
+                '開講情報一覧', (
                     SELECT jsonb_agg(
                         jsonb_build_object(
-                            '年', info->>'年',
-                            'シラバス', (
+                            '年度', info->>'年度',
+                            'シラバス一覧', (
                                 SELECT jsonb_agg(syllabus)
-                                FROM jsonb_array_elements(info->'シラバス') AS syllabus
-                                WHERE syllabus->'対象学部課程' @> '[\"知能情報メディア課程\"]'
+                                FROM jsonb_array_elements(info->'シラバス一覧') AS syllabus
+                                WHERE syllabus->'対象学部課程一覧' @> '[\"知能情報メディア課程\"]'
                             )
                         )
                     )
-                    FROM jsonb_array_elements(cache_data->'開講情報') AS info
-                    WHERE jsonb_typeof(info->'シラバス') = 'array'
+                    FROM jsonb_array_elements(cache_data->'開講情報一覧') AS info
+                    WHERE jsonb_typeof(info->'シラバス一覧') = 'array'
                     AND EXISTS (
                         SELECT 1
-                        FROM jsonb_array_elements(info->'シラバス') AS syllabus
-                        WHERE syllabus->'対象学部課程' @> '[\"知能情報メディア課程\"]'
+                        FROM jsonb_array_elements(info->'シラバス一覧') AS syllabus
+                        WHERE syllabus->'対象学部課程一覧' @> '[\"知能情報メディア課程\"]'
                     )
                 ),
-                '履修情報', (
+                '履修情報一覧', (
                     SELECT jsonb_agg(
                         jsonb_build_object(
-                            '年', info->>'年',
-                            '履修要綱', (
+                            '年度', info->>'年度',
+                            '履修要綱一覧', (
                                 SELECT jsonb_agg(outline)
-                                FROM jsonb_array_elements(info->'履修要綱') AS outline
+                                FROM jsonb_array_elements(info->'履修要綱一覧') AS outline
                                 WHERE outline->>'学部課程' = '知能情報メディア課程'
                             )
                         )
                     )
-                    FROM jsonb_array_elements(cache_data->'履修情報') AS info
-                    WHERE jsonb_typeof(info->'履修要綱') = 'array'
+                    FROM jsonb_array_elements(cache_data->'履修情報一覧') AS info
+                    WHERE jsonb_typeof(info->'履修要綱一覧') = 'array'
                     AND EXISTS (
                         SELECT 1
-                        FROM jsonb_array_elements(info->'履修要綱') AS outline
+                        FROM jsonb_array_elements(info->'履修要綱一覧') AS outline
                         WHERE outline->>'学部課程' = '知能情報メディア課程'
                     )
                 )
             ) as filtered_data
         FROM syllabus_cache
         WHERE cache_name = 'subject_syllabus_cache'
-        AND cache_data->'履修情報' @> '[{\"履修要綱\": [{\"学部課程\": \"知能情報メディア課程\"}]}]'
+        AND cache_data->'履修情報一覧' @> '[{\"履修要綱一覧\": [{\"学部課程\": \"知能情報メディア課程\"}]}]'
     )
     SELECT json_agg(filtered_data) as courses
     FROM filtered_cache
-    WHERE filtered_data->'履修情報' IS NOT NULL;
+    WHERE filtered_data->'履修情報一覧' IS NOT NULL;
     " > "$OUTPUT_FILE.raw"
     
     if [ $? -eq 0 ]; then
