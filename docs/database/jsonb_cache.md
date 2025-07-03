@@ -1,15 +1,15 @@
 ---
 title: JSONBキャッシュリスト仕様書
-file_version: v2.3.0
-project_version: v2.3.0
-last_updated: 2025-07-02
+file_version: v2.4.0
+project_version: v2.4.0
+last_updated: 2025-07-03
 ---
 
 # JSONBキャッシュリスト仕様書
 
-- File Version: v2.3.0
-- Project Version: v2.3.0
-- Last Updated: 2025-07-02
+- File Version: v2.4.0
+- Project Version: v2.4.0
+- Last Updated: 2025-07-03
 
 [readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -40,7 +40,7 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
 | 構造 | 語尾 | 例 | 説明 |
 |------|------|-----|------|
 | 配列 | `一覧` | `教員一覧`, `教科書一覧` | 要素数0以上の繰り返し構造 |
-| 単一値 | 名詞のまま、または`名`、`数`、`年` | `科目名`, `単位数` | 固有の1つの値 |
+| 単一値 | 名詞のまま、または`名`、`数`、`年度` | `科目名`, `単位数` | 固有の1つの値 |
 
 ### 命名規則の効果
 - **クエリ精度向上**: `教員一覧[].氏名` のように正しいパスを推測
@@ -134,7 +134,7 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
   "科目名": "微分積分学I",
   "開講情報一覧": [
     {
-      "年": 2025,
+      "年度": 2025,
       "シラバス一覧": [
         {
           "担当教員一覧": [
@@ -167,7 +167,7 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
   ],
   "履修情報一覧": [
     {
-      "年": 2025,
+      "年度": 2025,
       "履修要綱一覧": [
         {
           "学部課程": "理工学部",
@@ -195,7 +195,7 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
 - **科目名**: 科目の正式名称（subject_name.name）
 
 #### 開講情報一覧
-- **年**: シラバスの年度（syllabus_master.syllabus_year）
+- **年度**: シラバスの年度（syllabus_master.syllabus_year）
 - **シラバス一覧**: 年度内のシラバス情報の配列（1件でも必ず配列）
 
 ##### シラバス詳細
@@ -216,7 +216,7 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
 - **書名**: 書籍タイトル（book.title or book_uncategorized.title）
 - **著者**: 著者名（book.author or book_uncategorized.author）
 - **ISBN**: ISBN番号（book.isbn or book_uncategorized.isbn）
-- **値段**: 価格（book.price or book_uncategorized.price）
+- **価格**: 価格（book.price or book_uncategorized.price）
 
 ##### 成績評価
 - **項目**: 評価項目（grading_criterion.criteria_type）
@@ -225,7 +225,7 @@ JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確
 - **備考**: 備考情報（grading_criterion.note）
 
 #### 履修情報一覧
-- **年**: 履修要綱の年度（subject.curriculum_year）
+- **年度**: 履修要綱の年度（subject.curriculum_year）
 - **履修要綱一覧**: 履修要綱情報の配列
 
 ##### 履修要綱詳細
@@ -270,7 +270,7 @@ instructor_data AS (
         si.syllabus_id,
         json_agg(
             json_build_object(
-                '教員名', i.name,
+                '氏名', i.name,
                 '役割', COALESCE(si.role, '担当')
             )
         ) as instructors
@@ -303,7 +303,7 @@ textbook_data AS (
                 '書名', b.title,
                 '著者', b.author,
                 'ISBN', b.isbn,
-                '値段', b.price
+                '価格', b.price
             ) as book_info
         FROM syllabus_book sb
         JOIN book b ON sb.book_id = b.book_id
@@ -318,7 +318,7 @@ textbook_data AS (
                 '書名', bu.title,
                 '著者', bu.author,
                 'ISBN', bu.isbn,
-                '値段', bu.price
+                '価格', bu.price
             ) as book_info
         FROM book_uncategorized bu
         WHERE bu.role = '教科書'
@@ -337,7 +337,7 @@ reference_data AS (
                 '書名', b.title,
                 '著者', b.author,
                 'ISBN', b.isbn,
-                '値段', b.price
+                '価格', b.price
             ) as book_info
         FROM syllabus_book sb
         JOIN book b ON sb.book_id = b.book_id
@@ -352,7 +352,7 @@ reference_data AS (
                 '書名', bu.title,
                 '著者', bu.author,
                 'ISBN', bu.isbn,
-                '値段', bu.price
+                '価格', bu.price
             ) as book_info
         FROM book_uncategorized bu
         WHERE bu.role = '参考書'
@@ -410,18 +410,17 @@ syllabus_by_year AS (
         sd.syllabus_year,
         json_agg(
             json_build_object(
-                '担当', COALESCE(id.instructors, '[]'::json),
-                '対象学部課程', COALESCE(fd.faculties, '[]'::json),
+                '担当教員一覧', COALESCE(id.instructors, '[]'::json),
+                '対象学部課程一覧', COALESCE(fd.faculties, '[]'::json),
                 '学期', sd.term,
-                '曜日', COALESCE(ltd.lecture_times->0->>'曜日', ''),
-                '時限', COALESCE(ltd.periods, '[]'::json),
-                '単位', sd.credits,
-                '教科書', COALESCE(td.textbooks, '[]'::json),
+                '講義時間一覧', COALESCE(ltd.lecture_times, '[]'::json),
+                '単位数', sd.credits,
+                '教科書一覧', COALESCE(td.textbooks, '[]'::json),
                 '教科書コメント', sd.textbook_comment,
-                '参考書', COALESCE(rd.references, '[]'::json),
+                '参考書一覧', COALESCE(rd.references, '[]'::json),
                 '参考書コメント', sd.reference_comment,
-                '成績', COALESCE(gd.grading_criteria, '[]'::json),
-                '成績コメント', sd.grading_comment
+                '成績評価基準一覧', COALESCE(gd.grading_criteria, '[]'::json),
+                '成績評価コメント', sd.grading_comment
             )
         ) as syllabi
     FROM syllabus_data sd
@@ -438,16 +437,16 @@ cache_data AS (
         sby.subject_name_id,
         json_build_object(
             '科目名', sby.subject_name,
-            '開講情報', json_agg(
+            '開講情報一覧', json_agg(
                 json_build_object(
-                    '年', sby.syllabus_year,
-                    'シラバス', sby.syllabi
+                    '年度', sby.syllabus_year,
+                    'シラバス一覧', sby.syllabi
                 )
             ),
-            '履修情報', json_agg(
+            '履修情報一覧', json_agg(
                 json_build_object(
-                    '年', subd.curriculum_year,
-                    '履修要綱', subd.subject_info
+                    '年度', subd.curriculum_year,
+                    '履修要綱一覧', subd.subject_info
                 )
             )
         ) as cache_data
@@ -460,7 +459,7 @@ SELECT
     'subject_syllabus_cache',
     cd.subject_name_id,
     cd.cache_data,
-    'v2.1.0'
+    'v2.3.0'
 FROM cache_data cd;
 ```
 
@@ -505,12 +504,10 @@ FROM cache_data cd;
 
 #### 単一値フィールド
 - **科目名**: 文字列
-- **年**: 数値（年度）
+- **年度**: 数値（年度）
 - **氏名**: 文字列
 - **役割**: 文字列
 - **学期**: 文字列
-- **曜日**: 文字列
-- **時限**: 数値
 - **単位数**: 数値
 - **書名**: 文字列
 - **著者**: 文字列
@@ -525,6 +522,10 @@ FROM cache_data cd;
 - **科目小区分**: 文字列
 - **必須度**: 文字列
 - **課程別エンティティ**: 文字列
+
+#### 配列内オブジェクトフィールド
+- **講義時間一覧内の曜日**: 文字列
+- **講義時間一覧内の時限**: 数値
 
 #### コメントフィールド
 - **教科書コメント**: 文字列
@@ -541,7 +542,7 @@ FROM cache_data cd;
 // 年度別の開講情報
 "開講情報一覧": [
   {
-    "年": 2025,
+    "年度": 2025,
     "シラバス一覧": [...]
   }
 ]
@@ -556,6 +557,10 @@ FROM cache_data cd;
     "役割": "主担当"
   }
 ]
+
+// LLM用パス例
+// 教員一覧[].氏名
+// 教員一覧[].役割
 ```
 
 #### 学部課程検索
@@ -565,6 +570,10 @@ FROM cache_data cd;
 
 // 履修要綱の学部課程（履修情報レベル）
 "学部課程": "理工学部"
+
+// LLM用パス例
+// 開講情報一覧[].シラバス一覧[].対象学部課程一覧[]
+// 履修情報一覧[].履修要綱一覧[].学部課程
 
 // 学部課程での科目検索例
 // 理工学部で開講される科目を検索
@@ -599,6 +608,10 @@ FROM cache_data cd;
   { "曜日": "月曜日", "時限": 1 },
   { "曜日": "月曜日", "時限": 2 }
 ]
+
+// LLM用パス例
+// 講義時間一覧[].曜日
+// 講義時間一覧[].時限
 ```
 
 #### 書籍検索
@@ -612,6 +625,11 @@ FROM cache_data cd;
     "価格": 2500
   }
 ]
+
+// LLM用パス例
+// 教科書一覧[].書名
+// 教科書一覧[].著者
+// 教科書一覧[].価格
 ```
 
 ### 注意事項

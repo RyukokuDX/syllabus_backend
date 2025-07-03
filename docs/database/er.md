@@ -1,8 +1,8 @@
 ---
 title: データベースER図
-file_version: v2.3.0
-project_version: v2.3.0
-last_updated: 2025-07-02
+file_version: v2.4.0
+project_version: v2.4.0
+last_updated: 2025-07-03
 ---
 <!-- Curosr はversion 弄るな -->
 
@@ -14,9 +14,9 @@ last_updated: 2025-07-02
 
 # データベースER図
 
-- File Version: v2.3.0
-- Project Version: v2.3.0
-- Last Updated: 2025-07-02
+- File Version: v2.4.0
+- Project Version: v2.4.0
+- Last Updated: 2025-07-03
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [構造定義へ](structure.md)
 

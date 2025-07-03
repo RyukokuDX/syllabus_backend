@@ -1,8 +1,6 @@
-SELECT COUNT(*) AS not_array_count
-FROM syllabus_cache
-WHERE cache_name = 'subject_syllabus_cache'
-  AND (
-    jsonb_typeof(cache_data->'開講情報一覧') IS DISTINCT FROM 'array'
-    OR jsonb_typeof(cache_data->'開講情報一覧'->0->'シラバス一覧') IS DISTINCT FROM 'array'
-    OR jsonb_typeof(cache_data->'開講情報一覧'->0->'シラバス一覧'->0->'担当教員一覧') IS DISTINCT FROM 'array'
-  );
+  -- すべての配列フィールドが実際に array 型か確認
+SELECT key, jsonb_typeof(value)
+FROM   syllabus_cache,
+       jsonb_each(cache_data)
+WHERE  key LIKE '%一覧'
+  AND  jsonb_typeof(value) <> 'array';

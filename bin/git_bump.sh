@@ -1,7 +1,7 @@
 #!/bin/bash
-# File Version: v2.3.0
-# Project Version: v2.3.0
-# Last Updated: 2025-07-02
+# File Version: v2.4.0
+# Project Version: v2.4.0
+# Last Updated: 2025-07-03
 
 # バージョン更新の種類を確認
 if [ "$1" != "major" ] && [ "$1" != "minor" ] && [ "$1" != "patch" ]; then

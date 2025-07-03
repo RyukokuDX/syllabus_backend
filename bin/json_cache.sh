@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # -*- coding: utf-8 -*-
-# File Version: v2.3.0
-# Project Version: v2.3.0
-# Last Updated: 2025-07-02
+# File Version: v2.4.0
+# Project Version: v2.4.0
+# Last Updated: 2025-07-03
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -314,14 +314,14 @@ generate_subject_syllabus_cache() {
                 '科目名', sby.subject_name,
                 '開講情報一覧', json_agg(
                     json_build_object(
-                        '年', sby.syllabus_year,
+                        '年度', sby.syllabus_year,
                         'シラバス一覧', sby.syllabi
                     )
                 ),
                 '履修情報一覧', COALESCE(
                     json_agg(
                         json_build_object(
-                            '年', subd.curriculum_year,
+                            '年度', subd.curriculum_year,
                             '履修要綱一覧', COALESCE(subd.subject_info, '[]'::json)
                         )
                     ), '[]'::json
@@ -336,7 +336,7 @@ generate_subject_syllabus_cache() {
         'subject_syllabus_cache',
         cd.subject_name_id,
         cd.cache_data,
-        'v2.2.0'
+        'v2.3.0'
     FROM cache_data cd;
     "
     
