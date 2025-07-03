@@ -1,17 +1,25 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # - 更新の登録は, /docs/version_control.md に準拠して実行
-# File Version: 2.0.0
-# Project Version: 2.0.0
+# File Version: 2.0.1
+# Project Version: 2.0.1
 # Last Update: 2025-07-01
 
 # スクリプトのディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" && pwd )"
 VENV_DIR="$SCRIPT_DIR/venv_syllabus_backend"
 PYTHON="$VENV_DIR/bin/python"
 
-# .envファイルの読み込み
+# .envファイルのパスを設定
 ENV_FILE="$SCRIPT_DIR/.env"
+
+
+
+# OS別コマンド設定の読み込み
+source "$SCRIPT_DIR/bin/os_utils.sh"
+OS_TYPE=$(init_os_commands)
+
+# .envファイルの読み込み
 if [ ! -f "$ENV_FILE" ]; then
     echo "エラー: .envファイルが見つかりません: $ENV_FILE"
     exit 1
@@ -30,8 +38,9 @@ NC='\033[0m' # No Color
 show_file_history() {
     local file_path="$1"
     
-    # バージョンディレクトリの取得
-    VERSION_DIRS=($(ls -v version/v* 2>/dev/null))
+    # バージョンディレクトリの取得（共通関数を使用）
+    VERSION_DIRS=($(get_version_dirs "version" "v*"))
+    
     if [[ ${#VERSION_DIRS[@]} -eq 0 ]]; then
         echo -e "${YELLOW}警告: バージョンディレクトリが見つかりません${NC}"
         exit 0
@@ -228,6 +237,11 @@ show_help() {
     echo "  -p, --postgresql PostgreSQLサービスでコマンドを実行"
     echo "  -g, --git       Gitサービスでコマンドを実行"
     echo
+    echo "対応OS:"
+    echo "  - Linux (Ubuntu, CentOS, etc.)"
+    echo "  - macOS (Darwin)"
+    echo "  - Windows (WSL, Cygwin, MSYS2)"
+    echo
     echo "コマンド:"
     echo "  help           このヘルプメッセージを表示"
     echo "  version        syllabus.shのバージョンを表示"
@@ -250,6 +264,7 @@ show_help() {
     echo "  cache status     キャッシュの状態を表示"
     echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
     echo "  update          minorバージョンアップをdevelopへマージ（squash/no-ff選択）"
+    echo "  test-os           OS互換性テストを実行"
     echo
     echo "使用例:"
     echo "  $0 venv init             # Python仮想環境を初期化"
@@ -275,6 +290,7 @@ show_help() {
     echo "  $0 -p sql tests/cache_sample3.sql   # SQLファイルをPostgreSQLサーバーで実行"
     echo "  $0 update squash         # squashでdevelopにminorマージ"
     echo "  $0 update noff           # no-ffでdevelopにminorマージ"
+    echo "  $0 test-os               # OS互換性テストを実行"
 }
 
 # コマンドライン引数の解析
@@ -307,6 +323,8 @@ while [[ $# -gt 0 ]]; do
 	esac
 
 done
+
+
 
 # コマンドが指定されていない場合はヘルプを表示
 if [ -z "$COMMAND" ]; then
@@ -419,15 +437,15 @@ if [ "$SERVICE" = "postgres" ]; then
 			;;
 		shell)
 			# .envファイルからデータベース名とユーザー名を取得
-			DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-			DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 			docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME"
 			;;
 		records)
 			if [ ${#ARGS[@]} -eq 0 ]; then
 				# 引数なし: 従来通り全テーブルの件数表示
-				DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-				DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+				DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+				DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 				docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
 					SELECT 
 						schemaname || '.' || relname as table_name,
@@ -438,8 +456,8 @@ if [ "$SERVICE" = "postgres" ]; then
 			else
 				# 引数あり: 指定テーブルの全件表示
 				TABLE_NAME="${ARGS[0]}"
-				DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-				DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+				DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+				DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 				docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM $TABLE_NAME;"
 			fi
 			;;
@@ -568,9 +586,12 @@ if [ "$SERVICE" = "postgres" ]; then
 			fi
 			
 			echo "SQLファイルを実行中: $sql_file"
-			DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-			DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 			docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
+			;;
+		test-os)
+			"$SCRIPT_DIR/bin/test_os_compatibility.sh"
 			;;
 		*)
 			echo "エラー: 不明なコマンド '$COMMAND'"
@@ -634,6 +655,9 @@ else
 					exit 1
 					;;
 			esac
+			;;
+		test-os)
+			"$SCRIPT_DIR/bin/test_os_compatibility.sh"
 			;;
 		*)
 			echo "エラー: 不明なコマンド '$COMMAND'"

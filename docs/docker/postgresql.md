@@ -1,14 +1,14 @@
 ---
 title: PostgreSQL環境構築ガイド
-file_version: v2.4.0
-project_version: v2.4.0
+file_version: v2.5.0
+project_version: v2.5.0
 last_updated: 2025-07-03
 ---
 
 # PostgreSQL環境構築ガイド
 
-- File Version: v2.4.0
-- Project Version: v2.4.0
+- File Version: v2.5.0
+- Project Version: v2.5.0
 - Last Updated: 2025-07-03
 
 [readmeへ](../../README.md) | [doc.mdへ](../doc.md)

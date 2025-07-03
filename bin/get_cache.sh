@@ -1,12 +1,16 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# File Version: v2.4.0
-# Project Version: v2.4.0
+# File Version: v2.5.0
+# Project Version: v2.5.0
 # Last Updated: 2025-07-03
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# OS別コマンド設定の読み込み
+source "$SCRIPT_DIR/os_utils.sh"
+OS_TYPE=$(init_os_commands)
 
 # .envファイルの読み込み
 ENV_FILE="$PROJECT_DIR/.env"
@@ -26,8 +30,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # データベース接続情報
-DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
+DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
 
 # 出力ファイル名
 OUTPUT_FILE="$PROJECT_DIR/tests/json_output/full_cache.json"

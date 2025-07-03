@@ -1,16 +1,22 @@
 #!/bin/bash
 
 # -*- coding: utf-8 -*-
-# File Version: v2.4.0
-# Project Version: v2.4.0
+# File Version: v2.5.0
+# Project Version: v2.5.0
 # Last Updated: 2025-07-03
 
 # スクリプトのディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+# binの親ディレクトリをプロジェクトルートとみなす
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+ENV_FILE="$PROJECT_DIR/.env"
+
+
+# OS別コマンド設定の読み込み
+source "$SCRIPT_DIR/os_utils.sh"
+OS_TYPE=$(init_os_commands)
 
 # .envファイルの読み込み
-ENV_FILE="$PROJECT_DIR/.env"
 if [ ! -f "$ENV_FILE" ]; then
     echo "エラー: .envファイルが見つかりません: $ENV_FILE"
     exit 1
@@ -27,10 +33,10 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # データベース接続情報
-DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
-DB_HOST=$(grep POSTGRES_HOST .env | cut -d '=' -f2)
-DB_PORT=$(grep POSTGRES_PORT .env | cut -d '=' -f2)
+DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
+DB_HOST=$(get_env_value "POSTGRES_HOST" "$ENV_FILE")
+DB_PORT=$(get_env_value "POSTGRES_PORT" "$ENV_FILE")
 
 # キャッシュテーブル名
 CACHE_TABLE="syllabus_cache"
@@ -336,7 +342,7 @@ generate_subject_syllabus_cache() {
         'subject_syllabus_cache',
         cd.subject_name_id,
         cd.cache_data,
-        'v2.3.0'
+        'v2.4.1'
     FROM cache_data cd;
     "
     

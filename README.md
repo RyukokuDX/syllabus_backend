@@ -1,14 +1,14 @@
 ---
 title: Syllabus Backend
-file_version: v2.4.0
-project_version: v2.4.0
+file_version: v2.5.0
+project_version: v2.5.0
 last_updated: 2025-07-03
 ---
 
 # Syllabus Backend
 
-- File Version: v2.4.0
-- Project Version: v2.4.0
+- File Version: v2.5.0
+- Project Version: v2.5.0
 - Last Updated: 2025-07-03
 
 ## 概要
@@ -20,6 +20,7 @@ last_updated: 2025-07-03
 - データベースの自動更新とバックアップ
 - 複数年度のシラバス情報の管理
 - JSONBキャッシュによる高速検索機能
+- マルチプラットフォーム対応（Linux、macOS）
 
 ### システム構成
 - バックエンド: FastAPI (Python 3.11)
@@ -47,6 +48,9 @@ last_updated: 2025-07-03
 - ログ管理
   - ログディレクトリ（log/）
   - ログローテーション
+- マルチプラットフォーム対応
+  - Linux（Ubuntu、CentOS等）
+  - macOS（Darwin）
 
 ### 運用環境
 - VPN内のサーバーで運用
@@ -112,17 +116,26 @@ cp .env.example .env
 # 必要に応じて.envファイルの設定を編集
 ```
 
-3. 仮想環境の作成と初期化
+3. 実行権限の復元（macOSの場合）
+```bash
+# macOSでクローンした場合、実行権限が失われている可能性があります
+chmod +x bin/*.sh
+chmod +x syllabus.sh
+# または専用スクリプトを使用
+./bin/restore-permissions.sh
+```
+
+4. 仮想環境の作成と初期化
 ```bash
 ./syllabus.sh venv init
 ```
 
-4. データベースの起動
+5. データベースの起動
 ```bash
 ./syllabus.sh -p start
 ```
 
-5. データベースの初期化
+6. データベースの初期化
 ```bash
 # 初期化データの生成
 ./syllabus.sh -p migration generate init
@@ -130,11 +143,11 @@ cp .env.example .env
 ./syllabus.sh -p migration deploy
 ```
 
-6. データベースの起動確認
+7. データベースの起動確認
 ```bash
 ./syllabus.sh -p records
 ```
-7. キャッシュの生成（推奨）
+8. キャッシュの生成（推奨）
 ```bash
 # シラバスキャッシュを生成（検索性能向上のため）
 ./syllabus.sh -p cache generate subject_syllabus_cache
@@ -144,6 +157,12 @@ cp .env.example .env
 
 # 利用可能なキャッシュ一覧を表示
 ./syllabus.sh -p cache list
+```
+
+9. OS互換性の確認（オプション）
+```bash
+# OS互換性テストを実行
+./syllabus.sh test-os
 ```
 
 ## 開発ガイドライン
@@ -160,6 +179,7 @@ MIT License
 ### シェルスクリプト関連
 - [syllabus.sh](docs/sh/syllabus.md) - メインシェルスクリプトの使用方法
 - [git_bump.sh](docs/sh/git_bump.md) - バージョン管理スクリプトの使用方法
+- [OS互換性](docs/sh/os_compatibility.md) - マルチプラットフォーム対応について
 
 ### データベース関連
 - [ER図](docs/database/er.md) - データベースのER図

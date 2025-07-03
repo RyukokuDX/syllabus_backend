@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-# File Version: v2.4.0
-# Project Version: v2.4.0
+# File Version: v2.5.0
+# Project Version: v2.5.0
 # Last Updated: 2025-07-03
 """
 
