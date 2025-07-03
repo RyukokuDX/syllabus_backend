@@ -49,8 +49,12 @@ get_env_value() {
     # OS別の処理（将来的な拡張のため）
     local os_type=$(detect_os)
     
+    # コマンドが未定義の場合は直接使用
+    local grep_cmd="${GREP_CMD:-grep}"
+    local cut_cmd="${CUT_CMD:-cut}"
+    
     # 基本的にはgrepとcutを使用
-    local value=$($GREP_CMD "^${key}=" "$env_file" | $CUT_CMD -d '=' -f2-)
+    local value=$($grep_cmd "^${key}=" "$env_file" | $cut_cmd -d '=' -f2-)
     
     # 前後の空白を削除
     echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
@@ -71,11 +75,15 @@ get_version_dirs() {
     
     local os_type=$(detect_os)
     
+    # コマンドが未定義の場合は直接使用
+    local ls_version_cmd="${LS_VERSION_CMD:-ls -v}"
+    local sort_cmd="${SORT_CMD:-sort -V}"
+    
     if [ "$os_type" = "macos" ]; then
         # macOS: ls -1 で取得して sort -V でソート
-        $LS_VERSION_CMD "${base_dir}/${pattern}" 2>/dev/null | $SORT_CMD
+        $ls_version_cmd "${base_dir}/${pattern}" 2>/dev/null | $sort_cmd
     else
         # Linux: ls -v で直接ソート済みで取得
-        $LS_VERSION_CMD "${base_dir}/${pattern}" 2>/dev/null
+        $ls_version_cmd "${base_dir}/${pattern}" 2>/dev/null
     fi
 } 
