@@ -1,15 +1,15 @@
 ---
 title: OS互換性
-file_version: v2.5.0
-project_version: v2.5.0
-last_updated: 2025-07-03
+file_version: v2.5.1
+project_version: v2.5.1
+last_updated: 2025-07-04
 ---
 
 # OS互換性
 
-- File Version: v2.5.0
-- Project Version: v2.5.0
-- Last Updated: 2025-07-03
+- File Version: v2.5.1
+- Project Version: v2.5.1
+- Last Updated: 2025-07-04
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
 
