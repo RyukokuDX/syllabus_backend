@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # -*- coding: utf-8 -*-
-# File Version: v2.5.1
-# Project Version: v2.5.1
+# File Version: v2.5.2
+# Project Version: v2.5.2
 # Last Updated: 2025-07-04
 
 # スクリプトのディレクトリを取得
@@ -54,9 +54,11 @@ show_help() {
     echo "  refresh <cache_name>   指定されたキャッシュを削除して再生成"
     echo "  list                   利用可能なキャッシュ一覧を表示"
     echo "  status                 キャッシュの状態を表示"
+    echo "  get <cache_name>        指定されたキャッシュを取得"
     echo
     echo "利用可能なキャッシュ:"
     echo "  subject_syllabus_cache  科目別シラバスキャッシュ"
+    echo "  catalogue                EAVカタログキャッシュ"
     echo
     echo "使用例:"
     echo "  $0 generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
@@ -64,6 +66,7 @@ show_help() {
     echo "  $0 refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
     echo "  $0 list                             # キャッシュ一覧を表示"
     echo "  $0 status                           # キャッシュの状態を表示"
+    echo "  $0 get subject_syllabus_cache        # 科目別シラバスキャッシュを取得"
 }
 
 # キャッシュテーブルの作成
@@ -360,6 +363,64 @@ generate_subject_syllabus_cache() {
     fi
 }
 
+# EAVカタログキャッシュの生成
+generate_catalogue_cache() {
+    echo -e "${BLUE}EAVカタログキャッシュを生成中...${NC}"
+    # 既存のキャッシュを削除
+    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+    DELETE FROM $CACHE_TABLE WHERE cache_name = 'catalogue';
+    "
+    # EAVカタログ生成SQL（全attribute_name＋科目区分・小区分・対象学部一覧）
+    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+    WITH eav_catalog AS (
+      SELECT
+        jsonb_object_agg(attribute_name, values) AS catalog
+      FROM (
+        SELECT
+          sa.attribute_name,
+          jsonb_agg(DISTINCT sav.value ORDER BY sav.value) AS values
+        FROM subject_attribute sa
+        LEFT JOIN subject_attribute_value sav ON sa.attribute_id = sav.attribute_id
+        WHERE sav.value IS NOT NULL AND sav.value <> ''
+        GROUP BY sa.attribute_name
+      ) t
+    ),
+    class_catalog AS (
+      SELECT jsonb_agg(class_name ORDER BY class_name) AS class_list FROM class
+    ),
+    subclass_catalog AS (
+      SELECT jsonb_agg(subclass_name ORDER BY subclass_name) AS subclass_list FROM subclass
+    ),
+    faculty_catalog AS (
+      SELECT jsonb_agg(faculty_name ORDER BY faculty_name) AS faculty_list FROM faculty
+    ),
+    merged_catalog AS (
+      SELECT 
+        eav_catalog.catalog
+        || jsonb_build_object('科目区分', class_catalog.class_list)
+        || jsonb_build_object('科目小区分', subclass_catalog.subclass_list)
+        || jsonb_build_object('対象学部一覧', faculty_catalog.faculty_list)
+      AS full_catalog
+      FROM eav_catalog, class_catalog, subclass_catalog, faculty_catalog
+    )
+    INSERT INTO $CACHE_TABLE (cache_name, subject_name_id, cache_data, cache_version)
+    SELECT
+      'catalogue',
+      0,
+      full_catalog,
+      'v1.0.0'
+    FROM merged_catalog;
+    "
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}EAVカタログキャッシュの生成が完了しました${NC}"
+        count=$(docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM $CACHE_TABLE WHERE cache_name = 'catalogue';" | tr -d ' ')
+        echo -e "${BLUE}生成されたカタログキャッシュ件数: $count${NC}"
+    else
+        echo -e "${RED}EAVカタログキャッシュの生成に失敗しました${NC}"
+        exit 1
+    fi
+}
+
 # キャッシュの削除
 delete_cache() {
     local cache_name="$1"
@@ -388,16 +449,14 @@ delete_cache() {
 # キャッシュの削除して再生成
 refresh_cache() {
     local cache_name="$1"
-    
     echo -e "${BLUE}キャッシュ '$cache_name' を削除して再生成中...${NC}"
-    
-    # 既存のキャッシュを削除
     delete_cache "$cache_name"
-    
-    # キャッシュを再生成
     case "$cache_name" in
         subject_syllabus_cache)
             generate_subject_syllabus_cache
+            ;;
+        catalogue)
+            generate_catalogue_cache
             ;;
         *)
             echo -e "${RED}エラー: 不明なキャッシュ名 '$cache_name'${NC}"
@@ -405,7 +464,6 @@ refresh_cache() {
             exit 1
             ;;
     esac
-    
     echo -e "${GREEN}キャッシュ '$cache_name' の削除して再生成が完了しました${NC}"
 }
 
@@ -416,6 +474,10 @@ list_caches() {
     echo "1. subject_syllabus_cache - 科目別シラバスキャッシュ"
     echo "   - 科目のシラバス情報をJSONB形式でキャッシュ"
     echo "   - 教員、教科書、成績評価、履修情報を含む"
+    echo ""
+    echo "2. catalogue - EAVカタログキャッシュ"
+    echo "   - 各属性（科目区分、科目小区分、学部課程、課程別エンティティ等）の値一覧をJSONBでキャッシュ"
+    echo "   - LLMやUIの候補値提示、クエリ自動生成に利用"
     echo ""
 }
 
@@ -435,6 +497,26 @@ show_cache_status() {
     GROUP BY cache_name, cache_version
     ORDER BY cache_name;
     "
+}
+
+# キャッシュの取得
+get_cache() {
+    local cache_name="$1"
+    case "$cache_name" in
+        subject_syllabus_cache)
+            echo -e "${BLUE}科目別シラバスキャッシュ全件を取得中...${NC}"
+            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -A -c "SELECT cache_data FROM $CACHE_TABLE WHERE cache_name = 'subject_syllabus_cache' LIMIT 10;" | "$SCRIPT_DIR/json_prettify.sh"
+            ;;
+        catalogue)
+            echo -e "${BLUE}EAVカタログキャッシュを取得中...${NC}"
+            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -A -c "SELECT cache_data FROM $CACHE_TABLE WHERE cache_name = 'catalogue' LIMIT 1;" | "$SCRIPT_DIR/json_prettify.sh"
+            ;;
+        *)
+            echo -e "${RED}エラー: 不明なキャッシュ名 '$cache_name'${NC}"
+            list_caches
+            exit 1
+            ;;
+    esac
 }
 
 # メイン処理
@@ -463,6 +545,9 @@ main() {
                 subject_syllabus_cache)
                     generate_subject_syllabus_cache
                     ;;
+                catalogue)
+                    generate_catalogue_cache
+                    ;;
                 *)
                     echo -e "${RED}エラー: 不明なキャッシュ名 '$2'${NC}"
                     list_caches
@@ -479,6 +564,9 @@ main() {
             
             case "$2" in
                 subject_syllabus_cache)
+                    delete_cache "$2"
+                    ;;
+                catalogue)
                     delete_cache "$2"
                     ;;
                 *)
@@ -502,6 +590,9 @@ main() {
                 subject_syllabus_cache)
                     refresh_cache "$2"
                     ;;
+                catalogue)
+                    refresh_cache "$2"
+                    ;;
                 *)
                     echo -e "${RED}エラー: 不明なキャッシュ名 '$2'${NC}"
                     list_caches
@@ -514,6 +605,26 @@ main() {
             ;;
         status)
             show_cache_status
+            ;;
+        get)
+            if [ $# -lt 2 ]; then
+                echo -e "${RED}エラー: 取得タイプが指定されていません${NC}"
+                show_help
+                exit 1
+            fi
+            case "$2" in
+                subject_syllabus_cache)
+                    get_cache "$2"
+                    ;;
+                catalogue)
+                    get_cache "$2"
+                    ;;
+                *)
+                    echo -e "${RED}エラー: 不明な取得タイプ '$2'${NC}"
+                    list_caches
+                    exit 1
+                    ;;
+            esac
             ;;
         *)
             echo -e "${RED}エラー: 不明なコマンド '$1'${NC}"

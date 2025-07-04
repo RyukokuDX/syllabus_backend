@@ -236,26 +236,32 @@ show_help() {
     echo "  -h, --help     このヘルプメッセージを表示"
     echo "  -p, --postgresql PostgreSQLサービスでコマンドを実行"
     echo "  -g, --git       Gitサービスでコマンドを実行"
+    echo "  -m, --mcp       mcpサービスでコマンドを実行"
     echo
     echo "対応OS:"
     echo "  - Linux (Ubuntu, CentOS, etc.)"
     echo "  - macOS (Darwin)"
     echo "  - Windows (WSL, Cygwin, MSYS2)"
     echo
-    echo "コマンド:"
+    echo "【共通コマンド】"
     echo "  help           このヘルプメッセージを表示"
     echo "  version        syllabus.shのバージョンを表示"
     echo "  version <file> 指定されたファイルの更新履歴を表示"
     echo "  venv init      Python仮想環境を初期化"
+    echo "  csv normalize  指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
+    echo "  parser         指定されたテーブルのパーサースクリプトを実行"
+    echo "  test-os        OS互換性テストを実行"
+    echo
+    echo "【-p, --postgresql サービスコマンド】"
     echo "  start          指定されたサービスを開始"
     echo "  stop           指定されたサービスを停止"
     echo "  ps             サービスの状態を表示"
     echo "  logs           サービスのログを表示"
     echo "  shell          PostgreSQLサービスのシェルを開く"
     echo "  records        全テーブルのレコード数を表示"
+    echo "  records <table> 指定テーブルの全件表示"
     echo "  parser         指定されたテーブルのパーサースクリプトを実行"
     echo "  migration      マイグレーション関連のコマンド"
-    echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
     echo "  cache generate   指定されたキャッシュを生成"
     echo "  cache delete     指定されたキャッシュを削除"
     echo "  cache refresh    指定されたキャッシュを削除して再生成"
@@ -263,34 +269,15 @@ show_help() {
     echo "  cache list       利用可能なキャッシュ一覧を表示"
     echo "  cache status     キャッシュの状態を表示"
     echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
-    echo "  update          minorバージョンアップをdevelopへマージ（squash/no-ff選択）"
-    echo "  test-os           OS互換性テストを実行"
     echo
-    echo "使用例:"
-    echo "  $0 venv init             # Python仮想環境を初期化"
-    echo "  $0 -p start              # PostgreSQLサービスを開始"
-    echo "  $0 -p stop               # PostgreSQLサービスを停止"
-    echo "  $0 -p shell              # PostgreSQLサービスのシェルを開く"
-    echo "  $0 -p records            # レコード数を表示"
-    echo "  $0 parser book           # 書籍パーサーを実行"
-    echo "  $0 parser syllabus       # シラバスパーサーを実行"
-    echo "  $0 parser instructor     # 教員パーサーを実行"
-    echo "  $0 -p migration generate init      # 初期化データを生成"
-    echo "  $0 -p migration generate migration # マイグレーションデータを生成"
-    echo "  $0 -p migration check              # マイグレーションをチェック"
-    echo "  $0 -p migration deploy             # マイグレーションをデプロイ"
-    echo "  $0 csv normalize 2024    # 2024年度のCSVファイルを整形"
-    echo "  $0 csv normalize 2025 Y  # 2025年度のYサブディレクトリのCSVファイルを整形"
-    echo "  $0 -p cache generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
-    echo "  $0 -p cache delete subject_syllabus_cache    # 科目別シラバスキャッシュを削除"
-    echo "  $0 -p cache refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
-    echo "  $0 -p cache get full     # 全キャッシュデータを取得・整形"
-    echo "  $0 -p cache list         # キャッシュ一覧を表示"
-    echo "  $0 -p cache status       # キャッシュの状態を表示"
-    echo "  $0 -p sql tests/cache_sample3.sql   # SQLファイルをPostgreSQLサーバーで実行"
-    echo "  $0 update squash         # squashでdevelopにminorマージ"
-    echo "  $0 update noff           # no-ffでdevelopにminorマージ"
-    echo "  $0 test-os               # OS互換性テストを実行"
+    echo "【-g, --git サービスコマンド】"
+    echo "  update minor <squash|noff>  minorバージョンアップをdevelopへマージ（squash/no-ff選択）"
+    echo
+    echo "【-m, --mcp サービスコマンド】"
+    echo "  comment generate mcp用コメントSQLを生成"
+    echo "  start -f <json>  指定したmcp設定jsonの内容でmcpサーバー（postgres）をバックグラウンド起動"
+    echo "  stop -f <json>   指定したmcp設定jsonの内容でmcpサーバー（postgres）を停止"
+    echo "  restart -f <json> 停止→起動を連続実行"
 }
 
 # コマンドライン引数の解析
@@ -312,6 +299,10 @@ while [[ $# -gt 0 ]]; do
 			SERVICE="git"
 			shift
 			;;
+		-m|--mcp)
+			SERVICE="mcp"
+			shift
+			;;
 		*)
 			if [ -z "$COMMAND" ]; then
 				COMMAND="$1"
@@ -321,10 +312,63 @@ while [[ $# -gt 0 ]]; do
 			shift
 			;;
 	esac
-
 done
 
+# mcpサーバー管理コマンド
+if [ "$SERVICE" = "mcp" ]; then
+	if [ "$COMMAND" = "comment" ] && [ "${ARGS[0]}" = "generate" ]; then
+		"$SCRIPT_DIR/venv_syllabus_backend/bin/python" "$SCRIPT_DIR/src/db/mcp_comments.py"
+		exit 0
+	fi
 
+	if [ "$COMMAND" = "start" ] || [ "$COMMAND" = "stop" ] || [ "$COMMAND" = "restart" ]; then
+		# -f <json> の取得
+		MCP_JSON=""
+		for ((i=0; i<${#ARGS[@]}; i++)); do
+			if [ "${ARGS[$i]}" = "-f" ]; then
+				MCP_JSON="${ARGS[$((i+1))]}"
+			fi
+		done
+		if [ -z "$MCP_JSON" ]; then
+			echo "エラー: -f <json> を指定してください"
+			exit 1
+		fi
+
+		# サーバー名は現状postgres固定
+		cmd=$(jq -r '.mcpServers.postgres.command' "$MCP_JSON")
+		args=$(jq -r '.mcpServers.postgres.args | join(" ")' "$MCP_JSON")
+		PID_FILE=".mcp_server_postgres.pid"
+		LOG_FILE="mcp_server_postgres.log"
+
+		if [ "$COMMAND" = "start" ]; then
+			if [ -f "$PID_FILE" ]; then
+				echo "すでに起動しています (PID: $(cat $PID_FILE))"
+				exit 1
+			fi
+			nohup $cmd $args > "$LOG_FILE" 2>&1 &
+			echo $! > "$PID_FILE"
+			echo "mcpサーバー(postgres)を起動しました (PID: $(cat $PID_FILE))"
+		elif [ "$COMMAND" = "stop" ]; then
+			if [ -f "$PID_FILE" ]; then
+				kill $(cat "$PID_FILE")
+				rm "$PID_FILE"
+				echo "mcpサーバー(postgres)を停止しました"
+			else
+				echo "PIDファイルがありません。すでに停止している可能性があります。"
+			fi
+		elif [ "$COMMAND" = "restart" ]; then
+			if [ -f "$PID_FILE" ]; then
+				kill $(cat "$PID_FILE")
+				rm "$PID_FILE"
+				echo "mcpサーバー(postgres)を停止しました"
+			fi
+			nohup $cmd $args > "$LOG_FILE" 2>&1 &
+			echo $! > "$PID_FILE"
+			echo "mcpサーバー(postgres)を再起動しました (PID: $(cat $PID_FILE))"
+		fi
+		exit 0
+	fi
+fi
 
 # コマンドが指定されていない場合はヘルプを表示
 if [ -z "$COMMAND" ]; then
@@ -545,16 +589,22 @@ if [ "$SERVICE" = "postgres" ]; then
 				get)
 					if [ ${#ARGS[@]} -lt 2 ]; then
 						echo "エラー: 取得タイプが指定されていません"
-						echo "使用方法: $0 -p cache get [full]"
+						echo "使用方法: $0 -p cache get [full|catalogue|subject_syllabus_cache]"
 						exit 1
 					fi
 					case "${ARGS[1]}" in
 						full)
 							"$SCRIPT_DIR/bin/get_cache.sh" full
 							;;
+						catalogue)
+							"$SCRIPT_DIR/bin/json_cache.sh" get catalogue
+							;;
+						subject_syllabus_cache)
+							"$SCRIPT_DIR/bin/json_cache.sh" get subject_syllabus_cache
+							;;
 						*)
 							echo "エラー: 不明な取得タイプ '${ARGS[1]}'"
-							echo "使用方法: $0 -p cache get [full]"
+							echo "使用方法: $0 -p cache get [full|catalogue|subject_syllabus_cache]"
 							exit 1
 							;;
 					esac
@@ -655,6 +705,14 @@ else
 					exit 1
 					;;
 			esac
+			;;
+		parser)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: パーサー名または番号が指定されていません"
+				show_help
+				exit 1
+			fi
+			"$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
 			;;
 		test-os)
 			"$SCRIPT_DIR/bin/test_os_compatibility.sh"

@@ -6,8 +6,8 @@
 
 # syllabus.sh
 
-- File Version: v2.5.1
-- Project Version: v2.5.1
+- File Version: v2.5.2
+- Project Version: v2.5.2
 - Last Updated: 2025-07-04
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
@@ -32,81 +32,59 @@
 
 ### オプション
 
-- `-p, --postgres`: PostgreSQLサービスを操作
+- `-p, --postgresql`: PostgreSQLサービスを操作
+- `-g, --git`: Gitサービスを操作
+- `-m, --mcp`: mcpサービスを操作
 - `-h, --help`: ヘルプメッセージを表示
 
 ### コマンド
 
-#### 基本コマンド
+#### 【共通コマンド】
 
 - `help`: ヘルプメッセージを表示
-- `venv-init`: Python仮想環境の初期化
+- `version`: syllabus.shのバージョンを表示
+- `version <file>`: 指定されたファイルの更新履歴を表示
+- `venv init`: Python仮想環境の初期化
+- `csv normalize`: 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）
+- `parser`: 指定されたテーブルのパーサースクリプトを実行（引数必須）
+- `test-os`: OS互換性テストを実行
+
+#### 【-p, --postgresql サービスコマンド】
+
 - `start`: 指定されたサービスを開始
 - `stop`: 指定されたサービスを停止
 - `ps`: サービスの状態を表示
 - `logs`: サービスのログを表示
+- `shell`: PostgreSQLサービスのシェルを開く
+- `records`: 全テーブルのレコード数を表示
+- `records <table>`: 指定テーブルの全件表示
+- `parser`: 指定されたテーブルのパーサースクリプトを実行
+- `migration`: マイグレーション関連のコマンド
+- `cache generate`: 指定されたキャッシュを生成
+- `cache delete`: 指定されたキャッシュを削除
+- `cache refresh`: 指定されたキャッシュを削除して再生成
+- `cache get full`: 全キャッシュデータを取得・整形
+- `cache get catalogue`: EAVカタログキャッシュ（分類属性・学部・区分リスト等）をJSON整形で取得
+- `cache list`: 利用可能なキャッシュ一覧を表示
+- `cache status`: キャッシュの状態を表示
+- `sql <sqlfile>`: 指定したSQLファイルをPostgreSQLサーバーで実行
 
-#### PostgreSQL関連
+#### 【-g, --git サービスコマンド】
 
-- `shell`: PostgreSQLサービスのシェルを開く（-pオプション必須）
-- `records`: すべてのテーブルのレコード数を表示、または指定テーブルの全件表示（-pオプション必須）
-  - 引数なし: 全テーブルのレコード数を表示
-  - `records {テーブル名}`: 指定テーブルの全レコードを表示
+- `update minor <squash|noff>`: minorバージョンアップをdevelopへマージ（squash/no-ff選択）
 
-#### パーサー関連
+#### 【-m, --mcp サービスコマンド】
 
-- `parser`: 指定されたテーブルのパーサースクリプトを実行（引数必須）
-
-#### CSV関連
-
-- `csv normalize`: 指定年度のCSVファイルを整形
-  - 引数: `{year}` - 処理対象の年度
-  - 処理内容:
-    - 元ファイルを`.org`拡張子でバックアップ（既存の場合はスキップ）
-    - 区切り文字をタブに統一
-    - 全フィールドの前後の空白を削除
-    - 空値、`null`、`NULL`、`None`を`NULL`に統一
-    - "科目名"フィールドを正規化
-      - 全角アルファベットを半角に変換（例：Ａ→A）
-      - 全角数字を半角に変換（例：１→1）
-      - 全角記号を半角に変換（例：（→(、）→)）
-      - 全角スペースを半角スペースに変換
-      - 連続するスペースを1つに
-      - 全角ハイフン類を半角ハイフンに統一
-      - 全角ローマ数字を半角に変換（例：Ⅰ→I）
-      - 全角中点を半角中点に変換（例：・→·）
-
-#### データ管理関連
-
-- `generate`: 指定されたテーブルのデータを生成（-pオプション必須、引数必須）
-- `check`: 指定されたテーブルのデータをチェック（-pオプション必須）
-- `deploy`: 指定されたテーブルのデータをデプロイ（-pオプション必須）
-- `migration`: マイグレーション関連のコマンド（-pオプション必須）
-  - `migration generate init`: 初期化データを生成
-  - `migration generate migration`: マイグレーションデータを生成
-  - `migration check`: マイグレーションをチェック
-  - `migration deploy`: マイグレーションをデプロイ
-
-#### キャッシュ関連
-
-- `cache`: JSONBキャッシュ関連のコマンド（-pオプション必須）
-  - `cache generate`: シラバスキャッシュを生成
-  - `cache check`: キャッシュの状態を確認
-  - `cache clear`: キャッシュをクリア
-  - `cache test`: キャッシュのテストクエリを実行
-
-#### システム関連
-
-- `test-os`: OS互換性テストを実行
-  - 現在のOS環境でのコマンド互換性を確認
-  - 環境変数の読み込みテスト
-  - バージョンディレクトリ取得テスト
+- `comment generate`: mcp用コメントSQLを生成（src/db/mcp_comments.pyを実行）
+- `start -f <json>`: 指定したmcp設定jsonの内容でmcpサーバー（postgres）をバックグラウンド起動
+- `stop -f <json>`: 指定したmcp設定jsonの内容でmcpサーバー（postgres）を停止
+- `restart -f <json>`: 停止→起動を連続実行
 
 ### 使用例
 
 ```bash
 # Python仮想環境の初期化
-./syllabus.sh venv-init
+./syllabus.sh venv init
 
 # サービスの起動
 ./syllabus.sh -p start
@@ -115,7 +93,7 @@
 ./syllabus.sh -p stop
 
 # サービスの状態表示
-./syllabus.sh ps
+./syllabus.sh -p ps
 
 # サービスのログ表示
 ./syllabus.sh -p logs
@@ -147,25 +125,51 @@
 ./syllabus.sh -p migration deploy
 
 # キャッシュ生成
-./syllabus.sh -p cache generate <chache名>
+./syllabus.sh -p cache generate <cache名>
 
 # キャッシュ再生成
-./syllabus.sh -p cache refresh <chache名>
+./syllabus.sh -p cache refresh <cache名>
 
 # キャッシュ状態確認
-./syllabus.sh -p cache check
+./syllabus.sh -p cache status
 
 # キャッシュテスト
 ./syllabus.sh -p cache test
 
 # OS互換性テスト
 ./syllabus.sh test-os
+
+# コメントSQL生成
+./syllabus.sh -m comment generate
+
+# mcpサーバー起動
+./syllabus.sh -m start -f .cursor/mcp.json
+
+# mcpサーバー停止
+./syllabus.sh -m stop -f .cursor/mcp.json
+
+# mcpサーバー再起動
+./syllabus.sh -m restart -f .cursor/mcp.json
+
+# git minorバージョンアップ
+./syllabus.sh -g update minor squash
+./syllabus.sh -g update minor noff
+
+# EAVカタログキャッシュの生成
+./syllabus.sh -p cache generate catalogue
+
+# EAVカタログキャッシュの再生成
+./syllabus.sh -p cache refresh catalogue
+
+# EAVカタログキャッシュの取得（JSON整形出力）
+./syllabus.sh -p cache get catalogue
 ```
 
 ## 注意事項
 
-- PostgreSQLの操作（shell/records）を行う場合は、必ず`-p`オプションを指定してください
-- パーサーを実行する前に、`venv-init`コマンドでPython仮想環境を初期化してください
+- PostgreSQLの操作（shell/records/migration/cache/sql）を行う場合は、必ず`-p`オプションを指定してください
+- **EAVカタログキャッシュ（catalogue）は、分類属性・学部・区分リスト等をJSONで一括取得でき、get catalogueで自動的に整形表示されます**
+- パーサーを実行する前に、`venv init`コマンドでPython仮想環境を初期化してください
 - 各コマンドは`bin/`ディレクトリ内の対応するスクリプトを実行します
 - エラーが発生した場合は、適切なエラーメッセージとヘルプが表示されます
 
