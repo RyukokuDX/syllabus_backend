@@ -625,7 +625,7 @@ if [ "$SERVICE" = "postgres" ]; then
 		sql)
 			if [ ${#ARGS[@]} -eq 0 ]; then
 				echo "エラー: SQLファイルが指定されていません"
-				echo "使用方法: $0 -p sql <sqlfile>"
+				echo "使用方法: $0 -p sql <sqlfile> [--tuples-only] [--no-align]"
 				exit 1
 			fi
 			
@@ -638,7 +638,21 @@ if [ "$SERVICE" = "postgres" ]; then
 			echo "SQLファイルを実行中: $sql_file"
 			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
 			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
-			docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
+			# オプション解析
+			PSQL_OPTS=""
+			for arg in "${ARGS[@]:1}"; do
+				case "$arg" in
+					--tuples-only)
+						PSQL_OPTS="$PSQL_OPTS -t"
+						;;
+					--no-align)
+						PSQL_OPTS="$PSQL_OPTS -A"
+						;;
+					*)
+						;;
+				esac
+			done
+			docker exec -i postgres-db psql $PSQL_OPTS -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
 			;;
 		test-os)
 			"$SCRIPT_DIR/bin/test_os_compatibility.sh"

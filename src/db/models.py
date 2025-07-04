@@ -355,7 +355,7 @@ class SubjectAttributeValue(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        UniqueConstraint('subject_id', 'attribute_id', name='uix_subject_attribute_value_unique'),
+        UniqueConstraint('subject_id', 'attribute_id', 'value', name='uix_subject_attribute_value_unique'),
         Index('idx_subject_attribute_value_subject', 'subject_id'),
         Index('idx_subject_attribute_value_attribute', 'attribute_id'),
     )

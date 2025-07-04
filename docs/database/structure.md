@@ -735,7 +735,7 @@ periodは"0"とする.
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_subject_attribute_value_unique | (subject_id, attribute_id) | 科目・属性の一意性 |
+| idx_subject_attribute_value_unique | (subject_id, attribute_id, value) | 科目・属性・値の一意性 |
 | idx_subject_attribute_value_subject | subject_id | 科目IDでの検索用 |
 | idx_subject_attribute_value_attribute | attribute_id | 属性IDでの検索用 |
 

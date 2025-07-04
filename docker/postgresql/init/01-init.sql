@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
     value TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
+    UNIQUE(subject_id, attribute_id, value)
 );
 
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
@@ -377,3 +377,4 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250702123100__insert_subjects.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250702123149__insert_subject_attributes.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250702130556__insert_syllabus_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250704175801_insert_comments_for_mcp.sql
