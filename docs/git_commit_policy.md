@@ -1,15 +1,15 @@
 ---
 title: Gitコミットポリシー
-file_version: v2.5.1
-project_version: v2.5.1
-last_updated: 2025-07-04
+file_version: v2.6.0
+project_version: v2.6.0
+last_updated: 2025-07-05
 ---
 
 # Gitコミットポリシー
 
-- File Version: v2.5.1
-- Project Version: v2.5.1
-- Last Updated: 2025-07-04
+- File Version: v2.6.0
+- Project Version: v2.6.0
+- Last Updated: 2025-07-05
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](./doc.md)
 
@@ -209,36 +209,36 @@ last_updated: 2025-07-04
   ```markdown
   ---
   title: タイトル
-  file_version: v2.5.1
-  project_version: v2.5.1
+  file_version: v2.6.0
+  project_version: v2.6.0
   last_updated: YYYY-MM-DD
   ---
 
   # タイトル
 
-  - File Version: v2.5.1
-  - Project Version: v2.5.1
+  - File Version: v2.6.0
+  - Project Version: v2.6.0
   - Last Updated: YYYY-MM-DD
   ```
 
   **Pythonファイルの場合：**
   ```python
-  # File Version: v2.5.1
-  # Project Version: v2.5.1
+  # File Version: v2.6.0
+  # Project Version: v2.6.0
   # Last Updated: YYYY-MM-DD
   ```
 
   **Shellスクリプトの場合：**
   ```bash
-  # File Version: v2.5.1
-  # Project Version: v2.5.1
+  # File Version: v2.6.0
+  # Project Version: v2.6.0
   # Last Updated: YYYY-MM-DD
   ```
 
   **JSONファイルの場合：**
   ```json
-  // File Version: v2.5.1
-  // Project Version: v2.5.1
+  // File Version: v2.6.0
+  // Project Version: v2.6.0
   // Last Updated: YYYY-MM-DD
   ```
 
@@ -261,8 +261,8 @@ last_updated: 2025-07-04
          "body": [
            "# $1",
            "",
-           "- File Version: v2.5.1",
-           "- Project Version: v2.5.1",
+           "- File Version: v2.6.0",
+           "- Project Version: v2.6.0",
            "- Last Updated: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"
          ]
        }

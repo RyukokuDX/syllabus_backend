@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # cursorはversionを弄るな
 """
-# File Version: v2.5.1
-# Project Version: v2.5.1
-# Last Updated: 2025-07-04
+# File Version: v2.6.0
+# Project Version: v2.6.0
+# Last Updated: 2025-07-05
 """
 
 import os

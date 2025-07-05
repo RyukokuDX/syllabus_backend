@@ -1,15 +1,15 @@
 ---
 title: Docker環境構築ガイド
-file_version: v2.5.1
-project_version: v2.5.1
-last_updated: 2025-07-04
+file_version: v2.6.0
+project_version: v2.6.0
+last_updated: 2025-07-05
 ---
 
 # Docker環境構築ガイド
 
-- File Version: v2.5.1
-- Project Version: v2.5.1
-- Last Updated: 2025-07-04
+- File Version: v2.6.0
+- Project Version: v2.6.0
+- Last Updated: 2025-07-05
 
 [readmeへ](../README.md) | [サーバー構成へ](server.md) 
 
