@@ -6,9 +6,9 @@
 
 # syllabus.sh
 
-- File Version: v2.5.2
-- Project Version: v2.5.2
-- Last Updated: 2025-07-04
+- File Version: v2.5.3
+- Project Version: v2.5.3
+- Last Updated: 2025-07-05
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
 
@@ -53,6 +53,7 @@
 
 - `start`: 指定されたサービスを開始
 - `stop`: 指定されたサービスを停止
+- `restart`: 指定されたサービスを再起動
 - `ps`: サービスの状態を表示
 - `logs`: サービスのログを表示
 - `shell`: PostgreSQLサービスのシェルを開く
@@ -67,7 +68,7 @@
 - `cache get catalogue`: EAVカタログキャッシュ（分類属性・学部・区分リスト等）をJSON整形で取得
 - `cache list`: 利用可能なキャッシュ一覧を表示
 - `cache status`: キャッシュの状態を表示
-- `sql <sqlfile>`: 指定したSQLファイルをPostgreSQLサーバーで実行
+- `sql <sqlfile>`: 指定したSQLファイルをPostgreSQLサーバーで実行（psqlオプション：--tuples-only, --no-align等に対応）
 
 #### 【-g, --git サービスコマンド】
 
