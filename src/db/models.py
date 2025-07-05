@@ -1,6 +1,6 @@
-# File Version: v2.5.0
-# Project Version: v2.5.0
-# Last Updated: 2025-07-03
+# File Version: v2.6.0
+# Project Version: v2.6.0
+# Last Updated: 2025-07-05
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, TIMESTAMP, Index, CheckConstraint, ForeignKeyConstraint, UniqueConstraint, SmallInteger, func, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -355,7 +355,7 @@ class SubjectAttributeValue(Base):
     updated_at = Column(TIMESTAMP)
 
     __table_args__ = (
-        UniqueConstraint('subject_id', 'attribute_id', name='uix_subject_attribute_value_unique'),
+        UniqueConstraint('subject_id', 'attribute_id', 'value', name='uix_subject_attribute_value_unique'),
         Index('idx_subject_attribute_value_subject', 'subject_id'),
         Index('idx_subject_attribute_value_attribute', 'attribute_id'),
     )

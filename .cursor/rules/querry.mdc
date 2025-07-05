@@ -1,0 +1,15 @@
+---
+description: Rule for criation of postgresql querry with jsnb
+globs:
+alwaysApply: false
+---
+
+1. Read jsonb derinition
+docs/database/jsonb_cache.md
+
+1. Get AV catalogue
+``` bash
+wsl .syllabus.sh -p get catalogue
+```
+
+1. create querry 

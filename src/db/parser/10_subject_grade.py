@@ -1,5 +1,5 @@
-# File Version: v2.5.0
-# Project Version: v2.5.0
+# File Version: v2.6.0
+# Project Version: v2.6.0
 # Last Updated: 2025/6/21
 
 import os

@@ -1,8 +1,8 @@
 ---
 title: データベース構造定義
-file_version: v2.5.0
-project_version: v2.5.0
-last_updated: 2025-07-03
+file_version: v2.6.0
+project_version: v2.6.0
+last_updated: 2025-07-05
 ---
 <!-- Curosr はversion 弄るな -->
 
@@ -19,9 +19,9 @@ last_updated: 2025-07-03
 
 # データベース構造定義
 
-- File Version: v2.5.0
-- Project Version: v2.5.0
-- Last Updated: 2025-07-03
+- File Version: v2.6.0
+- Project Version: v2.6.0
+- Last Updated: 2025-07-05
 
 [readmeへ](../../README.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
 
@@ -735,7 +735,7 @@ periodは"0"とする.
 | インデックス名 | カラム | 説明 |
 |---------------|--------|------|
 | PRIMARY KEY | id | 主キー |
-| idx_subject_attribute_value_unique | (subject_id, attribute_id) | 科目・属性の一意性 |
+| idx_subject_attribute_value_unique | (subject_id, attribute_id, value) | 科目・属性・値の一意性 |
 | idx_subject_attribute_value_subject | subject_id | 科目IDでの検索用 |
 | idx_subject_attribute_value_attribute | attribute_id | 属性IDでの検索用 |
 

@@ -48,4 +48,16 @@ WHERE cache_name = 'subject_syllabus_cache'
       WHERE criteria->>'項目' LIKE '%試験%'
     )
   )
+  -- 数学系の科目（科目区分または科目小区分に「数学」または「数理」を含む）
+  AND EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(cache_data->'履修情報一覧') as curriculum_info,
+         jsonb_array_elements(curriculum_info->'履修要綱一覧') as requirement_info
+    WHERE (
+      requirement_info->>'科目区分' LIKE '%数学%'
+      OR requirement_info->>'科目区分' LIKE '%数理%'
+      OR requirement_info->>'科目小区分' LIKE '%数学%'
+      OR requirement_info->>'科目小区分' LIKE '%数理%'
+    )
+  )
 ORDER BY 教科名, 担当教員;

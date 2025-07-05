@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
     value TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
+    UNIQUE(subject_id, attribute_id, value)
 );
 
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);

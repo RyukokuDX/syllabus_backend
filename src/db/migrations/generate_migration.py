@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File Version: v2.5.0
-# Project Version: v2.5.0
-# Last Updated: 2025-07-03
+# File Version: v2.6.0
+# Project Version: v2.6.0
+# Last Updated: 2025-07-05
 
 import json
 import os
@@ -274,7 +274,10 @@ def generate_sql_insert(table_name, records):
     conflict_cols = conflict_columns.get(table_name, [])
     update_cols = update_columns.get(table_name, [])
     
-    if conflict_cols:
+    # subject_attribute_valueのみON CONFLICT句を付与しない
+    if table_name == 'subject_attribute_value':
+        conflict_str = ""
+    elif conflict_cols:
         conflict_str = f"ON CONFLICT ({', '.join(conflict_cols)})"
         if update_cols:
             update_str = "DO UPDATE SET " + ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
@@ -478,7 +481,7 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
     value TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
+    UNIQUE(subject_id, attribute_id, value)
 );""",
         'syllabus_study_system': """
 CREATE TABLE IF NOT EXISTS syllabus_study_system (

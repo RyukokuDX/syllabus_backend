@@ -1,15 +1,15 @@
 ---
 title: Syllabus Backend
-file_version: v2.5.0
-project_version: v2.5.0
-last_updated: 2025-07-03
+file_version: v2.6.0
+project_version: v2.6.0
+last_updated: 2025-07-05
 ---
 
 # Syllabus Backend
 
-- File Version: v2.5.0
-- Project Version: v2.5.0
-- Last Updated: 2025-07-03
+- File Version: v2.6.0
+- Project Version: v2.6.0
+- Last Updated: 2025-07-05
 
 ## 概要
 シラバス情報を管理するバックエンドシステム。Web Syllabusから取得したシラバス情報をデータベースに格納し、APIを通じて提供します。
@@ -41,7 +41,6 @@ last_updated: 2025-07-03
   - 仮想環境（venv）
 - データベース開発
   - PostgreSQL
-  - SQLite（開発用）
 - コンテナ開発
   - Docker
   - docker-compose
@@ -135,22 +134,15 @@ chmod +x syllabus.sh
 ./syllabus.sh -p start
 ```
 
-6. データベースの初期化
-```bash
-# 初期化データの生成
-./syllabus.sh -p migration generate init
-# マイグレーションのデプロイ
-./syllabus.sh -p migration deploy
-```
-
-7. データベースの起動確認
+6. データベースの起動確認
 ```bash
 ./syllabus.sh -p records
 ```
-8. キャッシュの生成（推奨）
+7. キャッシュの生成（推奨）
 ```bash
 # シラバスキャッシュを生成（検索性能向上のため）
 ./syllabus.sh -p cache generate subject_syllabus_cache
+./syllabus.sh -p cache generate catalogue
 
 # キャッシュの状態を確認
 ./syllabus.sh -p cache status
@@ -159,7 +151,7 @@ chmod +x syllabus.sh
 ./syllabus.sh -p cache list
 ```
 
-9. OS互換性の確認（オプション）
+8. OS互換性の確認（オプション）
 ```bash
 # OS互換性テストを実行
 ./syllabus.sh test-os
@@ -170,6 +162,18 @@ chmod +x syllabus.sh
 - [API仕様](docs/api/openapi.yaml)
 - [データベース構造定義](docs/database/structure.md)
 - [キャッシュ構造定義](docs/database/jsonb_cache.md)
+
+### Cursor関連
+- `.cursor/querry.mdc` - PostgreSQL+jsonbクエリ作成ルール
+  - jsonbキャッシュの仕様は docs/database/jsonb_cache.md を参照
+  - 属性値カタログ（AV catalogue）は `./syllabus.sh -p cache get catalogue` で取得
+  - クエリ作成時は上記カタログ・仕様を必ず参照すること
+- `.cursor/rules/` - Cursor IDEの追加ルール設定ディレクトリ
+  - `git.mdc` - Git操作に関するルール設定
+  - `general-rule.mdc` - 一般的な開発ルール設定
+  - これらのファイルは、Cursor IDEでの開発効率を向上させるための設定を含みます
+  - チーム開発時の一貫性を保つために使用されます
+  - 開発者はこれらのルールに従って作業を行う必要があります
 
 ## ライセンス
 MIT License
@@ -198,21 +202,7 @@ MIT License
 
 ### その他
 - [ドキュメント作成ガイド](docs/doc.md) - ドキュメント作成のガイドライン
-
-### Cursor関連
-- `.cursor/rules/` - Cursor IDEの設定ファイル
-  - `git.mdc` - Git操作に関するルール設定
-    - コミットメッセージの形式とプレフィックス
-    - ブランチ管理と命名規則
-    - バージョン管理とタグ運用
-    - マージ戦略とパッチ管理
-  - `general-rule.mdc` - 一般的な開発ルール設定
-    - ファイル更新時の規約
-    - 新規ファイル生成の制限
-    - 変更承認プロセス
-  - これらのファイルは、Cursor IDEでの開発効率を向上させるための設定を含みます
-  - チーム開発時の一貫性を保つために使用されます
-  - 開発者はこれらのルールに従って作業を行う必要があります
+- [トラブルシューティングガイド](docs/trouble_shoot.md) - よくある問題と解決方法
 
 ### Git更新手順
 1. バージョン更新

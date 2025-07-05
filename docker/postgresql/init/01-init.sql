@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
     value TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
+    UNIQUE(subject_id, attribute_id, value)
 );
 
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
@@ -368,9 +368,7 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250624124852__insert_syllabuss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624171346__insert_grading_criterions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_facultys.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_subject_attributes.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250627180556__insert_subjects.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250630101938__insert_subject_attribute_values.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250630111050__insert_syllabus_study_systems.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250701153432__insert_book_uncategorizeds.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250701153432__insert_books.sql
@@ -379,3 +377,4 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250702123100__insert_subjects.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250702123149__insert_subject_attributes.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250702130556__insert_syllabus_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250704175801_insert_comments_for_mcp.sql

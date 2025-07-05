@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # -*- coding: utf-8 -*-
-# File Version: v2.5.0
-# Project Version: v2.5.0
-# Last Updated: 2025-07-03
+# File Version: v2.6.0
+# Project Version: v2.6.0
+# Last Updated: 2025-07-05
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
@@ -54,9 +54,11 @@ show_help() {
     echo "  refresh <cache_name>   指定されたキャッシュを削除して再生成"
     echo "  list                   利用可能なキャッシュ一覧を表示"
     echo "  status                 キャッシュの状態を表示"
+    echo "  get <cache_name>        指定されたキャッシュを取得"
     echo
     echo "利用可能なキャッシュ:"
     echo "  subject_syllabus_cache  科目別シラバスキャッシュ"
+    echo "  catalogue                EAVカタログキャッシュ"
     echo
     echo "使用例:"
     echo "  $0 generate subject_syllabus_cache  # 科目別シラバスキャッシュを生成"
@@ -64,6 +66,7 @@ show_help() {
     echo "  $0 refresh subject_syllabus_cache   # 科目別シラバスキャッシュを削除して再生成"
     echo "  $0 list                             # キャッシュ一覧を表示"
     echo "  $0 status                           # キャッシュの状態を表示"
+    echo "  $0 get subject_syllabus_cache        # 科目別シラバスキャッシュを取得"
 }
 
 # キャッシュテーブルの作成
@@ -105,12 +108,10 @@ create_cache_table() {
 # 科目別シラバスキャッシュの生成
 generate_subject_syllabus_cache() {
     echo -e "${BLUE}科目別シラバスキャッシュを生成中...${NC}"
-    
     # 既存のキャッシュを削除
     docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
     DELETE FROM $CACHE_TABLE WHERE cache_name = 'subject_syllabus_cache';
     "
-    
     # キャッシュデータを生成して挿入
     docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
     WITH syllabus_data AS (
@@ -134,39 +135,39 @@ generate_subject_syllabus_cache() {
             s.grading_comment,
             s.advice
         FROM syllabus_master sm
-        JOIN syllabus s ON sm.syllabus_id = s.syllabus_id
-        JOIN subject_name sn ON s.subject_name_id = sn.subject_name_id
+        LEFT JOIN syllabus s ON sm.syllabus_id = s.syllabus_id
+        LEFT JOIN subject_name sn ON s.subject_name_id = sn.subject_name_id
     ),
     instructor_data AS (
         SELECT 
             si.syllabus_id,
-            json_agg(
+            COALESCE(json_agg(
                 json_build_object(
                     '氏名', i.name,
                     '役割', COALESCE(si.role, '担当')
                 )
-            ) as instructors
+            ) FILTER (WHERE i.instructor_id IS NOT NULL), '[]'::json) as instructors
         FROM syllabus_instructor si
-        JOIN instructor i ON si.instructor_id = i.instructor_id
+        LEFT JOIN instructor i ON si.instructor_id = i.instructor_id
         GROUP BY si.syllabus_id
     ),
     lecture_time_data AS (
         SELECT 
             lt.syllabus_id,
-            json_agg(
+            COALESCE(json_agg(
                 json_build_object(
                     '曜日', lt.day_of_week,
                     '時限', lt.period
                 )
-            ) as lecture_times,
-            json_agg(lt.period) as periods
+            ) FILTER (WHERE lt.period IS NOT NULL), '[]'::json) as lecture_times,
+            COALESCE(json_agg(lt.period) FILTER (WHERE lt.period IS NOT NULL), '[]'::json) as periods
         FROM lecture_time lt
         GROUP BY lt.syllabus_id
     ),
     textbook_data AS (
         SELECT 
             syllabus_id,
-            json_agg(book_info) as textbooks
+            COALESCE(json_agg(book_info), '[]'::json) as textbooks
         FROM (
             -- syllabus_bookから教科書を取得
             SELECT 
@@ -178,7 +179,7 @@ generate_subject_syllabus_cache() {
                     '価格', b.price
                 ) as book_info
             FROM syllabus_book sb
-            JOIN book b ON sb.book_id = b.book_id
+            LEFT JOIN book b ON sb.book_id = b.book_id
             WHERE sb.role = '教科書'
             
             UNION ALL
@@ -200,7 +201,7 @@ generate_subject_syllabus_cache() {
     reference_data AS (
         SELECT 
             syllabus_id,
-            json_agg(book_info) as references
+            COALESCE(json_agg(book_info), '[]'::json) as references
         FROM (
             -- syllabus_bookから参考書を取得
             SELECT 
@@ -212,7 +213,7 @@ generate_subject_syllabus_cache() {
                     '価格', b.price
                 ) as book_info
             FROM syllabus_book sb
-            JOIN book b ON sb.book_id = b.book_id
+            LEFT JOIN book b ON sb.book_id = b.book_id
             WHERE sb.role = '参考書'
             
             UNION ALL
@@ -234,22 +235,22 @@ generate_subject_syllabus_cache() {
     faculty_data AS (
         SELECT 
             sf.syllabus_id,
-            json_agg(f.faculty_name) as faculties
+            COALESCE(json_agg(f.faculty_name), '[]'::json) as faculties
         FROM syllabus_faculty sf
-        JOIN faculty f ON sf.faculty_id = f.faculty_id
+        LEFT JOIN faculty f ON sf.faculty_id = f.faculty_id
         GROUP BY sf.syllabus_id
     ),
     grading_data AS (
         SELECT 
             gc.syllabus_id,
-            json_agg(
+            COALESCE(json_agg(
                 json_build_object(
                     '項目', gc.criteria_type,
                     '割合', gc.ratio,
                     '評価方法', gc.criteria_description,
                     '備考', gc.note
                 )
-            ) as grading_criteria
+            ) FILTER (WHERE gc.criteria_type IS NOT NULL), '[]'::json) as grading_criteria
         FROM grading_criterion gc
         GROUP BY gc.syllabus_id
     ),
@@ -257,31 +258,35 @@ generate_subject_syllabus_cache() {
         SELECT 
             sub.subject_name_id,
             sub.curriculum_year,
-            json_agg(
-                CASE 
-                    WHEN sav.value IS NOT NULL THEN
-                        json_build_object(
-                            '学部課程', f.faculty_name,
-                            '科目区分', c.class_name,
-                            '科目小区分', COALESCE(sc.subclass_name, ''),
-                            '必須度', sub.requirement_type,
-                            '課程別エンティティ', sa.attribute_name || ': ' || sav.value
-                        )
-                    ELSE
-                        json_build_object(
-                            '学部課程', f.faculty_name,
-                            '科目区分', c.class_name,
-                            '科目小区分', COALESCE(sc.subclass_name, ''),
-                            '必須度', sub.requirement_type
-                        )
-                END
-            ) as subject_info
+            COALESCE(json_agg(
+                jsonb_strip_nulls(
+                    jsonb_build_object(
+                        '学部課程', f.faculty_name,
+                        '科目区分', c.class_name,
+                        '科目小区分', COALESCE(sc.subclass_name, ''),
+                        '必須度', sub.requirement_type
+                    ) || 
+                    COALESCE(
+                        (
+                            SELECT jsonb_object_agg(
+                                CASE WHEN sa.attribute_name = '学修プログラム' THEN '学修プログラム一覧' ELSE sa.attribute_name END,
+                                CASE WHEN sa.attribute_name = '学修プログラム' THEN (
+                                    SELECT jsonb_agg(sav2.value)
+                                    FROM subject_attribute_value sav2
+                                    WHERE sav2.subject_id = sub.subject_id AND sav2.attribute_id = sa.attribute_id
+                                ) ELSE to_jsonb(sav.value) END
+                            )
+                            FROM subject_attribute_value sav
+                            JOIN subject_attribute sa ON sav.attribute_id = sa.attribute_id
+                            WHERE sav.subject_id = sub.subject_id
+                        ), '{}'
+                    )
+                )
+            ) FILTER (WHERE f.faculty_name IS NOT NULL), '[]'::json) as subject_info
         FROM subject sub
-        JOIN faculty f ON sub.faculty_id = f.faculty_id
-        JOIN class c ON sub.class_id = c.class_id
+        LEFT JOIN faculty f ON sub.faculty_id = f.faculty_id
+        LEFT JOIN class c ON sub.class_id = c.class_id
         LEFT JOIN subclass sc ON sub.subclass_id = sc.subclass_id
-        LEFT JOIN subject_attribute_value sav ON sub.subject_id = sav.subject_id
-        LEFT JOIN subject_attribute sa ON sav.attribute_id = sa.attribute_id
         GROUP BY sub.subject_name_id, sub.curriculum_year
     ),
     syllabus_by_year AS (
@@ -289,7 +294,7 @@ generate_subject_syllabus_cache() {
             sd.subject_name_id,
             sd.subject_name,
             sd.syllabus_year,
-            json_agg(
+            COALESCE(json_agg(
                 json_build_object(
                     '担当教員一覧', COALESCE(id.instructors, '[]'::json),
                     '対象学部課程一覧', COALESCE(fd.faculties, '[]'::json),
@@ -303,7 +308,7 @@ generate_subject_syllabus_cache() {
                     '成績評価基準一覧', COALESCE(gd.grading_criteria, '[]'::json),
                     '成績評価コメント', sd.grading_comment
                 )
-            ) as syllabi
+            ) FILTER (WHERE sd.syllabus_id IS NOT NULL), '[]'::json) as syllabi
         FROM syllabus_data sd
         LEFT JOIN instructor_data id ON sd.syllabus_id = id.syllabus_id
         LEFT JOIN faculty_data fd ON sd.syllabus_id = fd.syllabus_id
@@ -318,20 +323,18 @@ generate_subject_syllabus_cache() {
             sby.subject_name_id,
             json_build_object(
                 '科目名', sby.subject_name,
-                '開講情報一覧', json_agg(
+                '開講情報一覧', COALESCE(json_agg(
                     json_build_object(
                         '年度', sby.syllabus_year,
                         'シラバス一覧', sby.syllabi
                     )
-                ),
-                '履修情報一覧', COALESCE(
-                    json_agg(
-                        json_build_object(
-                            '年度', subd.curriculum_year,
-                            '履修要綱一覧', COALESCE(subd.subject_info, '[]'::json)
-                        )
-                    ), '[]'::json
-                )
+                ) FILTER (WHERE sby.syllabus_year IS NOT NULL), '[]'::json),
+                '履修情報一覧', COALESCE(json_agg(
+                    json_build_object(
+                        '年度', subd.curriculum_year,
+                        '履修要綱一覧', COALESCE(subd.subject_info, '[]'::json)
+                    )
+                ) FILTER (WHERE subd.curriculum_year IS NOT NULL), '[]'::json)
             ) as cache_data
         FROM syllabus_by_year sby
         LEFT JOIN subject_data subd ON sby.subject_name_id = subd.subject_name_id
@@ -345,10 +348,8 @@ generate_subject_syllabus_cache() {
         'v2.4.1'
     FROM cache_data cd;
     "
-    
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}科目別シラバスキャッシュの生成が完了しました${NC}"
-        
         # 生成されたキャッシュの件数を表示
         count=$(docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -c "
         SELECT COUNT(*) FROM $CACHE_TABLE WHERE cache_name = 'subject_syllabus_cache';
@@ -356,6 +357,64 @@ generate_subject_syllabus_cache() {
         echo -e "${BLUE}生成されたキャッシュ件数: $count${NC}"
     else
         echo -e "${RED}科目別シラバスキャッシュの生成に失敗しました${NC}"
+        exit 1
+    fi
+}
+
+# EAVカタログキャッシュの生成
+generate_catalogue_cache() {
+    echo -e "${BLUE}EAVカタログキャッシュを生成中...${NC}"
+    # 既存のキャッシュを削除
+    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+    DELETE FROM $CACHE_TABLE WHERE cache_name = 'catalogue';
+    "
+    # EAVカタログ生成SQL（全attribute_name＋科目区分・小区分・対象学部一覧）
+    docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+    WITH eav_catalog AS (
+      SELECT
+        jsonb_object_agg(attribute_name, values) AS catalog
+      FROM (
+        SELECT
+          sa.attribute_name,
+          jsonb_agg(DISTINCT sav.value ORDER BY sav.value) AS values
+        FROM subject_attribute sa
+        LEFT JOIN subject_attribute_value sav ON sa.attribute_id = sav.attribute_id
+        WHERE sav.value IS NOT NULL AND sav.value <> ''
+        GROUP BY sa.attribute_name
+      ) t
+    ),
+    class_catalog AS (
+      SELECT jsonb_agg(class_name ORDER BY class_name) AS class_list FROM class
+    ),
+    subclass_catalog AS (
+      SELECT jsonb_agg(subclass_name ORDER BY subclass_name) AS subclass_list FROM subclass
+    ),
+    faculty_catalog AS (
+      SELECT jsonb_agg(faculty_name ORDER BY faculty_name) AS faculty_list FROM faculty
+    ),
+    merged_catalog AS (
+      SELECT 
+        eav_catalog.catalog
+        || jsonb_build_object('科目区分', class_catalog.class_list)
+        || jsonb_build_object('科目小区分', subclass_catalog.subclass_list)
+        || jsonb_build_object('対象学部一覧', faculty_catalog.faculty_list)
+      AS full_catalog
+      FROM eav_catalog, class_catalog, subclass_catalog, faculty_catalog
+    )
+    INSERT INTO $CACHE_TABLE (cache_name, subject_name_id, cache_data, cache_version)
+    SELECT
+      'catalogue',
+      0,
+      full_catalog,
+      'v1.0.0'
+    FROM merged_catalog;
+    "
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}EAVカタログキャッシュの生成が完了しました${NC}"
+        count=$(docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM $CACHE_TABLE WHERE cache_name = 'catalogue';" | tr -d ' ')
+        echo -e "${BLUE}生成されたカタログキャッシュ件数: $count${NC}"
+    else
+        echo -e "${RED}EAVカタログキャッシュの生成に失敗しました${NC}"
         exit 1
     fi
 }
@@ -388,16 +447,14 @@ delete_cache() {
 # キャッシュの削除して再生成
 refresh_cache() {
     local cache_name="$1"
-    
     echo -e "${BLUE}キャッシュ '$cache_name' を削除して再生成中...${NC}"
-    
-    # 既存のキャッシュを削除
     delete_cache "$cache_name"
-    
-    # キャッシュを再生成
     case "$cache_name" in
         subject_syllabus_cache)
             generate_subject_syllabus_cache
+            ;;
+        catalogue)
+            generate_catalogue_cache
             ;;
         *)
             echo -e "${RED}エラー: 不明なキャッシュ名 '$cache_name'${NC}"
@@ -405,7 +462,6 @@ refresh_cache() {
             exit 1
             ;;
     esac
-    
     echo -e "${GREEN}キャッシュ '$cache_name' の削除して再生成が完了しました${NC}"
 }
 
@@ -416,6 +472,10 @@ list_caches() {
     echo "1. subject_syllabus_cache - 科目別シラバスキャッシュ"
     echo "   - 科目のシラバス情報をJSONB形式でキャッシュ"
     echo "   - 教員、教科書、成績評価、履修情報を含む"
+    echo ""
+    echo "2. catalogue - EAVカタログキャッシュ"
+    echo "   - 各属性（科目区分、科目小区分、学部課程、課程別エンティティ等）の値一覧をJSONBでキャッシュ"
+    echo "   - LLMやUIの候補値提示、クエリ自動生成に利用"
     echo ""
 }
 
@@ -435,6 +495,26 @@ show_cache_status() {
     GROUP BY cache_name, cache_version
     ORDER BY cache_name;
     "
+}
+
+# キャッシュの取得
+get_cache() {
+    local cache_name="$1"
+    case "$cache_name" in
+        subject_syllabus_cache)
+            echo -e "${BLUE}科目別シラバスキャッシュ全件を取得中...${NC}"
+            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -A -c "SELECT cache_data FROM $CACHE_TABLE WHERE cache_name = 'subject_syllabus_cache';" | "$SCRIPT_DIR/json_prettify.sh"
+            ;;
+        catalogue)
+            echo -e "${BLUE}EAVカタログキャッシュを取得中...${NC}"
+            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -A -c "SELECT cache_data FROM $CACHE_TABLE WHERE cache_name = 'catalogue' LIMIT 1;" | "$SCRIPT_DIR/json_prettify.sh"
+            ;;
+        *)
+            echo -e "${RED}エラー: 不明なキャッシュ名 '$cache_name'${NC}"
+            list_caches
+            exit 1
+            ;;
+    esac
 }
 
 # メイン処理
@@ -463,6 +543,9 @@ main() {
                 subject_syllabus_cache)
                     generate_subject_syllabus_cache
                     ;;
+                catalogue)
+                    generate_catalogue_cache
+                    ;;
                 *)
                     echo -e "${RED}エラー: 不明なキャッシュ名 '$2'${NC}"
                     list_caches
@@ -479,6 +562,9 @@ main() {
             
             case "$2" in
                 subject_syllabus_cache)
+                    delete_cache "$2"
+                    ;;
+                catalogue)
                     delete_cache "$2"
                     ;;
                 *)
@@ -502,6 +588,9 @@ main() {
                 subject_syllabus_cache)
                     refresh_cache "$2"
                     ;;
+                catalogue)
+                    refresh_cache "$2"
+                    ;;
                 *)
                     echo -e "${RED}エラー: 不明なキャッシュ名 '$2'${NC}"
                     list_caches
@@ -514,6 +603,26 @@ main() {
             ;;
         status)
             show_cache_status
+            ;;
+        get)
+            if [ $# -lt 2 ]; then
+                echo -e "${RED}エラー: 取得タイプが指定されていません${NC}"
+                show_help
+                exit 1
+            fi
+            case "$2" in
+                subject_syllabus_cache)
+                    get_cache "$2"
+                    ;;
+                catalogue)
+                    get_cache "$2"
+                    ;;
+                *)
+                    echo -e "${RED}エラー: 不明な取得タイプ '$2'${NC}"
+                    list_caches
+                    exit 1
+                    ;;
+            esac
             ;;
         *)
             echo -e "${RED}エラー: 不明なコマンド '$1'${NC}"
