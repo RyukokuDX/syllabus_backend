@@ -6,8 +6,8 @@
 
 # syllabus.sh
 
-- File Version: v2.6.0
-- Project Version: v2.6.0
+- File Version: v2.6.2
+- Project Version: v2.6.2
 - Last Updated: 2025-07-05
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
@@ -69,6 +69,7 @@
 - `cache list`: 利用可能なキャッシュ一覧を表示
 - `cache status`: キャッシュの状態を表示
 - `sql <sqlfile>`: 指定したSQLファイルをPostgreSQLサーバーで実行（psqlオプション：--tuples-only, --no-align等に対応）
+- `sql2yaml <sqlfile>`: 指定したSQLファイルのWHERE句条件をYAMLツリー形式で可視化（src/db/sql_where_yaml.pyを実行）
 
 #### 【-g, --git サービスコマンド】
 
@@ -164,6 +165,9 @@
 
 # EAVカタログキャッシュの取得（JSON整形出力）
 ./syllabus.sh -p cache get catalogue
+
+# SQLファイルのWHERE句条件をYAMLツリーで可視化
+./syllabus.sh -p sql2yaml tests/kikai_text.sql
 ```
 
 ## 注意事項
@@ -217,5 +221,16 @@
 
 現在のブランチの内容をdevelopにsquashまたはno-ffでマージします。
 内部的に `bin/minor_version_update.sh` を呼び出します。
+
+## 機能概要
+
+- `sql2yaml` コマンドは、SQLファイルのWHERE句条件をYAMLツリー形式で出力します。
+  - 非エンジニアでもWHERE句の論理構造を直感的に把握可能
+  - 内部的に `src/db/sql_where_yaml.py` を呼び出し、SQLのWHERE句をパースしてYAMLで表示
+  - 複雑な条件式もツリー構造で可視化されるため、レビューや仕様確認に有用
+
+- `sql2yaml`コマンドはPostgreSQLのSQLファイル（.sql）に対応しています
+- YAML出力はWHERE句の論理構造のみを対象とし、SELECT句やORDER BY句等は含みません
+- SQLファイルの記述ミスや非標準構文には対応しない場合があります
 
 [🔝 ページトップへ](#syllabussh) 

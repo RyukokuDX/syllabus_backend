@@ -376,6 +376,22 @@ if [ -z "$COMMAND" ]; then
 	exit 1
 fi
 
+# SQLのWHERE句YAML可視化コマンド
+if [ "$COMMAND" = "sql2yaml" ]; then
+	if [ ${#ARGS[@]} -eq 0 ]; then
+		echo "エラー: SQLファイルが指定されていません"
+		echo "使用方法: $0 sql2yaml <sqlファイル>"
+		exit 1
+	fi
+	sql_file="${ARGS[0]}"
+	if [ ! -f "$sql_file" ]; then
+		echo "エラー: SQLファイルが見つかりません: $sql_file"
+		exit 1
+	fi
+	PYTHONPATH="$SCRIPT_DIR/src" "$PYTHON" "$SCRIPT_DIR/src/db/sql_where_yaml.py" "$sql_file"
+	exit 0
+fi
+
 # サービスごとに許可コマンドを分岐
 if [ "$SERVICE" = "git" ]; then
 	case $COMMAND in
