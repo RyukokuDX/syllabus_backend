@@ -1,7 +1,7 @@
 ---
 title: FastAPI環境構築ガイド
-file_version: v2.7.1
-project_version: v2.7.1
+file_version: v2.7.2
+project_version: v2.7.2
 last_updated: 2025-07-06
 ---
 
@@ -95,8 +95,8 @@ POST /api/v1/query
 #### リクエストボディ
 ```json
 {
-  "query": "SELECT * FROM subject WHERE faculty_id = ? AND curriculum_year = ?",
-  "params": [1, 2025]
+  "query": "SELECT s.syllabus_id, sn.name AS 科目名, s.term AS 学期 FROM syllabus s JOIN syllabus_instructor si ON s.syllabus_id = si.syllabus_id JOIN instructor i ON si.instructor_id = i.instructor_id JOIN subject_name sn ON s.subject_name_id = sn.subject_name_id WHERE i.name = %s ORDER BY s.syllabus_id;",
+  "params": ["藤原 和将"]
 }
 ```
 
@@ -104,20 +104,109 @@ POST /api/v1/query
 ```json
 {
   "results": [
-    {
-      "subject_id": 1,
-      "subject_name_id": 1,
-      "faculty_id": 1,
-      "curriculum_year": 2025,
-      "class_id": 1,
-      "subclass_id": 2,
-      "requirement_type": "必修",
-      "created_at": "2025-07-06T12:00:00Z",
-      "updated_at": "2025-07-06T12:00:00Z"
-    }
+    [
+      13,
+      "理工学のすすめ",
+      "後期"
+    ],
+    [
+      35,
+      "数理情報基礎演習B",
+      "後期"
+    ],
+    [
+      37,
+      "線形代数及び演習II",
+      "後期"
+    ],
+    [
+      47,
+      "プロジェクト演習",
+      "前期"
+    ],
+    [
+      57,
+      "数理情報演習",
+      "1Q"
+    ],
+    [
+      90,
+      "セミナ-I",
+      "後期"
+    ],
+    [
+      111,
+      "セミナ-II",
+      "前期"
+    ],
+    [
+      117,
+      "特別研究I",
+      "前期"
+    ],
+    [
+      130,
+      "特別研究II",
+      "後期"
+    ],
+    [
+      700,
+      "数理解析特別講義II",
+      "前期"
+    ],
+    [
+      703,
+      "数理解析特別研究",
+      "通年"
+    ],
+    [
+      718,
+      "基礎解析特論I",
+      "3Q"
+    ],
+    [
+      719,
+      "基礎解析特論II",
+      "4Q"
+    ],
+    [
+      732,
+      "先端理工学基礎演習I",
+      "前期"
+    ],
+    [
+      745,
+      "先端理工学基礎演習II",
+      "後期"
+    ],
+    [
+      758,
+      "数理·情報科学特別研究",
+      "前期"
+    ],
+    [
+      771,
+      "数理·情報科学特別研究",
+      "後期"
+    ],
+    [
+      782,
+      "先端理工学研究(数理·情報科学コ-ス)",
+      "通年"
+    ],
+    [
+      785,
+      "数理·情報科学演習",
+      "前期"
+    ],
+    [
+      798,
+      "数理·情報科学演習",
+      "後期"
+    ]
   ],
-  "execution_time": 0.123,
-  "row_count": 1
+  "execution_time": 0.022578954696655273,
+  "row_count": 20
 }
 ```
 
