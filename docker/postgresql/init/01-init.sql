@@ -378,3 +378,4 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250702123149__insert_subject_attributes.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250702130556__insert_syllabus_facultys.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250704175801_insert_comments_for_mcp.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250705080622__insert_subject_attribute_values.sql

@@ -1,16 +1,10 @@
-2025-05-22 14:23:48.373 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
+2025-07-06 11:12:59.006 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
 
-2025-05-22 14:24:35.542 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
+2025-07-06 11:16:13.333 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
 
-2025-05-22 14:38:27.290 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
+2025-07-06 11:16:40.120 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
 
-2025-05-22 14:39:48.878 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
-
-2025-05-22 14:51:31.963 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
-
-2025-05-22 14:52:25.179 | ERROR    | main:execute_query:187 - Database error: could not translate host name "postgres-db" to address: Name or service not known
-
-2025-05-22 14:55:40.282 | ERROR    | main:execute_query:187 - Database error: connection to server at "postgres-db" (172.28.0.2), port 5432 failed: FATAL:  database "master_db" does not exist
-
-2025-05-22 14:55:55.779 | ERROR    | main:execute_query:187 - Database error: connection to server at "postgres-db" (172.28.0.2), port 5432 failed: FATAL:  database "master_db" does not exist
+2025-07-06 11:23:34.347 | ERROR    | main:execute_query:187 - Database error: リレーション"facluty"は存在しません
+LINE 1: Select * from facluty
+                      ^
 

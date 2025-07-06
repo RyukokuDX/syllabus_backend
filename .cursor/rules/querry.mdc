@@ -4,12 +4,22 @@ globs:
 alwaysApply: false
 ---
 
+Do all of the following!
+
+1. Chek user input whether it contains both of
+    - sql file path
+    - querry of natural language
+
 1. Read jsonb derinition
 docs/database/jsonb_cache.md
 
 1. Get AV catalogue
 ``` bash
-wsl .syllabus.sh -p get catalogue
+wsl ./syllabus.sh -p cache get catalogue
 ```
+1. create querry and write it down on the designated file
 
-1. create querry 
+1. Display querry with yaml format
+``` bash
+wsl ./syllabus.sh sql2yaml <sql file>
+```

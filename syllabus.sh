@@ -237,6 +237,8 @@ show_help() {
     echo "  -p, --postgresql PostgreSQLサービスでコマンドを実行"
     echo "  -g, --git       Gitサービスでコマンドを実行"
     echo "  -m, --mcp       mcpサービスでコマンドを実行"
+    echo "  -f, --fastapi   FastAPI (docker) サービスでコマンドを実行"
+    echo "  -d, --docker    Dockerネットワーク管理コマンドを実行"
     echo
     echo "対応OS:"
     echo "  - Linux (Ubuntu, CentOS, etc.)"
@@ -278,6 +280,15 @@ show_help() {
     echo "  start -f <json>  指定したmcp設定jsonの内容でmcpサーバー（postgres）をバックグラウンド起動"
     echo "  stop -f <json>   指定したmcp設定jsonの内容でmcpサーバー（postgres）を停止"
     echo "  restart -f <json> 停止→起動を連続実行"
+    echo
+    echo "【-f, --fastapi サービスコマンド】"
+    echo "  start          FastAPI (docker) サービスをポート5000で起動"
+    echo "  restart        FastAPI (docker) サービスを再起動"
+    echo "  stop           FastAPI (docker) サービスを停止"
+    echo "  logs           FastAPI (docker) サービスのログを表示"
+    echo
+    echo "【-d, --docker ネットワーク管理コマンド】"
+    echo "  network up     syllabus-network を作成（存在しない場合のみ）"
 }
 
 # コマンドライン引数の解析
@@ -303,6 +314,14 @@ while [[ $# -gt 0 ]]; do
 			SERVICE="mcp"
 			shift
 			;;
+		-f|--fastapi)
+			SERVICE="fastapi"
+			shift
+			;;
+		-d|--docker)
+			SERVICE="docker"
+			shift
+			;;
 		*)
 			if [ -z "$COMMAND" ]; then
 				COMMAND="$1"
@@ -313,6 +332,79 @@ while [[ $# -gt 0 ]]; do
 			;;
 	esac
 done
+
+# Dockerネットワーク管理コマンド
+if [ "$SERVICE" = "docker" ]; then
+	case $COMMAND in
+		network)
+			if [ "${ARGS[0]}" = "up" ]; then
+				echo "syllabus-network の存在を確認します..."
+				if ! docker network ls --format '{{.Name}}' | grep -q '^syllabus-network$'; then
+					echo "syllabus-network が存在しないため作成します..."
+					docker network create syllabus-network
+				else
+					echo "syllabus-network は既に存在します。"
+				fi
+			else
+				echo "エラー: 未対応のdocker networkコマンドです: ${ARGS[*]}"
+				show_help
+				exit 1
+			fi
+			;;
+		*)
+			echo "エラー: dockerサービスで許可されていないコマンドです: $COMMAND"
+			show_help
+			exit 1
+			;;
+	esac
+	exit 0
+fi
+
+# FastAPI docker管理コマンド
+if [ "$SERVICE" = "fastapi" ]; then
+	case $COMMAND in
+		start)
+			echo "FastAPI (docker) をポート5000で起動します..."
+			# ネットワークがなければ作成
+			if ! docker network ls --format '{{.Name}}' | grep -q '^syllabus-network$'; then
+				echo "syllabus-network が存在しないため作成します..."
+				docker network create syllabus-network
+			fi
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" up -d
+			echo "FastAPIコンテナが起動しました (http://localhost:5000)"
+			;;
+		restart)
+			echo "FastAPI (docker) を再起動します..."
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" down
+			# ネットワークがなければ作成
+			if ! docker network ls --format '{{.Name}}' | grep -q '^syllabus-network$'; then
+				echo "syllabus-network が存在しないため作成します..."
+				docker network create syllabus-network
+			fi
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" up -d
+			echo "FastAPIコンテナを再起動しました (http://localhost:5000)"
+			;;
+		stop)
+			echo "FastAPI (docker) を停止します..."
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" down
+			echo "FastAPIコンテナを停止しました"
+			;;
+		logs)
+			echo "FastAPI (docker) のログを表示します..."
+			docker logs -f syllabus-api
+			;;
+		*)
+			echo "エラー: fastapiサービスで許可されていないコマンドです: $COMMAND"
+			show_help
+			exit 1
+			;;
+	esac
+	exit 0
+fi
 
 # mcpサーバー管理コマンド
 if [ "$SERVICE" = "mcp" ]; then
@@ -374,6 +466,22 @@ fi
 if [ -z "$COMMAND" ]; then
 	show_help
 	exit 1
+fi
+
+# SQLのWHERE句YAML可視化コマンド
+if [ "$COMMAND" = "sql2yaml" ]; then
+	if [ ${#ARGS[@]} -eq 0 ]; then
+		echo "エラー: SQLファイルが指定されていません"
+		echo "使用方法: $0 sql2yaml <sqlファイル>"
+		exit 1
+	fi
+	sql_file="${ARGS[0]}"
+	if [ ! -f "$sql_file" ]; then
+		echo "エラー: SQLファイルが見つかりません: $sql_file"
+		exit 1
+	fi
+	PYTHONPATH="$SCRIPT_DIR/src" "$PYTHON" "$SCRIPT_DIR/src/db/sql_where_yaml.py" "$sql_file"
+	exit 0
 fi
 
 # サービスごとに許可コマンドを分岐
