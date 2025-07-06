@@ -1,7 +1,7 @@
 ---
 title: FastAPI環境構築ガイド
-file_version: v2.7.0
-project_version: v2.7.0
+file_version: v2.7.1
+project_version: v2.7.1
 last_updated: 2025-07-06
 ---
 
@@ -14,11 +14,12 @@ last_updated: 2025-07-06
 2. [ディレクトリ構成](#ディレクトリ構成)
 3. [環境変数](#環境変数)
 4. [ボリュームマウント](#ボリュームマウント)
-5. [API開発のワークフロー](#api開発のワークフロー)
-6. [APIエンドポイント](#apiエンドポイント)
-7. [セキュリティ対策](#セキュリティ対策)
-8. [APIドキュメント](#apiドキュメント)
-9. [ログ](#ログ)
+5. [DBテーブル構成](#dbテーブル構成)
+6. [API開発のワークフロー](#api開発のワークフロー)
+7. [APIエンドポイント](#apiエンドポイント)
+8. [セキュリティ対策](#セキュリティ対策)
+9. [APIドキュメント](#apiドキュメント)
+10. [ログ](#ログ)
 
 ## 概要
 
@@ -45,7 +46,7 @@ src/                   # アプリケーションソース
 
 | 変数名 | 説明 | デフォルト値 |
 |--------|------|--------------|
-| DATABASE_URL | PostgreSQLへの接続URL | postgresql://app:password@db:5433/syllabus |
+| DATABASE_URL | PostgreSQLへの接続URL | postgresql://postgres:postgres@postgres-db:5432/syllabus_db |
 | PYTHONPATH | Pythonパッケージの検索パス | /app |
 
 ## ボリュームマウント
@@ -54,6 +55,12 @@ src/                   # アプリケーションソース
 |------------|--------------|------|
 | ../../src | /app/src | ソースコード |
 | ./pyproject.toml | /app/pyproject.toml | 依存関係定義 |
+
+## DBテーブル構成
+
+- テーブル・カラム名は[docs/database/structure.md](../database/structure.md)に厳密に準拠
+- 例: class, subclass, faculty, subject_name, instructor, syllabus_master, book, book_uncategorized, syllabus, subject_grade, lecture_time, lecture_session, lecture_session_irregular, syllabus_instructor, lecture_session_instructor, syllabus_book, grading_criterion, subject_attribute, subject, subject_attribute_value, syllabus_faculty, syllabus_study_system など
+- 各テーブルの詳細はstructure.mdを参照
 
 ## API開発のワークフロー
 
@@ -82,33 +89,35 @@ src/                   # アプリケーションソース
 
 #### エンドポイント
 ```
-POST /api/query
+POST /api/v1/query
 ```
 
 #### リクエストボディ
 ```json
 {
-  "query": "SELECT * FROM syllabus WHERE year = ? AND semester = ?",
-  "params": ["2025", "前期"]
+  "query": "SELECT * FROM subject WHERE faculty_id = ? AND curriculum_year = ?",
+  "params": [1, 2025]
 }
 ```
 
 #### レスポンス
 ```json
 {
-  "status": "success",
-  "data": [
+  "results": [
     {
-      "id": 1,
-      "year": "2025",
-      "title": "プログラミング基礎",
-      "semester": "前期"
+      "subject_id": 1,
+      "subject_name_id": 1,
+      "faculty_id": 1,
+      "curriculum_year": 2025,
+      "class_id": 1,
+      "subclass_id": 2,
+      "requirement_type": "必修",
+      "created_at": "2025-07-06T12:00:00Z",
+      "updated_at": "2025-07-06T12:00:00Z"
     }
   ],
-  "metadata": {
-    "row_count": 1,
-    "execution_time": "0.123s"
-  }
+  "execution_time": 0.123,
+  "row_count": 1
 }
 ```
 
@@ -119,6 +128,7 @@ POST /api/query
 - セミコロン（;）による複数命令は禁止
 - 1回のクエリで返却される最大行数：1000行
 - クエリ実行の最大時間：30秒
+- テーブル・カラム名はstructure.mdの定義に厳密に従うこと
 
 ## セキュリティ対策
 
@@ -132,87 +142,19 @@ POST /api/query
 - 実行計画の検証
 
 ### 3. カラム指定の制限
-```json
-{
-  "allowed_columns": {
-    "syllabus": ["id", "year", "title", "teacher", "semester", "credit"],
-    "departments": ["id", "name", "faculty"],
-    "teachers": ["id", "name", "title"]
-  }
-}
-```
+- structure.mdに記載されたカラムのみ許可
 
 ### 4. LIKE句の保護
-```json
-{
-  "suspicious_patterns": [
-    "%--",
-    "%';",
-    "%;",
-    "%/*",
-    "%*/",
-    "%@@"
-  ]
-}
-```
+- 危険なパターン（%--, %';, %;, %/*, %*/, %@@ など）を検出し拒否
 
 ### 5. レスポンスフィールドの制限
-```json
-{
-  "default_views": {
-    "syllabus_public": ["title", "teacher", "semester", "credit"],
-    "syllabus_admin": ["*"],
-    "teachers_public": ["name", "title"]
-  }
-}
-```
+- structure.mdに記載されたカラムのみ返却
 
 ### 6. 監査ログ
-```json
-{
-  "timestamp": "2024-03-20T10:30:00Z",
-  "level": "INFO",
-  "event": "QUERY_EXECUTION",
-  "details": {
-    "query": "SELECT * FROM syllabus WHERE year = ?",
-    "params": ["2025"],
-    "execution_time": "0.123s",
-    "query_analysis": {
-      "used_wildcards": false,
-      "used_functions": ["STRFTIME"],
-      "selected_columns": ["*"],
-      "table_access": ["syllabus"]
-    },
-    "client_info": {
-      "ip": "192.168.1.100",
-      "user_id": "user123",
-      "access_level": "public"
-    }
-  }
-}
-```
+- すべてのクエリ実行を監査ログに記録
 
 ### 7. 異常検知ルール
-```json
-{
-  "function_limits": {
-    "interval": "1hour",
-    "thresholds": {
-      "STRFTIME": 100,
-      "UPPER": 50,
-      "LOWER": 50,
-      "COUNT": 200
-    }
-  }
-}
-```
-
-### 8. ブロックポリシー
-- 段階的な制限
-  1. 警告ログの出力
-  2. レート制限の強化
-  3. 一時的なIPブロック
-  4. アカウントの停止
+- クエリ頻度や関数利用回数に応じてレート制限・警告・ブロックを段階的に実施
 
 ## APIドキュメント
 
@@ -221,13 +163,13 @@ POST /api/query
 
 ## ログ
 
-- ログは標準出力に出力され、`docker-compose logs api`で確認可能
+- ログは標準出力およびlogs/api.logに出力
 - ログレベルは環境変数`LOG_LEVEL`で制御（デフォルト: info）
 
 ## 更新履歴
 
 | 日付 | バージョン | 更新者 | 内容 |
 |------|------------|--------|------|
-| 2024-03-20 | 1.0.1 | 藤原 | 初版作成 |
+| 2025-07-06 | 2.7.1 | 藤原 | structure.mdに準拠したテーブル・カラム・API例・制約に更新 |
 
 [🔝 ページトップへ](#fastapi-docker環境) 

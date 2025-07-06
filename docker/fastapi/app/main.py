@@ -1,3 +1,7 @@
+# File Version: v2.7.1
+# Project Version: v2.7.1
+# Last Updated: 2025-07-06
+
 from fastapi import FastAPI, Request, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -20,8 +24,8 @@ API_PREFIX = os.getenv("API_PREFIX", "/api/v1")
 CORS_ORIGINS = json.loads(os.getenv("CORS_ORIGINS", '["http://localhost:3000"]'))
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
-# PostgreSQL接続設定
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres-db:5432/master_db")
+# PostgreSQL接続設定（structure.mdの定義に準拠）
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres-db:5432/syllabus_db")
 
 # FastAPIアプリケーションの初期化
 app = FastAPI(
@@ -54,12 +58,30 @@ logger.add(
     level="DEBUG" if DEBUG_MODE else "INFO"
 )
 
-# 許可されたカラムの定義
+# structure.mdに準拠した許可カラム定義
 ALLOWED_COLUMNS = {
-    "subject": ["subject_id", "name", "class_name", "subclass_name", "class_note"],
-    "syllabus": ["id", "year", "title", "teacher", "semester", "credit"],
-    "departments": ["id", "name", "faculty"],
-    "teachers": ["id", "name", "title"]
+    "class": ["class_id", "class_name", "created_at"],
+    "subclass": ["subclass_id", "subclass_name", "created_at"],
+    "faculty": ["faculty_id", "faculty_name", "created_at"],
+    "subject_name": ["subject_name_id", "name", "created_at"],
+    "instructor": ["instructor_id", "name", "name_kana", "created_at"],
+    "syllabus_master": ["syllabus_id", "syllabus_code", "syllabus_year", "created_at", "updated_at"],
+    "book": ["book_id", "title", "author", "publisher", "price", "isbn", "created_at"],
+    "book_uncategorized": ["id", "syllabus_id", "title", "author", "publisher", "price", "role", "isbn", "categorization_status", "created_at", "updated_at"],
+    "syllabus": ["syllabus_id", "subject_name_id", "subtitle", "term", "campus", "credits", "goals", "summary", "attainment", "methods", "outside_study", "textbook_comment", "reference_comment", "grading_comment", "advice", "created_at", "updated_at"],
+    "subject_grade": ["id", "syllabus_id", "grade", "created_at", "updated_at"],
+    "lecture_time": ["id", "syllabus_id", "day_of_week", "period", "created_at", "updated_at"],
+    "lecture_session": ["lecture_session_id", "syllabus_id", "session_number", "contents", "other_info", "lecture_format", "created_at", "updated_at"],
+    "lecture_session_irregular": ["lecture_session_irregular_id", "syllabus_id", "session_pattern", "contents", "other_info", "instructor", "error_message", "lecture_format", "created_at", "updated_at"],
+    "syllabus_instructor": ["id", "syllabus_id", "instructor_id", "role", "created_at", "updated_at"],
+    "lecture_session_instructor": ["id", "lecture_session_id", "instructor_id", "role", "created_at", "updated_at"],
+    "syllabus_book": ["id", "syllabus_id", "book_id", "role", "note", "created_at"],
+    "grading_criterion": ["id", "syllabus_id", "criteria_type", "criteria_description", "ratio", "note", "created_at"],
+    "subject_attribute": ["attribute_id", "attribute_name", "description", "created_at"],
+    "subject": ["subject_id", "subject_name_id", "faculty_id", "curriculum_year", "class_id", "subclass_id", "requirement_type", "created_at", "updated_at"],
+    "subject_attribute_value": ["id", "subject_id", "attribute_id", "value", "created_at", "updated_at"],
+    "syllabus_faculty": ["id", "syllabus_id", "faculty_id", "created_at", "updated_at"],
+    "syllabus_study_system": ["id", "source_syllabus_id", "target", "created_at", "updated_at"]
 }
 
 # 禁止されたSQLパターン

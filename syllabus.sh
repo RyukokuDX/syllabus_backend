@@ -1,9 +1,9 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # - 更新の登録は, /docs/version_control.md に準拠して実行
-# File Version: 2.0.1
-# Project Version: 2.0.1
-# Last Update: 2025-07-01
+# File Version: 2.7.2
+# Project Version: 2.7.2
+# Last Update: 2025-07-06
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" && pwd )"
