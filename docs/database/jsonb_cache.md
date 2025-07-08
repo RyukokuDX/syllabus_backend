@@ -1,0 +1,300 @@
+---
+title: JSONBキャッシュリスト仕様書
+file_version: v3.0.0
+project_version: v3.0.0
+last_updated: 2025-07-08
+---
+
+# JSONBキャッシュリスト仕様書
+
+- File Version: v3.0.0
+- Project Version: v3.0.0
+- Last Updated: 2025-07-08
+
+[readmeへ](../../README.md) | [データベース構造定義へ](structure.md) | [設計ポリシーへ](policy.md) | [ER図へ](er.md)
+
+## 目次
+
+1. [概要](#概要)
+2. [フィールド命名規則](#フィールド命名規則)
+3. [キャッシュ対象テーブル](#キャッシュ対象テーブル)
+4. [キャッシュ生成方針](#キャッシュ生成方針)
+5. [キャッシュ更新戦略](#キャッシュ更新戦略)
+6. [パフォーマンス考慮事項](#パフォーマンス考慮事項)
+7. [実装ガイドライン](#実装ガイドライン)
+
+## 概要
+
+### 目的
+- 複雑なJOINクエリのパフォーマンス向上
+- アプリケーション層でのデータアクセス効率化
+- リアルタイム性を重視しない集計・分析処理の高速化
+
+## フィールド命名規則
+
+### 基本方針
+JSONBキャッシュのフィールド命名は、LLMがデータ構造を正確に理解できるよう、語尾による構造指標を一貫して使用する。
+
+### 語尾による構造指標
+
+| 構造 | 語尾 | 例 | 説明 |
+|------|------|-----|------|
+| 配列 | `一覧` | `教員一覧`, `教科書一覧` | 要素数0以上の繰り返し構造 |
+| 単一値 | 名詞のまま、または`名`、`数`、`年度` | `科目名`, `単位数` | 固有の1つの値 |
+
+### 命名規則の効果
+- **クエリ精度向上**: `教員一覧[].氏名` のように正しいパスを推測
+- **構造の明確化**: 配列か単一値かの曖昧さを排除
+- **型推論の容易化**: JSON Schema生成にも役立つ
+- **プロンプトのテンプレ化**: 「`〜一覧[].〜名` にアクセスせよ」など明示可能
+
+## キャッシュ対象テーブル
+
+### 主要テーブル
+- **syllabus_master**: シラバスマスター情報
+- **syllabus**: シラバス基本情報
+- **subject_name**: 科目名マスター
+- **syllabus_instructor**: シラバス担当教員
+- **instructor**: 教員マスター
+- **lecture_time**: 講義時間
+- **syllabus_book**: シラバス書籍関連
+- **book**: 書籍マスター
+- **book_uncategorized**: 未分類書籍
+- **syllabus_faculty**: シラバス学部課程関連
+- **faculty**: 学部課程マスター
+- **grading_criterion**: 成績評価基準
+- **subject**: 履修要綱
+- **class**: 科目区分マスター
+- **subclass**: 科目小区分マスター
+- **subject_attribute_value**: 科目属性値
+- **subject_attribute**: 科目属性マスター
+
+## キャッシュ生成方針
+
+### 基本方針
+1. **LLMによるアクセス性重視** idやコードを利用しない, 自然言語による解析
+1. **階層構造の活用**: 親子関係を明確に表現
+1. **配列の活用**: 1対多の関係を配列として表現（1件でも必ず配列）
+
+### 更新方式
+1. **全量更新**: キャッシュ全体を再生成
+
+## キャッシュ更新戦略
+
+### 更新タイミング
+- データベースの構造変更時
+- 大量データの更新時
+- パフォーマンス改善が必要な時
+
+### 更新方法
+- 既存キャッシュの削除
+- 新規キャッシュの生成
+- バージョン管理による段階的移行
+
+## パフォーマンス考慮事項
+
+### キャッシュサイズ
+- JSONBデータの圧縮
+- 不要なフィールドの除外
+- インデックスの最適化
+
+### クエリ最適化
+- JSONB演算子の活用
+- インデックス付きフィールドの活用
+- 部分的なデータ取得
+
+## 実装ガイドライン
+
+### 配列フィールドの型保証とエラー防止（LLM向け）
+- **配列フィールドは必ず配列型で格納すること**
+  - 例：`json_agg(...)`で生成し、`COALESCE(..., '[]'::json)`で空配列を保証する
+- **nullやスカラ値が混入すると、jsonb_array_elements等で「スカラから要素を取り出すことはできません」エラーが発生する**
+- **キャッシュ生成時、全ての配列フィールドにCOALESCEを適用し、空配列を保証すること**
+- **型チェック用のデバッグクエリを活用し、配列でない値が混入していないか定期的に検証すること**
+  - 例：
+    ```sql
+    SELECT COUNT(*) FROM syllabus_cache WHERE cache_name = 'subject_syllabus_cache' AND jsonb_typeof(cache_data->'開講情報一覧') IS DISTINCT FROM 'array';
+    ```
+- **LLMによる自動クエリ生成時も、配列型であることを前提に展開処理を記述すること**
+
+### 開発環境での利用
+- 開発時は小規模データでのテスト
+- 本番環境でのパフォーマンス検証
+- 段階的なキャッシュ導入
+
+### メンテナンス
+- 定期的なキャッシュ更新
+- データ整合性の確認
+- パフォーマンス監視
+
+## JSONBフィールドフォーマット
+
+### サンプル構造
+```json
+{
+  "科目名": "微分積分学I",
+  "開講情報一覧": [
+    {
+      "年度": 2025,
+      "シラバス一覧": [
+        {
+          "担当教員一覧": [
+            { "氏名": "田中 太郎", "役割": "主担当" },
+            { "氏名": "佐藤 花子", "役割": "副担当" }
+          ],
+          "対象学部課程一覧": ["理工学部", "先端理工学部"],
+          "学期": "1Q",
+          "講義時間一覧": [
+            { "曜日": "月曜日", "時限": 1 },
+            { "曜日": "月曜日", "時限": 2 }
+          ],
+          "単位数": 2,
+          "教科書一覧": [
+            { "書名": "微分積分学入門", "著者": "山田 数学", "ISBN": "978-4-1234-5678-9", "価格": 2500 }
+          ],
+          "教科書コメント": "買ってください",
+          "参考書一覧": [
+            { "書名": "大学数学の基礎", "著者": "鈴木 計算", "ISBN": "978-4-9876-5432-1", "価格": 1800 }
+          ],
+          "参考書コメント": "借りて下さい",
+          "成績評価基準一覧": [
+            { "項目": "定期試験", "割合": 70, "評価方法": "筆記試験", "備考": "中間試験30%、期末試験40%" },
+            { "項目": "平常点", "割合": 30, "評価方法": "出席・課題提出", "備考": "毎回の課題提出を評価" }
+          ],
+          "成績評価コメント": "慈悲はない"
+        }
+      ]
+    }
+  ],
+  "履修情報一覧": [
+    {
+      "年度": 2025,
+      "履修要綱一覧": [
+        {
+          "学部課程": "理工学部",
+          "科目区分": "専門基礎科目",
+          "科目小区分": "数学",
+          "必須度": "必修",
+          "学修プログラム一覧": [1,2,3],
+          "専門応用履修要件": "数学系"
+        },
+        {
+          "学部課程": "先端理工学部",
+          "科目区分": "専門基礎科目",
+          "科目小区分": "数学",
+          "必須度": "選択"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### フィールド説明
+
+#### 基本情報
+- **科目名**: 科目の正式名称（subject_name.name）
+
+#### 開講情報一覧
+- **年度**: シラバスの年度（syllabus_master.syllabus_year）
+- **シラバス一覧**: 年度内のシラバス情報の配列（1件でも必ず配列）
+
+##### シラバス詳細
+- **担当教員一覧**: 教員情報の配列
+  - **氏名**: 教員の氏名（instructor.name）
+  - **役割**: 担当教員の役割（syllabus_instructor.role）
+- **対象学部課程一覧**: 開講対象の学部課程の配列（syllabus_faculty.faculty_name）
+- **学期**: 開講学期（syllabus.term）
+- **講義時間一覧**: 講義時間情報の配列
+  - **曜日**: 開講曜日（lecture_time.day_of_week）
+  - **時限**: 開講時限（lecture_time.period）
+- **単位数**: 単位数（syllabus.credits）
+- **教科書一覧**: 教科書情報の配列（syllabus_book.role = "教科書" or book_uncategorized.role = "教科書"）
+- **参考書一覧**: 参考書情報の配列（syllabus_book.role = "参考書" or book_uncategorized.role = "参考書"）
+- **成績評価基準一覧**: 成績評価基準の配列
+  - **項目**: 評価項目（grading_criterion.criteria_type）
+  - **割合**: 評価比率（grading_criterion.ratio）
+  - **評価方法**: 評価方法の詳細（grading_criterion.criteria_description）
+  - **備考**: 備考情報（grading_criterion.note）
+- **教科書コメント**: 教科書に関する補足説明（syllabus.textbook_comment）
+- **参考書コメント**: 参考書に関する補足説明（syllabus.reference_comment）
+- **成績評価コメント**: 成績評価に関する補足説明（syllabus.grading_comment）
+
+#### 履修情報一覧
+- **年度**: 履修要綱の年度（subject.curriculum_year）
+- **履修要綱一覧**: 履修要綱情報の配列
+
+##### 履修要綱詳細
+- **学部課程**: 開講学部・課程（faculty.faculty_name）
+- **科目区分**: 科目区分（class.class_name）
+- **科目小区分**: 科目小区分（subclass.subclass_name）
+- **必須度**: 必修/選択区分（subject.requirement_type）
+- **各種属性**: subject_attribute/subject_attribute_valueの全属性が属性名:値または属性名:配列で格納される（例：学修プログラム一覧、専門応用履修要件など。属性が複数ある場合はすべて出力される）
+  - **学修プログラム一覧**: 学修プログラム属性が複数登録されている場合は配列で格納
+  - **その他属性**: 属性名:値 で格納
+
+### 注意事項
+- 配列フィールドは常に配列形式（空配列の場合も含む）
+- 単一値フィールドは文字列または数値
+- 年度情報は「開講情報一覧」と「履修情報一覧」で別々に管理
+- 教員情報は「担当教員一覧」配列内のオブジェクトとして格納
+- 講義時間情報は「講義時間一覧」配列内のオブジェクトとして格納（曜日・時限の組み合わせ）
+- 書籍情報は「教科書一覧」「参考書一覧」配列内のオブジェクトとして格納
+- 学部課程情報は「開講情報一覧」と「履修情報一覧」で異なるレベルで管理
+  - 開講情報一覧: シラバスレベルで「対象学部課程一覧」として配列形式
+  - 履修情報一覧: 履修要綱レベルで「学部課程」として単一値
+- subject_attribute/subject_attribute_valueの属性はすべて履修要綱詳細に出力される
+- 属性が複数ある場合はすべて出力される
+- 学修プログラムは「学修プログラム一覧」として配列で格納される
+- その他属性は属性名:値で格納される
+
+## サンプルクエリ
+
+### 知能の専門応用科目で使用する教科書の冊数と総額
+
+```sql
+SELECT 
+	COUNT(DISTINCT 書名) AS textbook_count,
+	COALESCE(SUM(価格::integer), 0) AS total_textbook_price
+FROM (
+	SELECT
+		教科書->>'書名' AS 書名,
+		教科書->>'著者' AS 著者,
+		教科書->>'出版社' AS 出版社,
+		教科書->>'価格' AS 価格
+	FROM syllabus_cache
+	CROSS JOIN LATERAL (
+		SELECT curriculum_info
+		FROM jsonb_array_elements(cache_data->'履修情報一覧') AS curriculum_info
+		WHERE jsonb_typeof(curriculum_info) = 'object'
+	) AS cur
+	CROSS JOIN LATERAL (
+		SELECT requirement_info
+		FROM jsonb_array_elements(cur.curriculum_info->'履修要綱一覧') AS requirement_info
+		WHERE jsonb_typeof(requirement_info) = 'object'
+			AND (requirement_info->>'科目小区分' = '専門応用科目')
+			AND (requirement_info->>'学部課程' LIKE '%知能%')
+	) AS req
+	CROSS JOIN LATERAL (
+		SELECT open_info
+		FROM jsonb_array_elements(cache_data->'開講情報一覧') AS open_info
+		WHERE jsonb_typeof(open_info) = 'object'
+	) AS open
+	CROSS JOIN LATERAL (
+		SELECT syl_info
+		FROM jsonb_array_elements(open.open_info->'シラバス一覧') AS syl_info
+		WHERE jsonb_typeof(syl_info) = 'object'
+	) AS syl
+	CROSS JOIN LATERAL (
+		SELECT 教科書
+		FROM jsonb_array_elements(syl.syl_info->'教科書一覧') AS 教科書
+		WHERE jsonb_typeof(教科書) = 'object'
+	) AS 教科書
+	WHERE cache_name = 'subject_syllabus_cache'
+) t
+WHERE 価格 ~ '^[0-9]+$';
+```
+
+このようにjsonb構造を活用することで、複雑な条件でも柔軟に集計・抽出が可能です。
+
+[🔝 ページトップへ](#jsonbキャッシュリスト仕様書) 

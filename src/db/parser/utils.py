@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File Version: v2.0.0
-# Project Version: v2.0.0
-# Last Updated: 2025-06-30
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
 # curosrはversionをいじるな
 
 from datetime import datetime
@@ -107,8 +107,9 @@ def normalize_text(name: str, handle_null: bool = False) -> str:
 	for full, half in alpha_map.items():
 		name = name.replace(full, half)
 	
-	# 中点の統一（全角→半角）
-	name = name.replace('・', '·')
+	# 中点の統一（DBの値に合わせて「・」→「·」を最優先で変換）
+	# DBのfaculty.nameは「·」(U+00B7)で統一されているため、必ず「・」(U+30FB)やその他の中点を「·」に変換する
+	name = name.replace('・', '·')  # 全角カタカナ中点
 	name = name.replace('･', '·')  # 半角カタカナ中点
 	name = name.replace('•', '·')  # 箇条書き中点
 	name = name.replace('▪', '·')  # 黒四角中点

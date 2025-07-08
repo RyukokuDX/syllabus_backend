@@ -1,7 +1,30 @@
 #!/bin/bash
-# File Version: v2.0.0
-# Project Version: v2.0.0
-# Last Updated: 2025-06-30
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
+
+# スクリプトの絶対パスを取得
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# OS別コマンド設定の読み込み
+source "$SCRIPT_DIR/os_utils.sh"
+OS_TYPE=$(init_os_commands)
+
+# デバッグ用: SED_CMDの値を確認
+echo "DEBUG: SED_CMD = '$SED_CMD'"
+echo "DEBUG: OS_TYPE = '$OS_TYPE'"
+
+# SED_CMDが空の場合はフォールバック
+if [ -z "$SED_CMD" ]; then
+    echo "WARNING: SED_CMD is empty, using fallback"
+    OS_TYPE=$(uname -s)
+    if [[ "$OS_TYPE" == "Darwin"* ]]; then
+        SED_CMD="sed -i ''"
+    else
+        SED_CMD="sed -i"
+    fi
+    echo "DEBUG: Fallback SED_CMD = '$SED_CMD'"
+fi
 
 # バージョン更新の種類を確認
 if [ "$1" != "major" ] && [ "$1" != "minor" ] && [ "$1" != "patch" ]; then
@@ -86,12 +109,12 @@ for file in "${VERSION_FILES[@]}"; do
         else
           NEXT_FILE_VERSION=$NEXT_VERSION
         fi
-        sed -i "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/project_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/project_version: v$NEXT_VERSION/" "$file"
-        sed -i "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $TODAY/" "$file"
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        $SED_CMD "s/file_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/file_version: v$NEXT_FILE_VERSION/g" "$file"
+        $SED_CMD "s/project_version: v[0-9]\+\.[0-9]\+\.[0-9]\+/project_version: v$NEXT_VERSION/g" "$file"
+        $SED_CMD "s/last_updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/last_updated: $TODAY/g" "$file"
+        $SED_CMD "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/g" "$file"
+        $SED_CMD "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/g" "$file"
+        $SED_CMD "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/g" "$file"
         ;;
       *.py|*.sh)
         # Python/Shellファイルの更新
@@ -102,9 +125,9 @@ for file in "${VERSION_FILES[@]}"; do
         else
           NEXT_FILE_VERSION=$NEXT_VERSION
         fi
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        $SED_CMD "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/g" "$file"
+        $SED_CMD "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/g" "$file"
+        $SED_CMD "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/g" "$file"
         ;;
       *.json)
         # JSONファイルの更新
@@ -115,9 +138,9 @@ for file in "${VERSION_FILES[@]}"; do
         else
           NEXT_FILE_VERSION=$NEXT_VERSION
         fi
-        sed -i "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/" "$file"
-        sed -i "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/" "$file"
-        sed -i "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/" "$file"
+        $SED_CMD "s/File Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/File Version: v$NEXT_FILE_VERSION/g" "$file"
+        $SED_CMD "s/Project Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Project Version: v$NEXT_VERSION/g" "$file"
+        $SED_CMD "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $TODAY/g" "$file"
         ;;
       project_version.txt)
         # project_version.txtの更新
