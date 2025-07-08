@@ -311,19 +311,6 @@ CREATE INDEX IF NOT EXISTS idx_subject_class ON subject(class_id);
 CREATE INDEX IF NOT EXISTS idx_subject_faculty ON subject(faculty_id);
 CREATE INDEX IF NOT EXISTS idx_subject_curriculum_year ON subject(curriculum_year);
 
--- subject_syllabus（科目シラバス関連）
-CREATE TABLE IF NOT EXISTS subject_syllabus (
-    id SERIAL PRIMARY KEY,
-    subject_id INTEGER NOT NULL REFERENCES subject(subject_id) ON DELETE CASCADE,
-    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE RESTRICT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    UNIQUE(subject_id, syllabus_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_subject ON subject_syllabus(subject_id);
-CREATE INDEX IF NOT EXISTS idx_subject_syllabus_syllabus ON subject_syllabus(syllabus_id);
-
 -- subject_attribute_value（科目属性値）
 CREATE TABLE IF NOT EXISTS subject_attribute_value (
     id SERIAL PRIMARY KEY,
@@ -332,11 +319,24 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
     value TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
+    UNIQUE(subject_id, attribute_id, value)
 );
 
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_subject ON subject_attribute_value(subject_id);
 CREATE INDEX IF NOT EXISTS idx_subject_attribute_value_attribute ON subject_attribute_value(attribute_id);
+
+-- syllabus_faculty（シラバス学部関連）
+CREATE TABLE IF NOT EXISTS syllabus_faculty (
+    id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, faculty_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_syllabus ON syllabus_faculty(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_faculty ON syllabus_faculty(faculty_id);
 
 -- syllabus_study_system（シラバス系統的履修）
 CREATE TABLE IF NOT EXISTS syllabus_study_system (
@@ -359,16 +359,23 @@ CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_sy
 \i /docker-entrypoint-initdb.d/migrations/V20250620225007__insert_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250620225948__insert_syllabus_masters.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250621183238__insert_subject_names.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_book_uncategorizeds.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250622211632__insert_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622213107__insert_subject_grades.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250622213946__insert_lecture_times.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250623185437__insert_syllabus_instructors.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_session_irregulars.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112612__insert_lecture_sessions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624112916__insert_lecture_session_instructors.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250624120924__insert_syllabus_books.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624124852__insert_syllabuss.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250624171346__insert_grading_criterions.sql
 \i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_facultys.sql
-\i /docker-entrypoint-initdb.d/migrations/V20250625155318__insert_subject_attributes.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250627180556__insert_subjects.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250630111050__insert_syllabus_study_systems.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250701153432__insert_book_uncategorizeds.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250701153432__insert_books.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250701153651__insert_syllabus_books.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702122920__insert_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702123100__insert_subjects.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702123149__insert_subject_attributes.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250702130556__insert_syllabus_facultys.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250704175801_insert_comments_for_mcp.sql
+\i /docker-entrypoint-initdb.d/migrations/V20250705080622__insert_subject_attribute_values.sql

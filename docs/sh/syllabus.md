@@ -6,6 +6,10 @@
 
 # syllabus.sh
 
+- File Version: v3.0.0
+- Project Version: v3.0.0
+- Last Updated: 2025-07-08
+
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
 
 メインのシェルスクリプト。PostgreSQLとFastAPIサービスの管理を統一的に行うためのインターフェースを提供します。
@@ -16,8 +20,9 @@
 3. [コマンド](#コマンド)
 4. [使用例](#使用例)
 5. [注意事項](#注意事項)
-6. [関連スクリプト](#関連スクリプト)
-7. [更新履歴](#更新履歴)
+6. [OS互換性](#os互換性)
+7. [関連スクリプト](#関連スクリプト)
+8. [更新履歴](#更新履歴)
 
 ## 使用方法
 
@@ -27,61 +32,61 @@
 
 ### オプション
 
-- `-p, --postgres`: PostgreSQLサービスを操作
+- `-p, --postgresql`: PostgreSQLサービスを操作
+- `-g, --git`: Gitサービスを操作
+- `-m, --mcp`: mcpサービスを操作
 - `-h, --help`: ヘルプメッセージを表示
 
 ### コマンド
 
-#### 基本コマンド
+#### 【共通コマンド】
 
 - `help`: ヘルプメッセージを表示
-- `venv-init`: Python仮想環境の初期化
+- `version`: syllabus.shのバージョンを表示
+- `version <file>`: 指定されたファイルの更新履歴を表示
+- `venv init`: Python仮想環境の初期化
+- `csv normalize`: 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）
+- `parser`: 指定されたテーブルのパーサースクリプトを実行（引数必須）
+- `test-os`: OS互換性テストを実行
+
+#### 【-p, --postgresql サービスコマンド】
+
 - `start`: 指定されたサービスを開始
 - `stop`: 指定されたサービスを停止
+- `restart`: 指定されたサービスを再起動
 - `ps`: サービスの状態を表示
 - `logs`: サービスのログを表示
+- `shell`: PostgreSQLサービスのシェルを開く
+- `records`: 全テーブルのレコード数を表示
+- `records <table>`: 指定テーブルの全件表示
+- `parser`: 指定されたテーブルのパーサースクリプトを実行
+- `migration`: マイグレーション関連のコマンド
+- `cache generate`: 指定されたキャッシュを生成
+- `cache delete`: 指定されたキャッシュを削除
+- `cache refresh`: 指定されたキャッシュを削除して再生成
+- `cache get full`: 全キャッシュデータを取得・整形
+- `cache get catalogue`: EAVカタログキャッシュ（分類属性・学部・区分リスト等）をJSON整形で取得
+- `cache list`: 利用可能なキャッシュ一覧を表示
+- `cache status`: キャッシュの状態を表示
+- `sql <sqlfile>`: 指定したSQLファイルをPostgreSQLサーバーで実行（psqlオプション：--tuples-only, --no-align等に対応）
+- `sql2yaml <sqlfile>`: 指定したSQLファイルのWHERE句条件をYAMLツリー形式で可視化（src/db/sql_where_yaml.pyを実行）
 
-#### PostgreSQL関連
+#### 【-g, --git サービスコマンド】
 
-- `shell`: PostgreSQLサービスのシェルを開く（-pオプション必須）
-- `records`: すべてのテーブルのレコード数を表示、または指定テーブルの全件表示（-pオプション必須）
-  - 引数なし: 全テーブルのレコード数を表示
-  - `records {テーブル名}`: 指定テーブルの全レコードを表示
+- `update minor <squash|noff>`: minorバージョンアップをdevelopへマージ（squash/no-ff選択）
 
-#### パーサー関連
+#### 【-m, --mcp サービスコマンド】
 
-- `parser`: 指定されたテーブルのパーサースクリプトを実行（引数必須）
-
-#### CSV関連
-
-- `csv normalize`: 指定年度のCSVファイルを整形
-  - 引数: `{year}` - 処理対象の年度
-  - 処理内容:
-    - 元ファイルを`.org`拡張子でバックアップ（既存の場合はスキップ）
-    - 区切り文字をタブに統一
-    - 全フィールドの前後の空白を削除
-    - 空値、`null`、`NULL`、`None`を`NULL`に統一
-    - "科目名"フィールドを正規化
-      - 全角アルファベットを半角に変換（例：Ａ→A）
-      - 全角数字を半角に変換（例：１→1）
-      - 全角記号を半角に変換（例：（→(、）→)）
-      - 全角スペースを半角スペースに変換
-      - 連続するスペースを1つに
-      - 全角ハイフン類を半角ハイフンに統一
-      - 全角ローマ数字を半角に変換（例：Ⅰ→I）
-      - 全角中点を半角中点に変換（例：・→·）
-
-#### データ管理関連
-
-- `generate`: 指定されたテーブルのデータを生成（-pオプション必須、引数必須）
-- `check`: 指定されたテーブルのデータをチェック（-pオプション必須）
-- `deploy`: 指定されたテーブルのデータをデプロイ（-pオプション必須）
+- `comment generate`: mcp用コメントSQLを生成（src/db/mcp_comments.pyを実行）
+- `start -f <json>`: 指定したmcp設定jsonの内容でmcpサーバー（postgres）をバックグラウンド起動
+- `stop -f <json>`: 指定したmcp設定jsonの内容でmcpサーバー（postgres）を停止
+- `restart -f <json>`: 停止→起動を連続実行
 
 ### 使用例
 
 ```bash
 # Python仮想環境の初期化
-./syllabus.sh venv-init
+./syllabus.sh venv init
 
 # サービスの起動
 ./syllabus.sh -p start
@@ -90,7 +95,7 @@
 ./syllabus.sh -p stop
 
 # サービスの状態表示
-./syllabus.sh ps
+./syllabus.sh -p ps
 
 # サービスのログ表示
 ./syllabus.sh -p logs
@@ -112,35 +117,120 @@
 ./syllabus.sh csv normalize 2024
 
 # データ生成
-./syllabus.sh -p generate init
-./syllabus.sh -p generate migration
+./syllabus.sh -p migration generate init
+./syllabus.sh -p migration generate migration
 
 # データチェック
-./syllabus.sh -p check
+./syllabus.sh -p migration check
 
 # データデプロイ
-./syllabus.sh -p deploy
+./syllabus.sh -p migration deploy
+
+# キャッシュ生成
+./syllabus.sh -p cache generate <cache名>
+
+# キャッシュ再生成
+./syllabus.sh -p cache refresh <cache名>
+
+# キャッシュ状態確認
+./syllabus.sh -p cache status
+
+# キャッシュテスト
+./syllabus.sh -p cache test
+
+# OS互換性テスト
+./syllabus.sh test-os
+
+# コメントSQL生成
+./syllabus.sh -m comment generate
+
+# mcpサーバー起動
+./syllabus.sh -m start -f .cursor/mcp.json
+
+# mcpサーバー停止
+./syllabus.sh -m stop -f .cursor/mcp.json
+
+# mcpサーバー再起動
+./syllabus.sh -m restart -f .cursor/mcp.json
+
+# git minorバージョンアップ
+./syllabus.sh -g update minor squash
+./syllabus.sh -g update minor noff
+
+# EAVカタログキャッシュの生成
+./syllabus.sh -p cache generate catalogue
+
+# EAVカタログキャッシュの再生成
+./syllabus.sh -p cache refresh catalogue
+
+# EAVカタログキャッシュの取得（JSON整形出力）
+./syllabus.sh -p cache get catalogue
+
+# SQLファイルのWHERE句条件をYAMLツリーで可視化
+./syllabus.sh -p sql2yaml tests/kikai_text.sql
 ```
 
 ## 注意事項
 
-- PostgreSQLの操作（shell/records）を行う場合は、必ず`-p`オプションを指定してください
-- パーサーを実行する前に、`venv-init`コマンドでPython仮想環境を初期化してください
+- PostgreSQLの操作（shell/records/migration/cache/sql）を行う場合は、必ず`-p`オプションを指定してください
+- **EAVカタログキャッシュ（catalogue）は、分類属性・学部・区分リスト等をJSONで一括取得でき、get catalogueで自動的に整形表示されます**
+- パーサーを実行する前に、`venv init`コマンドでPython仮想環境を初期化してください
 - 各コマンドは`bin/`ディレクトリ内の対応するスクリプトを実行します
 - エラーが発生した場合は、適切なエラーメッセージとヘルプが表示されます
+
+## OS互換性
+
+本スクリプトは以下のOS環境で動作します：
+
+### 対応OS
+- **Linux**: Ubuntu、CentOS、Debian等
+- **macOS**: Darwin（M1/M2 Mac含む）
+
+### 自動判別機能
+- OS種類を自動判別し、適切なコマンドを選択
+- macOSでは`ls -v`オプションが利用できないため、`ls -1` + `sort -V`を使用
+- Linuxでは`ls -v`オプションを直接使用
+- 環境変数の読み込みは共通関数で統一
+
+### 互換性テスト
+```bash
+./syllabus.sh test-os
+```
+
+このコマンドで以下の項目をテストできます：
+- OS種類の判別
+- OS別コマンド設定
+- バージョンディレクトリ取得
+- 環境変数取得
+- 各コマンドの利用可能性
 
 ## 関連スクリプト
 
 ### パーサー関連
 - [parser.sh](../python/parser.md) - パーサースクリプトの実行
 
-## 更新履歴
+### minorバージョンアップのsquash/no-ffマージ
 
-| 日付 | バージョン | 更新者 | 内容 |
-|------|------------|--------|------|
-| 2024-06-05 | 1.0 | 藤原和将 | 初版作成 |
-| 2024-06-05 | 1.1 | 藤原和将  | Python仮想環境のサポートを追加、コマンド構造を整理 |
-| 2024-06-05 | 1.2 | 藤原和将  | parser関連の処理を追加 |
-| 2024-06-05 | 1.3 | 藤原和将  | CSVファイルの整形機能を追加 |
+- `-g update minor squash` : squashでdevelopにminorマージ
+- `-g update minor noff`   : no-ffでdevelopにminorマージ
+
+```bash
+./syllabus.sh -g update minor squash
+./syllabus.sh -g update minor noff
+```
+
+現在のブランチの内容をdevelopにsquashまたはno-ffでマージします。
+内部的に `bin/minor_version_update.sh` を呼び出します。
+
+## 機能概要
+
+- `sql2yaml` コマンドは、SQLファイルのWHERE句条件をYAMLツリー形式で出力します。
+  - 非エンジニアでもWHERE句の論理構造を直感的に把握可能
+  - 内部的に `src/db/sql_where_yaml.py` を呼び出し、SQLのWHERE句をパースしてYAMLで表示
+  - 複雑な条件式もツリー構造で可視化されるため、レビューや仕様確認に有用
+
+- `sql2yaml`コマンドはPostgreSQLのSQLファイル（.sql）に対応しています
+- YAML出力はWHERE句の論理構造のみを対象とし、SELECT句やORDER BY句等は含みません
+- SQLファイルの記述ミスや非標準構文には対応しない場合があります
 
 [🔝 ページトップへ](#syllabussh) 

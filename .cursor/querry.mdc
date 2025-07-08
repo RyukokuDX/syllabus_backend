@@ -1,0 +1,37 @@
+# PostgreSQL + jsonbクエリ作成ルール（@querry.mdc）
+
+## クエリ作成前の必須チェック
+
+1. 対象のキャッシュテーブル（例: syllabus_cache）がデータベースに存在するか確認する
+   - 例: 
+     ```sql
+     SELECT to_regclass('public.syllabus_cache');
+     ```
+2. 必要なキャッシュ（例: subject_syllabus_cache）が生成済みか、レコードが存在するか確認する
+   - 例:
+     ```sql
+     SELECT COUNT(*) FROM syllabus_cache WHERE cache_name = 'subject_syllabus_cache';
+     ```
+3. 存在しない場合は、必ず `./syllabus.sh -p cache generate <cache名>` でキャッシュを生成してからクエリを作成・実行する
+
+## クエリ作成手順
+
+1. ユーザー入力に以下が含まれているか確認する
+   - SQLファイルパス
+   - 自然言語によるクエリ内容
+2. jsonb定義（docs/database/jsonb_cache.md）を参照し、正しいフィールド名・階層・配列/単一値を確認する
+3. AVカタログ（属性値カタログ）を取得し、正しい値を確認する
+   - コマンド例:
+     ```bash
+     ./syllabus.sh -p cache get catalogue
+     ```
+4. クエリを作成し、指定されたSQLファイルに書き込む
+5. クエリのWHERE句条件をYAML形式で可視化する
+   - コマンド例:
+     ```bash
+     ./syllabus.sh sql2yaml <sqlファイル>
+     ```
+description:
+globs:
+alwaysApply: false
+---

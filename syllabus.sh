@@ -1,17 +1,25 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # - 更新の登録は, /docs/version_control.md に準拠して実行
-# File Version: 1.4.0
-# Project Version: 1.4.0
-# Last Update: 2025-06-25
+# File Version: 2.7.2
+# Project Version: 2.7.2
+# Last Update: 2025-07-06
 
 # スクリプトのディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" && pwd )"
 VENV_DIR="$SCRIPT_DIR/venv_syllabus_backend"
 PYTHON="$VENV_DIR/bin/python"
 
-# .envファイルの読み込み
+# .envファイルのパスを設定
 ENV_FILE="$SCRIPT_DIR/.env"
+
+
+
+# OS別コマンド設定の読み込み
+source "$SCRIPT_DIR/bin/os_utils.sh"
+OS_TYPE=$(init_os_commands)
+
+# .envファイルの読み込み
 if [ ! -f "$ENV_FILE" ]; then
     echo "エラー: .envファイルが見つかりません: $ENV_FILE"
     exit 1
@@ -30,8 +38,9 @@ NC='\033[0m' # No Color
 show_file_history() {
     local file_path="$1"
     
-    # バージョンディレクトリの取得
-    VERSION_DIRS=($(ls -v version/v* 2>/dev/null))
+    # バージョンディレクトリの取得（共通関数を使用）
+    VERSION_DIRS=($(get_version_dirs "version" "v*"))
+    
     if [[ ${#VERSION_DIRS[@]} -eq 0 ]]; then
         echo -e "${YELLOW}警告: バージョンディレクトリが見つかりません${NC}"
         exit 0
@@ -226,38 +235,60 @@ show_help() {
     echo "オプション:"
     echo "  -h, --help     このヘルプメッセージを表示"
     echo "  -p, --postgresql PostgreSQLサービスでコマンドを実行"
+    echo "  -g, --git       Gitサービスでコマンドを実行"
+    echo "  -m, --mcp       mcpサービスでコマンドを実行"
+    echo "  -f, --fastapi   FastAPI (docker) サービスでコマンドを実行"
+    echo "  -d, --docker    Dockerネットワーク管理コマンドを実行"
     echo
-    echo "コマンド:"
+    echo "対応OS:"
+    echo "  - Linux (Ubuntu, CentOS, etc.)"
+    echo "  - macOS (Darwin)"
+    echo "  - Windows (WSL, Cygwin, MSYS2)"
+    echo
+    echo "【共通コマンド】"
     echo "  help           このヘルプメッセージを表示"
     echo "  version        syllabus.shのバージョンを表示"
     echo "  version <file> 指定されたファイルの更新履歴を表示"
-    echo "  venv-init      Python仮想環境を初期化"
+    echo "  venv init      Python仮想環境を初期化"
+    echo "  csv normalize  指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
+    echo "  parser         指定されたテーブルのパーサースクリプトを実行"
+    echo "  test-os        OS互換性テストを実行"
+    echo
+    echo "【-p, --postgresql サービスコマンド】"
     echo "  start          指定されたサービスを開始"
     echo "  stop           指定されたサービスを停止"
     echo "  ps             サービスの状態を表示"
     echo "  logs           サービスのログを表示"
     echo "  shell          PostgreSQLサービスのシェルを開く"
     echo "  records        全テーブルのレコード数を表示"
+    echo "  records <table> 指定テーブルの全件表示"
     echo "  parser         指定されたテーブルのパーサースクリプトを実行"
-    echo "  generate       指定されたテーブルのデータを生成"
-    echo "  check          指定されたテーブルのデータをチェック"
-    echo "  deploy         指定されたテーブルのデータをデプロイ"
-    echo "  csv normalize 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）"
+    echo "  migration      マイグレーション関連のコマンド"
+    echo "  cache generate   指定されたキャッシュを生成"
+    echo "  cache delete     指定されたキャッシュを削除"
+    echo "  cache refresh    指定されたキャッシュを削除して再生成"
+    echo "  cache get full   全キャッシュデータを取得・整形"
+    echo "  cache list       利用可能なキャッシュ一覧を表示"
+    echo "  cache status     キャッシュの状態を表示"
+    echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
     echo
-    echo "使用例:"
-    echo "  $0 venv-init             # Python仮想環境を初期化"
-    echo "  $0 -p start              # PostgreSQLサービスを開始"
-    echo "  $0 -p stop               # PostgreSQLサービスを停止"
-    echo "  $0 -p shell              # PostgreSQLサービスのシェルを開く"
-    echo "  $0 -p records            # レコード数を表示"
-    echo "  $0 parser book           # 書籍パーサーを実行"
-    echo "  $0 parser syllabus       # シラバスパーサーを実行"
-    echo "  $0 parser instructor     # 教員パーサーを実行"
-    echo "  $0 -p generate           # 指定されたテーブルのデータを生成"
-    echo "  $0 -p check              # 指定されたテーブルのデータをチェック"
-    echo "  $0 -p deploy             # 指定されたテーブルのデータをデプロイ"
-    echo "  $0 csv normalize 2024    # 2024年度のCSVファイルを整形"
-    echo "  $0 csv normalize 2025 Y  # 2025年度のYサブディレクトリのCSVファイルを整形"
+    echo "【-g, --git サービスコマンド】"
+    echo "  update minor <squash|noff>  minorバージョンアップをdevelopへマージ（squash/no-ff選択）"
+    echo
+    echo "【-m, --mcp サービスコマンド】"
+    echo "  comment generate mcp用コメントSQLを生成"
+    echo "  start -f <json>  指定したmcp設定jsonの内容でmcpサーバー（postgres）をバックグラウンド起動"
+    echo "  stop -f <json>   指定したmcp設定jsonの内容でmcpサーバー（postgres）を停止"
+    echo "  restart -f <json> 停止→起動を連続実行"
+    echo
+    echo "【-f, --fastapi サービスコマンド】"
+    echo "  start          FastAPI (docker) サービスをポート5000で起動"
+    echo "  restart        FastAPI (docker) サービスを再起動"
+    echo "  stop           FastAPI (docker) サービスを停止"
+    echo "  logs           FastAPI (docker) サービスのログを表示"
+    echo
+    echo "【-d, --docker ネットワーク管理コマンド】"
+    echo "  network up     syllabus-network を作成（存在しない場合のみ）"
 }
 
 # コマンドライン引数の解析
@@ -266,200 +297,552 @@ COMMAND=""
 ARGS=()
 
 while [[ $# -gt 0 ]]; do
-    case $1 in
-        -h|--help)
-            show_help
-            exit 0
-            ;;
-        -p|--postgresql)
-            SERVICE="postgres"
-            shift
-            ;;
-        *)
-            if [ -z "$COMMAND" ]; then
-                COMMAND="$1"
-            else
-                ARGS+=("$1")
-            fi
-            shift
-            ;;
-    esac
+	case $1 in
+		-h|--help)
+			show_help
+			exit 0
+			;;
+		-p|--postgresql)
+			SERVICE="postgres"
+			shift
+			;;
+		-g|--git)
+			SERVICE="git"
+			shift
+			;;
+		-m|--mcp)
+			SERVICE="mcp"
+			shift
+			;;
+		-f|--fastapi)
+			SERVICE="fastapi"
+			shift
+			;;
+		-d|--docker)
+			SERVICE="docker"
+			shift
+			;;
+		*)
+			if [ -z "$COMMAND" ]; then
+				COMMAND="$1"
+			else
+				ARGS+=("$1")
+			fi
+			shift
+			;;
+	esac
 done
+
+# Dockerネットワーク管理コマンド
+if [ "$SERVICE" = "docker" ]; then
+	case $COMMAND in
+		network)
+			if [ "${ARGS[0]}" = "up" ]; then
+				echo "syllabus-network の存在を確認します..."
+				if ! docker network ls --format '{{.Name}}' | grep -q '^syllabus-network$'; then
+					echo "syllabus-network が存在しないため作成します..."
+					docker network create syllabus-network
+				else
+					echo "syllabus-network は既に存在します。"
+				fi
+			else
+				echo "エラー: 未対応のdocker networkコマンドです: ${ARGS[*]}"
+				show_help
+				exit 1
+			fi
+			;;
+		*)
+			echo "エラー: dockerサービスで許可されていないコマンドです: $COMMAND"
+			show_help
+			exit 1
+			;;
+	esac
+	exit 0
+fi
+
+# FastAPI docker管理コマンド
+if [ "$SERVICE" = "fastapi" ]; then
+	case $COMMAND in
+		start)
+			echo "FastAPI (docker) をポート5000で起動します..."
+			# ネットワークがなければ作成
+			if ! docker network ls --format '{{.Name}}' | grep -q '^syllabus-network$'; then
+				echo "syllabus-network が存在しないため作成します..."
+				docker network create syllabus-network
+			fi
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" up -d
+			echo "FastAPIコンテナが起動しました (http://localhost:5000)"
+			;;
+		restart)
+			echo "FastAPI (docker) を再起動します..."
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" down
+			# ネットワークがなければ作成
+			if ! docker network ls --format '{{.Name}}' | grep -q '^syllabus-network$'; then
+				echo "syllabus-network が存在しないため作成します..."
+				docker network create syllabus-network
+			fi
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" up -d
+			echo "FastAPIコンテナを再起動しました (http://localhost:5000)"
+			;;
+		stop)
+			echo "FastAPI (docker) を停止します..."
+			cd "$SCRIPT_DIR"
+			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" down
+			echo "FastAPIコンテナを停止しました"
+			;;
+		logs)
+			echo "FastAPI (docker) のログを表示します..."
+			docker logs -f syllabus-api
+			;;
+		*)
+			echo "エラー: fastapiサービスで許可されていないコマンドです: $COMMAND"
+			show_help
+			exit 1
+			;;
+	esac
+	exit 0
+fi
+
+# mcpサーバー管理コマンド
+if [ "$SERVICE" = "mcp" ]; then
+	if [ "$COMMAND" = "comment" ] && [ "${ARGS[0]}" = "generate" ]; then
+		"$SCRIPT_DIR/venv_syllabus_backend/bin/python" "$SCRIPT_DIR/src/db/mcp_comments.py"
+		exit 0
+	fi
+
+	if [ "$COMMAND" = "start" ] || [ "$COMMAND" = "stop" ] || [ "$COMMAND" = "restart" ]; then
+		# -f <json> の取得
+		MCP_JSON=""
+		for ((i=0; i<${#ARGS[@]}; i++)); do
+			if [ "${ARGS[$i]}" = "-f" ]; then
+				MCP_JSON="${ARGS[$((i+1))]}"
+			fi
+		done
+		if [ -z "$MCP_JSON" ]; then
+			echo "エラー: -f <json> を指定してください"
+			exit 1
+		fi
+
+		# サーバー名は現状postgres固定
+		cmd=$(jq -r '.mcpServers.postgres.command' "$MCP_JSON")
+		args=$(jq -r '.mcpServers.postgres.args | join(" ")' "$MCP_JSON")
+		PID_FILE=".mcp_server_postgres.pid"
+		LOG_FILE="mcp_server_postgres.log"
+
+		if [ "$COMMAND" = "start" ]; then
+			if [ -f "$PID_FILE" ]; then
+				echo "すでに起動しています (PID: $(cat $PID_FILE))"
+				exit 1
+			fi
+			nohup $cmd $args > "$LOG_FILE" 2>&1 &
+			echo $! > "$PID_FILE"
+			echo "mcpサーバー(postgres)を起動しました (PID: $(cat $PID_FILE))"
+		elif [ "$COMMAND" = "stop" ]; then
+			if [ -f "$PID_FILE" ]; then
+				kill $(cat "$PID_FILE")
+				rm "$PID_FILE"
+				echo "mcpサーバー(postgres)を停止しました"
+			else
+				echo "PIDファイルがありません。すでに停止している可能性があります。"
+			fi
+		elif [ "$COMMAND" = "restart" ]; then
+			if [ -f "$PID_FILE" ]; then
+				kill $(cat "$PID_FILE")
+				rm "$PID_FILE"
+				echo "mcpサーバー(postgres)を停止しました"
+			fi
+			nohup $cmd $args > "$LOG_FILE" 2>&1 &
+			echo $! > "$PID_FILE"
+			echo "mcpサーバー(postgres)を再起動しました (PID: $(cat $PID_FILE))"
+		fi
+		exit 0
+	fi
+fi
 
 # コマンドが指定されていない場合はヘルプを表示
 if [ -z "$COMMAND" ]; then
-    show_help
-    exit 1
+	show_help
+	exit 1
 fi
 
-# コマンドの実行
-case $COMMAND in
-    help)
-        show_help
-        ;;
-    version)
-        if [ ${#ARGS[@]} -eq 0 ]; then
-            show_script_version
-        else
-            show_file_history "${ARGS[0]}"
-        fi
-        ;;
-    venv-init)
-        init_venv
-        ;;
-    csv)
-        if [ ${#ARGS[@]} -eq 0 ]; then
-            echo "エラー: CSVコマンドのサブコマンドが指定されていません"
-            show_help
-            exit 1
-        fi
-        case "${ARGS[0]}" in
-            normalize)
-                if [ ${#ARGS[@]} -lt 2 ]; then
-                    echo "エラー: 年度が指定されていません"
-                    echo "使用方法: $0 csv normalize <year> [subdir]"
-                    exit 1
-                fi
-                # サブディレクトリが指定されている場合は3番目の引数、そうでなければ空文字列
-                subdir=""
-                if [ ${#ARGS[@]} -ge 3 ]; then
-                    subdir="${ARGS[2]}"
-                fi
-                normalize_csv "${ARGS[1]}" "$subdir"
-                ;;
-            *)
-                echo "エラー: 不明なCSVコマンド '${ARGS[0]}'"
-                show_help
-                exit 1
-                ;;
-        esac
-        ;;
-    start)
-        if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/start-postgres.sh"
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    stop)
-        if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/stop-postgres.sh"
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    restart)
-        if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/stop-postgres.sh"
-            "$SCRIPT_DIR/bin/start-postgres.sh"
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    ps)
-        docker ps
-        ;;
-    logs)
-        if [ "$SERVICE" = "postgres" ]; then
-            docker logs -f postgres-db
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    shell)
-        if [ "$SERVICE" = "postgres" ]; then
-            # .envファイルからデータベース名とユーザー名を取得
-            DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-            DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
-            docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME"
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    records)
-        if [ "$SERVICE" = "postgres" ]; then
-            if [ ${#ARGS[@]} -eq 0 ]; then
-                # 引数なし: 従来通り全テーブルの件数表示
-                DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-                DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
-                docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
-                    SELECT 
-                        schemaname || '.' || relname as table_name,
-                        n_live_tup as record_count
-                    FROM pg_stat_user_tables
-                    ORDER BY relname;
-                "
-            else
-                # 引数あり: 指定テーブルの全件表示
-                TABLE_NAME="${ARGS[0]}"
-                DB_NAME=$(grep POSTGRES_DB .env | cut -d '=' -f2)
-                DB_USER=$(grep POSTGRES_USER .env | cut -d '=' -f2)
-                docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM $TABLE_NAME;"
-            fi
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    parser)
-        if [ ${#ARGS[@]} -eq 0 ]; then
-            echo "エラー: パーサー名または番号が指定されていません"
-            show_help
-            exit 1
-        fi
-        "$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
-        ;;
-    generate)
-        if [ "$SERVICE" = "postgres" ]; then
-            if [ ${#ARGS[@]} -eq 0 ]; then
-                echo "エラー: 生成タイプが指定されていません"
-                echo "使用方法: $0 -p generate [init|migration]"
-                exit 1
-            fi
-            case "${ARGS[0]}" in
-                init)
-                    echo "初期化データを生成中..."
-                    "$SCRIPT_DIR/bin/generate-init.sh"
-                    ;;
-                migration)
-                    echo "マイグレーションデータを生成中..."
-                    "$SCRIPT_DIR/bin/generate-migration.sh"
-                    ;;
-                *)
-                    echo "エラー: 不明な生成タイプ '${ARGS[0]}'"
-                    echo "使用方法: $0 -p generate [init|migration]"
-                    exit 1
-                    ;;
-            esac
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    check)
-        if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/check-with-dev-db.sh"
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    deploy)
-        if [ "$SERVICE" = "postgres" ]; then
-            "$SCRIPT_DIR/bin/deploy-migration.sh"
-        else
-            echo "エラー: サービスが指定されていません。PostgreSQLサービスには -p を使用してください。"
-            exit 1
-        fi
-        ;;
-    *)
-        echo "エラー: 不明なコマンド '$COMMAND'"
-        show_help
-        exit 1
-        ;;
-esac 
+# SQLのWHERE句YAML可視化コマンド
+if [ "$COMMAND" = "sql2yaml" ]; then
+	if [ ${#ARGS[@]} -eq 0 ]; then
+		echo "エラー: SQLファイルが指定されていません"
+		echo "使用方法: $0 sql2yaml <sqlファイル>"
+		exit 1
+	fi
+	sql_file="${ARGS[0]}"
+	if [ ! -f "$sql_file" ]; then
+		echo "エラー: SQLファイルが見つかりません: $sql_file"
+		exit 1
+	fi
+	PYTHONPATH="$SCRIPT_DIR/src" "$PYTHON" "$SCRIPT_DIR/src/db/sql_where_yaml.py" "$sql_file"
+	exit 0
+fi
+
+# サービスごとに許可コマンドを分岐
+if [ "$SERVICE" = "git" ]; then
+	case $COMMAND in
+		update)
+			if [ ${#ARGS[@]} -lt 2 ]; then
+				echo "エラー: updateコマンドのサブコマンドが不足しています"
+				echo "使用方法: $0 -g update minor <squash|noff>"
+				exit 1
+			fi
+			if [ "${ARGS[0]}" = "minor" ]; then
+				if [ "${ARGS[1]}" != "squash" ] && [ "${ARGS[1]}" != "noff" ]; then
+					echo "エラー: squash か noff を指定してください"
+					exit 1
+				fi
+				"$SCRIPT_DIR/bin/minor_version_update.sh" "${ARGS[1]}"
+			else
+				echo "エラー: minor以外は未対応です"
+				exit 1
+			fi
+			;;
+		*)
+			echo "エラー: git関連で許可されていないコマンドです: $COMMAND"
+			show_help
+			exit 1
+			;;
+	esac
+	# gitサービスの場合はここで終了
+	exit 0
+fi
+
+if [ "$SERVICE" = "postgres" ]; then
+	# コマンドの実行
+	case $COMMAND in
+		help)
+			show_help
+			;;
+		version)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				show_script_version
+			else
+				show_file_history "${ARGS[0]}"
+			fi
+			;;
+		venv)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: venvコマンドのサブコマンドが指定されていません"
+				echo "使用方法: $0 venv [init]"
+				exit 1
+			fi
+			case "${ARGS[0]}" in
+				init)
+					init_venv
+					;;
+				*)
+					echo "エラー: 不明なvenvコマンド '${ARGS[0]}'"
+					echo "使用方法: $0 venv [init]"
+					exit 1
+					;;
+			esac
+			;;
+		csv)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: CSVコマンドのサブコマンドが指定されていません"
+				show_help
+				exit 1
+			fi
+			case "${ARGS[0]}" in
+				normalize)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: 年度が指定されていません"
+						echo "使用方法: $0 csv normalize <year> [subdir]"
+						exit 1
+					fi
+					# サブディレクトリが指定されている場合は3番目の引数、そうでなければ空文字列
+					subdir=""
+					if [ ${#ARGS[@]} -ge 3 ]; then
+						subdir="${ARGS[2]}"
+					fi
+					normalize_csv "${ARGS[1]}" "$subdir"
+					;;
+				*)
+					echo "エラー: 不明なCSVコマンド '${ARGS[0]}'"
+					show_help
+					exit 1
+					;;
+			esac
+			;;
+		start)
+			"$SCRIPT_DIR/bin/start-postgres.sh"
+			;;
+		stop)
+			"$SCRIPT_DIR/bin/stop-postgres.sh"
+			;;
+		restart)
+			"$SCRIPT_DIR/bin/stop-postgres.sh"
+			"$SCRIPT_DIR/bin/start-postgres.sh"
+			;;
+		ps)
+			docker ps
+			;;
+		logs)
+			docker logs -f postgres-db
+			;;
+		shell)
+			# .envファイルからデータベース名とユーザー名を取得
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
+			docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME"
+			;;
+		records)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				# 引数なし: 従来通り全テーブルの件数表示
+				DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+				DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
+				docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
+					SELECT 
+						schemaname || '.' || relname as table_name,
+						n_live_tup as record_count
+					FROM pg_stat_user_tables
+					ORDER BY relname;
+				"
+			else
+				# 引数あり: 指定テーブルの全件表示
+				TABLE_NAME="${ARGS[0]}"
+				DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+				DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
+				docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM $TABLE_NAME;"
+			fi
+			;;
+		parser)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: パーサー名または番号が指定されていません"
+				show_help
+				exit 1
+			fi
+			"$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
+			;;
+		migration)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: マイグレーションコマンドのサブコマンドが指定されていません"
+				echo "使用方法: $0 -p migration [generate|check|deploy] [init|migration]"
+				exit 1
+			fi
+			case "${ARGS[0]}" in
+				generate)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: 生成タイプが指定されていません"
+						echo "使用方法: $0 -p migration generate [init|migration]"
+						exit 1
+					fi
+					case "${ARGS[1]}" in
+						init)
+							echo "初期化データを生成中..."
+							"$SCRIPT_DIR/bin/generate-init.sh"
+							;;
+						migration)
+							echo "マイグレーションデータを生成中..."
+							"$SCRIPT_DIR/bin/generate-migration.sh"
+							;;
+						*)
+							echo "エラー: 不明な生成タイプ '${ARGS[1]}'"
+							echo "使用方法: $0 -p migration generate [init|migration]"
+							exit 1
+							;;
+					esac
+					;;
+				check)
+					"$SCRIPT_DIR/bin/check-with-dev-db.sh"
+					;;
+				deploy)
+					"$SCRIPT_DIR/bin/deploy-migration.sh"
+					;;
+				*)
+					echo "エラー: 不明なマイグレーションコマンド '${ARGS[0]}'"
+					echo "使用方法: $0 -p migration [generate|check|deploy] [init|migration]"
+					exit 1
+					;;
+			esac
+			;;
+		cache)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: キャッシュコマンドのサブコマンドが指定されていません"
+				echo "使用方法: $0 -p cache [generate|delete|list|status] [cache_name]"
+				exit 1
+			fi
+			case "${ARGS[0]}" in
+				generate)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: キャッシュ名が指定されていません"
+						echo "使用方法: $0 -p cache generate <cache_name>"
+						exit 1
+					fi
+					"$SCRIPT_DIR/bin/json_cache.sh" generate "${ARGS[1]}"
+					;;
+				delete)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: キャッシュ名が指定されていません"
+						echo "使用方法: $0 -p cache delete <cache_name>"
+						exit 1
+					fi
+					"$SCRIPT_DIR/bin/json_cache.sh" delete "${ARGS[1]}"
+					;;
+				refresh)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: キャッシュ名が指定されていません"
+						echo "使用方法: $0 -p cache refresh <cache_name>"
+						exit 1
+					fi
+					"$SCRIPT_DIR/bin/json_cache.sh" refresh "${ARGS[1]}"
+					;;
+				get)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: 取得タイプが指定されていません"
+						echo "使用方法: $0 -p cache get [full|catalogue|subject_syllabus_cache]"
+						exit 1
+					fi
+					case "${ARGS[1]}" in
+						full)
+							"$SCRIPT_DIR/bin/get_cache.sh" full
+							;;
+						catalogue)
+							"$SCRIPT_DIR/bin/json_cache.sh" get catalogue
+							;;
+						subject_syllabus_cache)
+							"$SCRIPT_DIR/bin/json_cache.sh" get subject_syllabus_cache
+							;;
+						*)
+							echo "エラー: 不明な取得タイプ '${ARGS[1]}'"
+							echo "使用方法: $0 -p cache get [full|catalogue|subject_syllabus_cache]"
+							exit 1
+							;;
+					esac
+					;;
+				list)
+					"$SCRIPT_DIR/bin/json_cache.sh" list
+					;;
+				status)
+					"$SCRIPT_DIR/bin/json_cache.sh" status
+					;;
+				*)
+					echo "エラー: 不明なキャッシュコマンド '${ARGS[0]}'"
+					echo "使用方法: $0 -p cache [generate|delete|refresh|get|list|status] [cache_name|full]"
+					exit 1
+					;;
+			esac
+			;;
+		sql)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: SQLファイルが指定されていません"
+				echo "使用方法: $0 -p sql <sqlfile> [--tuples-only] [--no-align]"
+				exit 1
+			fi
+			
+			sql_file="${ARGS[0]}"
+			if [ ! -f "$sql_file" ]; then
+				echo "エラー: SQLファイルが見つかりません: $sql_file"
+				exit 1
+			fi
+			
+			echo "SQLファイルを実行中: $sql_file"
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
+			# オプション解析
+			PSQL_OPTS=""
+			for arg in "${ARGS[@]:1}"; do
+				case "$arg" in
+					--tuples-only)
+						PSQL_OPTS="$PSQL_OPTS -t"
+						;;
+					--no-align)
+						PSQL_OPTS="$PSQL_OPTS -A"
+						;;
+					*)
+						;;
+				esac
+			done
+			docker exec -i postgres-db psql $PSQL_OPTS -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
+			;;
+		test-os)
+			"$SCRIPT_DIR/bin/test_os_compatibility.sh"
+			;;
+		*)
+			echo "エラー: 不明なコマンド '$COMMAND'"
+			show_help
+			exit 1
+			;;
+	esac
+else
+	# それ以外（共通コマンド）
+	case $COMMAND in
+		help)
+			show_help
+			;;
+		version)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				show_script_version
+			else
+				show_file_history "${ARGS[0]}"
+			fi
+			;;
+		venv)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: venvコマンドのサブコマンドが指定されていません"
+				echo "使用方法: $0 venv [init]"
+				exit 1
+			fi
+			case "${ARGS[0]}" in
+				init)
+					init_venv
+					;;
+				*)
+					echo "エラー: 不明なvenvコマンド '${ARGS[0]}'"
+					echo "使用方法: $0 venv [init]"
+					exit 1
+					;;
+			esac
+			;;
+		csv)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: CSVコマンドのサブコマンドが指定されていません"
+				show_help
+				exit 1
+			fi
+			case "${ARGS[0]}" in
+				normalize)
+					if [ ${#ARGS[@]} -lt 2 ]; then
+						echo "エラー: 年度が指定されていません"
+						echo "使用方法: $0 csv normalize <year> [subdir]"
+						exit 1
+					fi
+					# サブディレクトリが指定されている場合は3番目の引数、そうでなければ空文字列
+					subdir=""
+					if [ ${#ARGS[@]} -ge 3 ]; then
+						subdir="${ARGS[2]}"
+					fi
+					normalize_csv "${ARGS[1]}" "$subdir"
+					;;
+				*)
+					echo "エラー: 不明なCSVコマンド '${ARGS[0]}'"
+					show_help
+					exit 1
+					;;
+			esac
+			;;
+		parser)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: パーサー名または番号が指定されていません"
+				show_help
+				exit 1
+			fi
+			"$SCRIPT_DIR/bin/parser.sh" "${ARGS[@]}"
+			;;
+		test-os)
+			"$SCRIPT_DIR/bin/test_os_compatibility.sh"
+			;;
+		*)
+			echo "エラー: 不明なコマンド '$COMMAND'"
+			show_help
+			exit 1
+			;;
+	esac
+fi 

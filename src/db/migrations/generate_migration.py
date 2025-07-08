@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
+
 import json
 import os
 from datetime import datetime
@@ -40,6 +44,7 @@ TABLE_NAME_PLURAL = {
     'subject_attribute': 'subject_attributes',
     'subject': 'subjects',
     'subject_attribute_value': 'subject_attribute_values',
+    'syllabus_faculty': 'syllabus_faculties',
     'syllabus_study_system': 'syllabus_study_systems'
 }
 
@@ -79,7 +84,7 @@ def read_json_files(directory, table_name):
                     print(f"Warning: {file} does not contain '{array_name}' array or direct array")
                     continue
                 
-                # bookテーブルの場合、roleカラムを除外
+                # bookテーブルの場合、roleカラムのみを除外（authorカラムは保持）
                 if table_name == 'book':
                     records = [{k: v for k, v in record.items() if k != 'role'} for record in records]
                 # book_uncategorizedテーブルの場合、全てのカラムを保持
@@ -110,6 +115,7 @@ def read_json_files(directory, table_name):
             "syllabus_instructor": lambda r: (r.get('syllabus_id'), r.get('instructor_id')),
             "syllabus_book": lambda r: (r.get('syllabus_id'), r.get('book_id')),
             "grading_criterion": lambda r: (r.get('syllabus_id'), r.get('criteria_type')),
+            "syllabus_faculty": lambda r: (r.get('syllabus_id'), r.get('faculty_id')),
             "syllabus_study_system": lambda r: (r.get('source_syllabus_id'), r.get('target')),
             "subject_grade": lambda r: (r.get('syllabus_id'), r.get('grade'))
         }
@@ -183,9 +189,9 @@ def generate_sql_insert(table_name, records):
         else:
             columns = list(all_columns)
     
-    # bookテーブルの場合、authorカラムを除外
+    # bookテーブルの場合、全てのカラムを保持（authorカラムも含む）
     if table_name == 'book':
-        columns = [col for col in columns if col != 'author']
+        columns = list(columns)  # authorカラムも含めて全て保持
     # book_uncategorizedテーブルの場合、全てのカラムを保持
     elif table_name == 'book_uncategorized':
         columns = list(columns)
@@ -233,6 +239,7 @@ def generate_sql_insert(table_name, records):
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id"],
         "grading_criterion": ["syllabus_id", "criteria_type"],
+        "syllabus_faculty": ["syllabus_id", "faculty_id"],
         "syllabus_study_system": ["source_syllabus_id", "target"],
         "subject_grade": ["syllabus_id", "grade"]  # 新しく追加したユニーク制約に対応
     }
@@ -258,6 +265,7 @@ def generate_sql_insert(table_name, records):
         "syllabus_instructor": ["syllabus_id", "instructor_id"],
         "syllabus_book": ["syllabus_id", "book_id", "role", "note"],
         "grading_criterion": ["criteria_type", "ratio", "note"],
+        "syllabus_faculty": ["syllabus_id", "faculty_id"],
         "syllabus_study_system": ["target"],
         "subject_grade": ["grade"]  # gradeカラムを更新対象に
     }
@@ -266,7 +274,10 @@ def generate_sql_insert(table_name, records):
     conflict_cols = conflict_columns.get(table_name, [])
     update_cols = update_columns.get(table_name, [])
     
-    if conflict_cols:
+    # subject_attribute_valueのみON CONFLICT句を付与しない
+    if table_name == 'subject_attribute_value':
+        conflict_str = ""
+    elif conflict_cols:
         conflict_str = f"ON CONFLICT ({', '.join(conflict_cols)})"
         if update_cols:
             update_str = "DO UPDATE SET " + ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
@@ -470,7 +481,7 @@ CREATE TABLE IF NOT EXISTS subject_attribute_value (
     value TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    UNIQUE(subject_id, attribute_id)
+    UNIQUE(subject_id, attribute_id, value)
 );""",
         'syllabus_study_system': """
 CREATE TABLE IF NOT EXISTS syllabus_study_system (
@@ -480,6 +491,15 @@ CREATE TABLE IF NOT EXISTS syllabus_study_system (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     UNIQUE(source_syllabus_id, target)
+);""",
+        'syllabus_faculty': """
+CREATE TABLE IF NOT EXISTS syllabus_faculty (
+    id SERIAL PRIMARY KEY,
+    syllabus_id INTEGER NOT NULL REFERENCES syllabus_master(syllabus_id) ON DELETE CASCADE,
+    faculty_id INTEGER NOT NULL REFERENCES faculty(faculty_id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE(syllabus_id, faculty_id)
 );"""
     }
     
@@ -541,6 +561,9 @@ CREATE INDEX IF NOT EXISTS idx_grading_criterion_syllabus ON grading_criterion(s
         'syllabus_study_system': """
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_source ON syllabus_study_system(source_syllabus_id);
 CREATE INDEX IF NOT EXISTS idx_syllabus_study_system_target ON syllabus_study_system(target);""",
+        'syllabus_faculty': """
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_syllabus ON syllabus_faculty(syllabus_id);
+CREATE INDEX IF NOT EXISTS idx_syllabus_faculty_faculty ON syllabus_faculty(faculty_id);""",
         'subject_grade': """
 CREATE INDEX IF NOT EXISTS idx_subject_grade_grade ON subject_grade(grade);
 CREATE INDEX IF NOT EXISTS idx_subject_grade_syllabus ON subject_grade(syllabus_id);"""
@@ -720,6 +743,11 @@ def generate_migration():
             {
                 'json_dir': project_root / 'updates' / 'syllabus_study_system',
                 'table_name': 'syllabus_study_system',
+                'source': 'web_syllabus'
+            },
+            {
+                'json_dir': project_root / 'updates' / 'syllabus_faculty',
+                'table_name': 'syllabus_faculty',
                 'source': 'web_syllabus'
             },
             # 要件関連テーブル

@@ -26,4 +26,4 @@ volumes:
 
 networks:
   syllabus-network:
-    driver: bridge
+    external: true
