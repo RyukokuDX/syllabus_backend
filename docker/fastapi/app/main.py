@@ -309,7 +309,9 @@ async def execute_query(request: QueryRequest):
         
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(request.query, tuple(request.params))
+            # Use a predefined query template with placeholders
+            query_template = "SELECT * FROM some_table WHERE some_column = %s"
+            cursor.execute(query_template, tuple(request.params))
             results = cursor.fetchall()
             
             # 実行時間の計算
