@@ -309,7 +309,7 @@ async def execute_query(request: QueryRequest):
         
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(request.query, request.params)
+            cursor.execute(request.query, tuple(request.params))
             results = cursor.fetchall()
             
             # 実行時間の計算
