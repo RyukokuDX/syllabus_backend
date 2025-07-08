@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-# File Version: v2.7.0
-# Project Version: v2.7.0
-# Last Updated: 2025-07-06
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
 """
 
 import os

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# File Version: v2.7.0
-# Project Version: v2.7.0
-# Last Updated: 2025-07-06
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
 """
 SQLファイルからWHERE句のjsonb条件を日本語で意訳し、YAMLツリーとして出力するスクリプト。
 現状はmath_noexam.sql専用テンプレート。

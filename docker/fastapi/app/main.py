@@ -1,6 +1,6 @@
-# File Version: v2.7.2
-# Project Version: v2.7.3
-# Last Updated: 2025-07-07
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
 
 from fastapi import FastAPI, Request, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware

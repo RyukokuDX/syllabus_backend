@@ -1,7 +1,7 @@
 #!/bin/bash
-# File Version: v2.7.0
-# Project Version: v2.7.0
-# Last Updated: 2025-07-06
+# File Version: v3.0.0
+# Project Version: v3.0.0
+# Last Updated: 2025-07-08
 
 # スクリプトの絶対パスを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
