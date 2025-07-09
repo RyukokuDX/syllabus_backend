@@ -239,6 +239,7 @@ show_help() {
     echo "  -m, --mcp       mcpサービスでコマンドを実行"
     echo "  -f, --fastapi   FastAPI (docker) サービスでコマンドを実行"
     echo "  -d, --docker    Dockerネットワーク管理コマンドを実行"
+    echo "  -t, --trainer   Trainerサービスでコマンドを実行"
     echo
     echo "対応OS:"
     echo "  - Linux (Ubuntu, CentOS, etc.)"
@@ -322,6 +323,10 @@ while [[ $# -gt 0 ]]; do
 			SERVICE="docker"
 			shift
 			;;
+		-t|--trainer)
+			SERVICE="trainer"
+			shift
+			;;
 		*)
 			if [ -z "$COMMAND" ]; then
 				COMMAND="$1"
@@ -332,6 +337,21 @@ while [[ $# -gt 0 ]]; do
 			;;
 	esac
 done
+
+# trainerサービス用コマンド分岐を共通コマンドより前に配置
+if [ "$SERVICE" = "trainer" ]; then
+	if [ "$COMMAND" = "index" ]; then
+		if [ "${ARGS[0]}" = "refresh" ]; then
+			PYTHONPATH="$SCRIPT_DIR/src" "$PYTHON" "$SCRIPT_DIR/src/db/trainer_index.py"
+			echo "docs/trainer_index.md を自動生成・更新しました"
+			exit 0
+		else
+			echo "エラー: indexコマンドのサブコマンドが不足しています"
+			echo "使用方法: $0 -t index refresh"
+			exit 1
+		fi
+	fi
+fi
 
 # Dockerネットワーク管理コマンド
 if [ "$SERVICE" = "docker" ]; then
@@ -761,6 +781,25 @@ if [ "$SERVICE" = "postgres" ]; then
 				esac
 			done
 			docker exec -i postgres-db psql $PSQL_OPTS -U "$DB_USER" -d "$DB_NAME" < "$sql_file"
+			;;
+		sql-trainer)
+			if [ ${#ARGS[@]} -eq 0 ]; then
+				echo "エラー: SQLファイル名が指定されていません"
+				echo "使用方法: $0 -p sql-trainer <sqlファイル名（パス・拡張子なし）>"
+				exit 1
+			fi
+			name="${ARGS[0]}"
+			sql_file="$SCRIPT_DIR/trainer/sql/${name}.sql"
+			output_file="$SCRIPT_DIR/trainer/response/${name}.tsv"
+			if [ ! -f "$sql_file" ]; then
+				echo "エラー: SQLファイルが見つかりません: $sql_file"
+				exit 1
+			fi
+			echo "SQLファイルを実行中: $sql_file"
+			DB_NAME=$(get_env_value "POSTGRES_DB" "$ENV_FILE")
+			DB_USER=$(get_env_value "POSTGRES_USER" "$ENV_FILE")
+			docker exec -i postgres-db psql -U "$DB_USER" -d "$DB_NAME" -F $'\t' --no-align -P footer=off -P null='' < "$sql_file" > "$output_file"
+			echo "出力を $output_file に保存しました"
 			;;
 		test-os)
 			"$SCRIPT_DIR/bin/test_os_compatibility.sh"
