@@ -271,7 +271,8 @@ show_help() {
     echo "  cache get full   全キャッシュデータを取得・整形"
     echo "  cache list       利用可能なキャッシュ一覧を表示"
     echo "  cache status     キャッシュの状態を表示"
-    echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
+    	echo "  sql <sqlfile>    指定したSQLファイルをPostgreSQLサーバーで実行"
+	echo "  sql-trainer <name> 指定したSQLファイルを実行し、結果をtrainer/response/に保存"
     echo
     echo "【-g, --git サービスコマンド】"
     echo "  update minor <squash|noff>  minorバージョンアップをdevelopへマージ（squash/no-ff選択）"
