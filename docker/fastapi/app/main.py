@@ -1,6 +1,6 @@
-# File Version: v3.0.0
-# Project Version: v3.0.0
-# Last Updated: 2025-07-08
+# File Version: v3.0.1
+# Project Version: v3.0.8
+# Last Updated: 2025-07-12
 
 from fastapi import FastAPI, Request, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
@@ -310,8 +310,7 @@ async def execute_query(request: QueryRequest):
         with get_db_connection() as conn:
             cursor = conn.cursor()
             # Use a predefined query template with placeholders
-            query_template = "SELECT * FROM some_table WHERE some_column = %s"
-            cursor.execute(query_template, tuple(request.params))
+            cursor.execute(request.query, tuple(request.params or []))
             results = cursor.fetchall()
             
             # 実行時間の計算
