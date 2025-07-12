@@ -1,8 +1,13 @@
--- File Version: v1.0.2
--- Project Version: v2.5.0
--- Last Updated: 2025-07-03
+-- ---
+-- order: 数理の専門応用科目のうち、成績評価基準一覧に「レポート」を含まないものを抽出
+-- desc: 数理の専門応用科目で、成績評価基準に「レポート」が含まれない科目名を一覧で取得する。出力は必ずカラム名付きオブジェクト配列（例：[{"subject_name": "..."}, ...]）形式のJSONとする（ガイドライン準拠）。
+-- author: 藤原和将
+-- file_version: v2.5.2
+-- project_version: v2.5.2
+-- last_updated: 2025-07-09
+-- response_id: math_noreport.json
+-- ---
 
--- 数理の専門応用科目のうち、成績評価基準一覧に「レポート」を含まないものを抽出
 SELECT
 	cache_data->>'科目名' AS subject_name
 FROM syllabus_cache

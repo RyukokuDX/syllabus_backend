@@ -6,13 +6,13 @@
 
 # syllabus.sh
 
-- File Version: v3.0.0
-- Project Version: v3.0.0
-- Last Updated: 2025-07-08
+- File Version: v3.0.2
+- Project Version: v3.0.2
+- Last Updated: 2025-07-09
 
 [readmeへ](../README.md) | [ドキュメント作成ガイドラインへ](../doc.md)
 
-メインのシェルスクリプト。PostgreSQLとFastAPIサービスの管理を統一的に行うためのインターフェースを提供します。
+メインのシェルスクリプト。PostgreSQLとFastAPIサービスの管理に加え、trainer（学習データ）サービスの自動化・管理も統一的に行うためのインターフェースを提供します。
 
 ## 目次
 1. [使用方法](#使用方法)
@@ -35,6 +35,9 @@
 - `-p, --postgresql`: PostgreSQLサービスを操作
 - `-g, --git`: Gitサービスを操作
 - `-m, --mcp`: mcpサービスを操作
+- `-f, --fastapi`: FastAPIサービスを操作
+- `-d, --docker`: Dockerネットワーク管理コマンドを実行
+- `-t, --trainer`: Trainer（学習データ）サービスを操作
 - `-h, --help`: ヘルプメッセージを表示
 
 ### コマンド
@@ -48,6 +51,10 @@
 - `csv normalize`: 指定年度のCSVファイルを整形（区切り文字をタブに、空白を削除、科目名・課程名を正規化）
 - `parser`: 指定されたテーブルのパーサースクリプトを実行（引数必須）
 - `test-os`: OS互換性テストを実行
+
+#### 【-t, --trainer サービスコマンド】
+
+- `index refresh`: trainerディレクトリ配下のSQL・レスポンスファイルを走査し、docs/trainer_index.mdを自動生成・更新
 
 #### 【-p, --postgresql サービスコマンド】
 
@@ -168,12 +175,19 @@
 
 # SQLファイルのWHERE句条件をYAMLツリーで可視化
 ./syllabus.sh -p sql2yaml tests/kikai_text.sql
+
+# トレーニングデータインデックスの自動生成・更新
+./syllabus.sh -t index refresh
+
+# 学習データ用SQLの実行とレスポンスTSV出力
+./syllabus.sh -p sql-trainer math_noreport
 ```
 
 ## 注意事項
 
 - PostgreSQLの操作（shell/records/migration/cache/sql）を行う場合は、必ず`-p`オプションを指定してください
 - **EAVカタログキャッシュ（catalogue）は、分類属性・学部・区分リスト等をJSONで一括取得でき、get catalogueで自動的に整形表示されます**
+- **Trainerサービス（-t）は、学習データ管理・自動化専用です。index refresh等のコマンドでdocs/trainer_index.mdを自動生成します**
 - パーサーを実行する前に、`venv init`コマンドでPython仮想環境を初期化してください
 - 各コマンドは`bin/`ディレクトリ内の対応するスクリプトを実行します
 - エラーが発生した場合は、適切なエラーメッセージとヘルプが表示されます
