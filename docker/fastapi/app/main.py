@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-# File Version: v3.0.1
-# Project Version: v3.0.8
-# Last Updated: 2025-07-12
-=======
 # File Version: v3.0.2
 # Project Version: v3.0.9
 # Last Updated: 2025-07-13
->>>>>>> fujiwara/feature/make_trainer_json
 
 from fastapi import FastAPI, Request, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
