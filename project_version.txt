@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 3.0.8
+=======
+3.0.9
+>>>>>>> fujiwara/feature/make_trainer_json

@@ -4,10 +4,13 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: syllabus-api
+    env_file:
+      - ../../.env
     ports:
       - "5000:5000"  # ホスト:コンテナ ポート対応
     volumes:
       - ./app:/app
+      - ../../trainer:/app/trainer
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/${POSTGRES_DB}
     networks:

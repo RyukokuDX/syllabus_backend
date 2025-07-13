@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # File Version: v3.0.1
 # Project Version: v3.0.8
 # Last Updated: 2025-07-12
+=======
+# File Version: v3.0.2
+# Project Version: v3.0.9
+# Last Updated: 2025-07-13
+>>>>>>> fujiwara/feature/make_trainer_json
 
 from fastapi import FastAPI, Request, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +23,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from contextlib import contextmanager
 from urllib.parse import urlparse
+from trainer_query import router as trainer_query_router
 
 # 環境変数から設定を読み込み
 DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
@@ -340,6 +347,7 @@ async def version():
     return {"version": "1.0.1"}
 
 # ルーターをアプリケーションに登録
+app.include_router(trainer_query_router)
 app.include_router(router)
 
 # ルートエンドポイント

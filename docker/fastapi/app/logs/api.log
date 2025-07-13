@@ -8,3 +8,4 @@
 LINE 1: Select * from facluty
                       ^
 
+2025-07-13 12:15:04.540 | ERROR    | main:global_exception_handler:221 - Global exception: [Errno 2] No such file or directory: 'psql'

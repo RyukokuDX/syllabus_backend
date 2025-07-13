@@ -288,6 +288,7 @@ show_help() {
     echo "  restart        FastAPI (docker) サービスを再起動"
     echo "  stop           FastAPI (docker) サービスを停止"
     echo "  logs           FastAPI (docker) サービスのログを表示"
+    echo "  environments   FastAPI (docker) コンテナ内の全環境変数を表示"
     echo
     echo "【-d, --docker ネットワーク管理コマンド】"
     echo "  network up     syllabus-network を作成（存在しない場合のみ）"
@@ -297,9 +298,14 @@ show_help() {
 SERVICE=""
 COMMAND=""
 ARGS=()
+REBUILD=0
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
+		--rebuild)
+			REBUILD=1
+			shift
+			;;
 		-h|--help)
 			show_help
 			exit 0
@@ -392,6 +398,10 @@ if [ "$SERVICE" = "fastapi" ]; then
 				docker network create syllabus-network
 			fi
 			cd "$SCRIPT_DIR"
+			if [ "$REBUILD" = "1" ]; then
+				echo "Dockerイメージを再ビルドします..."
+				docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" build --no-cache
+			fi
 			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" up -d
 			echo "FastAPIコンテナが起動しました (http://localhost:5000)"
 			;;
@@ -405,6 +415,10 @@ if [ "$SERVICE" = "fastapi" ]; then
 				docker network create syllabus-network
 			fi
 			cd "$SCRIPT_DIR"
+			if [ "$REBUILD" = "1" ]; then
+				echo "Dockerイメージを再ビルドします..."
+				docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" build --no-cache
+			fi
 			docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" up -d
 			echo "FastAPIコンテナを再起動しました (http://localhost:5000)"
 			;;
@@ -417,6 +431,17 @@ if [ "$SERVICE" = "fastapi" ]; then
 		logs)
 			echo "FastAPI (docker) のログを表示します..."
 			docker logs -f syllabus-api
+			;;
+		environments)
+			if [ "${ARGS[0]}" = "show" ]; then
+				echo "FastAPI (docker) コンテナ内の全環境変数を表示します..."
+				docker-compose --env-file "$SCRIPT_DIR/.env" -f "$SCRIPT_DIR/docker/fastapi/docker-compose.yml" exec api env
+				exit 0
+			else
+				echo "エラー: environmentsコマンドのサブコマンドが不足しています"
+				echo "使用方法: $0 -f environments show"
+				exit 1
+			fi
 			;;
 		*)
 			echo "エラー: fastapiサービスで許可されていないコマンドです: $COMMAND"
